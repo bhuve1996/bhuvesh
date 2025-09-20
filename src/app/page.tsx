@@ -1,4 +1,3 @@
-import Image from "next/image";
 
 export default function Home() {
   return (
@@ -29,7 +28,7 @@ export default function Home() {
           </h1>
           
           <p className="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            I'm a passionate developer creating amazing digital experiences with modern technologies.
+            I&apos;m a passionate developer creating amazing digital experiences with modern technologies.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
