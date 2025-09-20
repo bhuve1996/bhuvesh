@@ -15,7 +15,7 @@ export default function Home() {
     // Loading animation
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 1500);
 
     window.addEventListener('mousemove', handleMouseMove);
 
@@ -78,7 +78,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Main Container with Scroll Snap */}
+      {/* Main Container */}
       <div className="main-container">
         {/* Hero Section */}
         <section className="homeHeader">
@@ -103,76 +103,43 @@ export default function Home() {
               </button>
             </div>
 
-            {/* 3D Feature Cards */}
+            {/* Feature Cards */}
             <div className="grid md:grid-cols-3 gap-8 mt-20">
-              <div className="card">
-                <div className="wrapper">
-                  <img 
-                    src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop" 
-                    alt="Code" 
-                    className="cover-image"
-                  />
-                  <div className="character">
-                    <img 
-                      src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop" 
-                      alt="Code Character" 
-                      className="character"
-                    />
-                  </div>
+              <div className="feature-card">
+                <div className="card-icon">
+                  <svg className="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
                 </div>
-                <div className="name_title">
-                  <h3 className="text-2xl font-bold text-white mb-2">Clean Code</h3>
-                  <p className="text-gray-300">Writing maintainable and scalable code with best practices.</p>
-                </div>
+                <h3 className="text-2xl font-bold text-white mb-4">Clean Code</h3>
+                <p className="text-gray-300">Writing maintainable and scalable code with best practices and modern development standards.</p>
               </div>
 
-              <div className="card">
-                <div className="wrapper">
-                  <img 
-                    src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop" 
-                    alt="Performance" 
-                    className="cover-image"
-                  />
-                  <div className="character">
-                    <img 
-                      src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop" 
-                      alt="Performance Character" 
-                      className="character"
-                    />
-                  </div>
+              <div className="feature-card">
+                <div className="card-icon">
+                  <svg className="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
                 </div>
-                <div className="name_title">
-                  <h3 className="text-2xl font-bold text-white mb-2">Fast Performance</h3>
-                  <p className="text-gray-300">Optimized applications that deliver exceptional user experiences.</p>
-                </div>
+                <h3 className="text-2xl font-bold text-white mb-4">Fast Performance</h3>
+                <p className="text-gray-300">Optimized applications that deliver exceptional user experiences with lightning-fast load times.</p>
               </div>
 
-              <div className="card">
-                <div className="wrapper">
-                  <img 
-                    src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&h=300&fit=crop" 
-                    alt="User Experience" 
-                    className="cover-image"
-                  />
-                  <div className="character">
-                    <img 
-                      src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&h=300&fit=crop" 
-                      alt="UX Character" 
-                      className="character"
-                    />
-                  </div>
+              <div className="feature-card">
+                <div className="card-icon">
+                  <svg className="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
                 </div>
-                <div className="name_title">
-                  <h3 className="text-2xl font-bold text-white mb-2">User Focused</h3>
-                  <p className="text-gray-300">Designing with users in mind for intuitive and engaging interfaces.</p>
-                </div>
+                <h3 className="text-2xl font-bold text-white mb-4">User Focused</h3>
+                <p className="text-gray-300">Designing with users in mind for intuitive and engaging interfaces that delight and inspire.</p>
               </div>
             </div>
           </div>
         </section>
 
         {/* About Section */}
-        <section className="aboutContainer">
+        <section id="about" className="aboutContainer">
           <div className="aboutHeroContainer">
             <div className="aboutLeft">
               <h2 className="aboutTitle text-5xl font-bold mb-8">About Me</h2>
@@ -180,10 +147,18 @@ export default function Home() {
                 I&apos;m a passionate developer with expertise in modern web technologies. 
                 I love creating beautiful, performant applications that provide exceptional user experiences.
               </p>
-              <p className="text-lg text-gray-300 leading-relaxed">
+              <p className="text-lg text-gray-300 leading-relaxed mb-6">
                 My journey in development has led me to master various technologies including 
                 React, Next.js, TypeScript, and modern CSS frameworks.
               </p>
+              <div className="skills-grid">
+                <span className="skill-tag">React</span>
+                <span className="skill-tag">Next.js</span>
+                <span className="skill-tag">TypeScript</span>
+                <span className="skill-tag">Tailwind CSS</span>
+                <span className="skill-tag">Node.js</span>
+                <span className="skill-tag">MongoDB</span>
+              </div>
             </div>
             <div className="aboutRight">
               <div className="frame">
@@ -203,7 +178,7 @@ export default function Home() {
         </section>
 
         {/* Contact Section */}
-        <section className="contactContainer">
+        <section id="contact" className="contactContainer">
           <div className="contactHeroContainer">
             <div className="contactCard">
               <h2 className="title text-5xl font-bold mb-8">Get In Touch</h2>

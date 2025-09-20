@@ -4,8 +4,6 @@
 :root {
   --background: #000000;
   --foreground: #ffffff;
-  --card-height: 300px;
-  --card-width: calc(var(--card-height) / 1.5);
 }
 
 @theme inline {
@@ -74,35 +72,9 @@ body {
 }
 
 /* Orbital Loading Animation */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(359deg); }
-}
-
 @keyframes spin3D {
   0% { transform: rotate3d(0.5, 0.5, 0.5, 360deg); }
   100% { transform: rotate3d(0deg); }
-}
-
-@keyframes configure-clockwise {
-  0% { transform: rotate(0); }
-  25% { transform: rotate(90deg); }
-  50% { transform: rotate(180deg); }
-  75% { transform: rotate(270deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes configure-xclockwise {
-  0% { transform: rotate(45deg); }
-  25% { transform: rotate(-45deg); }
-  50% { transform: rotate(-135deg); }
-  75% { transform: rotate(-225deg); }
-  100% { transform: rotate(-315deg); }
-}
-
-@keyframes pulse {
-  0% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0.25; transform: scale(0.75); }
 }
 
 .spinner-box {
@@ -126,28 +98,28 @@ body {
   width: 165px;
   height: 165px;
   border: 1px solid #91daffa5;
-  -webkit-animation: spin3D 3s linear 0.2s infinite;
+  animation: spin3D 3s linear 0.2s infinite;
 }
 
 .green-orbit {
   width: 120px;
   height: 120px;
   border: 1px solid #91ffbfa5;
-  -webkit-animation: spin3D 2s linear 0s infinite;
+  animation: spin3D 2s linear 0s infinite;
 }
 
 .red-orbit {
   width: 90px;
   height: 90px;
   border: 1px solid #ffca91a5;
-  -webkit-animation: spin3D 1s linear 0s infinite;
+  animation: spin3D 1s linear 0s infinite;
 }
 
 .white-orbit {
   width: 60px;
   height: 60px;
   border: 2px solid #ffffff;
-  -webkit-animation: spin3D 10s linear 0s infinite;
+  animation: spin3D 10s linear 0s infinite;
 }
 
 .w1 {
@@ -167,6 +139,8 @@ body {
   width: 40vmin;
   height: 40vmin;
   position: relative;
+  max-width: 300px;
+  max-height: 300px;
 }
 
 .core {
@@ -245,12 +219,46 @@ body {
   justify-content: center;
   align-items: center;
   scroll-snap-align: center;
-  padding-left: 30px;
+  padding: 0 30px;
 }
 
 section {
   height: 100vh;
   scroll-snap-align: center;
+}
+
+/* Feature Cards */
+.feature-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(115, 205, 190, 0.2);
+  border-radius: 20px;
+  padding: 40px 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(115, 205, 190, 0.5);
+  box-shadow: 0 20px 40px rgba(115, 205, 190, 0.1);
+}
+
+.card-icon {
+  width: 80px;
+  height: 80px;
+  background: rgba(115, 205, 190, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover .card-icon {
+  background: rgba(115, 205, 190, 0.2);
+  transform: scale(1.1);
 }
 
 /* About Section */
@@ -262,6 +270,7 @@ section {
   align-items: center;
   font-family: "Exo 2", sans-serif;
   background-color: #000;
+  padding: 0 20px;
 }
 
 .aboutTitle {
@@ -272,29 +281,22 @@ section {
 .aboutHeroContainer {
   height: 100vh;
   scroll-snap-align: center;
-  width: 80vw;
+  width: 100%;
+  max-width: 1200px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 40px;
 }
 
 .aboutLeft {
   flex: 1;
   border-radius: 20px;
-  -webkit-backdrop-filter: blur(25px);
   backdrop-filter: blur(25px);
   box-shadow: -15px 17px 17px rgba(10, 10, 10, 0.25);
-  height: 80%;
-  width: 80%;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
   padding: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(115, 205, 190, 0.2);
 }
 
 .aboutRight {
@@ -306,11 +308,35 @@ section {
   justify-content: center;
 }
 
+/* Skills Grid */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.skill-tag {
+  background: rgba(115, 205, 190, 0.1);
+  border: 1px solid rgba(115, 205, 190, 0.3);
+  border-radius: 25px;
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #73cdbe;
+  transition: all 0.3s ease;
+}
+
+.skill-tag:hover {
+  background: rgba(115, 205, 190, 0.2);
+  transform: translateY(-2px);
+}
+
 /* Contact Section */
 .contactContainer {
   background-color: #000;
   height: 100vh;
-  padding: 10px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -320,29 +346,22 @@ section {
 .contactHeroContainer {
   height: 100vh;
   scroll-snap-align: center;
-  width: 80vw;
+  width: 100%;
+  max-width: 1200px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 40px;
 }
 
 .contactCard {
   flex: 1;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
   border-radius: 20px;
-  -webkit-backdrop-filter: blur(25px);
   backdrop-filter: blur(25px);
   box-shadow: -15px 17px 17px rgba(10, 10, 10, 0.25);
-  height: 90%;
-  width: 80%;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
   padding: 40px;
+  border: 1px solid rgba(115, 205, 190, 0.2);
 }
 
 .right {
@@ -391,7 +410,7 @@ section {
   flex-direction: column;
   justify-content: space-around;
   padding: 20px;
-  width: 150%;
+  width: 100%;
 }
 
 .formControl {
@@ -407,6 +426,7 @@ section {
   border-bottom: 2px solid rgba(255, 255, 255, 0.2);
   margin-bottom: 20px;
   padding: 10px;
+  transition: all 0.3s ease;
 }
 
 .formControl:focus {
@@ -418,7 +438,7 @@ section {
   font-family: "Exo 2", sans-serif;
   font-size: 18px;
   height: 48px;
-  margin: 32px;
+  margin: 32px 0;
   border: 1px solid #a39eeb;
   background: #000;
   color: #fff;
@@ -438,7 +458,8 @@ section {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  width: 40%;
+  width: 100%;
+  max-width: 300px;
 }
 
 .socialIcon {
@@ -459,115 +480,6 @@ section {
   to {
     transform: translateY(5px);
   }
-}
-
-/* 3D Card Effects */
-.card {
-  width: var(--card-width);
-  height: var(--card-height);
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 0 36px;
-  perspective: 2500px;
-  margin: 0 50px;
-  flex-direction: column;
-}
-
-.cover-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.wrapper {
-  transition: all 0.5s;
-  position: absolute;
-  width: 100%;
-  z-index: -1;
-  height: 300px;
-}
-
-.card:hover .wrapper {
-  transform: perspective(900px) translateY(-5%) rotateX(25deg) translateZ(0);
-  box-shadow: 2px 35px 32px -8px rgba(0, 0, 0, 0.75);
-  -webkit-box-shadow: 2px 35px 32px -8px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 2px 35px 32px -8px rgba(0, 0, 0, 0.75);
-}
-
-.wrapper:before,
-.wrapper:after {
-  content: "";
-  opacity: 0;
-  width: 100%;
-  height: 80px;
-  transition: all 0.5s;
-  position: absolute;
-  left: 0;
-}
-
-.wrapper:before {
-  top: 0;
-  height: 100%;
-  background-image: linear-gradient(
-    to top,
-    transparent 46%,
-    rgba(12, 13, 19, 0.5) 68%,
-    rgba(12, 13, 19) 97%
-  );
-}
-
-.wrapper:after {
-  bottom: 0;
-  opacity: 1;
-  background-image: linear-gradient(
-    to bottom,
-    transparent 46%,
-    rgba(12, 13, 19, 0.5) 68%,
-    rgba(12, 13, 19) 97%
-  );
-}
-
-.card:hover .wrapper:before,
-.wrapper:after {
-  opacity: 1;
-}
-
-.card:hover .wrapper:after {
-  height: 120px;
-}
-
-.card:hover .name_title {
-  transform: scale(0.5);
-}
-
-.card:hover .cover-image {
-  display: none;
-  background: transparent;
-}
-
-.name_title {
-  width: 100%;
-  transition: transform 0.5s;
-}
-
-.character {
-  width: 100%;
-  opacity: 0;
-  transition: all 0.5s;
-  position: absolute;
-  z-index: -1;
-  height: 260px;
-}
-
-.card:hover .character {
-  opacity: 1;
-  transform: translate3d(0, -25%, 100px);
-}
-
-.card:hover .name_title {
-  transform: scale(0.8);
 }
 
 /* Text Animations */
@@ -647,15 +559,30 @@ section {
 .delay-8 { animation-delay: 2.4s; }
 
 /* Responsive Design */
-@media only screen and (max-width: 800px) {
-  .aboutLeft {
-    max-width: 40vw;
+@media only screen and (max-width: 1024px) {
+  .aboutHeroContainer,
+  .contactHeroContainer {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .aboutLeft,
+  .contactCard {
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .aboutRight,
+  .right {
+    width: 100%;
+    max-width: 400px;
   }
 }
 
-@media only screen and (max-width: 700px) {
+@media only screen and (max-width: 800px) {
   .aboutLeft {
-    display: none;
+    padding: 20px;
   }
   
   .aboutDescription {
@@ -663,70 +590,61 @@ section {
   }
   
   .aboutTitle {
-    margin-top: 80px;
+    margin-top: 40px;
     font-size: 32px;
-  }
-}
-
-@media only screen and (max-width: 1300px) {
-  .contactForm {
-    width: 100%;
-  }
-}
-
-@media only screen and (max-width: 800px) {
-  .heroContainer {
-    height: 100vh;
-    scroll-snap-align: center;
-    width: 80vw;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  
-  .contactHeroContainer {
-    margin-top: 50px;
-  }
-  
-  .right {
-    display: none;
-  }
-  
-  .mainContainer {
-    height: 100vh;
-    justify-content: center;
-  }
-  
-  .heroContainer {
-    height: 80%;
-  }
-  
-  .contactCard {
-    width: 95%;
-  }
-  
-  .formContainer {
-    width: 80%;
   }
   
   .title {
     font-size: 32px;
-    margin-top: 10px;
+    margin-top: 20px;
   }
   
   .contactForm {
-    width: 100%;
     padding: 10px;
-    justify-content: space-around;
   }
   
   .formControl,
   .submitBtn {
-    font-size: 14px;
+    font-size: 16px;
   }
   
   .socialIcon {
     width: 48px;
     height: auto;
+  }
+  
+  .skills-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+  }
+  
+  .skill-tag {
+    font-size: 12px;
+    padding: 8px 16px;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .homeHeader {
+    padding: 0 20px;
+  }
+  
+  .aboutContainer,
+  .contactContainer {
+    padding: 10px;
+  }
+  
+  .aboutLeft,
+  .contactCard {
+    padding: 20px;
+  }
+  
+  .feature-card {
+    padding: 30px 20px;
+  }
+  
+  .card-icon {
+    width: 60px;
+    height: 60px;
   }
 }
