@@ -204,9 +204,9 @@ import { Icons } from '@/components/ui';
 ```tsx
 import { Button, Card, Section } from '@/components/ui';
 
-<Section id="about" className="py-20">
+<Section id='about' className='py-20'>
   <Card>
-    <Button variant="primary" size="lg" onClick={handleClick}>
+    <Button variant='primary' size='lg' onClick={handleClick}>
       Get Started
     </Button>
   </Card>
@@ -220,7 +220,7 @@ import { projects, skills } from '@/lib/data';
 
 // Use in components
 {
-  projects.map((project) => <ProjectCard key={project.id} project={project} />);
+  projects.map(project => <ProjectCard key={project.id} project={project} />);
 }
 ```
 

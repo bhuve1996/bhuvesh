@@ -1,8 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bhuvesh Portfolio
 
-## Getting Started
+A modern, responsive portfolio website built with Next.js 15, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+## 🚀 Features
+
+- **Modern Tech Stack**: Next.js 15, TypeScript, Tailwind CSS
+- **Responsive Design**: Mobile-first approach with beautiful animations
+- **Component Architecture**: Modular, reusable React components
+- **Performance Optimized**: Fast loading with Turbopack
+- **SEO Ready**: Optimized for search engines
+- **Accessibility**: WCAG compliant design
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Animations**: Custom CSS animations
+- **Build Tool**: Turbopack
+- **Deployment**: Vercel
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                    # Next.js App Router pages
+├── components/             # Reusable React components
+│   ├── ui/                # UI components (Button, Card, Section, Loading, SVG)
+│   ├── layout/            # Layout components (Navigation)
+│   └── sections/          # Page sections (Hero, About, Projects, Contact)
+├── lib/                   # Utility functions and data
+├── styles/                # Custom CSS styles
+├── types/                 # TypeScript type definitions
+└── assets/               # Static assets
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm, yarn, pnpm, or bun
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/bhuve1996/bhuvesh.git
+cd bhuvesh
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Run the development server:
 
 ```bash
 npm run dev
@@ -10,27 +69,88 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📚 Documentation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Comprehensive documentation is available in the [`docs/`](./docs/) directory:
 
-## Learn More
+- **[Project Structure](./docs/PROJECT_STRUCTURE.md)** - Detailed project organization
+- **[Development Guidelines](./.cursorrules)** - Coding standards and best practices
+- **[Styles Documentation](./docs/styles-README.md)** - CSS organization and animations
+- **[Component Documentation](./docs/components/README.md)** - Component usage and guidelines
 
-To learn more about Next.js, take a look at the following resources:
+## 🎨 Customization
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Adding New Components
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Create component in appropriate directory (`ui/`, `layout/`, or `sections/`)
+2. Define TypeScript interfaces in `types/index.ts`
+3. Add component to index file for easy imports
+4. Update documentation
 
-## Deploy on Vercel
+### Styling
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Use Tailwind CSS classes
+- Add custom animations in `styles/loading-animations.css`
+- Follow the established color scheme (cyan-400, blue-500)
+- Maintain responsive design principles
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Data Management
+
+- Store static data in `lib/data.ts`
+- Use TypeScript interfaces for type safety
+- Keep data separate from components
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Deploy automatically on every push
+
+### Other Platforms
+
+The project can be deployed to any platform that supports Next.js:
+
+- Netlify
+- AWS Amplify
+- Railway
+- DigitalOcean App Platform
+
+## 📝 Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix ESLint errors
+npm run format       # Format code with Prettier
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 👨‍💻 Author
+
+**Bhuvesh Singla**
+
+- GitHub: [@bhuve1996](https://github.com/bhuve1996)
+- Portfolio: [bhuvesh.dev](https://bhuvesh.dev)
+
+---
+
+Built with ❤️ using Next.js and modern web technologies.

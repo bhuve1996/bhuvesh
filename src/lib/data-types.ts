@@ -1,3 +1,5 @@
+// Data structure type definitions
+
 // Navigation types
 export interface NavItem {
   label: string;
@@ -107,44 +109,4 @@ export interface ContactForm {
   name: string;
   email: string;
   message: string;
-}
-
-// Component props types
-export interface ButtonProps {
-  children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
-  onClick?: () => void;
-  className?: string;
-  type?: 'button' | 'submit' | 'reset';
-  disabled?: boolean;
-}
-
-export interface CardProps {
-  children: React.ReactNode;
-  className?: string;
-  hover?: boolean;
-}
-
-export interface SectionProps {
-  children: React.ReactNode;
-  className?: string;
-  id?: string;
-}
-
-// SVG component types
-export interface SVGProps {
-  className?: string;
-  width?: number | string;
-  height?: number | string;
-  fill?: string;
-  stroke?: string;
-  strokeWidth?: number;
-  viewBox?: string;
-}
-
-// Loading component types
-export interface LoadingProps {
-  message?: string;
-  subMessage?: string;
 }

@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import { Navigation } from '@/components/layout';
-import { Loading } from '@/components/ui';
 import {
   HeroSection,
   AboutSection,
   ProjectsSection,
   ContactSection,
 } from '@/components/sections';
+import { Loading } from '@/components/ui';
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState('home');
@@ -60,7 +61,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className='min-h-screen bg-black text-white'>
       <Navigation
         activeSection={activeSection}
         onSectionClick={scrollToSection}

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function Blog() {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -100,46 +100,46 @@ export default function Blog() {
   const filteredPosts =
     selectedCategory === 'all'
       ? blogPosts
-      : blogPosts.filter((post) => post.category === selectedCategory);
+      : blogPosts.filter(post => post.category === selectedCategory);
 
-  const featuredPosts = blogPosts.filter((post) => post.featured);
+  const featuredPosts = blogPosts.filter(post => post.featured);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className='min-h-screen bg-black text-white'>
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/20">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">B</span>
+      <nav className='fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/20'>
+        <div className='max-w-6xl mx-auto px-6 py-4'>
+          <div className='flex justify-between items-center'>
+            <div className='flex items-center space-x-2'>
+              <div className='w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center'>
+                <span className='text-white font-bold text-lg'>B</span>
               </div>
-              <span className="text-xl font-bold text-white">Bhuvesh</span>
+              <span className='text-xl font-bold text-white'>Bhuvesh</span>
             </div>
 
-            <div className="hidden md:flex items-center space-x-8">
+            <div className='hidden md:flex items-center space-x-8'>
               <Link
-                href="/"
-                className="text-gray-300 hover:text-white transition-colors duration-300"
+                href='/'
+                className='text-gray-300 hover:text-white transition-colors duration-300'
               >
                 Home
               </Link>
               <Link
-                href="/#about"
-                className="text-gray-300 hover:text-white transition-colors duration-300"
+                href='/#about'
+                className='text-gray-300 hover:text-white transition-colors duration-300'
               >
                 About
               </Link>
               <Link
-                href="/#projects"
-                className="text-gray-300 hover:text-white transition-colors duration-300"
+                href='/#projects'
+                className='text-gray-300 hover:text-white transition-colors duration-300'
               >
                 Projects
               </Link>
-              <span className="text-cyan-400">Blog</span>
+              <span className='text-cyan-400'>Blog</span>
               <Link
-                href="/#contact"
-                className="text-gray-300 hover:text-white transition-colors duration-300"
+                href='/#contact'
+                className='text-gray-300 hover:text-white transition-colors duration-300'
               >
                 Contact
               </Link>
@@ -149,12 +149,12 @@ export default function Blog() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-cyan-400">
+      <section className='pt-32 pb-16 px-6'>
+        <div className='max-w-4xl mx-auto text-center'>
+          <h1 className='text-5xl md:text-6xl font-bold mb-6 text-cyan-400'>
             My Blog
           </h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+          <p className='text-xl text-gray-300 mb-8 max-w-2xl mx-auto'>
             Thoughts, tutorials, and insights about web development, technology,
             and the journey of building digital experiences.
           </p>
@@ -162,48 +162,48 @@ export default function Blog() {
       </section>
 
       {/* Featured Posts */}
-      <section className="px-6 pb-16">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-white mb-8">
+      <section className='px-6 pb-16'>
+        <div className='max-w-6xl mx-auto'>
+          <h2 className='text-3xl font-bold text-white mb-8'>
             Featured Articles
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredPosts.map((post) => (
+          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {featuredPosts.map(post => (
               <article
                 key={post.id}
-                className="bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-6 hover:bg-white/10 transition-colors group cursor-pointer"
+                className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-6 hover:bg-white/10 transition-colors group cursor-pointer'
               >
-                <div className="mb-4">
-                  <span className="bg-cyan-400/20 text-cyan-400 px-3 py-1 rounded-full text-sm font-semibold">
+                <div className='mb-4'>
+                  <span className='bg-cyan-400/20 text-cyan-400 px-3 py-1 rounded-full text-sm font-semibold'>
                     {post.category}
                   </span>
                 </div>
 
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">
+                <h3 className='text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors'>
                   {post.title}
                 </h3>
 
-                <p className="text-gray-300 mb-4 leading-relaxed">
+                <p className='text-gray-300 mb-4 leading-relaxed'>
                   {post.excerpt}
                 </p>
 
-                <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
+                <div className='flex items-center justify-between text-sm text-gray-400 mb-4'>
                   <span>{post.date}</span>
                   <span>{post.readTime}</span>
                 </div>
 
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {post.tags.slice(0, 3).map((tag) => (
+                <div className='flex flex-wrap gap-2 mb-4'>
+                  {post.tags.slice(0, 3).map(tag => (
                     <span
                       key={tag}
-                      className="bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-xs"
+                      className='bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-xs'
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
 
-                <button className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
+                <button className='text-cyan-400 hover:text-cyan-300 font-semibold transition-colors'>
                   Read More →
                 </button>
               </article>
@@ -213,17 +213,17 @@ export default function Blog() {
       </section>
 
       {/* All Posts */}
-      <section className="px-6 pb-20">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-8">
+      <section className='px-6 pb-20'>
+        <div className='max-w-6xl mx-auto'>
+          <div className='flex flex-col md:flex-row gap-8'>
             {/* Sidebar */}
-            <div className="md:w-1/4">
-              <div className="bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-6 sticky top-32">
-                <h3 className="text-xl font-bold text-white mb-4">
+            <div className='md:w-1/4'>
+              <div className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-6 sticky top-32'>
+                <h3 className='text-xl font-bold text-white mb-4'>
                   Categories
                 </h3>
-                <div className="space-y-2">
-                  {categories.map((category) => (
+                <div className='space-y-2'>
+                  {categories.map(category => (
                     <button
                       key={category}
                       onClick={() => setSelectedCategory(category)}
@@ -241,62 +241,62 @@ export default function Blog() {
             </div>
 
             {/* Posts List */}
-            <div className="md:w-3/4">
-              <h2 className="text-3xl font-bold text-white mb-8">
+            <div className='md:w-3/4'>
+              <h2 className='text-3xl font-bold text-white mb-8'>
                 {selectedCategory === 'all' ? 'All Articles' : selectedCategory}
               </h2>
 
-              <div className="space-y-8">
-                {filteredPosts.map((post) => (
+              <div className='space-y-8'>
+                {filteredPosts.map(post => (
                   <article
                     key={post.id}
-                    className="bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8 hover:bg-white/10 transition-colors group cursor-pointer"
+                    className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8 hover:bg-white/10 transition-colors group cursor-pointer'
                   >
-                    <div className="flex flex-col md:flex-row gap-6">
-                      <div className="md:w-2/3">
-                        <div className="flex items-center gap-4 mb-4">
-                          <span className="bg-cyan-400/20 text-cyan-400 px-3 py-1 rounded-full text-sm font-semibold">
+                    <div className='flex flex-col md:flex-row gap-6'>
+                      <div className='md:w-2/3'>
+                        <div className='flex items-center gap-4 mb-4'>
+                          <span className='bg-cyan-400/20 text-cyan-400 px-3 py-1 rounded-full text-sm font-semibold'>
                             {post.category}
                           </span>
                           {post.featured && (
-                            <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-sm font-semibold">
+                            <span className='bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-sm font-semibold'>
                               Featured
                             </span>
                           )}
                         </div>
 
-                        <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">
+                        <h3 className='text-2xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors'>
                           {post.title}
                         </h3>
 
-                        <p className="text-gray-300 mb-4 leading-relaxed">
+                        <p className='text-gray-300 mb-4 leading-relaxed'>
                           {post.excerpt}
                         </p>
 
-                        <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
+                        <div className='flex items-center justify-between text-sm text-gray-400 mb-4'>
                           <span>{post.date}</span>
                           <span>{post.readTime}</span>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {post.tags.map((tag) => (
+                        <div className='flex flex-wrap gap-2 mb-4'>
+                          {post.tags.map(tag => (
                             <span
                               key={tag}
-                              className="bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-xs"
+                              className='bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-xs'
                             >
                               {tag}
                             </span>
                           ))}
                         </div>
 
-                        <button className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
+                        <button className='text-cyan-400 hover:text-cyan-300 font-semibold transition-colors'>
                           Read Full Article →
                         </button>
                       </div>
 
-                      <div className="md:w-1/3 flex items-center justify-center">
-                        <div className="w-full h-48 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-lg flex items-center justify-center border border-cyan-400/20">
-                          <span className="text-4xl">📝</span>
+                      <div className='md:w-1/3 flex items-center justify-center'>
+                        <div className='w-full h-48 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-lg flex items-center justify-center border border-cyan-400/20'>
+                          <span className='text-4xl'>📝</span>
                         </div>
                       </div>
                     </div>

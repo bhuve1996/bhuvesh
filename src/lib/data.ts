@@ -8,7 +8,7 @@ import {
   Service,
   ProcessStep,
   Testimonial,
-} from '@/types';
+} from './data-types';
 
 export const projects: Project[] = [
   {

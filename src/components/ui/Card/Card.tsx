@@ -1,5 +1,6 @@
 import React from 'react';
-import { CardProps } from '@/types';
+
+import { CardProps } from './types';
 
 export const Card: React.FC<CardProps> = ({
   children,
