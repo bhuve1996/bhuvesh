@@ -33,6 +33,10 @@ src/
 │   └── index.ts
 ├── lib/                   # Utility functions and data
 │   └── data.ts           # Static data and constants
+├── styles/                # Custom CSS styles
+│   ├── index.css         # Main styles entry point
+│   ├── loading-animations.css # Loading animation styles
+│   └── README.md         # Styles documentation
 ├── types/                 # TypeScript type definitions
 │   └── index.ts
 └── assets/               # Static assets
@@ -99,6 +103,24 @@ src/
 
 - Contact form and information
 - Uses SVG icons for contact methods
+
+## 🎨 Styles Management
+
+### Styles Directory (`/styles/`)
+
+**Organized CSS Structure**
+
+- `index.css`: Main entry point for all custom styles
+- `loading-animations.css`: Dedicated file for loading animations
+- `README.md`: Documentation for styles organization
+
+**Key Features:**
+
+- Modular CSS organization
+- Custom animation keyframes
+- Utility classes for animations
+- Easy to maintain and extend
+- Proper CSS import structure
 
 ## 📊 Data Management
 
