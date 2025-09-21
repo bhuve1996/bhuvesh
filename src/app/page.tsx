@@ -1,243 +1,400 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [activeSection, setActiveSection] = useState('home');
+  const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  const handleGetStarted = () => {
+    setActiveSection('about');
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    setActiveSection(sectionId);
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
-    // Custom cursor effect
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
-    // Loading animation
+    setMounted(true);
+    
+    // Loading timer
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1500);
+    }, 2000);
 
-    window.addEventListener('mousemove', handleMouseMove);
+    // Safety timeout to ensure loading doesn't get stuck
+    const safetyTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 4000);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
       clearTimeout(timer);
+      clearTimeout(safetyTimer);
     };
   }, []);
 
+  if (!mounted) {
+    return null;
+  }
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        {/* Orbital Loading Animation */}
-        <div className="spinner-box">
-          <div className="leo blue-orbit"></div>
-          <div className="leo green-orbit"></div>
-          <div className="leo red-orbit"></div>
-          <div className="leo white-orbit w1"></div>
-          <div className="leo white-orbit w2"></div>
-          <div className="leo white-orbit w3"></div>
+      <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
+        {/* Animated background particles */}
+        <div className="absolute inset-0">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-cyan-400 rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${i * 0.1}s`,
+                animationDuration: `${2 + Math.random() * 2}s`
+              }}
+            />
+          ))}
+        </div>
+        
+        <div className="relative w-80 h-80 flex items-center justify-center">
+          {/* Orbital rings */}
+          <div className="absolute w-64 h-64 border border-blue-400/30 rounded-full animate-spin" style={{ animationDuration: '3s' }}></div>
+          <div className="absolute w-48 h-48 border border-green-400/30 rounded-full animate-spin" style={{ animationDuration: '2s', animationDirection: 'reverse' }}></div>
+          <div className="absolute w-36 h-36 border border-red-400/30 rounded-full animate-spin" style={{ animationDuration: '1s' }}></div>
+          <div className="absolute w-24 h-24 border-2 border-white rounded-full animate-spin" style={{ animationDuration: '10s', animationDirection: 'reverse' }}></div>
+          
+          {/* Center pulsing dot */}
+          <div className="w-4 h-4 bg-cyan-400 rounded-full animate-pulse" style={{ animationDuration: '2s' }}></div>
+        </div>
+        
+        {/* Loading text */}
+        <div className="absolute bottom-20 text-center">
+          <h2 className="text-2xl font-bold text-white mb-2">Loading Portfolio</h2>
+          <p className="text-cyan-400 text-lg">Preparing amazing experience...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      {/* Custom Cursor */}
-      <div 
-        className="cursor fixed w-12 h-12 border border-cyan-400 rounded-full pointer-events-none z-50 transition-all duration-100 ease-out"
-        style={{
-          left: mousePosition.x,
-          top: mousePosition.y,
-          transform: 'translate(-50%, -50%)',
-          boxShadow: '0 0 20px #73cdbe'
-        }}
-      />
-      <div 
-        className="cursor2 fixed w-8 h-8 bg-transparent rounded-full pointer-events-none z-50 transition-all duration-150 ease-out"
-        style={{
-          left: mousePosition.x,
-          top: mousePosition.y,
-          transform: 'translate(-50%, -50%)',
-          boxShadow: '0 0 20px #73cdbe'
-        }}
-      />
-
+    <div className="min-h-screen bg-black text-white">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 w-full z-40 flex justify-between items-center p-6 lg:px-8">
-        <div className="flex items-center space-x-2">
-          <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">B</span>
+      <nav className="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/20">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">B</span>
+              </div>
+              <span className="text-xl font-bold text-white">Bhuvesh</span>
+            </div>
+            
+            <div className="hidden md:flex items-center space-x-8">
+              <button
+                onClick={() => scrollToSection('home')}
+                className={`transition-colors duration-300 ${
+                  activeSection === 'home' ? 'text-cyan-400' : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                Home
+              </button>
+              <button
+                onClick={() => scrollToSection('about')}
+                className={`transition-colors duration-300 ${
+                  activeSection === 'about' ? 'text-cyan-400' : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                About
+              </button>
+              <button
+                onClick={() => scrollToSection('projects')}
+                className={`transition-colors duration-300 ${
+                  activeSection === 'projects' ? 'text-cyan-400' : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                Projects
+              </button>
+              <a
+                href="/blog"
+                className="text-gray-300 hover:text-white transition-colors duration-300"
+              >
+                Blog
+              </a>
+              <a
+                href="/resume"
+                className="text-gray-300 hover:text-white transition-colors duration-300"
+              >
+                Resume
+          </a>
+          <a
+                href="/services"
+                className="text-gray-300 hover:text-white transition-colors duration-300"
+              >
+                Services
+              </a>
+              <button
+                onClick={() => scrollToSection('contact')}
+                className={`transition-colors duration-300 ${
+                  activeSection === 'contact' ? 'text-cyan-400' : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                Contact
+              </button>
+            </div>
           </div>
-          <span className="text-2xl font-bold text-white">Bhuvesh</span>
-        </div>
-        <div className="hidden md:flex items-center space-x-8">
-          <a href="#about" className="text-gray-300 hover:text-white transition-colors duration-300">About</a>
-          <a href="#projects" className="text-gray-300 hover:text-white transition-colors duration-300">Projects</a>
-          <a href="#contact" className="text-gray-300 hover:text-white transition-colors duration-300">Contact</a>
         </div>
       </nav>
 
-      {/* Main Container */}
-      <div className="main-container">
-        {/* Hero Section */}
-        <section className="homeHeader">
-          <div className="max-w-6xl mx-auto text-center px-6">
-            <h1 className="text-6xl lg:text-8xl font-bold mb-8 animate">
-              Welcome to{" "}
-              <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent animate-text">
-                My Portfolio
-              </span>
-            </h1>
-            
-            <p className="text-xl lg:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-              I&apos;m a passionate developer creating amazing digital experiences with modern technologies and cutting-edge animations.
+      {/* Hero Section */}
+      <section id="home" className="min-h-screen flex items-center justify-center px-6 pt-20">
+        <div className="text-center max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-7xl font-bold mb-8 text-cyan-400">
+            Welcome to My Portfolio
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
+            I'm a passionate <span className="text-cyan-400 font-semibold">Full-Stack Developer</span>
+          </p>
+          <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
+            Creating amazing digital experiences with modern technologies and cutting-edge solutions.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <button 
+              onClick={handleGetStarted}
+              className="bg-cyan-400 text-black px-8 py-4 rounded-lg font-bold hover:bg-cyan-300 transition-colors transform hover:scale-105 active:scale-95 text-lg"
+            >
+              Get Started
+            </button>
+            <button 
+              onClick={() => scrollToSection('projects')}
+              className="border-2 border-cyan-400 text-cyan-400 px-8 py-4 rounded-lg font-bold hover:bg-cyan-400 hover:text-black transition-colors text-lg"
+            >
+              View Projects
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="min-h-screen flex items-center justify-center px-6 py-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-cyan-400">About Me</h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Passionate developer with expertise in modern web technologies
             </p>
-
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20">
-              <button className="bg-gradient-to-r from-cyan-400 to-blue-500 text-black px-10 py-4 rounded-full font-bold text-lg hover:from-cyan-300 hover:to-blue-400 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-cyan-500/25">
-                Get Started
-              </button>
-              <button className="border-2 border-cyan-400 text-cyan-400 px-10 py-4 rounded-full font-bold text-lg hover:bg-cyan-400 hover:text-black transition-all duration-300 transform hover:scale-105">
-                View Projects
-              </button>
-            </div>
-
-            {/* Feature Cards */}
-            <div className="grid md:grid-cols-3 gap-8 mt-20">
-              <div className="feature-card">
-                <div className="card-icon">
-                  <svg className="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Clean Code</h3>
-                <p className="text-gray-300">Writing maintainable and scalable code with best practices and modern development standards.</p>
-              </div>
-
-              <div className="feature-card">
-                <div className="card-icon">
-                  <svg className="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Fast Performance</h3>
-                <p className="text-gray-300">Optimized applications that deliver exceptional user experiences with lightning-fast load times.</p>
-              </div>
-
-              <div className="feature-card">
-                <div className="card-icon">
-                  <svg className="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-4">User Focused</h3>
-                <p className="text-gray-300">Designing with users in mind for intuitive and engaging interfaces that delight and inspire.</p>
-              </div>
-            </div>
           </div>
-        </section>
 
-        {/* About Section */}
-        <section id="about" className="aboutContainer">
-          <div className="aboutHeroContainer">
-            <div className="aboutLeft">
-              <h2 className="aboutTitle text-5xl font-bold mb-8">About Me</h2>
-              <p className="text-lg text-gray-300 leading-relaxed mb-6">
-                I&apos;m a passionate developer with expertise in modern web technologies. 
-                I love creating beautiful, performant applications that provide exceptional user experiences.
-              </p>
-              <p className="text-lg text-gray-300 leading-relaxed mb-6">
-                My journey in development has led me to master various technologies including 
-                React, Next.js, TypeScript, and modern CSS frameworks.
-              </p>
-              <div className="skills-grid">
-                <span className="skill-tag">React</span>
-                <span className="skill-tag">Next.js</span>
-                <span className="skill-tag">TypeScript</span>
-                <span className="skill-tag">Tailwind CSS</span>
-                <span className="skill-tag">Node.js</span>
-                <span className="skill-tag">MongoDB</span>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8">
+                <h3 className="text-2xl font-bold text-white mb-4">My Journey</h3>
+                <p className="text-gray-300 leading-relaxed mb-4">
+                  I'm a passionate developer with expertise in modern web technologies. 
+                  I love creating beautiful, performant applications that solve real-world problems.
+                </p>
+                <p className="text-gray-300 leading-relaxed">
+                  My journey has led me to master React, Next.js, TypeScript, and modern CSS frameworks.
+                  I'm always learning and staying up-to-date with the latest technologies.
+                </p>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8">
+                <h3 className="text-2xl font-bold text-white mb-6">Skills & Technologies</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {['React', 'Next.js', 'TypeScript', 'Tailwind', 'Node.js', 'MongoDB', 'Python', 'Git', 'Docker'].map((skill) => (
+                    <div 
+                      key={skill}
+                      className="bg-cyan-400/10 border border-cyan-400/30 rounded-full px-4 py-2 text-center text-sm text-cyan-400 hover:bg-cyan-400/20 transition-colors cursor-pointer"
+                    >
+                      {skill}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className="aboutRight">
-              <div className="frame">
-                <div className="core"></div>
-                <div className="orbit" style={{'--duration': '3s'} as React.CSSProperties}>
-                  <div className="electron"></div>
-                </div>
-                <div className="orbit" style={{'--duration': '4s'} as React.CSSProperties}>
-                  <div className="electron"></div>
-                </div>
-                <div className="orbit" style={{'--duration': '5s'} as React.CSSProperties}>
-                  <div className="electron"></div>
+
+            <div className="flex items-center justify-center">
+              <div className="w-80 h-80 relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-500/20 rounded-full blur-3xl"></div>
+                <div className="relative w-full h-full bg-gradient-to-r from-cyan-400/10 to-blue-500/10 rounded-full flex items-center justify-center border border-cyan-400/20">
+                  <div className="text-6xl">🚀</div>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Contact Section */}
-        <section id="contact" className="contactContainer">
-          <div className="contactHeroContainer">
-            <div className="contactCard">
-              <h2 className="title text-5xl font-bold mb-8">Get In Touch</h2>
-              <div className="formContainer">
-                <form className="contactForm">
-                  <input 
-                    type="text" 
-                    placeholder="Your Name" 
-                    className="formControl"
+      {/* Projects Section */}
+      <section id="projects" className="min-h-screen flex items-center justify-center px-6 py-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-cyan-400">My Projects</h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Here are some of my recent projects and work
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                title: "E-Commerce Platform",
+                description: "Full-stack e-commerce solution with React, Node.js, and MongoDB",
+                tech: ["React", "Node.js", "MongoDB", "Stripe"],
+                status: "Completed"
+              },
+              {
+                title: "Task Management App",
+                description: "Collaborative task management tool with real-time updates",
+                tech: ["Next.js", "TypeScript", "Prisma", "PostgreSQL"],
+                status: "In Progress"
+              },
+              {
+                title: "Portfolio Website",
+                description: "Modern portfolio website with animations and responsive design",
+                tech: ["Next.js", "Tailwind", "Framer Motion"],
+                status: "Completed"
+              }
+            ].map((project, index) => (
+              <div 
+                key={index}
+                className="bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-6 hover:bg-white/10 transition-colors group"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">
+                    {project.title}
+                  </h3>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    project.status === 'Completed' 
+                      ? 'bg-green-500/20 text-green-400' 
+                      : 'bg-yellow-500/20 text-yellow-400'
+                  }`}>
+                    {project.status}
+                  </span>
+                </div>
+                
+                <p className="text-gray-300 mb-4 leading-relaxed">
+                  {project.description}
+                </p>
+                
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {project.tech.map((tech) => (
+                    <span 
+                      key={tech}
+                      className="bg-cyan-400/10 text-cyan-400 px-2 py-1 rounded text-xs"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+                
+                <button className="w-full bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 py-2 rounded-lg hover:bg-cyan-400/20 transition-colors">
+                  View Project
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="min-h-screen flex items-center justify-center px-6 py-20">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-cyan-400">Get In Touch</h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Let's work together to bring your ideas to life
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div className="bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8">
+              <h3 className="text-2xl font-bold text-white mb-6">Send me a message</h3>
+              
+              <form className="space-y-6">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Your Name"
+                    className="w-full bg-transparent border-b-2 border-gray-600 text-white placeholder-gray-400 py-3 focus:border-cyan-400 focus:outline-none transition-colors duration-300"
                   />
-                  <input 
-                    type="email" 
-                    placeholder="Your Email" 
-                    className="formControl"
+                </div>
+                
+                <div>
+                  <input
+                    type="email"
+                    placeholder="Your Email"
+                    className="w-full bg-transparent border-b-2 border-gray-600 text-white placeholder-gray-400 py-3 focus:border-cyan-400 focus:outline-none transition-colors duration-300"
                   />
-                  <textarea 
-                    placeholder="Your Message" 
+                </div>
+                
+                <div>
+                  <textarea
+                    placeholder="Your Message"
                     rows={4}
-                    className="formControl"
+                    className="w-full bg-transparent border-b-2 border-gray-600 text-white placeholder-gray-400 py-3 focus:border-cyan-400 focus:outline-none transition-colors duration-300 resize-none"
                   />
-                  <button type="submit" className="submitBtn">
-                    Send Message
-                  </button>
-                </form>
-                <div className="socials">
-                  <a href="#" className="socialIcon">
-                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                    </svg>
-                  </a>
-                  <a href="#" className="socialIcon">
-                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                    </svg>
-                  </a>
-                  <a href="#" className="socialIcon">
-                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.746-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z"/>
-                    </svg>
-                  </a>
+                </div>
+                
+                <button
+                  type="submit"
+                  className="w-full bg-cyan-400 text-black py-3 rounded-lg font-bold hover:bg-cyan-300 transition-colors"
+                >
+                  Send Message
+                </button>
+              </form>
+            </div>
+
+            <div className="space-y-8">
+              <div className="bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8">
+                <h3 className="text-2xl font-bold text-white mb-6">Contact Information</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-cyan-400/10 rounded-full flex items-center justify-center">
+                      <span className="text-cyan-400 text-xl">📧</span>
+                    </div>
+                    <div>
+                      <p className="text-gray-300">Email</p>
+                      <p className="text-white">bhuvesh@example.com</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-cyan-400/10 rounded-full flex items-center justify-center">
+                      <span className="text-cyan-400 text-xl">📍</span>
+                    </div>
+                    <div>
+                      <p className="text-gray-300">Location</p>
+                      <p className="text-white">Your City, Country</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8">
+                <h3 className="text-2xl font-bold text-white mb-6">Follow Me</h3>
+                <div className="flex space-x-4">
+                  {['GitHub', 'LinkedIn', 'Twitter'].map((social) => (
+                    <button
+                      key={social}
+                      className="bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 px-6 py-3 rounded-lg hover:bg-cyan-400/20 transition-colors"
+                    >
+                      {social}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
-            <div className="right">
-              <div className="astronaut">
-                <svg className="w-full h-full" viewBox="0 0 200 200" fill="none">
-                  <circle cx="100" cy="100" r="80" fill="url(#gradient)" opacity="0.3"/>
-                  <defs>
-                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#73cdbe"/>
-                      <stop offset="100%" stopColor="#4f46e5"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-            </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
