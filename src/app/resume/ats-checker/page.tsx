@@ -6,7 +6,7 @@ import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
 import { FileUpload } from '@/components/resume/FileUpload';
 import { ResultsDisplay } from '@/components/resume/ResultsDisplay';
 import { Section } from '@/components/ui/Section';
-import { AnalysisResult, analyzeResume } from '@/lib/ats/analyzer';
+import { AnalysisResult } from '@/lib/ats/analyzer';
 
 export default function ATSCheckerPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -29,12 +29,58 @@ export default function ATSCheckerPage() {
     setError(null);
 
     try {
-      const result = await analyzeResume(file);
+      // Call our Python backend API
+      const result = await analyzeResumeWithBackend(file);
       setAnalysisResult(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed');
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const analyzeResumeWithBackend = async (
+    file: File
+  ): Promise<AnalysisResult> => {
+    // Create FormData for file upload
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      // Call Python backend API
+      const response = await fetch('http://localhost:8000/api/upload/parse', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const apiResult = await response.json();
+
+      if (!apiResult.success) {
+        throw new Error(apiResult.message || 'Failed to parse file');
+      }
+
+      // Return real analysis results from Python backend
+      return {
+        jobType: apiResult.data.job_type,
+        atsScore: apiResult.data.ats_score,
+        keywordMatches: apiResult.data.keyword_matches,
+        missingKeywords: apiResult.data.missing_keywords,
+        suggestions: apiResult.data.suggestions,
+        strengths: apiResult.data.strengths,
+        weaknesses: apiResult.data.weaknesses,
+        keywordDensity: apiResult.data.keyword_density,
+        wordCount: apiResult.data.word_count,
+        characterCount: apiResult.data.character_count,
+      };
+    } catch (error) {
+      console.error('Backend API error:', error);
+      throw new Error(
+        'Failed to connect to analysis server. Please try again.'
+      );
     }
   };
 

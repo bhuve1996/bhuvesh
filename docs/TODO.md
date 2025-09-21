@@ -1,4 +1,4 @@
-# ATS Resume Checker - Development TODO
+explain python rember rigt?# ATS Resume Checker - Development TODO
 
 ## 🎯 **Project Overview**
 
