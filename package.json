@@ -17,13 +17,17 @@
   },
   "dependencies": {
     "framer-motion": "^12.23.16",
+    "mammoth": "^1.11.0",
+    "natural": "^8.1.0",
     "next": "15.5.3",
+    "pdfjs-dist": "^5.4.149",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
