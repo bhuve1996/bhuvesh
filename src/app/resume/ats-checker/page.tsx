@@ -76,8 +76,8 @@ export default function ATSCheckerPage() {
         wordCount: apiResult.data.word_count,
         characterCount: apiResult.data.character_count,
       };
-    } catch (error) {
-      console.error('Backend API error:', error);
+    } catch {
+      // Backend API error - show user-friendly message
       throw new Error(
         'Failed to connect to analysis server. Please try again.'
       );
