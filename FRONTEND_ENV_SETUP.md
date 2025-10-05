@@ -89,6 +89,11 @@ npm run dev
 NEXT_PUBLIC_API_URL=https://bhuvesh-production.up.railway.app
 ```
 
+**⚠️ IMPORTANT:** No trailing slash at the end! Otherwise you'll get double slashes like:
+
+- ❌ `https://app.railway.app//api/upload/analyze` (wrong)
+- ✅ `https://app.railway.app/api/upload/analyze` (correct)
+
 5. Click "Save"
 6. Go to "Deployments"
 7. Click "Redeploy" on the latest deployment
