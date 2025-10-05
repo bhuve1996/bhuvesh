@@ -13,3 +13,8 @@ npm run lint
 # Run format check
 echo "💅 Checking code formatting..."
 npm run format:check
+
+# Check backend (Python)
+if [ -f "scripts/check-backend.sh" ]; then
+  ./scripts/check-backend.sh
+fi
