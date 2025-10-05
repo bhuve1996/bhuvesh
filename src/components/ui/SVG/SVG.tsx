@@ -123,6 +123,41 @@ export const Icons = {
     </SVG>
   ),
 
+  // Chevron icons
+  ChevronDown: (props: SVGProps) => (
+    <SVG {...props} viewBox='0 0 24 24' stroke='currentColor' fill='none'>
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        strokeWidth={2}
+        d='M19 9l-7 7-7-7'
+      />
+    </SVG>
+  ),
+
+  ChevronUp: (props: SVGProps) => (
+    <SVG {...props} viewBox='0 0 24 24' stroke='currentColor' fill='none'>
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        strokeWidth={2}
+        d='M5 15l7-7 7 7'
+      />
+    </SVG>
+  ),
+
+  // Action icons
+  Check: (props: SVGProps) => (
+    <SVG {...props} viewBox='0 0 24 24' stroke='currentColor' fill='none'>
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        strokeWidth={2}
+        d='M5 13l4 4L19 7'
+      />
+    </SVG>
+  ),
+
   // Loading/Spinner
   Spinner: (props: SVGProps) => (
     <SVG {...props} viewBox='0 0 24 24' stroke='currentColor' fill='none'>
@@ -131,13 +166,6 @@ export const Icons = {
         strokeLinejoin='round'
         d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'
       />
-    </SVG>
-  ),
-
-  // Checkmark
-  Check: (props: SVGProps) => (
-    <SVG {...props} viewBox='0 0 24 24' stroke='currentColor' fill='none'>
-      <path strokeLinecap='round' strokeLinejoin='round' d='M5 13l4 4L19 7' />
     </SVG>
   ),
 

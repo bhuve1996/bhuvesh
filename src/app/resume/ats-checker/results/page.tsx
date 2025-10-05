@@ -3,6 +3,11 @@
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
+import { ImprovementPlan } from '@/components/resume';
+import type {
+  ImprovementItem,
+  ImprovementSummary,
+} from '@/components/resume/ImprovementPlan';
 import { Button, Card } from '@/components/ui';
 import type {
   AnalysisResult,
@@ -19,6 +24,47 @@ export default function ATSResultsPage() {
   const [analysisData, setAnalysisData] = React.useState<AnalysisResult | null>(
     null
   );
+  const [improvementPlan, setImprovementPlan] = React.useState<{
+    improvements: ImprovementItem[];
+    summary: ImprovementSummary;
+    quick_wins: ImprovementItem[];
+  } | null>(null);
+  const [loadingImprovements, setLoadingImprovements] = React.useState(false);
+
+  const fetchImprovementPlan = React.useCallback(
+    async (result: AnalysisResult) => {
+      if (!result.extraction_details) return;
+
+      setLoadingImprovements(true);
+      try {
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const response = await fetch(`${apiUrl}/api/upload/improvement-plan`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            analysis_result: result,
+            extracted_data: result.extraction_details,
+            job_description: null, // Can add later if available
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setImprovementPlan(data.data);
+          }
+        }
+      } catch {
+        // Silently fail - improvement plan is optional
+      } finally {
+        setLoadingImprovements(false);
+      }
+    },
+    []
+  );
 
   React.useEffect(() => {
     // Get data from sessionStorage (passed from upload page)
@@ -26,11 +72,14 @@ export default function ATSResultsPage() {
     if (storedData) {
       const parsed = JSON.parse(storedData) as AnalysisResult;
       setAnalysisData(parsed);
+
+      // Fetch improvement plan
+      fetchImprovementPlan(parsed);
     } else {
       // No data found, redirect back
       router.push('/resume/ats-checker');
     }
-  }, [router]);
+  }, [router, fetchImprovementPlan]);
 
   const handleTryAgain = () => {
     sessionStorage.removeItem('ats_analysis_result');
@@ -135,6 +184,29 @@ export default function ATSResultsPage() {
           </div>
         </div>
       </Card>
+
+      {/* Improvement Plan Section */}
+      {loadingImprovements && (
+        <Card className='p-8 mb-8'>
+          <div className='text-center'>
+            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto'></div>
+            <p className='mt-4 text-gray-400'>
+              Generating personalized improvement suggestions...
+            </p>
+          </div>
+        </Card>
+      )}
+
+      {improvementPlan && !loadingImprovements && (
+        <div className='mb-8'>
+          <ImprovementPlan
+            improvements={improvementPlan.improvements}
+            summary={improvementPlan.summary}
+            quick_wins={improvementPlan.quick_wins}
+            currentScore={atsScore}
+          />
+        </div>
+      )}
 
       {/* Contact Information */}
       <Card className='p-6 mb-6'>

@@ -14,12 +14,22 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.utils.file_parser import file_parser
 from app.services.ats_analyzer import ats_analyzer
+from app.services.resume_improver import ResumeImprover
+
+# Initialize services
+resume_improver = ResumeImprover()
 
 # Pydantic models for request/response validation
 class JobDescriptionRequest(BaseModel):
     """Request model for job description comparison"""
     job_description: str
     resume_text: Optional[str] = None
+
+class ImprovementPlanRequest(BaseModel):
+    """Request model for improvement plan generation"""
+    analysis_result: Dict[str, Any]
+    extracted_data: Dict[str, Any]
+    job_description: Optional[str] = None
 
 # Create a router (like Express router)
 router = APIRouter(prefix="/api/upload", tags=["upload"])
@@ -160,6 +170,36 @@ async def analyze_resume_with_jd(
         raise HTTPException(
             status_code=500, 
             detail=f"Error during analysis: {str(e)}"
+        )
+
+@router.post("/improvement-plan")
+async def get_improvement_plan(request: ImprovementPlanRequest) -> Dict[str, Any]:
+    """
+    Generate personalized improvement plan based on ATS analysis
+    
+    Args:
+        request: ImprovementPlanRequest with analysis_result, extracted_data, and optional job_description
+        
+    Returns:
+        Improvement plan with actionable suggestions, priorities, and score impacts
+    """
+    try:
+        plan = resume_improver.generate_improvement_plan(
+            analysis_result=request.analysis_result,
+            extracted_data=request.extracted_data,
+            job_description=request.job_description
+        )
+        
+        return {
+            "success": True,
+            "data": plan,
+            "message": "Improvement plan generated successfully"
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating improvement plan: {str(e)}"
         )
 
 @router.get("/supported-formats")
