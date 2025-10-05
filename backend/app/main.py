@@ -19,9 +19,24 @@ app = FastAPI(
 
 # Configure CORS (Cross-Origin Resource Sharing)
 # This allows our Next.js frontend to talk to this Python backend
+import os
+
+# Allow multiple origins for production and development
+origins = [
+    "http://localhost:3000",  # Local development
+    "http://127.0.0.1:3000",  # Local development (alternative)
+    "https://bhuvesh.vercel.app",  # Your Vercel deployment
+    "https://*.vercel.app",  # Any Vercel preview deployments
+]
+
+# Add custom domain if set in environment
+custom_domain = os.getenv("FRONTEND_URL")
+if custom_domain:
+    origins.append(custom_domain)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Our Next.js app
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # Allow all headers
