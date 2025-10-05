@@ -1,0 +1,66 @@
+BHUVESH SINGLA
+ +91 - 9530529550 |   bhuve1996@gmail.com | Linkedin
+
+SUMMARY
+Senior Software Developer / Frontend Engineer with 7+ years of experience building scalable web applications, specializing in React.js, Next.js, Angular, and headless CMS integrations. Proven expertise in e-commerce platforms, API integrations, performance optimization, and cross-platform development.
+WORK EXPERIENCE
+
+AKQA, India                                                                                                                                                       09/2022 – present
+Senior Software Developer / Senior Frontend Engineer                                                                               Gurugram, India 
+
+ The Kusnacht Practice (Luxury Swiss Health & Rehabilitation Clinic)
+Engineered scalable UI components, reusable Storybook modules, and integrated Contentful CMS to enable dynamic, global content delivery. (Next.js, SCSS, Contentful, Storybook)
+
+Nexeon (Battery Technology & Solutions Company)
+Developed modular UI components, optimized SEO and load performance, and streamlined content workflows through Contentful and Storybook integration. (Next.js, SCSS, Contentful, Storybook)
+
+ Melbourne Convention Bureau (Tourism & Business Events Platform)
+Architected and customized Sitecore templates with Vue.js and SCSS, ensuring scalable and reusable frontend modules for events and campaigns. (HTML, Vue.js, SCSS)
+
+Visit Victoria (Official Tourism Board of Victoria, Australia)
+Integrated Mapbox for interactive maps, customized React components for destination discovery, and improved accessibility across devices. (Mapbox, React.js, TypeScript, SCSS)
+
+Bunnings (Leading Australian Home Improvement Retailer)
+Rebuilt catalog and checkout flows with Next.js and GraphQL, optimized performance with Vercel deployments, and ensured responsive customer journeys. (Next.js, Vercel, GraphQL, Storybook)
+
+JOSH Software, India                                                                                                                                  10/2021 – 09/2022 
+Senior Software Developer / Frontend Engineer                                                                                            Bengaluru, India 
+
+ADIB Bank (Abu Dhabi Islamic Bank, UAE)
+Delivered secure and responsive banking modules with Angular and React, implemented dynamic forms, and integrated APIs for digital banking services. (Angular.js, React.js, SCSS, Postman, GitHub, Jira)
+
+SBER Bank (Largest Russian Financial Institution)
+Implemented React UI dashboards enriched with GSAP animations, improving user engagement and cross-browser compatibility. (React.js, GSAP, SCSS, Bitbucket)
+
+
+
+
+KDMS India                                                                                                                                                      05/2018 – 10/2021
+Software Developer / Frontend Engineer                                                                                                       Chandigarh, India 
+
+GreatMocks (EdTech Platform, Mock Test Solutions)
+Designed responsive learning modules, integrated APIs, and implemented dynamic forms to improve student experience. (React.js, REST APIs, React Bootstrap, JavaScript, CSS)
+
+Galatron (Italian E-commerce Platform for Electronics & Components)
+Built multilingual e-commerce UI with React and Material UI, optimizing accessibility and scalability for international users. (React.js, Material UI, REST APIs, JavaScript, CSS)
+
+
+SKILLS
+
+
+Languages & Frameworks: JavaScript, TypeScript, React.js, Next.js, Angular, Vue.js, React Native, Ruby (basic)
+Styling: SCSS/SASS, CSS3, HTML5, Tailwind, Styled Components, Material UI, React Bootstrap, LESS
+Tools & Platforms: Storybook, Contentful, Sitecore, Vercel, Webpack, Babel, Grunt, GitHub, Bitbucket, Jira, Confluence
+APIs & Data: GraphQL, REST API Integration, Postman
+Other Expertise: GSAP Animations, Mapbox, Cordova, LangChain AI (basic integration), Agile/Scrum Methodologies
+UI Development, Performance Optimization, Cross-Browser Testing, Responsive Web Design/Responsive UI/UX Design, Micro Frontends, CI/CD pipelines, API Security, Single Page Applications (SPAs)
+EDUCATION
+
+Bachelor of Engineering (B.E.), Computer Science – Chitkara University (2013 – 2017)
+Top 10 percentile of the university with 8.2 CGPA
+Higher Secondary (Class 12, CBSE Board) – 77% (2013)
+ Secondary (Class 10, CBSE Board) – 9.2 CGPA (2011)
+LANGUAGES
+Punjabi, Hindi, English
+HOBBIES
+Cricket, Badminton, Swimming

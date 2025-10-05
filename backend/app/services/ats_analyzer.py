@@ -70,6 +70,7 @@ class ATSAnalyzer:
         # Perform all analyses
         keyword_analysis = self._analyze_keywords_vs_jd(resume_text, jd_keywords)
         semantic_analysis = self._analyze_semantic_match(resume_text, jd_text)
+        
         format_analysis = self._analyze_format(parsed_resume)
         content_analysis = self._analyze_content(resume_text, parsed_resume.get('word_count', 0))
         ats_analysis = self._analyze_ats_compatibility(parsed_resume)
@@ -129,6 +130,9 @@ class ATSAnalyzer:
                 # Skills & Technologies specifically identified
                 'skills_found': self._extract_skills(parsed_resume.get('text', '')),
                 'skills_required': self._extract_skills(job_description),
+                
+                # COMPREHENSIVE RESUME CATEGORIZATION
+                'categorized_resume': self._categorize_resume(parsed_resume.get('text', '')),
                 
                 # Text samples for verification
                 'resume_text_sample': parsed_resume.get('text', '')[:1000] + '...' if len(parsed_resume.get('text', '')) > 1000 else parsed_resume.get('text', ''),
@@ -485,95 +489,989 @@ class ATSAnalyzer:
             'weaknesses': weaknesses if weaknesses else ["Good overall structure"]
         }
     
+    def _categorize_resume(self, text: str) -> Dict[str, Any]:
+        """
+        Comprehensive categorization of ALL resume sections
+        Extracts: contact info, education, work experience, skills, hobbies, etc.
+        """
+        text_lower = text.lower()
+        lines = text.split('\n')
+        
+        categorized = {
+            'contact_info': self._extract_contact_info(text),
+            'education': self._extract_education(text),
+            'work_experience': self._extract_work_experience(text),
+            'certifications': self._extract_certifications(text),
+            'hobbies_interests': self._extract_hobbies(text),
+            'languages': self._extract_languages(text),
+            'achievements': self._extract_achievements(text),
+            'summary_profile': self._extract_summary(text),
+            'formatting_analysis': self._analyze_formatting(text, lines)
+        }
+        
+        return categorized
+    
+    def _analyze_formatting(self, text: str, lines: List[str]) -> Dict[str, Any]:
+        """
+        Detailed formatting analysis for ATS compatibility
+        Checks: bullets, spacing, consistency, structure, etc.
+        """
+        analysis = {
+            'bullet_points': {
+                'detected': False,
+                'count': 0,
+                'types_used': [],
+                'consistent': True,
+                'recommendation': ''
+            },
+            'spacing': {
+                'line_spacing_consistent': True,
+                'excessive_whitespace': False,
+                'proper_section_breaks': True
+            },
+            'structure': {
+                'has_clear_sections': False,
+                'sections_detected': [],
+                'logical_flow': True,
+                'chronological_order': True
+            },
+            'text_formatting': {
+                'all_caps_excessive': False,
+                'appropriate_capitalization': True,
+                'special_characters_count': 0,
+                'emoji_count': 0
+            },
+            'length_analysis': {
+                'total_words': len(text.split()),
+                'total_lines': len([l for l in lines if l.strip()]),
+                'average_line_length': 0,
+                'estimated_pages': 0,
+                'appropriate_length': True
+            },
+            'ats_compatibility': {
+                'score': 0,
+                'issues': [],
+                'warnings': [],
+                'recommendations': []
+            }
+        }
+        
+        # Detect bullet points
+        bullet_patterns = ['•', '●', '◦', '▪', '▸', '→', '-', '*', '✓', '►']
+        bullet_counts = {}
+        
+        for line in lines:
+            line_stripped = line.strip()
+            for bullet in bullet_patterns:
+                if line_stripped.startswith(bullet):
+                    bullet_counts[bullet] = bullet_counts.get(bullet, 0) + 1
+                    analysis['bullet_points']['detected'] = True
+        
+        if bullet_counts:
+            analysis['bullet_points']['count'] = sum(bullet_counts.values())
+            analysis['bullet_points']['types_used'] = list(bullet_counts.keys())
+            
+            # Check consistency (should use max 2 types)
+            if len(bullet_counts) > 2:
+                analysis['bullet_points']['consistent'] = False
+                analysis['ats_compatibility']['warnings'].append(
+                    f"Using {len(bullet_counts)} different bullet types. Stick to 1-2 for consistency."
+                )
+        
+        # Check spacing
+        empty_line_count = sum(1 for line in lines if not line.strip())
+        non_empty_count = len([l for l in lines if l.strip()])
+        
+        if empty_line_count > non_empty_count * 0.3:
+            analysis['spacing']['excessive_whitespace'] = True
+            analysis['ats_compatibility']['issues'].append(
+                "Excessive whitespace detected. ATS may parse incorrectly."
+            )
+        
+        # Detect sections
+        common_sections = [
+            'summary', 'objective', 'profile', 'experience', 'work experience',
+            'employment', 'education', 'skills', 'certifications', 'projects',
+            'achievements', 'awards', 'languages', 'hobbies', 'interests',
+            'references', 'publications', 'volunteer'
+        ]
+        
+        for line in lines:
+            line_lower = line.strip().lower()
+            for section in common_sections:
+                if line_lower == section or line_lower == section + ':':
+                    analysis['structure']['sections_detected'].append(section.title())
+                    analysis['structure']['has_clear_sections'] = True
+        
+        # Check for excessive caps
+        caps_words = [word for word in text.split() if word.isupper() and len(word) > 1]
+        if len(caps_words) > len(text.split()) * 0.1:  # More than 10% all caps
+            analysis['text_formatting']['all_caps_excessive'] = True
+            analysis['ats_compatibility']['warnings'].append(
+                "Excessive use of ALL CAPS. Use title case for better ATS readability."
+            )
+        
+        # Count special characters and emojis
+        special_chars = re.findall(r'[^\w\s\.,\-\(\)\[\]\/\@\#]', text)
+        analysis['text_formatting']['special_characters_count'] = len(special_chars)
+        
+        # Detect emojis (basic check)
+        emoji_pattern = re.compile("["
+            u"\U0001F600-\U0001F64F"  # emoticons
+            u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+            u"\U0001F680-\U0001F6FF"  # transport & map symbols
+            u"\U0001F1E0-\U0001F1FF"  # flags
+            "]+", flags=re.UNICODE)
+        emojis = emoji_pattern.findall(text)
+        analysis['text_formatting']['emoji_count'] = len(emojis)
+        
+        if len(emojis) > 0:
+            analysis['ats_compatibility']['warnings'].append(
+                f"Found {len(emojis)} emoji(s). Some ATS may not parse emojis correctly."
+            )
+        
+        # Length analysis
+        non_empty_lines = [l for l in lines if l.strip()]
+        if non_empty_lines:
+            avg_length = sum(len(l) for l in non_empty_lines) / len(non_empty_lines)
+            analysis['length_analysis']['average_line_length'] = round(avg_length, 1)
+        
+        word_count = analysis['length_analysis']['total_words']
+        analysis['length_analysis']['estimated_pages'] = max(1, round(word_count / 350))
+        
+        # Appropriate length check
+        if word_count < 200:
+            analysis['length_analysis']['appropriate_length'] = False
+            analysis['ats_compatibility']['issues'].append(
+                "Resume is too short (< 200 words). Add more details about experience and skills."
+            )
+        elif word_count > 1500:
+            analysis['length_analysis']['appropriate_length'] = False
+            analysis['ats_compatibility']['warnings'].append(
+                "Resume is lengthy (> 1500 words). Consider condensing to 1-2 pages."
+            )
+        
+        # Calculate ATS compatibility score
+        score = 100
+        
+        # Deduct for issues
+        if analysis['spacing']['excessive_whitespace']:
+            score -= 10
+        if not analysis['structure']['has_clear_sections']:
+            score -= 15
+            analysis['ats_compatibility']['issues'].append(
+                "No clear section headings detected. Add sections like 'Experience', 'Education', 'Skills'."
+            )
+        if analysis['text_formatting']['all_caps_excessive']:
+            score -= 10
+        if len(analysis['structure']['sections_detected']) < 3:
+            score -= 10
+            analysis['ats_compatibility']['warnings'].append(
+                f"Only {len(analysis['structure']['sections_detected'])} sections detected. Standard resumes have 4-6 sections."
+            )
+        if not analysis['bullet_points']['detected']:
+            score -= 5
+            analysis['ats_compatibility']['recommendations'].append(
+                "Use bullet points to list achievements and responsibilities for better readability."
+            )
+        if not analysis['bullet_points']['consistent'] and analysis['bullet_points']['detected']:
+            score -= 5
+        
+        analysis['ats_compatibility']['score'] = max(0, score)
+        
+        # Add positive recommendations
+        if analysis['bullet_points']['detected'] and analysis['bullet_points']['consistent']:
+            analysis['ats_compatibility']['recommendations'].append(
+                "✓ Good use of consistent bullet points."
+            )
+        if analysis['structure']['has_clear_sections'] and len(analysis['structure']['sections_detected']) >= 4:
+            analysis['ats_compatibility']['recommendations'].append(
+                "✓ Well-structured with clear section headings."
+            )
+        if 300 <= word_count <= 800:
+            analysis['ats_compatibility']['recommendations'].append(
+                "✓ Optimal length for 1-page resume."
+            )
+        
+        return analysis
+    
+    def _extract_contact_info(self, text: str) -> Dict[str, Any]:
+        """Extract detailed contact information"""
+        contact = {
+            'full_name': '',
+            'first_name': '',
+            'middle_name': '',
+            'last_name': '',
+            'email': '',
+            'phone': {
+                'raw': '',
+                'country_code': '',
+                'number': ''
+            },
+            'linkedin': {
+                'url': '',
+                'username': ''
+            },
+            'github': {
+                'url': '',
+                'username': ''
+            },
+            'portfolio': '',
+            'location': {
+                'full': '',
+                'city': '',
+                'state': '',
+                'country': ''
+            }
+        }
+        
+        # Extract full name (usually first line)
+        lines = [l.strip() for l in text.split('\n') if l.strip()]
+        if lines:
+            full_name = lines[0]
+            contact['full_name'] = full_name
+            
+            # Parse name into parts
+            name_parts = full_name.split()
+            if len(name_parts) >= 2:
+                contact['first_name'] = name_parts[0]
+                contact['last_name'] = name_parts[-1]
+                if len(name_parts) > 2:
+                    contact['middle_name'] = ' '.join(name_parts[1:-1])
+            elif len(name_parts) == 1:
+                contact['first_name'] = name_parts[0]
+        
+        # Extract email
+        email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', text)
+        if email_match:
+            contact['email'] = email_match.group(0)
+        
+        # Extract phone with detailed parsing
+        phone_match = re.search(r'([\+\d][\d\s\-\(\)]{8,})', text)
+        if phone_match:
+            phone_raw = phone_match.group(0).strip()
+            contact['phone']['raw'] = phone_raw
+            
+            # Extract country code
+            country_code_match = re.search(r'^\+(\d{1,3})', phone_raw)
+            if country_code_match:
+                contact['phone']['country_code'] = '+' + country_code_match.group(1)
+                # Remove country code to get number
+                contact['phone']['number'] = re.sub(r'^\+\d{1,3}\s*[-\s]*', '', phone_raw)
+            else:
+                contact['phone']['number'] = phone_raw
+        
+        # Extract LinkedIn with username
+        if 'linkedin' in text.lower():
+            linkedin_match = re.search(r'linkedin\.com/in/([\w\-]+)', text.lower())
+            if linkedin_match:
+                contact['linkedin']['username'] = linkedin_match.group(1)
+                contact['linkedin']['url'] = f"linkedin.com/in/{linkedin_match.group(1)}"
+            else:
+                contact['linkedin']['url'] = 'Found (URL not extracted)'
+        
+        # Extract GitHub with username
+        if 'github' in text.lower():
+            github_match = re.search(r'github\.com/([\w\-]+)', text.lower())
+            if github_match:
+                contact['github']['username'] = github_match.group(1)
+                contact['github']['url'] = f"github.com/{github_match.group(1)}"
+            else:
+                contact['github']['url'] = 'Found (URL not extracted)'
+        
+        # Extract portfolio/website
+        portfolio_patterns = [
+            r'(https?://)?(?:www\.)?([\w\-]+\.(?:com|dev|io|net|org|in))',
+            r'portfolio\s*:?\s*([\w\-]+\.[\w\-]+)'
+        ]
+        for pattern in portfolio_patterns:
+            match = re.search(pattern, text.lower())
+            if match and 'linkedin' not in match.group(0) and 'github' not in match.group(0):
+                contact['portfolio'] = match.group(0)
+                break
+        
+        # Extract detailed location
+        # Pattern 1: City, State/Country
+        location_match = re.search(r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)', text)
+        if location_match:
+            contact['location']['full'] = location_match.group(0)
+            contact['location']['city'] = location_match.group(1)
+            location_second = location_match.group(2)
+            
+            # Determine if it's state or country
+            indian_states = ['Haryana', 'Karnataka', 'Punjab', 'Delhi', 'Maharashtra', 'Gujarat']
+            if location_second in indian_states:
+                contact['location']['state'] = location_second
+                contact['location']['country'] = 'India'
+            else:
+                contact['location']['country'] = location_second
+        
+        # Pattern 2: Just city name
+        city_patterns = [
+            r'\b(Gurugram|Bengaluru|Chandigarh|Delhi|Mumbai|Pune|Hyderabad|Chennai|Noida|Gurgaon)\b'
+        ]
+        if not contact['location']['full']:
+            for pattern in city_patterns:
+                match = re.search(pattern, text)
+                if match:
+                    contact['location']['city'] = match.group(1)
+                    contact['location']['country'] = 'India'
+                    contact['location']['full'] = f"{match.group(1)}, India"
+                    break
+        
+        return contact
+    
+    def _extract_education(self, text: str) -> List[Dict[str, Any]]:
+        """Extract detailed education information"""
+        education_list = []
+        
+        # Look for education section
+        lines = text.split('\n')
+        in_education = False
+        current_edu = {}
+        
+        for i, line in enumerate(lines):
+            line_stripped = line.strip()
+            line_lower = line_stripped.lower()
+            
+            # Detect education section start
+            if re.search(r'\b(education|academic|qualification)\b', line_lower) and len(line_stripped) < 30:
+                in_education = True
+                continue
+            
+            # Stop at next major section
+            if in_education and re.search(r'\b(experience|work|skills|projects|certifications|languages|hobbies)\b', line_lower) and len(line_stripped) < 30:
+                if current_edu:
+                    education_list.append(current_edu)
+                break
+            
+            if in_education and line_stripped:
+                # Extract degree
+                degree_match = re.search(r'(bachelor|master|phd|doctorate|b\.?e\.?|b\.?tech|m\.?e\.?|m\.?tech|b\.?s\.?|m\.?s\.?|b\.?a\.?|m\.?a\.?|mba|diploma)', line_lower)
+                if degree_match and not current_edu.get('degree'):
+                    # Parse degree details
+                    degree_full = line_stripped
+                    degree_type = ''
+                    major = ''
+                    specialization = ''
+                    
+                    # Extract degree type
+                    if 'bachelor' in line_lower or 'b.e.' in line_lower or 'b.tech' in line_lower or 'b.s.' in line_lower:
+                        degree_type = 'Bachelor'
+                    elif 'master' in line_lower or 'm.e.' in line_lower or 'm.tech' in line_lower or 'm.s.' in line_lower or 'mba' in line_lower:
+                        degree_type = 'Master'
+                    elif 'phd' in line_lower or 'doctorate' in line_lower:
+                        degree_type = 'Doctorate'
+                    elif 'diploma' in line_lower:
+                        degree_type = 'Diploma'
+                    
+                    # Extract major/field
+                    majors = ['computer science', 'engineering', 'information technology', 'electronics', 
+                             'mechanical', 'civil', 'business', 'commerce', 'arts', 'science']
+                    for maj in majors:
+                        if maj in line_lower:
+                            major = maj.title()
+                            break
+                    
+                    current_edu = {
+                        'degree_full': degree_full,
+                        'degree_type': degree_type,
+                        'major': major,
+                        'specialization': specialization,
+                        'institution': {
+                            'name': '',
+                            'type': '',  # University, College, Institute
+                            'location': ''
+                        },
+                        'duration': {
+                            'start_year': '',
+                            'end_year': '',
+                            'total_years': 0
+                        },
+                        'grade': {
+                            'value': '',
+                            'type': '',  # CGPA, GPA, Percentage
+                            'scale': '',
+                            'percentile': ''
+                        }
+                    }
+                
+                # Extract institution
+                if current_edu and ('university' in line_lower or 'college' in line_lower or 'institute' in line_lower or 'school' in line_lower):
+                    current_edu['institution']['name'] = line_stripped
+                    
+                    # Determine institution type
+                    if 'university' in line_lower:
+                        current_edu['institution']['type'] = 'University'
+                    elif 'college' in line_lower:
+                        current_edu['institution']['type'] = 'College'
+                    elif 'institute' in line_lower:
+                        current_edu['institution']['type'] = 'Institute'
+                    elif 'school' in line_lower:
+                        current_edu['institution']['type'] = 'School'
+                
+                # Extract year with detailed parsing
+                year_match = re.search(r'(19|20)(\d{2})\s*[-–]\s*(19|20)(\d{2})', line)
+                if current_edu and year_match:
+                    start_year = year_match.group(1) + year_match.group(2)
+                    end_year = year_match.group(3) + year_match.group(4)
+                    
+                    current_edu['duration']['start_year'] = start_year
+                    current_edu['duration']['end_year'] = end_year
+                    current_edu['duration']['total_years'] = int(end_year) - int(start_year)
+                
+                # Extract grade with detailed parsing
+                if current_edu:
+                    # CGPA pattern
+                    cgpa_match = re.search(r'(\d+\.?\d*)\s*(?:out of|/)?\s*(\d+\.?\d*)?\s*(cgpa|gpa)', line_lower)
+                    if cgpa_match:
+                        current_edu['grade']['value'] = cgpa_match.group(1)
+                        current_edu['grade']['type'] = cgpa_match.group(3).upper()
+                        if cgpa_match.group(2):
+                            current_edu['grade']['scale'] = cgpa_match.group(2)
+                    
+                    # Percentage pattern
+                    percentage_match = re.search(r'(\d+\.?\d*)\s*(?:%|percentage)', line_lower)
+                    if percentage_match and not current_edu['grade']['value']:
+                        current_edu['grade']['value'] = percentage_match.group(1)
+                        current_edu['grade']['type'] = 'Percentage'
+                        current_edu['grade']['scale'] = '100'
+                    
+                    # Percentile pattern
+                    percentile_match = re.search(r'top\s+(\d+)\s*%|(\d+)(?:st|nd|rd|th)?\s*percentile', line_lower)
+                    if percentile_match:
+                        percentile_val = percentile_match.group(1) or percentile_match.group(2)
+                        current_edu['grade']['percentile'] = percentile_val
+        
+        if current_edu and current_edu not in education_list:
+            education_list.append(current_edu)
+        
+        return education_list
+    
+    def _extract_work_experience(self, text: str) -> List[Dict[str, Any]]:
+        """
+        Extract detailed work experience including:
+        - Company name and location
+        - Job role/title
+        - Duration (start date - end date)
+        - Projects with descriptions and skills used
+        """
+        experiences = []
+        lines = text.split('\n')
+        
+        in_experience = False
+        current_job = None
+        current_project = None
+        
+        for i, line in enumerate(lines):
+            line_stripped = line.strip()
+            line_lower = line_stripped.lower()
+            
+            # Detect work experience section start
+            if re.search(r'\b(work experience|experience|employment|professional experience)\b', line_lower) and len(line_stripped) < 50:
+                in_experience = True
+                continue
+            
+            # Stop at next major section
+            if in_experience and re.search(r'\b(education|skills|certification)\b', line_lower) and len(line_stripped) < 30:
+                if current_project and current_job:
+                    current_job['projects'].append(current_project)
+                if current_job:
+                    experiences.append(current_job)
+                break
+            
+            if in_experience and line_stripped:
+                # Detect company name (usually has location pattern or is followed by date)
+                # Look ahead to see if next few lines have date pattern
+                has_date_nearby = False
+                for j in range(i, min(i+3, len(lines))):
+                    if re.search(r'\d{2}/\d{4}\s*[-–]\s*(\d{2}/\d{4}|present)', lines[j].lower()):
+                        has_date_nearby = True
+                        break
+                
+                if has_date_nearby and (re.search(r',\s*[A-Z][a-z]+', line) or line.isupper() or len(line_stripped) < 60):
+                    # Save previous job
+                    if current_project and current_job:
+                        current_job['projects'].append(current_project)
+                        current_project = None
+                    if current_job:
+                        experiences.append(current_job)
+                    
+                    # Extract location from company line
+                    location_match = re.search(r',\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)', line)
+                    location = location_match.group(1) if location_match else ''
+                    
+                    current_job = {
+                        'company': line_stripped,
+                        'location': location,
+                        'role': '',
+                        'duration': '',
+                        'start_date': '',
+                        'end_date': '',
+                        'total_duration_months': 0,
+                        'projects': []
+                    }
+                    continue
+                
+                # Detect job role/title
+                if current_job and not current_job['role'] and re.search(r'(engineer|developer|manager|analyst|designer|architect|consultant|specialist|lead|senior|junior|software|frontend|backend)', line_lower):
+                    # Make sure it's not a project description
+                    if not re.search(r'(developed|built|implemented|created|designed|integrated|engineered|architected)', line_lower):
+                        current_job['role'] = line_stripped
+                        continue
+                
+                # Detect duration with dates
+                date_match = re.search(r'(\d{2})/(\d{4})\s*[-–]\s*(?:(\d{2})/(\d{4})|(present|current))', line_lower)
+                if current_job and date_match:
+                    current_job['duration'] = date_match.group(0)
+                    
+                    # Parse start and end dates
+                    start_month, start_year = date_match.group(1), date_match.group(2)
+                    current_job['start_date'] = f"{start_month}/{start_year}"
+                    
+                    if date_match.group(5):  # present/current
+                        current_job['end_date'] = 'Present'
+                        # Calculate duration to present
+                        from datetime import datetime
+                        start = datetime(int(start_year), int(start_month), 1)
+                        now = datetime.now()
+                        months = (now.year - start.year) * 12 + (now.month - start.month)
+                        current_job['total_duration_months'] = months
+                    else:
+                        end_month, end_year = date_match.group(3), date_match.group(4)
+                        current_job['end_date'] = f"{end_month}/{end_year}"
+                        # Calculate duration
+                        months = (int(end_year) - int(start_year)) * 12 + (int(end_month) - int(start_month))
+                        current_job['total_duration_months'] = months
+                    
+                    current_job['duration_formatted'] = self._format_duration(current_job['total_duration_months'])
+                    continue
+                
+                # Detect project name (usually starts with company name in parentheses or is a header)
+                project_match = re.search(r'^\s*([A-Z][^(]+?)(?:\s*\(([^)]+)\))?$', line_stripped)
+                if current_job and project_match and len(line_stripped) > 10 and len(line_stripped) < 100:
+                    # Check if it looks like a project header (not a sentence)
+                    if not re.search(r'(developed|built|implemented|created|designed|integrated|with|and|the)', line_lower):
+                        # Save previous project
+                        if current_project:
+                            current_job['projects'].append(current_project)
+                        
+                        project_name = project_match.group(1).strip()
+                        project_type = project_match.group(2).strip() if project_match.group(2) else ''
+                        
+                        current_project = {
+                            'name': project_name,
+                            'type': project_type,
+                            'description': '',
+                            'technologies': [],
+                            'achievements': []
+                        }
+                        continue
+                
+                # Extract technologies from parentheses (Next.js, React, SCSS, etc.)
+                tech_match = re.search(r'\(([^)]+)\)$', line_stripped)
+                if current_project and tech_match:
+                    tech_string = tech_match.group(1)
+                    # Split by common separators
+                    technologies = [t.strip() for t in re.split(r'[,;/]', tech_string) if t.strip()]
+                    current_project['technologies'].extend(technologies)
+                    
+                    # Also add the description (text before the parentheses)
+                    desc_text = line_stripped[:line_stripped.rfind('(')].strip()
+                    if desc_text and len(desc_text) > 10:
+                        current_project['description'] += desc_text + ' '
+                    continue
+                
+                # Detect project description/achievements
+                if current_project and line_stripped and len(line_stripped) > 20:
+                    # If it starts with a bullet or dash, it's likely a description
+                    clean_line = re.sub(r'^[-•●▪▸◦]\s*', '', line_stripped)
+                    if clean_line != line_stripped or re.search(r'(developed|built|implemented|created|designed|integrated|engineered|architected|delivered|optimized)', line_lower):
+                        current_project['achievements'].append(clean_line)
+        
+        # Save last project and job
+        if current_project and current_job:
+            current_job['projects'].append(current_project)
+        if current_job:
+            experiences.append(current_job)
+        
+        return experiences
+    
+    def _format_duration(self, months: int) -> str:
+        """Format duration in months to human-readable format"""
+        if months < 12:
+            return f"{months} month{'s' if months != 1 else ''}"
+        years = months // 12
+        remaining_months = months % 12
+        if remaining_months == 0:
+            return f"{years} year{'s' if years != 1 else ''}"
+        return f"{years} year{'s' if years != 1 else ''} {remaining_months} month{'s' if remaining_months != 1 else ''}"
+    
+    def _extract_certifications(self, text: str) -> List[str]:
+        """Extract certifications"""
+        certifications = []
+        lines = text.split('\n')
+        
+        in_cert_section = False
+        for line in lines:
+            line_lower = line.lower()
+            
+            if re.search(r'\b(certification|certificate|licensed|credential)\b', line_lower) and len(line.strip()) < 40:
+                in_cert_section = True
+                continue
+            
+            if in_cert_section and re.search(r'\b(education|skills|experience|languages)\b', line_lower) and len(line.strip()) < 30:
+                break
+            
+            if in_cert_section and line.strip() and len(line.strip()) > 5:
+                certifications.append(line.strip())
+        
+        return certifications
+    
+    def _extract_hobbies(self, text: str) -> List[str]:
+        """Extract hobbies and interests"""
+        hobbies = []
+        lines = text.split('\n')
+        
+        for i, line in enumerate(lines):
+            line_lower = line.lower()
+            
+            if re.search(r'\b(hobbies|interests|activities)\b', line_lower) and len(line.strip()) < 30:
+                # Get next few lines
+                for j in range(i+1, min(i+5, len(lines))):
+                    next_line = lines[j].strip()
+                    if next_line and not re.search(r'\b(education|experience|skills)\b', next_line.lower()):
+                        # Split by common separators
+                        hobby_items = re.split(r'[,;|]', next_line)
+                        hobbies.extend([h.strip() for h in hobby_items if h.strip()])
+                break
+        
+        return hobbies
+    
+    def _extract_languages(self, text: str) -> List[str]:
+        """Extract spoken languages"""
+        languages = []
+        lines = text.split('\n')
+        
+        for i, line in enumerate(lines):
+            line_lower = line.lower()
+            
+            if re.search(r'\b(languages?|linguistic)\b', line_lower) and len(line.strip()) < 30:
+                # Get next few lines
+                for j in range(i+1, min(i+3, len(lines))):
+                    next_line = lines[j].strip()
+                    if next_line and not re.search(r'\b(hobbies|education|skills)\b', next_line.lower()):
+                        # Split by common separators
+                        lang_items = re.split(r'[,;|]', next_line)
+                        languages.extend([l.strip() for l in lang_items if l.strip()])
+                break
+        
+        return languages
+    
+    def _extract_achievements(self, text: str) -> List[str]:
+        """Extract achievements and awards"""
+        achievements = []
+        
+        # Look for achievement indicators
+        achievement_patterns = [
+            r'top\s+\d+\s*%',
+            r'ranked\s+\d+',
+            r'award',
+            r'achievement',
+            r'recognition',
+            r'winner',
+            r'first place',
+            r'percentile'
+        ]
+        
+        lines = text.split('\n')
+        for line in lines:
+            line_lower = line.lower()
+            for pattern in achievement_patterns:
+                if re.search(pattern, line_lower):
+                    achievements.append(line.strip())
+                    break
+        
+        return achievements
+    
+    def _extract_summary(self, text: str) -> str:
+        """Extract summary/profile section"""
+        lines = text.split('\n')
+        summary = ""
+        
+        in_summary = False
+        for i, line in enumerate(lines):
+            line_lower = line.lower()
+            
+            if re.search(r'\b(summary|profile|objective|about)\b', line_lower) and len(line.strip()) < 30:
+                in_summary = True
+                continue
+            
+            if in_summary:
+                if re.search(r'\b(experience|education|skills|work)\b', line_lower) and len(line.strip()) < 30:
+                    break
+                if line.strip():
+                    summary += line.strip() + " "
+        
+        return summary.strip()
+    
     def _extract_skills(self, text: str) -> Dict[str, List[str]]:
         """
-        Extract specific skills and technologies from text
-        Categorizes by type for better analysis
+        UNIVERSAL skill extraction for ANY profession
+        Tech, Non-Tech, Creative, Medical, Education, Business, etc.
         """
         text_lower = text.lower()
         
         skills = {
-            'programming_languages': [],
-            'frameworks_libraries': [],
-            'databases': [],
-            'cloud_platforms': [],
-            'tools_technologies': [],
+            # Technical Skills (IT/Software)
+            'technical_programming': [],
+            'technical_tools': [],
+            
+            # Business & Management
+            'business_management': [],
+            'financial_accounting': [],
+            
+            # Creative & Design
+            'creative_design': [],
+            'media_content': [],
+            
+            # Medical & Healthcare
+            'medical_clinical': [],
+            'healthcare_admin': [],
+            
+            # Education & Training
+            'teaching_training': [],
+            'academic_research': [],
+            
+            # Sales & Marketing
+            'sales_marketing': [],
+            'customer_service': [],
+            
+            # Manufacturing & Operations
+            'manufacturing_operations': [],
+            'quality_control': [],
+            
+            # Hospitality & Tourism
+            'hospitality_food': [],
+            'travel_tourism': [],
+            
+            # Legal & Compliance
+            'legal_regulatory': [],
+            
+            # HR & Recruitment
+            'hr_recruitment': [],
+            
+            # Fashion & Beauty
+            'fashion_styling': [],
+            'beauty_cosmetology': [],
+            
+            # Construction & Engineering
+            'construction_civil': [],
+            'mechanical_electrical': [],
+            
+            # Soft Skills (Universal)
             'soft_skills': [],
-            'other_skills': []
+            
+            # Languages
+            'languages_spoken': [],
+            
+            # Certifications & Tools (General)
+            'tools_software': [],
+            'certifications': []
         }
         
-        # Programming Languages
-        prog_langs = [
+        # === TECHNICAL / IT SKILLS ===
+        tech_programming = [
             'python', 'javascript', 'java', 'c\\+\\+', 'c#', 'ruby', 'php', 'swift',
-            'kotlin', 'go', 'rust', 'typescript', 'scala', 'perl', 'r', 'matlab',
-            'sql', 'html', 'css', 'bash', 'powershell', 'objective-c'
+            'kotlin', 'go', 'rust', 'typescript', 'react', 'angular', 'vue', 'node',
+            'django', 'flask', 'spring', 'sql', 'mongodb', 'aws', 'azure', 'docker',
+            'kubernetes', 'git', 'agile', 'devops', 'machine learning', 'ai', 'data science'
         ]
-        for lang in prog_langs:
-            if re.search(r'\b' + lang + r'\b', text_lower):
-                skills['programming_languages'].append(lang.replace('\\+\\+', '++').replace('\\', ''))
+        for skill in tech_programming:
+            if re.search(r'\b' + skill.replace('+', '\\+') + r'\b', text_lower):
+                skills['technical_programming'].append(skill.replace('\\+', '+'))
         
-        # Frameworks & Libraries
-        frameworks = [
-            'react', 'angular', 'vue', 'node\\.?js', 'express', 'django', 'flask',
-            'spring', 'laravel', 'rails', 'asp\\.net', 'next\\.?js', 'nuxt',
-            'jquery', 'bootstrap', 'tailwind', 'fastapi', 'tensorflow', 'pytorch',
-            'keras', 'pandas', 'numpy', 'scikit-learn', 'opencv'
+        # === BUSINESS & MANAGEMENT ===
+        business = [
+            'project management', 'strategic planning', 'business analysis', 'stakeholder management',
+            'budgeting', 'forecasting', 'business development', 'operations management',
+            'process improvement', 'change management', 'vendor management', 'contract negotiation',
+            'pmp', 'six sigma', 'lean', 'prince2', 'scrum master', 'product management'
         ]
-        for fw in frameworks:
-            if re.search(r'\b' + fw + r'\b', text_lower):
-                skills['frameworks_libraries'].append(fw.replace('\\.?', '.').replace('\\', ''))
+        for skill in business:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['business_management'].append(skill.title())
         
-        # Databases
-        databases = [
-            'mysql', 'postgresql', 'mongodb', 'redis', 'elasticsearch', 'oracle',
-            'sql server', 'dynamodb', 'cassandra', 'neo4j', 'sqlite', 'mariadb',
-            'firestore', 'couchdb'
+        # === FINANCIAL & ACCOUNTING ===
+        finance = [
+            'accounting', 'bookkeeping', 'financial reporting', 'tax', 'audit', 'payroll',
+            'accounts payable', 'accounts receivable', 'quickbooks', 'sap', 'oracle financials',
+            'financial analysis', 'budgeting', 'forecasting', 'cpa', 'cfa', 'excel', 'tally',
+            'gaap', 'ifrs', 'financial modeling', 'valuation'
         ]
-        for db in databases:
-            if re.search(r'\b' + db + r'\b', text_lower):
-                skills['databases'].append(db)
+        for skill in finance:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['financial_accounting'].append(skill.title())
         
-        # Cloud Platforms
-        cloud = [
-            'aws', 'azure', 'gcp', 'google cloud', 'heroku', 'digitalocean',
-            'vercel', 'netlify', 'firebase', 'cloudflare', 'kubernetes', 'docker',
-            'terraform', 'ansible'
+        # === CREATIVE & DESIGN ===
+        creative = [
+            'adobe photoshop', 'illustrator', 'indesign', 'after effects', 'premiere pro',
+            'figma', 'sketch', 'canva', 'graphic design', 'ui/ux', 'web design', 'logo design',
+            'branding', 'typography', 'video editing', 'motion graphics', '3d modeling',
+            'blender', 'maya', 'autocad', 'coreldraw', 'final cut pro'
         ]
-        for c in cloud:
-            if re.search(r'\b' + c + r'\b', text_lower):
-                skills['cloud_platforms'].append(c)
+        for skill in creative:
+            if re.search(r'\b' + skill.replace('/', '\\/') + r'\b', text_lower):
+                skills['creative_design'].append(skill.title())
         
-        # Tools & Technologies
-        tools = [
-            'git', 'github', 'gitlab', 'bitbucket', 'jira', 'confluence', 'slack',
-            'jenkins', 'circleci', 'travis', 'webpack', 'babel', 'eslint', 'prettier',
-            'vscode', 'intellij', 'postman', 'figma', 'sketch', 'adobe', 'grafana',
-            'prometheus', 'datadog', 'splunk', 'selenium', 'jest', 'mocha', 'pytest'
+        # === MEDICAL & HEALTHCARE ===
+        medical = [
+            'patient care', 'diagnosis', 'treatment planning', 'surgery', 'emergency care',
+            'icu', 'cardiology', 'pediatrics', 'oncology', 'radiology', 'nursing',
+            'phlebotomy', 'ehr', 'epic', 'cerner', 'medical coding', 'icd-10', 'cpt',
+            'hipaa', 'clinical research', 'pharmacology', 'anatomy', 'physiology'
         ]
-        for tool in tools:
-            if re.search(r'\b' + tool + r'\b', text_lower):
-                skills['tools_technologies'].append(tool)
+        for skill in medical:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['medical_clinical'].append(skill.title())
         
-        # Soft Skills
+        # === EDUCATION & TRAINING ===
+        education = [
+            'teaching', 'curriculum development', 'lesson planning', 'classroom management',
+            'student assessment', 'tutoring', 'training', 'instructional design',
+            'e-learning', 'lms', 'moodle', 'blackboard', 'zoom', 'google classroom',
+            'child development', 'special education', 'tesol', 'tefl'
+        ]
+        for skill in education:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['teaching_training'].append(skill.title())
+        
+        # === SALES & MARKETING ===
+        sales_marketing = [
+            'sales', 'business development', 'lead generation', 'cold calling', 'crm',
+            'salesforce', 'hubspot', 'digital marketing', 'seo', 'sem', 'social media marketing',
+            'content marketing', 'email marketing', 'ppc', 'google ads', 'facebook ads',
+            'marketing automation', 'brand management', 'market research', 'copywriting'
+        ]
+        for skill in sales_marketing:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['sales_marketing'].append(skill.title())
+        
+        # === CUSTOMER SERVICE ===
+        customer_service = [
+            'customer service', 'customer support', 'technical support', 'help desk',
+            'call center', 'ticketing', 'zendesk', 'freshdesk', 'complaint resolution',
+            'chat support', 'phone support', 'email support', 'customer satisfaction'
+        ]
+        for skill in customer_service:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['customer_service'].append(skill.title())
+        
+        # === MANUFACTURING & OPERATIONS ===
+        manufacturing = [
+            'manufacturing', 'production', 'assembly', 'quality control', 'quality assurance',
+            'iso', 'lean manufacturing', 'continuous improvement', 'supply chain',
+            'inventory management', 'logistics', 'warehouse', 'forklift', 'cnc',
+            'welding', 'plc', 'automation', 'maintenance'
+        ]
+        for skill in manufacturing:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['manufacturing_operations'].append(skill.title())
+        
+        # === HOSPITALITY & FOOD ===
+        hospitality = [
+            'hotel management', 'front desk', 'concierge', 'housekeeping', 'room service',
+            'food service', 'cooking', 'chef', 'baking', 'pastry', 'culinary',
+            'restaurant management', 'menu planning', 'food safety', 'haccp',
+            'bartending', 'sommelier', 'catering', 'banquet'
+        ]
+        for skill in hospitality:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['hospitality_food'].append(skill.title())
+        
+        # === TRAVEL & TOURISM ===
+        travel = [
+            'travel planning', 'tour guide', 'ticketing', 'gds', 'amadeus', 'sabre',
+            'tourism', 'hospitality', 'visa processing', 'itinerary planning',
+            'destination knowledge', 'customer relations'
+        ]
+        for skill in travel:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['travel_tourism'].append(skill.title())
+        
+        # === LEGAL ===
+        legal = [
+            'legal research', 'contract law', 'litigation', 'compliance', 'corporate law',
+            'intellectual property', 'labor law', 'legal writing', 'case management',
+            'mediation', 'arbitration', 'due diligence', 'regulatory compliance'
+        ]
+        for skill in legal:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['legal_regulatory'].append(skill.title())
+        
+        # === HR & RECRUITMENT ===
+        hr = [
+            'recruitment', 'talent acquisition', 'onboarding', 'employee relations',
+            'performance management', 'hris', 'workday', 'bamboohr', 'compensation',
+            'benefits administration', 'training and development', 'hr policy',
+            'labor relations', 'interviewing', 'sourcing', 'linkedin recruiter'
+        ]
+        for skill in hr:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['hr_recruitment'].append(skill.title())
+        
+        # === FASHION & BEAUTY ===
+        fashion = [
+            'fashion design', 'pattern making', 'sewing', 'tailoring', 'merchandising',
+            'fashion styling', 'trend analysis', 'textile', 'garment construction',
+            'fashion illustration', 'makeup', 'cosmetology', 'hair styling', 'manicure',
+            'pedicure', 'skincare', 'beauty consultation', 'bridal makeup'
+        ]
+        for skill in fashion:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['fashion_styling'].append(skill.title())
+        
+        # === CONSTRUCTION & CIVIL ===
+        construction = [
+            'construction', 'civil engineering', 'project coordination', 'site management',
+            'autocad', 'revit', 'structural design', 'surveying', 'estimation',
+            'blueprints', 'building codes', 'safety compliance', 'concrete', 'steel'
+        ]
+        for skill in construction:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['construction_civil'].append(skill.title())
+        
+        # === MECHANICAL & ELECTRICAL ===
+        mechanical = [
+            'mechanical engineering', 'electrical engineering', 'hvac', 'plumbing',
+            'electronics', 'circuit design', 'cad', 'solidworks', 'matlab',
+            'machinery', 'troubleshooting', 'preventive maintenance', 'robotics'
+        ]
+        for skill in mechanical:
+            if re.search(r'\b' + skill + r'\b', text_lower):
+                skills['mechanical_electrical'].append(skill.title())
+        
+        # === SOFT SKILLS (Universal) ===
         soft = [
             'leadership', 'communication', 'teamwork', 'problem solving', 'analytical',
-            'collaboration', 'agile', 'scrum', 'project management', 'mentoring',
-            'time management', 'critical thinking', 'adaptability', 'creativity'
+            'collaboration', 'time management', 'critical thinking', 'adaptability',
+            'creativity', 'attention to detail', 'multitasking', 'decision making',
+            'conflict resolution', 'negotiation', 'presentation', 'interpersonal',
+            'organizational', 'self-motivated', 'flexible', 'reliable'
         ]
         for s in soft:
             if re.search(r'\b' + s + r'\b', text_lower):
-                skills['soft_skills'].append(s)
+                skills['soft_skills'].append(s.title())
         
-        # Other common technical skills
-        other = [
-            'api', 'rest', 'graphql', 'microservices', 'ci/cd', 'devops', 'machine learning',
-            'artificial intelligence', 'data science', 'blockchain', 'iot', 'mobile',
-            'web development', 'backend', 'frontend', 'full stack', 'testing', 'security',
-            'performance optimization', 'scalability', 'architecture'
+        # === TOOLS & SOFTWARE (General) ===
+        tools = [
+            'microsoft office', 'excel', 'word', 'powerpoint', 'outlook', 'teams',
+            'google workspace', 'sheets', 'docs', 'slides', 'slack', 'zoom',
+            'trello', 'asana', 'jira', 'confluence', 'notion', 'evernote'
         ]
-        for o in other:
-            if re.search(r'\b' + o + r'\b', text_lower):
-                skills['other_skills'].append(o)
+        for tool in tools:
+            if re.search(r'\b' + tool + r'\b', text_lower):
+                skills['tools_software'].append(tool.title())
         
         # Remove duplicates and sort
         for category in skills:

@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Navigation } from '@/components/layout';
 import {
-  HeroSection,
   AboutSection,
-  ProjectsSection,
   ContactSection,
+  HeroSection,
+  ProjectsSection,
 } from '@/components/sections';
 import { Loading } from '@/components/ui';
 

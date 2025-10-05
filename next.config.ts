@@ -4,6 +4,12 @@ const nextConfig: NextConfig = {
   /* config options here */
   serverExternalPackages: [],
 
+  // Image optimization configuration
+  images: {
+    remotePatterns: [],
+    formats: ['image/avif', 'image/webp'],
+  },
+
   // Handle forwarded headers from Railway/Vercel
   async headers() {
     return [

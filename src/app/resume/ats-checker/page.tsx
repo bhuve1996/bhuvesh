@@ -1,14 +1,18 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
 import { FileUpload } from '@/components/resume/FileUpload';
 import { ResultsDisplay } from '@/components/resume/ResultsDisplay';
 import { Section } from '@/components/ui/Section';
-import { AnalysisResult } from '@/lib/ats/analyzer';
+import type { AnalysisResult, ATSAnalysisBackendResponse } from '@/types/ats';
+
+// Note: Metadata is defined in layout.tsx
 
 export default function ATSCheckerPage() {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
@@ -30,10 +34,12 @@ export default function ATSCheckerPage() {
 
     try {
       const result = await analyzeResumeWithBackend(file, jobDescription);
-      setAnalysisResult(result);
+
+      // Store result in sessionStorage and redirect to results page
+      sessionStorage.setItem('ats_analysis_result', JSON.stringify(result));
+      router.push('/resume/ats-checker/results');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed');
-    } finally {
       setIsAnalyzing(false);
     }
   };
@@ -61,7 +67,7 @@ export default function ATSCheckerPage() {
           throw new Error(error.detail || 'Analysis failed');
         }
 
-        const apiResult = await response.json();
+        const apiResult: ATSAnalysisBackendResponse = await response.json();
 
         if (!apiResult.success) {
           throw new Error(apiResult.message || 'Failed to analyze resume');
@@ -69,8 +75,8 @@ export default function ATSCheckerPage() {
 
         // Map enhanced backend response to frontend format
         const detectedJob = apiResult.data.detected_job_type
-          ? `${apiResult.data.detected_job_type} (${Math.round(apiResult.data.job_detection_confidence * 100)}% confidence)`
-          : apiResult.data.match_category || 'General Analysis';
+          ? `${apiResult.data.detected_job_type} (${Math.round((apiResult.data.job_detection_confidence || 0) * 100)}% confidence)`
+          : 'General Analysis';
 
         return {
           jobType: detectedJob,
@@ -82,7 +88,9 @@ export default function ATSCheckerPage() {
           weaknesses: apiResult.data.weaknesses || [],
           keywordDensity: {},
           wordCount: apiResult.data.word_count || 0,
-          characterCount: 0,
+          characterCount:
+            apiResult.data.extraction_details?.full_resume_text?.length || 0,
+          extraction_details: apiResult.data.extraction_details,
         };
       } else {
         // Basic analysis without job description - use generic job description
@@ -111,7 +119,7 @@ export default function ATSCheckerPage() {
           throw new Error(error.detail || 'Analysis failed');
         }
 
-        const apiResult = await response.json();
+        const apiResult: ATSAnalysisBackendResponse = await response.json();
 
         if (!apiResult.success) {
           throw new Error(apiResult.message || 'Failed to analyze resume');
@@ -119,7 +127,7 @@ export default function ATSCheckerPage() {
 
         // Return basic analysis with note about improving with JD
         const detectedJob = apiResult.data.detected_job_type
-          ? `${apiResult.data.detected_job_type} (${Math.round(apiResult.data.job_detection_confidence * 100)}% confidence)`
+          ? `${apiResult.data.detected_job_type} (${Math.round((apiResult.data.job_detection_confidence || 0) * 100)}% confidence)`
           : 'General Analysis';
 
         return {
@@ -137,7 +145,9 @@ export default function ATSCheckerPage() {
           weaknesses: apiResult.data.weaknesses || [],
           keywordDensity: {},
           wordCount: apiResult.data.word_count || 0,
-          characterCount: 0,
+          characterCount:
+            apiResult.data.extraction_details?.full_resume_text?.length || 0,
+          extraction_details: apiResult.data.extraction_details,
         };
       }
     } catch (error) {

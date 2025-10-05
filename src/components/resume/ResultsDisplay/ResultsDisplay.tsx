@@ -3,10 +3,11 @@
 import React from 'react';
 
 import { Card } from '@/components/ui/Card';
-import { AnalysisResult } from '@/lib/ats/analyzer';
+import type { AnalysisResult } from '@/types/ats';
 
 interface ResultsDisplayProps {
   result: AnalysisResult;
+  onTryAgain?: () => void;
 }
 
 export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {

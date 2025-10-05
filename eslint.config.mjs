@@ -19,16 +19,16 @@ const eslintConfig = [
         'error',
         { argsIgnorePattern: '^_' },
       ],
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error', // Changed from 'warn' to 'error'
       '@typescript-eslint/no-var-requires': 'error',
 
       // React specific rules
       'react/prop-types': 'off', // We use TypeScript
       'react/react-in-jsx-scope': 'off', // Next.js handles this
-      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/exhaustive-deps': 'error', // Changed from 'warn' to 'error'
 
       // General rules
-      'no-console': 'warn',
+      'no-console': 'error', // Changed from 'warn' to 'error'
       'no-debugger': 'error',
       'prefer-const': 'error',
       'no-var': 'error',

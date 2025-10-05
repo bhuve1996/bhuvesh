@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
@@ -15,26 +16,30 @@ export const Navigation: React.FC<NavigationProps> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems: NavItem[] = [
-    { label: 'Home', href: '#home' },
-    { label: 'About', href: '#about' },
-    { label: 'Projects', href: '#projects' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'Resume', href: '/resume' },
+    { label: 'About', href: '/#about' },
+    { label: 'Projects', href: '/#projects' },
+    { label: 'ATS Checker', href: '/resume/ats-checker' },
     { label: 'Services', href: '/services' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Contact', href: '/#contact' },
   ];
 
   const handleNavClick = (item: NavItem) => {
-    if (item.href.startsWith('#')) {
-      const sectionId = item.href.substring(1);
-      onSectionClick?.(sectionId);
+    // Handle hash links like /#about
+    if (item.href.includes('#')) {
+      const sectionId = item.href.split('#')[1];
+      if (sectionId && onSectionClick) {
+        onSectionClick(sectionId);
+      }
     }
     setIsMobileMenuOpen(false);
   };
 
   const isActive = (item: NavItem) => {
-    if (item.href.startsWith('#')) {
-      return activeSection === item.href.substring(1);
+    // Handle hash links like /#about
+    if (item.href.includes('#')) {
+      const sectionId = item.href.split('#')[1];
+      return activeSection === sectionId;
     }
     return false;
   };
@@ -44,19 +49,28 @@ export const Navigation: React.FC<NavigationProps> = ({
       <div className='max-w-6xl mx-auto px-6 py-4'>
         <div className='flex justify-between items-center'>
           {/* Logo */}
-          <div className='flex items-center space-x-2'>
-            <div className='w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center'>
-              <span className='text-white font-bold text-lg'>B</span>
-            </div>
-            <span className='text-xl font-bold text-white'>Bhuvesh</span>
-          </div>
+          <Link
+            href='/'
+            className='hover:opacity-80 transition-opacity'
+            aria-label='Go to homepage'
+          >
+            <Image
+              src='/logo.png'
+              alt='Bhuvesh Logo'
+              width={64}
+              height={64}
+              className='w-16 h-16 rounded-lg object-cover'
+              priority
+            />
+          </Link>
 
           {/* Desktop Navigation */}
           <div className='hidden md:flex items-center space-x-8'>
             {navItems.map(item => (
               <React.Fragment key={item.label}>
-                {item.href.startsWith('#') ? (
-                  <button
+                {item.href.includes('#') ? (
+                  <Link
+                    href={item.href}
                     onClick={() => handleNavClick(item)}
                     className={`transition-colors duration-300 ${
                       isActive(item)
@@ -65,7 +79,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                     }`}
                   >
                     {item.label}
-                  </button>
+                  </Link>
                 ) : (
                   <Link
                     href={item.href}
@@ -97,8 +111,9 @@ export const Navigation: React.FC<NavigationProps> = ({
             <div className='flex flex-col space-y-4 pt-4'>
               {navItems.map(item => (
                 <React.Fragment key={item.label}>
-                  {item.href.startsWith('#') ? (
-                    <button
+                  {item.href.includes('#') ? (
+                    <Link
+                      href={item.href}
                       onClick={() => handleNavClick(item)}
                       className={`text-left transition-colors duration-300 ${
                         isActive(item)
@@ -107,7 +122,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                       }`}
                     >
                       {item.label}
-                    </button>
+                    </Link>
                   ) : (
                     <Link
                       href={item.href}
