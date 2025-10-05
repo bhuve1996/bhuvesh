@@ -79,6 +79,7 @@ This is CRITICAL for your app to work!
 | ----------------------- | ------------------------------------------------ |
 | `GEMINI_API_KEY`        | `AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs`        |
 | `GOOGLE_GEMINI_API_KEY` | `AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs`        |
+| `ENVIRONMENT`           | `production` (optional)                          |
 | `PORT`                  | `8000` (Railway usually sets this automatically) |
 
 **Screenshot of what it should look like:**

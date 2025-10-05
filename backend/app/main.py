@@ -27,9 +27,11 @@ origins = [
     "http://127.0.0.1:3000",  # Local development (alternative)
     "https://bhuvesh.vercel.app",  # Your Vercel deployment
     "https://*.vercel.app",  # Any Vercel preview deployments
+    "https://www.bhuvesh.com",  # Your custom domain
+    "https://bhuvesh.com",  # Your custom domain (without www)
 ]
 
-# Add custom domain if set in environment
+# Add additional custom domains from environment
 custom_domain = os.getenv("FRONTEND_URL")
 if custom_domain:
     origins.append(custom_domain)
