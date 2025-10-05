@@ -75,19 +75,20 @@ This is CRITICAL for your app to work!
 2. Click **"Add Variable"** or **"New Variable"**
 3. Add these variables:
 
-| Variable Name           | Value                                            |
-| ----------------------- | ------------------------------------------------ |
-| `GEMINI_API_KEY`        | `AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs`        |
-| `GOOGLE_GEMINI_API_KEY` | `AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs`        |
-| `ENVIRONMENT`           | `production` (optional)                          |
-| `PORT`                  | `8000` (Railway usually sets this automatically) |
+| Variable Name    | Value                                            |
+| ---------------- | ------------------------------------------------ |
+| `GEMINI_API_KEY` | `AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs`        |
+| `ENVIRONMENT`    | `production` (optional)                          |
+| `PORT`           | `8000` (Railway usually sets this automatically) |
 
 **Screenshot of what it should look like:**
 
 ```
 GEMINI_API_KEY = AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs
-GOOGLE_GEMINI_API_KEY = AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs
+ENVIRONMENT = production
 ```
+
+**Note:** You only need `GEMINI_API_KEY` - we simplified it to use just one variable!
 
 4. Click **"Add"** or **"Save"**
 

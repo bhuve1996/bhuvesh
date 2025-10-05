@@ -31,10 +31,14 @@ origins = [
     "https://bhuvesh.com",  # Your custom domain (without www)
 ]
 
-# Add additional custom domains from environment
-custom_domain = os.getenv("FRONTEND_URL")
-if custom_domain:
-    origins.append(custom_domain)
+# Add additional custom domains from environment variable
+# Supports multiple domains separated by commas
+# Example: FRONTEND_URL=https://staging.bhuvesh.com,https://beta.bhuvesh.com
+custom_domains = os.getenv("FRONTEND_URL")
+if custom_domains:
+    # Split by comma and add each domain
+    additional_domains = [domain.strip() for domain in custom_domains.split(",") if domain.strip()]
+    origins.extend(additional_domains)
 
 app.add_middleware(
     CORSMiddleware,
