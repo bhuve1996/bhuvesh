@@ -1,333 +1,374 @@
 """
-ATS (Applicant Tracking System) Analysis Engine
-This analyzes resumes for ATS compatibility and provides scoring
+Advanced ATS (Applicant Tracking System) Analysis Engine
+Uses semantic embeddings for concept matching, not just keywords
 """
 
 import re
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any, Tuple, Optional
 from collections import Counter
+import numpy as np
+
+# Import job detector
+from app.services.job_detector import job_detector
+
+# Try to import sentence-transformers, fall back to basic matching if not available
+try:
+    from sentence_transformers import SentenceTransformer, util
+    EMBEDDINGS_AVAILABLE = True
+except ImportError:
+    EMBEDDINGS_AVAILABLE = False
+    print("Warning: sentence-transformers not available. Using keyword-only matching.")
 
 class ATSAnalyzer:
     """
-    Advanced ATS resume analyzer
-    Analyzes resumes for keyword matching, format compliance, and ATS compatibility
+    Production-grade ATS analyzer with semantic matching
     """
     
     def __init__(self):
-        """
-        Initialize the ATS analyzer with job profiles and scoring weights
-        """
-        # Scoring weights (must add up to 100)
-        self.weights = {
-            'keyword_matching': 40,    # 40% - Most important
-            'format_compliance': 25,   # 25% - ATS-friendly formatting
-            'content_quality': 20,     # 20% - Content structure and quality
-            'ats_compatibility': 15    # 15% - General ATS compatibility
-        }
+        """Initialize with embeddings model if available"""
+        # Load sentence transformer model for semantic matching
+        if EMBEDDINGS_AVAILABLE:
+            try:
+                self.model = SentenceTransformer('all-MiniLM-L6-v2')  # Lightweight, fast model
+                self.use_embeddings = True
+            except:
+                self.use_embeddings = False
+        else:
+            self.use_embeddings = False
         
-        # Job profiles with keywords and requirements
-        self.job_profiles = {
-            'software_engineer': {
-                'name': 'Software Engineer',
-                'keywords': [
-                    'javascript', 'typescript', 'python', 'java', 'c++', 'c#', 'go', 'rust',
-                    'react', 'vue', 'angular', 'node.js', 'express', 'django', 'flask',
-                    'spring boot', 'asp.net', 'laravel', 'ruby on rails',
-                    'sql', 'postgresql', 'mysql', 'mongodb', 'redis', 'elasticsearch',
-                    'aws', 'azure', 'gcp', 'docker', 'kubernetes', 'jenkins', 'git',
-                    'rest api', 'graphql', 'microservices', 'agile', 'scrum', 'devops'
-                ],
-                'skills': [
-                    'programming', 'problem solving', 'algorithm design', 'data structures',
-                    'software architecture', 'code review', 'testing', 'debugging',
-                    'version control', 'ci/cd', 'cloud computing', 'database design'
-                ],
-                'experience_keywords': [
-                    '2+ years', '3+ years', '5+ years', 'senior level', 'lead developer',
-                    'full-stack development', 'backend development', 'frontend development'
-                ]
-            },
-            'data_scientist': {
-                'name': 'Data Scientist',
-                'keywords': [
-                    'python', 'r', 'sql', 'pandas', 'numpy', 'scikit-learn', 'tensorflow',
-                    'pytorch', 'keras', 'jupyter', 'matplotlib', 'seaborn', 'plotly',
-                    'apache spark', 'hadoop', 'kafka', 'airflow', 'mlflow',
-                    'machine learning', 'deep learning', 'nlp', 'computer vision',
-                    'statistics', 'probability', 'linear algebra', 'calculus',
-                    'a/b testing', 'feature engineering', 'model deployment'
-                ],
-                'skills': [
-                    'statistical analysis', 'machine learning', 'data visualization',
-                    'data mining', 'predictive modeling', 'experimental design',
-                    'business intelligence', 'data storytelling', 'critical thinking'
-                ],
-                'experience_keywords': [
-                    '2+ years', '3+ years', '5+ years', 'phd', 'research experience',
-                    'industry experience', 'academic background'
-                ]
-            },
-            'marketing_manager': {
-                'name': 'Marketing Manager',
-                'keywords': [
-                    'digital marketing', 'seo', 'sem', 'ppc', 'google ads', 'facebook ads',
-                    'content marketing', 'social media marketing', 'email marketing',
-                    'marketing automation', 'hubspot', 'salesforce', 'google analytics',
-                    'adobe creative suite', 'canva', 'figma', 'wordpress',
-                    'campaign management', 'brand management', 'market research',
-                    'customer acquisition', 'lead generation', 'conversion optimization'
-                ],
-                'skills': [
-                    'strategic planning', 'campaign management', 'brand development',
-                    'market research', 'data analysis', 'creative direction',
-                    'project management', 'team leadership', 'communication'
-                ],
-                'experience_keywords': [
-                    '3+ years', '5+ years', 'management experience', 'team leadership',
-                    'campaign management', 'brand management'
-                ]
-            }
+        # Scoring weights
+        self.weights = {
+            'keyword_matching': 35,      # Reduced from 40 since we have semantic now
+            'semantic_matching': 15,     # NEW: Concept/semantic matching
+            'format_compliance': 20,     # Format and structure
+            'content_quality': 20,       # Content quality
+            'ats_compatibility': 10      # ATS-friendly formatting
         }
     
-    def analyze_resume(self, parsed_content: Dict[str, Any]) -> Dict[str, Any]:
+    def analyze_resume_with_job_description(
+        self, 
+        parsed_resume: Dict[str, Any], 
+        job_description: str
+    ) -> Dict[str, Any]:
         """
-        Main analysis method that scores a resume
+        Complete ATS analysis comparing resume with job description
         
         Args:
-            parsed_content: Parsed resume content from file parser
+            parsed_resume: Parsed resume from file_parser
+            job_description: Job description text from user
             
         Returns:
-            Complete analysis results with score and recommendations
+            Comprehensive analysis with scores and recommendations
         """
-        text = parsed_content.get('text', '').lower()
-        word_count = parsed_content.get('word_count', 0)
+        resume_text = parsed_resume.get('text', '').lower()
+        jd_text = job_description.lower()
         
-        # Step 1: Detect job type
-        job_type = self._detect_job_type(text)
-        job_profile = self.job_profiles.get(job_type, self.job_profiles['software_engineer'])
+        # Extract keywords from job description
+        jd_keywords = self._extract_keywords(jd_text)
+        jd_requirements = self._extract_requirements(jd_text)
         
-        # Step 2: Analyze different aspects
-        keyword_analysis = self._analyze_keywords(text, job_profile)
-        format_analysis = self._analyze_format(parsed_content)
-        content_analysis = self._analyze_content(text, word_count)
-        ats_analysis = self._analyze_ats_compatibility(parsed_content)
+        # Perform all analyses
+        keyword_analysis = self._analyze_keywords_vs_jd(resume_text, jd_keywords)
+        semantic_analysis = self._analyze_semantic_match(resume_text, jd_text)
+        format_analysis = self._analyze_format(parsed_resume)
+        content_analysis = self._analyze_content(resume_text, parsed_resume.get('word_count', 0))
+        ats_analysis = self._analyze_ats_compatibility(parsed_resume)
         
-        # Step 3: Calculate overall score
+        # Calculate overall score
         overall_score = self._calculate_overall_score(
-            keyword_analysis, format_analysis, content_analysis, ats_analysis
+            keyword_analysis, 
+            semantic_analysis,
+            format_analysis, 
+            content_analysis, 
+            ats_analysis
         )
         
-        # Step 4: Generate recommendations
-        recommendations = self._generate_recommendations(
-            keyword_analysis, format_analysis, content_analysis, ats_analysis, job_profile
+        # Detect job type using AI
+        detected_job, job_confidence = job_detector.detect_job_type(resume_text)
+        
+        # Generate recommendations
+        recommendations = self._generate_recommendations_with_jd(
+            keyword_analysis,
+            semantic_analysis,
+            format_analysis,
+            content_analysis,
+            ats_analysis,
+            jd_requirements
         )
         
         return {
-            'job_type': job_profile['name'],
             'ats_score': overall_score,
+            'match_category': self._get_match_category(overall_score),
+            'detected_job_type': detected_job,
+            'job_detection_confidence': round(job_confidence, 2),
             'keyword_matches': keyword_analysis['matched_keywords'],
             'missing_keywords': keyword_analysis['missing_keywords'],
+            'semantic_similarity': semantic_analysis['similarity_score'],
             'suggestions': recommendations['suggestions'],
             'strengths': recommendations['strengths'],
             'weaknesses': recommendations['weaknesses'],
-            'keyword_density': keyword_analysis['keyword_density'],
-            'word_count': word_count,
-            'character_count': parsed_content.get('character_count', 0),
-            'detailed_analysis': {
-                'keyword_score': keyword_analysis['score'],
-                'format_score': format_analysis['score'],
-                'content_score': content_analysis['score'],
-                'ats_score': ats_analysis['score']
-            }
+            'formatting_issues': parsed_resume.get('formatting_analysis', {}).get('formatting_issues', []),
+            'ats_friendly': parsed_resume.get('formatting_analysis', {}).get('ats_friendly', True),
+            'word_count': parsed_resume.get('word_count', 0),
+            'detailed_scores': {
+                'keyword_score': round(keyword_analysis['score'], 1),
+                'semantic_score': round(semantic_analysis['score'], 1),
+                'format_score': round(format_analysis['score'], 1),
+                'content_score': round(content_analysis['score'], 1),
+                'ats_score': round(ats_analysis['score'], 1)
+            },
+            'requirements_met': jd_requirements
         }
     
-    def _detect_job_type(self, text: str) -> str:
+    def _extract_keywords(self, text: str) -> List[str]:
         """
-        Detect the most likely job type based on resume content
+        Extract important keywords from job description
         """
-        job_scores = {}
+        # Remove common words
+        stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 
+                     'of', 'with', 'by', 'from', 'is', 'are', 'was', 'were', 'be', 'been',
+                     'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should',
+                     'can', 'could', 'may', 'might', 'must', 'shall'}
         
-        for job_id, profile in self.job_profiles.items():
-            score = 0
-            
-            # Check for job title mentions
-            if profile['name'].lower() in text:
-                score += 10
-            
-            # Check for keyword matches
-            for keyword in profile['keywords']:
-                if keyword in text:
-                    score += 2
-            
-            # Check for skill matches
-            for skill in profile['skills']:
-                if skill in text:
-                    score += 1
-            
-            job_scores[job_id] = score
+        # Extract words and phrases
+        words = re.findall(r'\b[a-z]+\b', text)
         
-        # Return job type with highest score
-        return max(job_scores, key=job_scores.get)
+        # Filter and count
+        filtered_words = [w for w in words if w not in stop_words and len(w) > 2]
+        word_freq = Counter(filtered_words)
+        
+        # Get top keywords (appearing more than once)
+        keywords = [word for word, freq in word_freq.most_common(30) if freq > 1]
+        
+        # Also extract common tech/skill terms
+        tech_patterns = [
+            r'\b\w*(?:javascript|python|java|c\+\+|sql|aws|azure|docker|kubernetes)\w*\b',
+            r'\b\d\+\s*years?\b',
+            r'\b(?:bachelor|master|phd|degree)\b'
+        ]
+        
+        for pattern in tech_patterns:
+            matches = re.findall(pattern, text, re.IGNORECASE)
+            keywords.extend([m.lower() for m in matches])
+        
+        return list(set(keywords))[:50]  # Return unique, limit to 50
     
-    def _analyze_keywords(self, text: str, job_profile: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_requirements(self, jd_text: str) -> Dict[str, List[str]]:
         """
-        Analyze keyword matching and density
+        Extract structured requirements from job description
         """
-        keywords = job_profile['keywords']
+        requirements = {
+            'must_have': [],
+            'nice_to_have': [],
+            'experience': [],
+            'education': []
+        }
+        
+        # Extract experience requirements
+        exp_patterns = [
+            r'(\d+)\+?\s*years?.*?experience',
+            r'experience.*?(\d+)\+?\s*years?',
+        ]
+        for pattern in exp_patterns:
+            matches = re.findall(pattern, jd_text, re.IGNORECASE)
+            if matches:
+                requirements['experience'].extend(matches)
+        
+        # Extract education requirements
+        edu_patterns = [
+            r'\b(bachelor|master|phd|degree).*?(computer science|engineering|business|mathematics|statistics)\b',
+            r'\b(computer science|engineering|business|mathematics|statistics).*?(bachelor|master|phd|degree)\b'
+        ]
+        for pattern in edu_patterns:
+            matches = re.findall(pattern, jd_text, re.IGNORECASE)
+            if matches:
+                requirements['education'].extend([' '.join(m) for m in matches])
+        
+        return requirements
+    
+    def _analyze_keywords_vs_jd(self, resume_text: str, jd_keywords: List[str]) -> Dict[str, Any]:
+        """
+        Analyze keyword matching between resume and JD
+        """
         matched_keywords = []
         missing_keywords = []
-        keyword_density = {}
         
-        # Check for keyword matches
-        for keyword in keywords:
-            if keyword in text:
+        for keyword in jd_keywords:
+            if keyword in resume_text:
                 matched_keywords.append(keyword)
-                # Calculate keyword density
-                density = (text.count(keyword) / len(text.split())) * 100
-                keyword_density[keyword] = round(density, 2)
             else:
                 missing_keywords.append(keyword)
         
-        # Calculate keyword score (0-100)
-        keyword_score = (len(matched_keywords) / len(keywords)) * 100
+        # Calculate score
+        if len(jd_keywords) > 0:
+            score = (len(matched_keywords) / len(jd_keywords)) * 100
+        else:
+            score = 50  # Default if no keywords extracted
         
         return {
-            'matched_keywords': matched_keywords,
-            'missing_keywords': missing_keywords[:10],  # Top 10 missing
-            'keyword_density': keyword_density,
-            'score': min(keyword_score, 100)
+            'matched_keywords': matched_keywords[:20],  # Top 20
+            'missing_keywords': missing_keywords[:10],  # Top 10
+            'match_percentage': round((len(matched_keywords) / max(len(jd_keywords), 1)) * 100, 1),
+            'score': min(score, 100)
         }
     
-    def _analyze_format(self, parsed_content: Dict[str, Any]) -> Dict[str, Any]:
+    def _analyze_semantic_match(self, resume_text: str, jd_text: str) -> Dict[str, Any]:
         """
-        Analyze resume format compliance
+        Analyze semantic similarity using embeddings (concept matching)
         """
-        text = parsed_content.get('text', '').lower()
-        word_count = parsed_content.get('word_count', 0)
+        if not self.use_embeddings:
+            # Fallback to basic matching
+            return {
+                'similarity_score': 0,
+                'score': 50,  # Neutral score
+                'method': 'embeddings_unavailable'
+            }
+        
+        try:
+            # Split into sentences for better matching
+            resume_sentences = [s.strip() for s in resume_text.split('.') if len(s.strip()) > 20][:10]
+            jd_sentences = [s.strip() for s in jd_text.split('.') if len(s.strip()) > 20][:10]
+            
+            if not resume_sentences or not jd_sentences:
+                return {'similarity_score': 0, 'score': 50, 'method': 'insufficient_text'}
+            
+            # Encode sentences
+            resume_embeddings = self.model.encode(resume_sentences, convert_to_tensor=True)
+            jd_embeddings = self.model.encode(jd_sentences, convert_to_tensor=True)
+            
+            # Calculate cosine similarity
+            similarities = util.cos_sim(resume_embeddings, jd_embeddings)
+            
+            # Get max similarity for each resume sentence
+            max_similarities = similarities.max(dim=1)[0]
+            avg_similarity = max_similarities.mean().item()
+            
+            # Convert to score (0-100)
+            score = avg_similarity * 100
+            
+            return {
+                'similarity_score': round(avg_similarity, 3),
+                'score': round(score, 1),
+                'method': 'sentence_transformers'
+            }
+            
+        except Exception as e:
+            print(f"Error in semantic analysis: {e}")
+            return {
+                'similarity_score': 0,
+                'score': 50,
+                'method': 'error'
+            }
+    
+    def _analyze_format(self, parsed_resume: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Analyze resume format and structure
+        """
+        text = parsed_resume.get('text', '').lower()
+        word_count = parsed_resume.get('word_count', 0)
         score = 0
         
-        # Check for required sections
+        # Check for required sections (0-40 points)
         required_sections = ['experience', 'education', 'skills']
-        found_sections = 0
-        
-        for section in required_sections:
-            if section in text:
-                found_sections += 1
-        
-        # Section score (0-40 points)
+        found_sections = sum(1 for section in required_sections if section in text)
         section_score = (found_sections / len(required_sections)) * 40
         score += section_score
         
         # Word count score (0-30 points)
         if 400 <= word_count <= 800:
-            score += 30  # Optimal length
+            score += 30  # Optimal
         elif 300 <= word_count <= 1000:
-            score += 20  # Good length
+            score += 20
         elif 200 <= word_count <= 1200:
-            score += 10  # Acceptable length
+            score += 10
         
         # Contact info score (0-30 points)
         contact_keywords = ['email', 'phone', 'linkedin', 'github']
-        contact_found = sum(1 for keyword in contact_keywords if keyword in text)
+        contact_found = sum(1 for kw in contact_keywords if kw in text)
         contact_score = (contact_found / len(contact_keywords)) * 30
         score += contact_score
         
         return {
             'score': min(score, 100),
             'sections_found': found_sections,
-            'word_count': word_count,
-            'contact_info_score': contact_score
+            'word_count': word_count
         }
     
     def _analyze_content(self, text: str, word_count: int) -> Dict[str, Any]:
         """
-        Analyze content quality and structure
+        Analyze content quality
         """
         score = 0
         
-        # Check for quantifiable achievements (0-40 points)
+        # Quantifiable achievements (0-40 points)
         numbers = re.findall(r'\d+', text)
-        if len(numbers) >= 3:
+        if len(numbers) >= 5:
             score += 40
+        elif len(numbers) >= 3:
+            score += 25
         elif len(numbers) >= 1:
-            score += 20
+            score += 10
         
-        # Check for action verbs (0-30 points)
+        # Action verbs (0-30 points)
         action_verbs = [
             'developed', 'implemented', 'designed', 'created', 'built', 'managed',
-            'led', 'increased', 'improved', 'optimized', 'delivered', 'achieved'
+            'led', 'increased', 'improved', 'optimized', 'delivered', 'achieved',
+            'established', 'launched', 'executed', 'collaborated', 'coordinated'
         ]
         verb_count = sum(1 for verb in action_verbs if verb in text)
-        verb_score = min((verb_count / len(action_verbs)) * 30, 30)
+        verb_score = min((verb_count / 5) * 30, 30)
         score += verb_score
         
-        # Check for professional language (0-30 points)
+        # Professional language (0-30 points)
         professional_terms = [
-            'collaborated', 'strategic', 'innovative', 'efficient', 'scalable',
-            'robust', 'comprehensive', 'proven', 'expertise', 'proficiency'
+            'strategic', 'innovative', 'efficient', 'scalable', 'robust',
+            'comprehensive', 'proven', 'expertise', 'proficiency', 'excellence'
         ]
-        professional_count = sum(1 for term in professional_terms if term in text)
-        professional_score = min((professional_count / len(professional_terms)) * 30, 30)
-        score += professional_score
+        prof_count = sum(1 for term in professional_terms if term in text)
+        prof_score = min((prof_count / 3) * 30, 30)
+        score += prof_score
         
         return {
             'score': min(score, 100),
-            'numbers_found': len(numbers),
-            'action_verbs': verb_count,
-            'professional_terms': professional_count
+            'metrics_count': len(numbers),
+            'action_verbs_count': verb_count
         }
     
-    def _analyze_ats_compatibility(self, parsed_content: Dict[str, Any]) -> Dict[str, Any]:
+    def _analyze_ats_compatibility(self, parsed_resume: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Analyze ATS compatibility factors
+        Analyze ATS-friendly formatting
         """
-        text = parsed_content.get('text', '')
-        score = 0
+        formatting = parsed_resume.get('formatting_analysis', {})
+        score = 100  # Start with perfect score
         
-        # Check for ATS-friendly formatting (0-50 points)
-        # No special characters that might confuse ATS
-        special_chars = ['@', '#', '$', '%', '^', '&', '*', '(', ')', '[', ']', '{', '}']
-        special_char_count = sum(text.count(char) for char in special_chars)
+        # Deduct points for issues
+        images_count = formatting.get('images_count', 0)
+        if images_count > 0:
+            score -= 30
         
-        if special_char_count < 10:
-            score += 50
-        elif special_char_count < 20:
-            score += 30
-        else:
-            score += 10
+        tables_detected = formatting.get('tables_detected', False)
+        if tables_detected:
+            score -= 20
         
-        # Check for standard section headers (0-30 points)
-        standard_headers = [
-            'experience', 'work history', 'employment',
-            'education', 'academic background',
-            'skills', 'technical skills', 'core competencies'
-        ]
-        header_count = sum(1 for header in standard_headers if header.lower() in text.lower())
-        header_score = min((header_count / len(standard_headers)) * 30, 30)
-        score += header_score
-        
-        # Check for consistent formatting (0-20 points)
-        # Look for consistent bullet points or numbering
-        bullet_points = text.count('•') + text.count('-') + text.count('*')
-        if bullet_points >= 5:
-            score += 20
-        elif bullet_points >= 3:
-            score += 10
+        fonts_count = formatting.get('fonts_count', 1)
+        if fonts_count > 3:
+            score -= 15
         
         return {
-            'score': min(score, 100),
-            'special_char_count': special_char_count,
-            'standard_headers': header_count,
-            'bullet_points': bullet_points
+            'score': max(score, 0),
+            'ats_friendly': formatting.get('ats_friendly', True),
+            'issues': formatting.get('formatting_issues', [])
         }
     
-    def _calculate_overall_score(self, keyword_analysis: Dict, format_analysis: Dict, 
-                                content_analysis: Dict, ats_analysis: Dict) -> int:
+    def _calculate_overall_score(self, keyword_analysis: Dict, semantic_analysis: Dict,
+                                format_analysis: Dict, content_analysis: Dict, 
+                                ats_analysis: Dict) -> int:
         """
-        Calculate weighted overall ATS score
+        Calculate weighted overall score
         """
         weighted_score = (
             keyword_analysis['score'] * self.weights['keyword_matching'] +
+            semantic_analysis['score'] * self.weights['semantic_matching'] +
             format_analysis['score'] * self.weights['format_compliance'] +
             content_analysis['score'] * self.weights['content_quality'] +
             ats_analysis['score'] * self.weights['ats_compatibility']
@@ -335,11 +376,29 @@ class ATSAnalyzer:
         
         return round(weighted_score)
     
-    def _generate_recommendations(self, keyword_analysis: Dict, format_analysis: Dict,
-                                 content_analysis: Dict, ats_analysis: Dict, 
-                                 job_profile: Dict[str, Any]) -> Dict[str, List[str]]:
+    def _get_match_category(self, score: int) -> str:
         """
-        Generate actionable recommendations based on analysis
+        Categorize the match score
+        """
+        if score >= 80:
+            return "Excellent Match"
+        elif score >= 70:
+            return "Good Match"
+        elif score >= 60:
+            return "Fair Match"
+        elif score >= 50:
+            return "Needs Improvement"
+        else:
+            return "Poor Match"
+    
+    def _generate_recommendations_with_jd(self, keyword_analysis: Dict, 
+                                         semantic_analysis: Dict,
+                                         format_analysis: Dict,
+                                         content_analysis: Dict,
+                                         ats_analysis: Dict,
+                                         requirements: Dict) -> Dict[str, List[str]]:
+        """
+        Generate actionable recommendations
         """
         suggestions = []
         strengths = []
@@ -347,43 +406,52 @@ class ATSAnalyzer:
         
         # Keyword recommendations
         if keyword_analysis['score'] < 70:
-            suggestions.append(f"Add more {job_profile['name']} keywords: {', '.join(keyword_analysis['missing_keywords'][:5])}")
-            weaknesses.append("Low keyword alignment with industry requirements")
+            missing = keyword_analysis['missing_keywords'][:5]
+            suggestions.append(f"Add these keywords from the job description: {', '.join(missing)}")
+            weaknesses.append(f"Only {keyword_analysis['match_percentage']}% keyword match")
         else:
-            strengths.append("Good keyword coverage for the role")
+            strengths.append(f"Strong keyword match ({keyword_analysis['match_percentage']}%)")
+        
+        # Semantic recommendations
+        if semantic_analysis['score'] < 60:
+            suggestions.append("Rephrase experiences to better align with job description concepts")
+            weaknesses.append("Low semantic similarity with job requirements")
+        elif semantic_analysis['score'] > 70:
+            strengths.append("Good conceptual alignment with role requirements")
         
         # Format recommendations
         if format_analysis['score'] < 70:
-            suggestions.append("Improve resume structure with clear sections (Experience, Education, Skills)")
+            suggestions.append("Add clear sections: Experience, Education, Skills")
             weaknesses.append("Missing important resume sections")
         else:
-            strengths.append("Well-structured resume format")
+            strengths.append("Well-structured resume")
         
         # Content recommendations
-        if content_analysis['score'] < 60:
-            suggestions.append("Add more quantifiable achievements and metrics")
-            weaknesses.append("Lack of measurable accomplishments")
+        if content_analysis['metrics_count'] < 3:
+            suggestions.append("Add quantifiable achievements (numbers, percentages, metrics)")
+            weaknesses.append("Lacks measurable accomplishments")
         else:
-            strengths.append("Strong content with quantifiable achievements")
+            strengths.append(f"Good use of metrics ({content_analysis['metrics_count']} quantifiable results)")
         
         # ATS recommendations
-        if ats_analysis['score'] < 70:
-            suggestions.append("Simplify formatting for better ATS compatibility")
-            weaknesses.append("Format may not be ATS-friendly")
+        if not ats_analysis['ats_friendly']:
+            for issue in ats_analysis['issues']:
+                suggestions.append(f"Fix: {issue}")
+            weaknesses.append("Format may not be ATS-compatible")
         else:
-            strengths.append("ATS-compatible formatting")
+            strengths.append("ATS-friendly formatting")
         
-        # Word count recommendations
-        word_count = format_analysis.get('word_count', 0)
+        # Word count
+        word_count = format_analysis['word_count']
         if word_count < 400:
-            suggestions.append("Expand resume with more detailed descriptions")
+            suggestions.append("Expand resume with more detailed descriptions (aim for 400-800 words)")
         elif word_count > 800:
-            suggestions.append("Consider condensing resume to focus on most relevant information")
+            suggestions.append("Consider condensing to 400-800 words for optimal ATS parsing")
         
         return {
             'suggestions': suggestions,
-            'strengths': strengths,
-            'weaknesses': weaknesses
+            'strengths': strengths if strengths else ["Review suggestions to improve your resume"],
+            'weaknesses': weaknesses if weaknesses else ["Good overall structure"]
         }
 
 # Create global instance

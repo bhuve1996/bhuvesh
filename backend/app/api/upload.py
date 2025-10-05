@@ -1,10 +1,11 @@
 """
 File upload API endpoints
-This handles file uploads and parsing
+Enhanced with job description comparison and semantic matching
 """
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from typing import Dict, Any
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form
+from typing import Dict, Any, Optional
+from pydantic import BaseModel
 import sys
 import os
 
@@ -13,6 +14,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.utils.file_parser import file_parser
 from app.services.ats_analyzer import ats_analyzer
+
+# Pydantic models for request/response validation
+class JobDescriptionRequest(BaseModel):
+    """Request model for job description comparison"""
+    job_description: str
+    resume_text: Optional[str] = None
 
 # Create a router (like Express router)
 router = APIRouter(prefix="/api/upload", tags=["upload"])
@@ -54,21 +61,20 @@ async def parse_resume(file: UploadFile = File(...)) -> Dict[str, Any]:
         # Parse the file
         parsed_content = file_parser.parse_file(file_content, file.filename)
         
-        # Perform ATS analysis
-        analysis_result = ats_analyzer.analyze_resume(parsed_content)
-        
-        # Add file metadata to analysis result
-        analysis_result.update({
-            "filename": file.filename,
-            "file_size": len(file_content),
-            "file_type": file.content_type,
-            "parsed_content": parsed_content
-        })
-        
+        # Return parsed content (client can then call analyze endpoint)
         return {
             "success": True,
-            "data": analysis_result,
-            "message": "Resume analyzed successfully"
+            "data": {
+                "filename": file.filename,
+                "file_size": len(file_content),
+                "file_type": file.content_type,
+                "text": parsed_content.get('text', ''),
+                "word_count": parsed_content.get('word_count', 0),
+                "character_count": parsed_content.get('character_count', 0),
+                "formatting_analysis": parsed_content.get('formatting_analysis', {}),
+                "parsed_content": parsed_content
+            },
+            "message": "Resume parsed successfully"
         }
         
     except HTTPException:
@@ -79,6 +85,81 @@ async def parse_resume(file: UploadFile = File(...)) -> Dict[str, Any]:
         raise HTTPException(
             status_code=500, 
             detail=f"Error processing file: {str(e)}"
+        )
+
+@router.post("/analyze")
+async def analyze_resume_with_jd(
+    file: UploadFile = File(...),
+    job_description: str = Form(...)
+) -> Dict[str, Any]:
+    """
+    Complete ATS analysis: Parse resume and compare with job description
+    Uses semantic embeddings for concept matching
+    
+    Args:
+        file: Resume file (PDF, DOCX, or TXT)
+        job_description: Job description text
+        
+    Returns:
+        Comprehensive ATS analysis with scores and recommendations
+    """
+    try:
+        # Validate inputs
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="No file provided")
+        
+        if not job_description or len(job_description.strip()) < 50:
+            raise HTTPException(
+                status_code=400, 
+                detail="Job description is too short. Please provide a detailed job description (at least 50 characters)."
+            )
+        
+        # Check file type
+        file_extension = file.filename.lower().split('.')[-1]
+        if file_extension not in ['pdf', 'docx', 'doc', 'txt']:
+            raise HTTPException(
+                status_code=400, 
+                detail="Unsupported file type. Please upload PDF, DOCX, or TXT files."
+            )
+        
+        # Read and parse file
+        file_content = await file.read()
+        
+        # Check file size
+        if len(file_content) > 10 * 1024 * 1024:
+            raise HTTPException(
+                status_code=400, 
+                detail="File too large. Maximum size is 10MB."
+            )
+        
+        # Parse the resume
+        parsed_resume = file_parser.parse_file(file_content, file.filename)
+        
+        # Perform comprehensive ATS analysis with job description
+        analysis_result = ats_analyzer.analyze_resume_with_job_description(
+            parsed_resume, 
+            job_description
+        )
+        
+        # Add metadata
+        analysis_result.update({
+            "filename": file.filename,
+            "file_size": len(file_content),
+            "jd_length": len(job_description),
+        })
+        
+        return {
+            "success": True,
+            "data": analysis_result,
+            "message": "ATS analysis completed successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error during analysis: {str(e)}"
         )
 
 @router.get("/supported-formats")

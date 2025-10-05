@@ -22,15 +22,14 @@ export default function ATSCheckerPage() {
     setError(null);
   };
 
-  const handleAnalysis = async () => {
+  const handleAnalysis = async (jobDescription: string) => {
     if (!file) return;
 
     setIsAnalyzing(true);
     setError(null);
 
     try {
-      // Call our Python backend API
-      const result = await analyzeResumeWithBackend(file);
+      const result = await analyzeResumeWithBackend(file, jobDescription);
       setAnalysisResult(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed');
@@ -40,46 +39,113 @@ export default function ATSCheckerPage() {
   };
 
   const analyzeResumeWithBackend = async (
-    file: File
+    file: File,
+    jobDescription: string
   ): Promise<AnalysisResult> => {
-    // Create FormData for file upload
-    const formData = new FormData();
-    formData.append('file', file);
+    const API_URL = 'http://localhost:8000';
 
     try {
-      // Call Python backend API
-      const response = await fetch('http://localhost:8000/api/upload/parse', {
-        method: 'POST',
-        body: formData,
-      });
+      // If job description provided, use enhanced analysis
+      if (jobDescription && jobDescription.trim().length >= 50) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('job_description', jobDescription);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const response = await fetch(`${API_URL}/api/upload/analyze`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.detail || 'Analysis failed');
+        }
+
+        const apiResult = await response.json();
+
+        if (!apiResult.success) {
+          throw new Error(apiResult.message || 'Failed to analyze resume');
+        }
+
+        // Map enhanced backend response to frontend format
+        const detectedJob = apiResult.data.detected_job_type
+          ? `${apiResult.data.detected_job_type} (${Math.round(apiResult.data.job_detection_confidence * 100)}% confidence)`
+          : apiResult.data.match_category || 'General Analysis';
+
+        return {
+          jobType: detectedJob,
+          atsScore: apiResult.data.ats_score,
+          keywordMatches: apiResult.data.keyword_matches || [],
+          missingKeywords: apiResult.data.missing_keywords || [],
+          suggestions: apiResult.data.suggestions || [],
+          strengths: apiResult.data.strengths || [],
+          weaknesses: apiResult.data.weaknesses || [],
+          keywordDensity: {},
+          wordCount: apiResult.data.word_count || 0,
+          characterCount: 0,
+        };
+      } else {
+        // Basic analysis without job description - use generic job description
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // Create a generic job description for basic analysis
+        const genericJD = `Professional role requiring:
+- Strong communication and collaboration skills
+- Problem-solving abilities
+- Relevant experience in your field
+- Technical or domain expertise
+- Ability to work independently and in teams
+- Attention to detail
+- Project management capabilities`;
+
+        formData.append('job_description', genericJD);
+
+        const response = await fetch(`${API_URL}/api/upload/analyze`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.detail || 'Analysis failed');
+        }
+
+        const apiResult = await response.json();
+
+        if (!apiResult.success) {
+          throw new Error(apiResult.message || 'Failed to analyze resume');
+        }
+
+        // Return basic analysis with note about improving with JD
+        const detectedJob = apiResult.data.detected_job_type
+          ? `${apiResult.data.detected_job_type} (${Math.round(apiResult.data.job_detection_confidence * 100)}% confidence)`
+          : 'General Analysis';
+
+        return {
+          jobType: detectedJob,
+          atsScore: apiResult.data.ats_score,
+          keywordMatches: apiResult.data.keyword_matches || [],
+          missingKeywords: [],
+          suggestions: [
+            '💡 Add a specific job description for more accurate analysis',
+            '🎯 Enable job description comparison above for semantic matching',
+            '📊 Get tailored keyword suggestions from the actual job posting',
+            ...(apiResult.data.suggestions || []),
+          ],
+          strengths: apiResult.data.strengths || [],
+          weaknesses: apiResult.data.weaknesses || [],
+          keywordDensity: {},
+          wordCount: apiResult.data.word_count || 0,
+          characterCount: 0,
+        };
       }
-
-      const apiResult = await response.json();
-
-      if (!apiResult.success) {
-        throw new Error(apiResult.message || 'Failed to parse file');
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
       }
-
-      // Return real analysis results from Python backend
-      return {
-        jobType: apiResult.data.job_type,
-        atsScore: apiResult.data.ats_score,
-        keywordMatches: apiResult.data.keyword_matches,
-        missingKeywords: apiResult.data.missing_keywords,
-        suggestions: apiResult.data.suggestions,
-        strengths: apiResult.data.strengths,
-        weaknesses: apiResult.data.weaknesses,
-        keywordDensity: apiResult.data.keyword_density,
-        wordCount: apiResult.data.word_count,
-        characterCount: apiResult.data.character_count,
-      };
-    } catch {
-      // Backend API error - show user-friendly message
       throw new Error(
-        'Failed to connect to analysis server. Please try again.'
+        'Failed to connect to analysis server. Please ensure the backend is running on port 8000.'
       );
     }
   };

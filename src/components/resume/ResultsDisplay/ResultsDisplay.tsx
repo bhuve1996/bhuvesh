@@ -35,7 +35,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         </p>
       </div>
 
-      {/* ATS Score */}
+      {/* ATS Score - Always Show */}
       <Card className='p-6'>
         <div className='text-center'>
           <h3 className='text-xl font-bold mb-4 text-white'>
@@ -57,47 +57,55 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
               result.atsScore < 80 &&
               'Good! Your resume has good ATS compatibility with room for improvement.'}
             {result.atsScore < 60 &&
-              'Your resume needs significant improvements for ATS compatibility.'}
+              result.atsScore >= 0 &&
+              'Your resume needs improvements for better ATS compatibility.'}
           </p>
         </div>
       </Card>
 
       {/* Keyword Analysis */}
-      <div className='grid md:grid-cols-2 gap-6'>
-        {/* Matched Keywords */}
-        <Card className='p-6'>
-          <h3 className='text-xl font-bold mb-4 text-green-400'>
-            ✅ Matched Keywords
-          </h3>
-          <div className='flex flex-wrap gap-2'>
-            {result.keywordMatches.map((keyword, index) => (
-              <span
-                key={index}
-                className='px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm border border-green-500/30'
-              >
-                {keyword}
-              </span>
-            ))}
-          </div>
-        </Card>
+      {(result.keywordMatches.length > 0 ||
+        result.missingKeywords.length > 0) && (
+        <div className='grid md:grid-cols-2 gap-6'>
+          {/* Matched Keywords */}
+          {result.keywordMatches.length > 0 && (
+            <Card className='p-6'>
+              <h3 className='text-xl font-bold mb-4 text-green-400'>
+                ✅ Matched Keywords
+              </h3>
+              <div className='flex flex-wrap gap-2'>
+                {result.keywordMatches.map((keyword, index) => (
+                  <span
+                    key={index}
+                    className='px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm border border-green-500/30'
+                  >
+                    {keyword}
+                  </span>
+                ))}
+              </div>
+            </Card>
+          )}
 
-        {/* Missing Keywords */}
-        <Card className='p-6'>
-          <h3 className='text-xl font-bold mb-4 text-red-400'>
-            ❌ Missing Keywords
-          </h3>
-          <div className='flex flex-wrap gap-2'>
-            {result.missingKeywords.map((keyword, index) => (
-              <span
-                key={index}
-                className='px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm border border-red-500/30'
-              >
-                {keyword}
-              </span>
-            ))}
-          </div>
-        </Card>
-      </div>
+          {/* Missing Keywords */}
+          {result.missingKeywords.length > 0 && (
+            <Card className='p-6'>
+              <h3 className='text-xl font-bold mb-4 text-red-400'>
+                ❌ Missing Keywords
+              </h3>
+              <div className='flex flex-wrap gap-2'>
+                {result.missingKeywords.map((keyword, index) => (
+                  <span
+                    key={index}
+                    className='px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm border border-red-500/30'
+                  >
+                    {keyword}
+                  </span>
+                ))}
+              </div>
+            </Card>
+          )}
+        </div>
+      )}
 
       {/* Strengths and Weaknesses */}
       <div className='grid md:grid-cols-2 gap-6'>
