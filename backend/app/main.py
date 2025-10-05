@@ -27,14 +27,20 @@ origins = [
     "http://127.0.0.1:3000",  # Local development (alternative)
     "https://bhuvesh.vercel.app",  # Your Vercel deployment
     "https://*.vercel.app",  # Any Vercel preview deployments
-    "https://www.bhuvesh.com",  # Your custom domain
-    "https://bhuvesh.com",  # Your custom domain (without www)
+    "https://www.bhuvesh.com",  # Your custom domain (HTTPS)
+    "https://bhuvesh.com",  # Your custom domain without www (HTTPS)
+    "http://www.bhuvesh.com",  # Your custom domain (HTTP)
+    "http://bhuvesh.com",  # Your custom domain without www (HTTP)
 ]
 
-# Add additional custom domains from environment
-custom_domain = os.getenv("FRONTEND_URL")
-if custom_domain:
-    origins.append(custom_domain)
+# Add additional custom domains from environment variable
+# Supports multiple domains separated by commas
+# Example: FRONTEND_URL=https://staging.bhuvesh.com,https://beta.bhuvesh.com
+custom_domains = os.getenv("FRONTEND_URL")
+if custom_domains:
+    # Split by comma and add each domain
+    additional_domains = [domain.strip() for domain in custom_domains.split(",") if domain.strip()]
+    origins.extend(additional_domains)
 
 app.add_middleware(
     CORSMiddleware,

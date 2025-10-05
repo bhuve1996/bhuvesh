@@ -8,17 +8,12 @@ All sensitive configuration and secrets are stored in environment variables, not
 
 ## Required Variables
 
-### 🔑 Google Gemini API Keys
+### 🔑 Google Gemini API Key
 
 **Variable:** `GEMINI_API_KEY`  
 **Value:** Your Google Gemini API key  
 **Required:** ✅ YES  
 **Purpose:** Powers AI-based job role detection (Tier 3 fallback)
-
-**Variable:** `GOOGLE_GEMINI_API_KEY`  
-**Value:** Same as above (alternative name for compatibility)  
-**Required:** ✅ YES  
-**Purpose:** Same as above
 
 **How to get:**
 
@@ -42,22 +37,30 @@ AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs
 ### 🌐 Frontend URL
 
 **Variable:** `FRONTEND_URL`  
-**Value:** Additional frontend domain to allow  
+**Value:** Additional frontend domain(s) to allow  
 **Required:** ❌ NO (defaults are already set)  
 **Purpose:** Allow CORS from additional custom domains
 
-**Default allowed domains:**
+**Default allowed domains (already configured):**
 
 - `http://localhost:3000` (local dev)
 - `https://bhuvesh.vercel.app` (Vercel)
 - `https://www.bhuvesh.com` (your custom domain)
 - `https://bhuvesh.com` (your custom domain without www)
 
-**Example:**
+**Single domain example:**
 
 ```
 FRONTEND_URL=https://staging.bhuvesh.com
 ```
+
+**Multiple domains example (comma-separated):**
+
+```
+FRONTEND_URL=https://staging.bhuvesh.com,https://beta.bhuvesh.com,https://dev.bhuvesh.com
+```
+
+**Note:** You can add as many domains as you want, separated by commas. Spaces are automatically trimmed.
 
 ---
 
@@ -97,7 +100,6 @@ FRONTEND_URL=https://staging.bhuvesh.com
 
    ```bash
    GEMINI_API_KEY=AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs
-   GOOGLE_GEMINI_API_KEY=AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs
    PORT=8000
    ENVIRONMENT=development
    ```
@@ -113,11 +115,10 @@ FRONTEND_URL=https://staging.bhuvesh.com
 3. Click "New Variable"
 4. Add each variable:
 
-| Variable Name           | Value                                     |
-| ----------------------- | ----------------------------------------- |
-| `GEMINI_API_KEY`        | `AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs` |
-| `GOOGLE_GEMINI_API_KEY` | `AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs` |
-| `ENVIRONMENT`           | `production`                              |
+| Variable Name    | Value                                     |
+| ---------------- | ----------------------------------------- |
+| `GEMINI_API_KEY` | `AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs` |
+| `ENVIRONMENT`    | `production`                              |
 
 **Note:** Railway automatically sets `PORT` - don't add it manually!
 
@@ -233,13 +234,12 @@ else:
 
 ## Summary Table
 
-| Variable                | Required | Purpose                | Where to Set        |
-| ----------------------- | -------- | ---------------------- | ------------------- |
-| `GEMINI_API_KEY`        | ✅ YES   | AI job detection       | Railway Variables   |
-| `GOOGLE_GEMINI_API_KEY` | ✅ YES   | AI job detection       | Railway Variables   |
-| `PORT`                  | ❌ NO    | Server port            | Auto-set by Railway |
-| `FRONTEND_URL`          | ❌ NO    | Additional CORS domain | Railway Variables   |
-| `ENVIRONMENT`           | ❌ NO    | Environment type       | Railway Variables   |
+| Variable         | Required | Purpose                   | Where to Set        |
+| ---------------- | -------- | ------------------------- | ------------------- |
+| `GEMINI_API_KEY` | ✅ YES   | AI job detection          | Railway Variables   |
+| `PORT`           | ❌ NO    | Server port               | Auto-set by Railway |
+| `FRONTEND_URL`   | ❌ NO    | Additional CORS domain(s) | Railway Variables   |
+| `ENVIRONMENT`    | ❌ NO    | Environment type          | Railway Variables   |
 
 ---
 
@@ -249,9 +249,9 @@ else:
 
 ```bash
 GEMINI_API_KEY=AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs
-GOOGLE_GEMINI_API_KEY=AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs
 ENVIRONMENT=production
 # PORT is auto-set by Railway
+# FRONTEND_URL is optional (defaults already include your domains)
 ```
 
 **Allowed CORS Origins:**
