@@ -25,7 +25,7 @@ All sensitive configuration and secrets are stored in environment variables, not
 **Current Key (for your reference):**
 
 ```
-AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs
+AIzaSy************************************Zqs
 ```
 
 **⚠️ Security:** Never commit this to GitHub! Always use environment variables.
@@ -99,7 +99,7 @@ FRONTEND_URL=https://staging.bhuvesh.com,https://beta.bhuvesh.com,https://dev.bh
 2. Edit `.env` with your actual values:
 
    ```bash
-   GEMINI_API_KEY=AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs
+   GEMINI_API_KEY=your_actual_gemini_api_key_here
    PORT=8000
    ENVIRONMENT=development
    ```
@@ -115,10 +115,10 @@ FRONTEND_URL=https://staging.bhuvesh.com,https://beta.bhuvesh.com,https://dev.bh
 3. Click "New Variable"
 4. Add each variable:
 
-| Variable Name    | Value                                     |
-| ---------------- | ----------------------------------------- |
-| `GEMINI_API_KEY` | `AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs` |
-| `ENVIRONMENT`    | `production`                              |
+| Variable Name    | Value                             |
+| ---------------- | --------------------------------- |
+| `GEMINI_API_KEY` | `your_actual_gemini_api_key_here` |
+| `ENVIRONMENT`    | `production`                      |
 
 **Note:** Railway automatically sets `PORT` - don't add it manually!
 
@@ -248,7 +248,7 @@ else:
 **Production (Railway):**
 
 ```bash
-GEMINI_API_KEY=AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs
+GEMINI_API_KEY=your_actual_gemini_api_key_here
 ENVIRONMENT=production
 # PORT is auto-set by Railway
 # FRONTEND_URL is optional (defaults already include your domains)

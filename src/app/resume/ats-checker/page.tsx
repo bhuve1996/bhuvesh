@@ -42,7 +42,7 @@ export default function ATSCheckerPage() {
     file: File,
     jobDescription: string
   ): Promise<AnalysisResult> => {
-    const API_URL = 'http://localhost:8000';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
     try {
       // If job description provided, use enhanced analysis

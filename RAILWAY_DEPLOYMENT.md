@@ -6,7 +6,7 @@ Before you start, make sure you have:
 
 - [x] GitHub account
 - [x] Your code pushed to GitHub (DONE ✅)
-- [x] Google Gemini API key: `AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs`
+- [x] Google Gemini API key (get yours from https://makersuite.google.com/app/apikey)
 
 ---
 
@@ -77,14 +77,14 @@ This is CRITICAL for your app to work!
 
 | Variable Name    | Value                                            |
 | ---------------- | ------------------------------------------------ |
-| `GEMINI_API_KEY` | `AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs`        |
+| `GEMINI_API_KEY` | `your_actual_gemini_api_key_here`                |
 | `ENVIRONMENT`    | `production` (optional)                          |
 | `PORT`           | `8000` (Railway usually sets this automatically) |
 
 **Screenshot of what it should look like:**
 
 ```
-GEMINI_API_KEY = AIzaSyAV9-3KvdlwgBbt1etD02Qk_PrTY98-Zqs
+GEMINI_API_KEY = your_actual_gemini_api_key_here
 ENVIRONMENT = production
 ```
 
