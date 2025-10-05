@@ -27,8 +27,10 @@ origins = [
     "http://127.0.0.1:3000",  # Local development (alternative)
     "https://bhuvesh.vercel.app",  # Your Vercel deployment
     "https://*.vercel.app",  # Any Vercel preview deployments
-    "https://www.bhuvesh.com",  # Your custom domain
-    "https://bhuvesh.com",  # Your custom domain (without www)
+    "https://www.bhuvesh.com",  # Your custom domain (HTTPS)
+    "https://bhuvesh.com",  # Your custom domain without www (HTTPS)
+    "http://www.bhuvesh.com",  # Your custom domain (HTTP)
+    "http://bhuvesh.com",  # Your custom domain without www (HTTP)
 ]
 
 # Add additional custom domains from environment variable
