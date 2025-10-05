@@ -117,7 +117,16 @@ class ATSAnalyzer:
                 'content_score': round(content_analysis['score'], 1),
                 'ats_score': round(ats_analysis['score'], 1)
             },
-            'requirements_met': jd_requirements
+            'requirements_met': jd_requirements,
+            # DEBUG/VERIFICATION DATA
+            'extraction_details': {
+                'resume_keywords_found': keyword_analysis.get('resume_keywords', [])[:20],  # Top 20 resume keywords
+                'jd_keywords_extracted': jd_keywords[:20],  # Top 20 JD keywords
+                'resume_text_sample': parsed_resume.get('text', '')[:500] + '...' if len(parsed_resume.get('text', '')) > 500 else parsed_resume.get('text', ''),  # First 500 chars
+                'total_resume_keywords': len(keyword_analysis.get('resume_keywords', [])),
+                'total_jd_keywords': len(jd_keywords),
+                'extraction_successful': bool(parsed_resume.get('text', '').strip())
+            }
         }
     
     def _extract_keywords(self, text: str) -> List[str]:
@@ -190,6 +199,9 @@ class ATSAnalyzer:
         """
         Analyze keyword matching between resume and JD
         """
+        # Extract keywords from resume for comparison
+        resume_keywords = self._extract_keywords(resume_text)
+        
         matched_keywords = []
         missing_keywords = []
         
@@ -209,7 +221,8 @@ class ATSAnalyzer:
             'matched_keywords': matched_keywords[:20],  # Top 20
             'missing_keywords': missing_keywords[:10],  # Top 10
             'match_percentage': round((len(matched_keywords) / max(len(jd_keywords), 1)) * 100, 1),
-            'score': min(score, 100)
+            'score': min(score, 100),
+            'resume_keywords': resume_keywords  # All keywords found in resume
         }
     
     def _analyze_semantic_match(self, resume_text: str, jd_text: str) -> Dict[str, Any]:
