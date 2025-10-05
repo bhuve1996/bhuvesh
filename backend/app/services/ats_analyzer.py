@@ -118,14 +118,32 @@ class ATSAnalyzer:
                 'ats_score': round(ats_analysis['score'], 1)
             },
             'requirements_met': jd_requirements,
-            # DEBUG/VERIFICATION DATA
+            # COMPLETE EXTRACTION & MATCHING DATA
             'extraction_details': {
-                'resume_keywords_found': keyword_analysis.get('resume_keywords', [])[:20],  # Top 20 resume keywords
-                'jd_keywords_extracted': jd_keywords[:20],  # Top 20 JD keywords
-                'resume_text_sample': parsed_resume.get('text', '')[:500] + '...' if len(parsed_resume.get('text', '')) > 500 else parsed_resume.get('text', ''),  # First 500 chars
+                # ALL keywords extracted (not limited)
+                'all_resume_keywords': keyword_analysis.get('resume_keywords', []),
+                'all_jd_keywords': jd_keywords,
+                'all_matched_keywords': keyword_analysis['matched_keywords'],  # All matches, not limited
+                'all_missing_keywords': keyword_analysis['missing_keywords'],  # All missing, not limited
+                
+                # Skills & Technologies specifically identified
+                'skills_found': self._extract_skills(parsed_resume.get('text', '')),
+                'skills_required': self._extract_skills(job_description),
+                
+                # Text samples for verification
+                'resume_text_sample': parsed_resume.get('text', '')[:1000] + '...' if len(parsed_resume.get('text', '')) > 1000 else parsed_resume.get('text', ''),
+                'full_resume_text': parsed_resume.get('text', ''),  # Complete text for advanced analysis
+                
+                # Statistics
                 'total_resume_keywords': len(keyword_analysis.get('resume_keywords', [])),
                 'total_jd_keywords': len(jd_keywords),
-                'extraction_successful': bool(parsed_resume.get('text', '').strip())
+                'total_matched': len(keyword_analysis['matched_keywords']),
+                'total_missing': len(keyword_analysis['missing_keywords']),
+                'match_percentage': round((len(keyword_analysis['matched_keywords']) / max(len(jd_keywords), 1)) * 100, 2),
+                
+                # Validation flags
+                'extraction_successful': bool(parsed_resume.get('text', '').strip()),
+                'has_sufficient_content': len(parsed_resume.get('text', '').split()) >= 50
             }
         }
     
@@ -218,8 +236,8 @@ class ATSAnalyzer:
             score = 50  # Default if no keywords extracted
         
         return {
-            'matched_keywords': matched_keywords[:20],  # Top 20
-            'missing_keywords': missing_keywords[:10],  # Top 10
+            'matched_keywords': matched_keywords,  # ALL matched keywords (not limited)
+            'missing_keywords': missing_keywords,  # ALL missing keywords (not limited)
             'match_percentage': round((len(matched_keywords) / max(len(jd_keywords), 1)) * 100, 1),
             'score': min(score, 100),
             'resume_keywords': resume_keywords  # All keywords found in resume
@@ -466,6 +484,102 @@ class ATSAnalyzer:
             'strengths': strengths if strengths else ["Review suggestions to improve your resume"],
             'weaknesses': weaknesses if weaknesses else ["Good overall structure"]
         }
+    
+    def _extract_skills(self, text: str) -> Dict[str, List[str]]:
+        """
+        Extract specific skills and technologies from text
+        Categorizes by type for better analysis
+        """
+        text_lower = text.lower()
+        
+        skills = {
+            'programming_languages': [],
+            'frameworks_libraries': [],
+            'databases': [],
+            'cloud_platforms': [],
+            'tools_technologies': [],
+            'soft_skills': [],
+            'other_skills': []
+        }
+        
+        # Programming Languages
+        prog_langs = [
+            'python', 'javascript', 'java', 'c\\+\\+', 'c#', 'ruby', 'php', 'swift',
+            'kotlin', 'go', 'rust', 'typescript', 'scala', 'perl', 'r', 'matlab',
+            'sql', 'html', 'css', 'bash', 'powershell', 'objective-c'
+        ]
+        for lang in prog_langs:
+            if re.search(r'\b' + lang + r'\b', text_lower):
+                skills['programming_languages'].append(lang.replace('\\+\\+', '++').replace('\\', ''))
+        
+        # Frameworks & Libraries
+        frameworks = [
+            'react', 'angular', 'vue', 'node\\.?js', 'express', 'django', 'flask',
+            'spring', 'laravel', 'rails', 'asp\\.net', 'next\\.?js', 'nuxt',
+            'jquery', 'bootstrap', 'tailwind', 'fastapi', 'tensorflow', 'pytorch',
+            'keras', 'pandas', 'numpy', 'scikit-learn', 'opencv'
+        ]
+        for fw in frameworks:
+            if re.search(r'\b' + fw + r'\b', text_lower):
+                skills['frameworks_libraries'].append(fw.replace('\\.?', '.').replace('\\', ''))
+        
+        # Databases
+        databases = [
+            'mysql', 'postgresql', 'mongodb', 'redis', 'elasticsearch', 'oracle',
+            'sql server', 'dynamodb', 'cassandra', 'neo4j', 'sqlite', 'mariadb',
+            'firestore', 'couchdb'
+        ]
+        for db in databases:
+            if re.search(r'\b' + db + r'\b', text_lower):
+                skills['databases'].append(db)
+        
+        # Cloud Platforms
+        cloud = [
+            'aws', 'azure', 'gcp', 'google cloud', 'heroku', 'digitalocean',
+            'vercel', 'netlify', 'firebase', 'cloudflare', 'kubernetes', 'docker',
+            'terraform', 'ansible'
+        ]
+        for c in cloud:
+            if re.search(r'\b' + c + r'\b', text_lower):
+                skills['cloud_platforms'].append(c)
+        
+        # Tools & Technologies
+        tools = [
+            'git', 'github', 'gitlab', 'bitbucket', 'jira', 'confluence', 'slack',
+            'jenkins', 'circleci', 'travis', 'webpack', 'babel', 'eslint', 'prettier',
+            'vscode', 'intellij', 'postman', 'figma', 'sketch', 'adobe', 'grafana',
+            'prometheus', 'datadog', 'splunk', 'selenium', 'jest', 'mocha', 'pytest'
+        ]
+        for tool in tools:
+            if re.search(r'\b' + tool + r'\b', text_lower):
+                skills['tools_technologies'].append(tool)
+        
+        # Soft Skills
+        soft = [
+            'leadership', 'communication', 'teamwork', 'problem solving', 'analytical',
+            'collaboration', 'agile', 'scrum', 'project management', 'mentoring',
+            'time management', 'critical thinking', 'adaptability', 'creativity'
+        ]
+        for s in soft:
+            if re.search(r'\b' + s + r'\b', text_lower):
+                skills['soft_skills'].append(s)
+        
+        # Other common technical skills
+        other = [
+            'api', 'rest', 'graphql', 'microservices', 'ci/cd', 'devops', 'machine learning',
+            'artificial intelligence', 'data science', 'blockchain', 'iot', 'mobile',
+            'web development', 'backend', 'frontend', 'full stack', 'testing', 'security',
+            'performance optimization', 'scalability', 'architecture'
+        ]
+        for o in other:
+            if re.search(r'\b' + o + r'\b', text_lower):
+                skills['other_skills'].append(o)
+        
+        # Remove duplicates and sort
+        for category in skills:
+            skills[category] = sorted(list(set(skills[category])))
+        
+        return skills
 
 # Create global instance
 ats_analyzer = ATSAnalyzer()
