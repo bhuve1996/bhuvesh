@@ -31,9 +31,10 @@ if [ -f "backend/nixpacks.toml" ]; then
     
     # Check for common errors in nixpacks.toml
     if grep -q "pip" backend/nixpacks.toml && grep -q "nixPkgs" backend/nixpacks.toml; then
-        if grep -A 1 "nixPkgs" backend/nixpacks.toml | grep -q "'pip'"; then
-            echo "❌ Error: 'pip' should not be in nixPkgs (it comes with Python)"
-            echo "   Fix: Remove 'pip' from nixPkgs in backend/nixpacks.toml"
+        # Check if using bare 'pip' (wrong) vs 'python39Packages.pip' (correct)
+        if grep -A 1 "nixPkgs" backend/nixpacks.toml | grep -q "'pip'" && ! grep -q "python39Packages.pip" backend/nixpacks.toml; then
+            echo "❌ Error: 'pip' should be 'python39Packages.pip' in nixPkgs"
+            echo "   Fix: Use 'python39Packages.pip' instead of 'pip' in backend/nixpacks.toml"
             exit 1
         fi
     fi
