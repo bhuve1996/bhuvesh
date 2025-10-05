@@ -1,34 +1,4 @@
 # Backend directory (deployed separately to Railway)
+# Just tell Vercel to ignore this during frontend builds
 backend/
-
-# Python files
-*.pyc
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-
-# Virtual environments
-venv/
-env/
-ENV/
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Logs
-*.log
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-
-# Documentation (optional - remove if you want to include)
-# docs/
 
