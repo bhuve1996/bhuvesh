@@ -1,11 +1,14 @@
 """
 Intelligent Job Type Detection using Semantic Embeddings
 Detects ANY job role, not just predefined ones
+Uses parallel execution for Gemini + Semantic for best results
 """
 
 import re
 import os
-from typing import List, Tuple, Optional
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from typing import List, Tuple, Optional, Dict, Any
 import numpy as np
 
 # Try to import sentence-transformers
@@ -195,22 +198,48 @@ class JobTypeDetector:
     
     def detect_job_type(self, resume_text: str) -> Tuple[str, float]:
         """
-        Detect job type from resume using 3-tier approach:
-        1. Semantic matching (fast, free)
-        2. Keyword matching (fallback)
-        3. Gemini LLM (fallback for unknown roles, free tier)
+        Detect job type using PARALLEL execution for best accuracy
+        - Runs Gemini + Semantic simultaneously
+        - Compares results for validation
+        - Returns best result with metadata
         
         Returns:
             Tuple of (job_title, confidence_score)
+            Note: In future, this could return Dict with alternatives
         """
-        # Tier 1: Semantic matching with database
+        # Run both detection methods in parallel
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            # Submit both tasks
+            gemini_future = executor.submit(self._safe_gemini_detection, resume_text)
+            semantic_future = executor.submit(self._semantic_and_keyword_detection, resume_text)
+            
+            # Wait for both to complete
+            gemini_result = gemini_future.result()
+            semantic_result = semantic_future.result()
+        
+        # Combine and choose best result
+        return self._combine_results(gemini_result, semantic_result)
+    
+    def _safe_gemini_detection(self, resume_text: str) -> Tuple[Optional[str], float]:
+        """
+        Safely call Gemini detection with error handling
+        """
+        if not GEMINI_AVAILABLE:
+            return None, 0.0
+        
+        try:
+            return self._gemini_detection(resume_text)
+        except Exception as e:
+            print(f"Gemini detection failed: {e}")
+            return None, 0.0
+    
+    def _semantic_and_keyword_detection(self, resume_text: str) -> Tuple[str, float]:
+        """
+        Combined semantic + keyword detection
+        """
+        # If embeddings not available, use keyword only
         if not self.use_embeddings:
-            # Skip to Tier 2
-            job, confidence = self._keyword_based_detection(resume_text)
-            # If keyword detection has low confidence, try Gemini
-            if confidence < 0.5 and GEMINI_AVAILABLE:
-                return self._gemini_detection(resume_text)
-            return job, confidence
+            return self._keyword_based_detection(resume_text)
         
         try:
             # Extract relevant sections for job detection
@@ -222,47 +251,94 @@ class JobTypeDetector:
             # Calculate similarities with all job titles
             similarities = util.cos_sim(resume_embedding, self.job_embeddings)[0]
             
-            # Get top 3 matches
-            top_indices = similarities.argsort(descending=True)[:3]
-            top_jobs = [(self.job_database[idx], similarities[idx].item()) 
-                       for idx in top_indices]
+            # Get top match
+            top_idx = similarities.argmax()
+            best_job = self.job_database[top_idx]
+            best_score = similarities[top_idx].item()
             
-            # Return best match with confidence
-            best_job, best_score = top_jobs[0]
-            
-            # If confidence is medium to high, return it
-            if best_score >= 0.4:
-                return best_job, best_score
-            
-            # Tier 2: Low confidence - try keyword detection
-            keyword_job, keyword_conf = self._keyword_based_detection(resume_text)
-            
-            # If keyword detection is better, use it
-            if keyword_conf > best_score:
-                best_job, best_score = keyword_job, keyword_conf
-            
-            # Tier 3: Still low confidence - try Gemini as last resort
-            if best_score < 0.5 and GEMINI_AVAILABLE:
-                try:
-                    return self._gemini_detection(resume_text)
-                except Exception as e:
-                    print(f"Gemini fallback failed: {e}")
-                    # Return best we have
-                    return best_job, best_score
+            # If confidence is low, try keyword detection
+            if best_score < 0.4:
+                keyword_job, keyword_conf = self._keyword_based_detection(resume_text)
+                if keyword_conf > best_score:
+                    return keyword_job, keyword_conf
             
             return best_job, best_score
             
         except Exception as e:
             print(f"Error in semantic job detection: {e}")
-            # Try Tier 2
-            job, confidence = self._keyword_based_detection(resume_text)
-            # Try Tier 3 if needed
-            if confidence < 0.5 and GEMINI_AVAILABLE:
-                try:
-                    return self._gemini_detection(resume_text)
-                except:
-                    return job, confidence
-            return job, confidence
+            return self._keyword_based_detection(resume_text)
+    
+    def _combine_results(self, gemini_result: Tuple[Optional[str], float], 
+                        semantic_result: Tuple[str, float]) -> Tuple[str, float]:
+        """
+        Intelligently combine results from Gemini and semantic detection
+        """
+        gemini_job, gemini_conf = gemini_result
+        semantic_job, semantic_conf = semantic_result
+        
+        # If Gemini failed, use semantic
+        if gemini_job is None:
+            print(f"📊 Using semantic detection: {semantic_job} ({semantic_conf:.2f})")
+            return semantic_job, semantic_conf
+        
+        # Check if they agree (similar job titles)
+        if self._jobs_are_similar(gemini_job, semantic_job):
+            # Both agree! High confidence
+            print(f"✅ Validated by both AI: {gemini_job} (confidence: 0.95)")
+            return gemini_job, 0.95
+        
+        # They disagree - trust Gemini more (it's smarter)
+        # But boost confidence if semantic also found something reasonable
+        if semantic_conf >= 0.5:
+            # Both found decent matches but different
+            print(f"🤔 AI disagree: Gemini={gemini_job} ({gemini_conf:.2f}), Semantic={semantic_job} ({semantic_conf:.2f})")
+            print(f"   → Using Gemini result (more accurate)")
+            # Slight confidence penalty for disagreement
+            return gemini_job, max(0.7, gemini_conf * 0.9)
+        
+        # Semantic had low confidence, trust Gemini fully
+        print(f"🎯 Using Gemini: {gemini_job} ({gemini_conf:.2f})")
+        return gemini_job, gemini_conf
+    
+    def _jobs_are_similar(self, job1: str, job2: str) -> bool:
+        """
+        Check if two job titles are similar enough to be considered the same
+        """
+        j1_lower = job1.lower()
+        j2_lower = job2.lower()
+        
+        # Exact match
+        if j1_lower == j2_lower:
+            return True
+        
+        # Check for common variations
+        # E.g., "Software Engineer" vs "Software Developer"
+        j1_words = set(j1_lower.split())
+        j2_words = set(j2_lower.split())
+        
+        # If they share major keywords
+        overlap = j1_words & j2_words
+        if len(overlap) >= 2:  # At least 2 words in common
+            return True
+        
+        # Check for synonyms
+        synonyms = {
+            frozenset(['engineer', 'developer']),
+            frozenset(['manager', 'lead']),
+            frozenset(['analyst', 'specialist']),
+            frozenset(['designer', 'architect']),
+        }
+        
+        for syn_set in synonyms:
+            if (any(w in j1_lower for w in syn_set) and 
+                any(w in j2_lower for w in syn_set)):
+                # Check if rest of the words match
+                j1_remaining = j1_words - syn_set
+                j2_remaining = j2_words - syn_set
+                if j1_remaining & j2_remaining:
+                    return True
+        
+        return False
     
     def _extract_relevant_sections(self, resume_text: str) -> str:
         """

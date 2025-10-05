@@ -3,10 +3,10 @@ fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
 
-# Database
-sqlalchemy==2.0.23
-alembic==1.12.1
-psycopg2-binary==2.9.9
+# Database (optional - comment out if not using database)
+# sqlalchemy==2.0.23
+# alembic==1.12.1
+# psycopg2-binary==2.9.9
 
 # File processing - UPGRADED
 PyMuPDF==1.23.8  # Better PDF parsing (also known as fitz)
@@ -15,14 +15,14 @@ python-magic==0.4.27
 pdfplumber==0.10.3  # Alternative PDF parser
 Pillow==10.1.0  # Image processing for format checks
 
-# Natural Language Processing - UPGRADED
+# Natural Language Processing - OPTIMIZED FOR DEPLOYMENT
+# Install CPU-only torch first to save space (500MB vs 2GB)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.1.1+cpu
 sentence-transformers==2.2.2  # Semantic embeddings matching
-spacy==3.7.2
-nltk==3.8.1
 scikit-learn==1.3.2
 keybert==0.8.3  # Keyword extraction
 transformers==4.35.2  # Hugging Face transformers
-torch==2.1.1  # PyTorch for embeddings
 
 # AI/LLM Integration (Optional)
 google-generativeai==0.3.2  # Google Gemini (FREE tier available)
@@ -36,20 +36,19 @@ python-dotenv==1.0.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
 
-# Authentication and security
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
+# Authentication and security (optional - comment out if not using auth)
+# python-jose[cryptography]==3.3.0
+# passlib[bcrypt]==1.7.4
 
 # CORS and middleware
 fastapi-cors==0.0.6
 
-# Testing
-pytest==7.4.3
-pytest-asyncio==0.21.1
+# Testing (optional - comment out for faster deployment)
+# pytest==7.4.3
+# pytest-asyncio==0.21.1
 httpx==0.25.2
 
-# Development
-black==23.11.0
-isort==5.12.0
-flake8==6.1.0
+# Development (optional - comment out for faster deployment)
+# black==23.11.0
+# isort==5.12.0
+# flake8==6.1.0
