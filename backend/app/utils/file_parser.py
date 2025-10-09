@@ -59,17 +59,37 @@ class FileParser:
             for page_num in range(len(doc)):
                 page = doc[page_num]
                 
-                # Extract text with better handling
+                # Method 1: Standard text extraction
                 page_text = page.get_text()
-                text += page_text + "\n"
+                
+                # Method 2: Extract text blocks with coordinates for better structure
+                blocks = page.get_text("blocks")
+                
+                # Method 3: Extract text with layout preservation
+                text_dict = page.get_text("dict")
+                
+                # Combine extraction methods for better content
+                combined_text = ""
+                
+                # Process blocks to maintain structure and get more content
+                for block in blocks:
+                    if len(block) >= 5:  # Valid text block
+                        block_text = block[4].strip()
+                        if block_text:
+                            combined_text += block_text + "\n"
+                
+                # Use the better extraction method
+                if combined_text.strip():
+                    text += combined_text + "\n"
+                else:
+                    text += page_text + "\n"
                 
                 # Detect images (ATS red flag)
                 images = page.get_images()
                 images_count += len(images)
                 
                 # Detect fonts (unusual fonts can cause ATS issues)
-                blocks = page.get_text("dict")["blocks"]
-                for block in blocks:
+                for block in text_dict.get("blocks", []):
                     if "lines" in block:
                         for line in block["lines"]:
                             for span in line["spans"]:
@@ -78,6 +98,10 @@ class FileParser:
                 # Detect tables (can cause parsing issues)
                 if self._detect_tables_in_text(page_text):
                     tables_detected = True
+                
+                # Detect text formatting issues
+                if self._detect_formatting_issues(page_text):
+                    formatting_issues.append(f"Page {page_num + 1}: Potential formatting issues detected")
             
             # Analyze formatting issues
             if images_count > 0:
@@ -95,6 +119,8 @@ class FileParser:
             if unusual_fonts:
                 formatting_issues.append(f"Unusual fonts detected: {', '.join(list(unusual_fonts)[:3])}")
             
+            # Store page count before closing
+            page_count = len(doc)
             doc.close()
             
             # Calculate statistics
@@ -105,7 +131,7 @@ class FileParser:
                 "text": text.strip(),
                 "word_count": word_count,
                 "character_count": character_count,
-                "page_count": len(doc),
+                "page_count": page_count,
                 "file_type": "pdf",
                 "formatting_analysis": {
                     "images_count": images_count,
@@ -133,16 +159,39 @@ class FileParser:
             images_count = 0
             formatting_issues = []
             
-            # Extract text from paragraphs
+            # Extract text from paragraphs with better structure preservation
             for paragraph in doc.paragraphs:
-                text += paragraph.text + "\n"
+                para_text = paragraph.text.strip()
+                if para_text:
+                    text += para_text + "\n"
             
-            # Extract text from tables
+            # Extract text from tables with better formatting
             for table in doc.tables:
+                table_text = ""
                 for row in table.rows:
+                    row_text = []
                     for cell in row.cells:
-                        text += cell.text + " "
-                text += "\n"
+                        cell_text = cell.text.strip()
+                        if cell_text:
+                            row_text.append(cell_text)
+                    if row_text:
+                        table_text += " | ".join(row_text) + "\n"
+                if table_text:
+                    text += table_text + "\n"
+            
+            # Extract text from headers and footers
+            for section in doc.sections:
+                if section.header:
+                    for paragraph in section.header.paragraphs:
+                        header_text = paragraph.text.strip()
+                        if header_text:
+                            text += header_text + "\n"
+                
+                if section.footer:
+                    for paragraph in section.footer.paragraphs:
+                        footer_text = paragraph.text.strip()
+                        if footer_text:
+                            text += footer_text + "\n"
             
             # Count images/shapes
             try:
@@ -222,6 +271,23 @@ class FileParser:
         
         # If more than 3 lines look like tables, flag it
         return tabular_lines > 3
+    
+    def _detect_formatting_issues(self, text: str) -> bool:
+        """Detect potential formatting issues in text"""
+        # Check for excessive special characters
+        special_char_count = len(re.findall(r'[^\w\s\.\,\;\:\!\?\-\(\)]', text))
+        if special_char_count > len(text) * 0.1:  # More than 10% special characters
+            return True
+        
+        # Check for excessive whitespace
+        if re.search(r'\s{5,}', text):  # 5 or more consecutive spaces
+            return True
+        
+        # Check for mixed case issues
+        if re.search(r'[A-Z]{5,}', text):  # 5 or more consecutive uppercase letters
+            return True
+        
+        return False
 
 # Create global instance
 file_parser = FileParser()

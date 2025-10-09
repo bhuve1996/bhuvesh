@@ -288,6 +288,89 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         </ul>
       </Card>
 
+      {/* Structured Experience Analysis */}
+      {result.structured_experience && (
+        <Card className='p-6'>
+          <h3 className='text-xl font-bold mb-4 text-purple-400'>
+            🤖 AI-Enhanced Experience Analysis
+          </h3>
+          <div className='space-y-4'>
+            {result.structured_experience.work_experience.map((job, index) => (
+              <div
+                key={index}
+                className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
+              >
+                <div className='flex justify-between items-start mb-2'>
+                  <div>
+                    <h4 className='text-white font-medium'>{job.position}</h4>
+                    <p className='text-gray-300 text-sm'>{job.company}</p>
+                    <p className='text-gray-400 text-xs'>
+                      {job.location} • {job.duration}
+                    </p>
+                  </div>
+                </div>
+
+                {job.projects && job.projects.length > 0 && (
+                  <div className='mt-3'>
+                    <h5 className='text-cyan-400 text-sm font-medium mb-2'>
+                      Projects ({job.projects.length})
+                    </h5>
+                    <div className='space-y-2'>
+                      {job.projects.map((project, pIndex) => (
+                        <div
+                          key={pIndex}
+                          className='bg-gray-700/30 rounded p-3'
+                        >
+                          <h6 className='text-white text-sm font-medium'>
+                            {project.name}
+                          </h6>
+                          <p className='text-gray-300 text-xs mt-1'>
+                            {project.description}
+                          </p>
+                          {project.technologies &&
+                            project.technologies.length > 0 && (
+                              <div className='mt-2'>
+                                <span className='text-gray-400 text-xs'>
+                                  Technologies:{' '}
+                                </span>
+                                <span className='text-blue-400 text-xs'>
+                                  {project.technologies.join(', ')}
+                                </span>
+                              </div>
+                            )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {job.responsibilities && job.responsibilities.length > 0 && (
+                  <div className='mt-3'>
+                    <h5 className='text-green-400 text-sm font-medium mb-2'>
+                      Key Responsibilities
+                    </h5>
+                    <ul className='text-gray-300 text-xs space-y-1'>
+                      {job.responsibilities.slice(0, 3).map((resp, rIndex) => (
+                        <li key={rIndex} className='flex items-start'>
+                          <span className='text-green-400 mr-2'>•</span>
+                          <span>{resp}</span>
+                        </li>
+                      ))}
+                      {job.responsibilities.length > 3 && (
+                        <li className='text-gray-400 text-xs'>
+                          +{job.responsibilities.length - 3} more
+                          responsibilities
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
       {/* Action Buttons */}
       <div className='text-center space-x-4'>
         <button className='px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-lg hover:from-cyan-500 hover:to-blue-600 transition-all font-medium'>

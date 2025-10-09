@@ -199,6 +199,39 @@ export interface DetailedScores {
   ats_score: number;
 }
 
+export interface Project {
+  name: string;
+  description: string;
+  technologies: string[];
+  achievements: string[];
+}
+
+export interface StructuredWorkExperience {
+  company: string;
+  position: string;
+  location: string;
+  duration: string;
+  start_date: string;
+  end_date: string;
+  responsibilities: string[];
+  projects: Project[];
+  achievements: string[];
+}
+
+export interface StructuredContactInfo {
+  full_name: string;
+  email: string;
+  phone: string;
+  location: string;
+  linkedin: string;
+  github: string;
+}
+
+export interface StructuredExperience {
+  work_experience: StructuredWorkExperience[];
+  contact_info: StructuredContactInfo;
+}
+
 export interface ATSAnalysisBackendResponse {
   success: boolean;
   message?: string;
@@ -219,6 +252,7 @@ export interface ATSAnalysisBackendResponse {
     detailed_scores?: DetailedScores;
     ats_compatibility?: ATSCompatibility;
     format_analysis?: FormatAnalysis;
+    structured_experience?: StructuredExperience;
     extraction_details?: ExtractionDetails;
   };
 }
@@ -243,4 +277,5 @@ export interface AnalysisResult {
   match_category?: string;
   ats_friendly?: boolean;
   formatting_issues?: string[];
+  structured_experience?: StructuredExperience;
 }

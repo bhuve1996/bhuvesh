@@ -1,54 +1,33 @@
 John Doe
 Software Engineer
-Email: john.doe@email.com
-Phone: (555) 123-4567
-LinkedIn: linkedin.com/in/johndoe
-GitHub: github.com/johndoe
+john.doe@email.com
+(555) 123-4567
+San Francisco, CA
 
 EXPERIENCE
-
-Senior Software Engineer | Tech Company Inc. | 2020-2024
-• Developed and maintained web applications using JavaScript, React, and Node.js
-• Implemented REST APIs and microservices architecture
-• Collaborated with cross-functional teams using Agile methodology
-• Increased application performance by 40% through optimization
-• Led a team of 3 developers on multiple projects
-
-Software Engineer | StartupXYZ | 2018-2020
-• Built responsive web applications with React and TypeScript
-• Worked with PostgreSQL and MongoDB databases
+Software Engineer | Tech Corp | San Francisco, CA | 01/2020 - Present
+• Developed web applications using React and Node.js
+• Led a team of 3 developers on a major project
 • Implemented CI/CD pipelines using Jenkins and Docker
-• Improved code quality through code reviews and testing
-• Delivered 5+ major features on time and within budget
+
+Project: E-commerce Platform
+• Built a full-stack e-commerce solution using React, Node.js, and MongoDB
+• Integrated payment processing with Stripe API
+• Achieved 40% improvement in page load times
+
+Senior Developer | StartupXYZ | San Francisco, CA | 06/2018 - 12/2019
+• Architected microservices using AWS and Kubernetes
+• Mentored junior developers and conducted code reviews
+• Implemented automated testing reducing bugs by 60%
+
+Project: Cloud Migration
+• Migrated legacy monolith to cloud-native microservices
+• Used AWS Lambda, API Gateway, and DynamoDB
+• Reduced infrastructure costs by 35%
 
 EDUCATION
-
 Bachelor of Science in Computer Science
-University of Technology | 2014-2018
-GPA: 3.8/4.0
+University of California, Berkeley | 2014-2018
 
 SKILLS
-
-Programming Languages: JavaScript, TypeScript, Python, Java, C++
-Frameworks: React, Vue.js, Express.js, Django, Spring Boot
-Databases: PostgreSQL, MySQL, MongoDB, Redis
-Cloud & DevOps: AWS, Azure, Docker, Kubernetes, Jenkins
-Tools: Git, VS Code, Jira, Confluence
-
-CERTIFICATIONS
-
-AWS Certified Developer Associate
-Google Cloud Professional Developer
-Microsoft Azure Fundamentals
-
-PROJECTS
-
-E-commerce Platform
-• Built full-stack e-commerce application using React and Node.js
-• Implemented payment processing with Stripe API
-• Achieved 99.9% uptime and handled 10,000+ daily users
-
-Task Management App
-• Developed collaborative task management tool
-• Used real-time WebSocket connections
-• Integrated with Slack and email notifications
+JavaScript, Python, React, Node.js, AWS, Docker, Kubernetes, MongoDB, PostgreSQL

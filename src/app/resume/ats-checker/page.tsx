@@ -14,7 +14,6 @@ import type { AnalysisResult, ATSAnalysisBackendResponse } from '@/types/ats';
 export default function ATSCheckerPage() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
     null
   );
@@ -29,7 +28,6 @@ export default function ATSCheckerPage() {
   const handleAnalysis = async (jobDescription: string) => {
     if (!file) return;
 
-    setIsAnalyzing(true);
     setError(null);
 
     try {
@@ -40,7 +38,6 @@ export default function ATSCheckerPage() {
       router.push('/resume/ats-checker/results');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed');
-      setIsAnalyzing(false);
     }
   };
 
@@ -186,7 +183,6 @@ export default function ATSCheckerPage() {
               <ATSAnalysis
                 file={file}
                 onAnalyze={handleAnalysis}
-                isAnalyzing={isAnalyzing}
                 error={error}
               />
             </div>

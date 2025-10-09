@@ -1,13 +1,15 @@
 // Export all UI components
 export { Button } from './Button';
 export { Card } from './Card';
-export { Section } from './Section';
 export { Loading } from './Loading';
-export { SVG, Icons } from './SVG';
+export { ProgressSteps } from './ProgressSteps';
+export { Icons, SVG } from './SVG';
+export { Section } from './Section';
 
 // Export all UI component types
 export type { ButtonProps } from './Button';
 export type { CardProps } from './Card';
-export type { SectionProps } from './Section';
 export type { LoadingProps } from './Loading';
+export type { ProgressStep } from './ProgressSteps';
 export type { SVGProps } from './SVG';
+export type { SectionProps } from './Section';

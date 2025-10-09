@@ -145,14 +145,18 @@ async def analyze_resume_with_jd(
         # Parse the resume
         parsed_resume = file_parser.parse_file(file_content, file.filename)
         
+        # Extract structured experience data
+        structured_experience = ats_analyzer.extract_structured_experience(parsed_resume.get('text', ''))
+        
         # Perform comprehensive ATS analysis with job description
         analysis_result = ats_analyzer.analyze_resume_with_job_description(
             parsed_resume, 
             job_description
         )
         
-        # Add metadata
+        # Add structured experience and metadata
         analysis_result.update({
+            "structured_experience": structured_experience,
             "filename": file.filename,
             "file_size": len(file_content),
             "jd_length": len(job_description),
@@ -170,6 +174,68 @@ async def analyze_resume_with_jd(
         raise HTTPException(
             status_code=500, 
             detail=f"Error during analysis: {str(e)}"
+        )
+
+@router.post("/extract-experience")
+async def extract_structured_experience(
+    file: UploadFile = File(...)
+) -> Dict[str, Any]:
+    """
+    Extract structured work experience with proper project association
+    Uses AI to distinguish between job responsibilities and project descriptions
+    
+    Args:
+        file: Resume file (PDF, DOCX, or TXT)
+        
+    Returns:
+        Structured experience data with projects properly associated with jobs
+    """
+    try:
+        # Validate inputs
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="No file provided")
+        
+        # Check file type
+        file_extension = file.filename.lower().split('.')[-1]
+        if file_extension not in ['pdf', 'docx', 'doc', 'txt']:
+            raise HTTPException(
+                status_code=400, 
+                detail="Unsupported file type. Please upload PDF, DOCX, or TXT files."
+            )
+        
+        # Read and parse file
+        file_content = await file.read()
+        
+        # Check file size
+        if len(file_content) > 10 * 1024 * 1024:
+            raise HTTPException(
+                status_code=400, 
+                detail="File too large. Maximum size is 10MB."
+            )
+        
+        # Parse the resume
+        parsed_resume = file_parser.parse_file(file_content, file.filename)
+        
+        # Extract structured experience
+        structured_experience = ats_analyzer.extract_structured_experience(parsed_resume.get('text', ''))
+        
+        return {
+            "success": True,
+            "data": {
+                "structured_experience": structured_experience,
+                "filename": file.filename,
+                "file_size": len(file_content),
+                "raw_text": parsed_resume.get('text', '')[:500] + '...' if len(parsed_resume.get('text', '')) > 500 else parsed_resume.get('text', '')
+            },
+            "message": "Structured experience extracted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error extracting experience: {str(e)}"
         )
 
 @router.post("/improvement-plan")

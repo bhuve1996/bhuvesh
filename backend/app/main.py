@@ -24,7 +24,9 @@ import os
 # Allow multiple origins for production and development
 origins = [
     "http://localhost:3000",  # Local development
+    "http://localhost:3009",  # Local development (alternative port)
     "http://127.0.0.1:3000",  # Local development (alternative)
+    "http://127.0.0.1:3009",  # Local development (alternative port)
     "https://bhuvesh.vercel.app",  # Your Vercel deployment
     "https://*.vercel.app",  # Any Vercel preview deployments
     "https://www.bhuvesh.com",  # Your custom domain (HTTPS)

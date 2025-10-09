@@ -8,8 +8,9 @@ from typing import Dict, List, Any, Tuple, Optional
 from collections import Counter
 import numpy as np
 
-# Import job detector
+# Import job detector and project extractor
 from app.services.job_detector import job_detector
+from app.services.project_extractor import project_extractor
 
 # Try to import sentence-transformers, fall back to basic matching if not available
 try:
@@ -57,6 +58,12 @@ class ATSAnalyzer:
             'standard_bullets': ['•', '-', '*'],
             'date_formats': [r'\d{1,2}/\d{4}', r'\d{4}', r'\d{1,2}-\d{4}']
         }
+    
+    def extract_structured_experience(self, resume_text: str) -> Dict[str, Any]:
+        """
+        Extract structured work experience with proper project association
+        """
+        return project_extractor.extract_structured_experience(resume_text)
     
     def analyze_resume_with_job_description(
         self, 
