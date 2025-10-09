@@ -169,19 +169,56 @@ export interface ExtractionDetails {
   categorized_resume?: CategorizedResume;
 }
 
+export interface ATSCompatibility {
+  grade: string;
+  issues: string[];
+  warnings: string[];
+  recommendations: string[];
+  sections_found: string[];
+  contact_completeness: string;
+  bullet_consistency: boolean;
+  word_count_optimal: boolean;
+}
+
+export interface FormatAnalysis {
+  grade: string;
+  sections_found: number;
+  optional_sections_found: number;
+  contact_completeness: string;
+  has_professional_summary: boolean;
+  section_headers_count: number;
+  issues: string[];
+  recommendations: string[];
+}
+
+export interface DetailedScores {
+  keyword_score: number;
+  semantic_score: number;
+  format_score: number;
+  content_score: number;
+  ats_score: number;
+}
+
 export interface ATSAnalysisBackendResponse {
   success: boolean;
   message?: string;
   data: {
     ats_score: number;
+    match_category: string;
     detected_job_type?: string;
     job_detection_confidence?: number;
     keyword_matches?: string[];
     missing_keywords?: string[];
+    semantic_similarity?: number;
     suggestions?: string[];
     strengths?: string[];
     weaknesses?: string[];
+    formatting_issues?: string[];
+    ats_friendly?: boolean;
     word_count?: number;
+    detailed_scores?: DetailedScores;
+    ats_compatibility?: ATSCompatibility;
+    format_analysis?: FormatAnalysis;
     extraction_details?: ExtractionDetails;
   };
 }
@@ -198,4 +235,12 @@ export interface AnalysisResult {
   wordCount: number;
   characterCount: number;
   extraction_details?: ExtractionDetails | undefined;
+  // Enhanced analysis data
+  ats_compatibility?: ATSCompatibility;
+  format_analysis?: FormatAnalysis;
+  detailed_scores?: DetailedScores;
+  semantic_similarity?: number;
+  match_category?: string;
+  ats_friendly?: boolean;
+  formatting_issues?: string[];
 }

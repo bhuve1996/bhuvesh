@@ -36,7 +36,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         </p>
       </div>
 
-      {/* ATS Score - Always Show */}
+      {/* Enhanced ATS Score Display */}
       <Card className='p-6'>
         <div className='text-center'>
           <h3 className='text-xl font-bold mb-4 text-white'>
@@ -61,6 +61,24 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
               result.atsScore >= 0 &&
               'Your resume needs improvements for better ATS compatibility.'}
           </p>
+
+          {/* Enhanced Analysis Grades */}
+          {result.ats_compatibility && (
+            <div className='mt-6 grid grid-cols-2 gap-4'>
+              <div className='text-center'>
+                <p className='text-sm text-gray-400 mb-1'>ATS Compatibility</p>
+                <p className='text-lg font-semibold text-cyan-400'>
+                  {result.ats_compatibility.grade || 'N/A'}
+                </p>
+              </div>
+              <div className='text-center'>
+                <p className='text-sm text-gray-400 mb-1'>Format Structure</p>
+                <p className='text-lg font-semibold text-blue-400'>
+                  {result.format_analysis?.grade || 'N/A'}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </Card>
 
@@ -140,6 +158,120 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           </ul>
         </Card>
       </div>
+
+      {/* Enhanced ATS Compatibility Analysis */}
+      {result.ats_compatibility && (
+        <div className='grid md:grid-cols-2 gap-6'>
+          {/* ATS Issues & Warnings */}
+          <Card className='p-6'>
+            <h3 className='text-xl font-bold mb-4 text-orange-400'>
+              ⚠️ ATS Compatibility Issues
+            </h3>
+            <div className='space-y-4'>
+              {/* Critical Issues */}
+              {result.ats_compatibility.issues?.length > 0 && (
+                <div>
+                  <h4 className='text-red-400 font-semibold mb-2'>
+                    Critical Issues:
+                  </h4>
+                  <ul className='space-y-2'>
+                    {result.ats_compatibility.issues.map(
+                      (issue: string, index: number) => (
+                        <li key={index} className='flex items-start space-x-2'>
+                          <span className='text-red-400 mt-1'>•</span>
+                          <span className='text-gray-300 text-sm'>{issue}</span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </div>
+              )}
+
+              {/* Warnings */}
+              {result.ats_compatibility.warnings?.length > 0 && (
+                <div>
+                  <h4 className='text-yellow-400 font-semibold mb-2'>
+                    Warnings:
+                  </h4>
+                  <ul className='space-y-2'>
+                    {result.ats_compatibility.warnings.map(
+                      (warning: string, index: number) => (
+                        <li key={index} className='flex items-start space-x-2'>
+                          <span className='text-yellow-400 mt-1'>•</span>
+                          <span className='text-gray-300 text-sm'>
+                            {warning}
+                          </span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* ATS Recommendations */}
+          <Card className='p-6'>
+            <h3 className='text-xl font-bold mb-4 text-green-400'>
+              ✅ ATS Optimization Tips
+            </h3>
+            <ul className='space-y-2'>
+              {result.ats_compatibility.recommendations?.map(
+                (rec: string, index: number) => (
+                  <li key={index} className='flex items-start space-x-2'>
+                    <span className='text-green-400 mt-1'>•</span>
+                    <span className='text-gray-300 text-sm'>{rec}</span>
+                  </li>
+                )
+              )}
+            </ul>
+          </Card>
+        </div>
+      )}
+
+      {/* Format Analysis Details */}
+      {result.format_analysis && (
+        <Card className='p-6'>
+          <h3 className='text-xl font-bold mb-4 text-blue-400'>
+            📋 Resume Structure Analysis
+          </h3>
+          <div className='grid md:grid-cols-3 gap-4 mb-4'>
+            <div className='text-center'>
+              <p className='text-2xl font-bold text-blue-400'>
+                {result.format_analysis.sections_found || 0}
+              </p>
+              <p className='text-sm text-gray-400'>Required Sections</p>
+            </div>
+            <div className='text-center'>
+              <p className='text-2xl font-bold text-green-400'>
+                {result.format_analysis.optional_sections_found || 0}
+              </p>
+              <p className='text-sm text-gray-400'>Optional Sections</p>
+            </div>
+            <div className='text-center'>
+              <p className='text-2xl font-bold text-cyan-400'>
+                {result.format_analysis.section_headers_count || 0}
+              </p>
+              <p className='text-sm text-gray-400'>Section Headers</p>
+            </div>
+          </div>
+
+          <div className='space-y-2'>
+            <p className='text-gray-300'>
+              <span className='text-blue-400 font-semibold'>Contact Info:</span>{' '}
+              {result.format_analysis.contact_completeness || 'N/A'}
+            </p>
+            <p className='text-gray-300'>
+              <span className='text-blue-400 font-semibold'>
+                Professional Summary:
+              </span>{' '}
+              {result.format_analysis.has_professional_summary
+                ? '✅ Present'
+                : '❌ Missing'}
+            </p>
+          </div>
+        </Card>
+      )}
 
       {/* Suggestions */}
       <Card className='p-6'>

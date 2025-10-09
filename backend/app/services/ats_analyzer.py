@@ -36,13 +36,26 @@ class ATSAnalyzer:
         else:
             self.use_embeddings = False
         
-        # Scoring weights
+        # Enhanced scoring weights based on industry standards
         self.weights = {
-            'keyword_matching': 35,      # Reduced from 40 since we have semantic now
-            'semantic_matching': 15,     # NEW: Concept/semantic matching
-            'format_compliance': 20,     # Format and structure
-            'content_quality': 20,       # Content quality
-            'ats_compatibility': 10      # ATS-friendly formatting
+            'keyword_matching': 40,      # Industry standard: 30-50% weight
+            'semantic_matching': 15,     # AI-powered concept matching
+            'format_compliance': 20,     # Structure and sections
+            'content_quality': 15,       # Achievements and metrics
+            'ats_compatibility': 10      # Formatting compatibility
+        }
+        
+        # Industry-standard ATS compatibility rules
+        self.ats_standards = {
+            'preferred_fonts': ['arial', 'calibri', 'times new roman', 'helvetica'],
+            'max_fonts': 3,
+            'standard_sections': ['experience', 'education', 'skills', 'summary', 'contact'],
+            'optimal_word_count': (400, 800),
+            'acceptable_word_count': (300, 1000),
+            'max_images': 0,
+            'max_tables': 0,
+            'standard_bullets': ['•', '-', '*'],
+            'date_formats': [r'\d{1,2}/\d{4}', r'\d{4}', r'\d{1,2}-\d{4}']
         }
     
     def analyze_resume_with_job_description(
@@ -108,8 +121,8 @@ class ATSAnalyzer:
             'suggestions': recommendations['suggestions'],
             'strengths': recommendations['strengths'],
             'weaknesses': recommendations['weaknesses'],
-            'formatting_issues': parsed_resume.get('formatting_analysis', {}).get('formatting_issues', []),
-            'ats_friendly': parsed_resume.get('formatting_analysis', {}).get('ats_friendly', True),
+            'formatting_issues': ats_analysis.get('issues', []),
+            'ats_friendly': ats_analysis.get('ats_friendly', True),
             'word_count': parsed_resume.get('word_count', 0),
             'detailed_scores': {
                 'keyword_score': round(keyword_analysis['score'], 1),
@@ -119,6 +132,27 @@ class ATSAnalyzer:
                 'ats_score': round(ats_analysis['score'], 1)
             },
             'requirements_met': jd_requirements,
+            # Enhanced analysis results
+            'ats_compatibility': {
+                'grade': ats_analysis.get('compatibility_grade', 'N/A'),
+                'issues': ats_analysis.get('issues', []),
+                'warnings': ats_analysis.get('warnings', []),
+                'recommendations': ats_analysis.get('recommendations', []),
+                'sections_found': ats_analysis.get('sections_found', []),
+                'contact_completeness': ats_analysis.get('contact_completeness', 'N/A'),
+                'bullet_consistency': ats_analysis.get('bullet_consistency', False),
+                'word_count_optimal': ats_analysis.get('word_count_optimal', False)
+            },
+            'format_analysis': {
+                'grade': format_analysis.get('format_grade', 'N/A'),
+                'sections_found': format_analysis.get('sections_found', 0),
+                'optional_sections_found': format_analysis.get('optional_sections_found', 0),
+                'contact_completeness': format_analysis.get('contact_completeness', 'N/A'),
+                'has_professional_summary': format_analysis.get('has_professional_summary', False),
+                'section_headers_count': format_analysis.get('section_headers_count', 0),
+                'issues': format_analysis.get('issues', []),
+                'recommendations': format_analysis.get('recommendations', [])
+            },
             # COMPLETE EXTRACTION & MATCHING DATA
             'extraction_details': {
                 # ALL keywords extracted (not limited)
@@ -153,36 +187,74 @@ class ATSAnalyzer:
     
     def _extract_keywords(self, text: str) -> List[str]:
         """
-        Extract important keywords from job description
+        Enhanced keyword extraction based on industry ATS standards
         """
-        # Remove common words
-        stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 
-                     'of', 'with', 'by', 'from', 'is', 'are', 'was', 'were', 'be', 'been',
-                     'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should',
-                     'can', 'could', 'may', 'might', 'must', 'shall'}
+        # Industry-standard stop words (expanded)
+        stop_words = {
+            'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 
+            'of', 'with', 'by', 'from', 'is', 'are', 'was', 'were', 'be', 'been',
+            'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should',
+            'can', 'could', 'may', 'might', 'must', 'shall', 'this', 'that',
+            'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they',
+            'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'her', 'its',
+            'our', 'their', 'am', 'being', 'been', 'get', 'got', 'getting'
+        }
         
-        # Extract words and phrases
+        # Extract words and phrases with better patterns
         words = re.findall(r'\b[a-z]+\b', text)
         
-        # Filter and count
-        filtered_words = [w for w in words if w not in stop_words and len(w) > 2]
+        # Filter and count with minimum length of 3
+        filtered_words = [w for w in words if w not in stop_words and len(w) >= 3]
         word_freq = Counter(filtered_words)
         
-        # Get top keywords (appearing more than once)
-        keywords = [word for word, freq in word_freq.most_common(30) if freq > 1]
+        # Get keywords with frequency-based scoring
+        keywords = []
         
-        # Also extract common tech/skill terms
-        tech_patterns = [
-            r'\b\w*(?:javascript|python|java|c\+\+|sql|aws|azure|docker|kubernetes)\w*\b',
-            r'\b\d\+\s*years?\b',
-            r'\b(?:bachelor|master|phd|degree)\b'
+        # High-frequency keywords (appearing 2+ times)
+        high_freq = [word for word, freq in word_freq.most_common(50) if freq >= 2]
+        keywords.extend(high_freq)
+        
+        # Industry-specific patterns with higher priority
+        industry_patterns = [
+            # Technical skills
+            r'\b(?:javascript|python|java|c\+\+|c#|ruby|php|swift|kotlin|go|rust|typescript|react|angular|vue|node|django|flask|spring|sql|mongodb|postgresql|mysql|redis|aws|azure|gcp|docker|kubernetes|jenkins|git|github|gitlab|jira|confluence|agile|scrum|devops|ci/cd|microservices|api|rest|graphql|machine learning|ai|data science|tensorflow|pytorch|pandas|numpy|scikit-learn)\b',
+            
+            # Experience patterns
+            r'\b\d+\+?\s*years?\s*(?:of\s*)?(?:experience|exp)\b',
+            r'\b(?:entry|junior|mid|senior|lead|principal|architect|manager|director|vp|cto)\s*level\b',
+            
+            # Education patterns
+            r'\b(?:bachelor|master|phd|doctorate|b\.?e\.?|b\.?tech|m\.?e\.?|m\.?tech|b\.?s\.?|m\.?s\.?|b\.?a\.?|m\.?a\.?|mba|diploma|certification|certified)\b',
+            
+            # Soft skills
+            r'\b(?:leadership|communication|teamwork|problem solving|analytical|collaboration|time management|critical thinking|adaptability|creativity|attention to detail|multitasking|decision making|conflict resolution|negotiation|presentation|interpersonal|organizational|self-motivated|flexible|reliable)\b',
+            
+            # Business terms
+            r'\b(?:project management|strategic planning|business analysis|stakeholder management|budgeting|forecasting|business development|operations management|process improvement|change management|vendor management|contract negotiation|pmp|six sigma|lean|prince2|scrum master|product management)\b'
         ]
         
-        for pattern in tech_patterns:
+        for pattern in industry_patterns:
             matches = re.findall(pattern, text, re.IGNORECASE)
             keywords.extend([m.lower() for m in matches])
         
-        return list(set(keywords))[:50]  # Return unique, limit to 50
+        # Remove duplicates and return top keywords
+        unique_keywords = list(set(keywords))
+        
+        # Prioritize by industry relevance and frequency
+        prioritized_keywords = []
+        
+        # Add high-priority technical terms first
+        tech_priority = ['python', 'javascript', 'java', 'react', 'aws', 'docker', 'kubernetes', 'sql', 'git', 'agile']
+        for tech in tech_priority:
+            if tech in unique_keywords:
+                prioritized_keywords.append(tech)
+        
+        # Add remaining keywords
+        for keyword in unique_keywords:
+            if keyword not in prioritized_keywords:
+                prioritized_keywords.append(keyword)
+        
+        return prioritized_keywords[:60]  # Increased limit for better coverage
     
     def _extract_requirements(self, jd_text: str) -> Dict[str, List[str]]:
         """
@@ -297,37 +369,134 @@ class ATSAnalyzer:
     
     def _analyze_format(self, parsed_resume: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Analyze resume format and structure
+        Enhanced format analysis based on industry ATS standards
         """
         text = parsed_resume.get('text', '').lower()
         word_count = parsed_resume.get('word_count', 0)
         score = 0
+        issues = []
+        recommendations = []
         
-        # Check for required sections (0-40 points)
+        # 1. Required sections analysis (40 points)
         required_sections = ['experience', 'education', 'skills']
-        found_sections = sum(1 for section in required_sections if section in text)
-        section_score = (found_sections / len(required_sections)) * 40
+        optional_sections = ['summary', 'profile', 'objective', 'contact', 'certifications', 'projects']
+        
+        found_required = sum(1 for section in required_sections if section in text)
+        found_optional = sum(1 for section in optional_sections if section in text)
+        
+        section_score = (found_required / len(required_sections)) * 40
         score += section_score
         
-        # Word count score (0-30 points)
-        if 400 <= word_count <= 800:
-            score += 30  # Optimal
-        elif 300 <= word_count <= 1000:
-            score += 20
-        elif 200 <= word_count <= 1200:
-            score += 10
+        if found_required < len(required_sections):
+            missing = [s for s in required_sections if s not in text]
+            issues.append(f"Missing required sections: {', '.join(missing)}")
+            recommendations.append("Include all required sections: Experience, Education, Skills.")
         
-        # Contact info score (0-30 points)
-        contact_keywords = ['email', 'phone', 'linkedin', 'github']
-        contact_found = sum(1 for kw in contact_keywords if kw in text)
-        contact_score = (contact_found / len(contact_keywords)) * 30
+        # Bonus for optional sections (up to 10 points)
+        if found_optional > 0:
+            score += min(found_optional * 2, 10)
+        
+        # 2. Word count optimization (25 points)
+        optimal_range = self.ats_standards['optimal_word_count']
+        acceptable_range = self.ats_standards['acceptable_word_count']
+        
+        if optimal_range[0] <= word_count <= optimal_range[1]:
+            score += 25  # Optimal
+        elif acceptable_range[0] <= word_count <= acceptable_range[1]:
+            score += 15  # Acceptable
+        elif 200 <= word_count <= 1200:
+            score += 10  # Poor but workable
+        else:
+            if word_count < 200:
+                issues.append(f"Resume too short ({word_count} words). Minimum 200 words recommended.")
+                recommendations.append("Add more detailed descriptions of your experience and skills.")
+            elif word_count > 1200:
+                issues.append(f"Resume too long ({word_count} words). Consider condensing to 1-2 pages.")
+                recommendations.append("Focus on most relevant experience and achievements.")
+        
+        # 3. Contact information completeness (20 points)
+        essential_contact = ['email', 'phone']
+        additional_contact = ['linkedin', 'github', 'portfolio', 'website']
+        
+        essential_found = sum(1 for contact in essential_contact if contact in text)
+        additional_found = sum(1 for contact in additional_contact if contact in text)
+        
+        contact_score = (essential_found / len(essential_contact)) * 15
         score += contact_score
+        
+        # Bonus for additional contact info
+        if additional_found > 0:
+            score += min(additional_found * 2, 5)
+        
+        if essential_found < len(essential_contact):
+            missing_essential = [c for c in essential_contact if c not in text]
+            issues.append(f"Missing essential contact info: {', '.join(missing_essential)}")
+            recommendations.append("Include email and phone number at the top of your resume.")
+        
+        # 4. Section ordering and structure (15 points)
+        lines = text.split('\n')
+        section_order_score = 0
+        
+        # Check if contact info appears early (first 10 lines)
+        contact_in_header = any(contact in ' '.join(lines[:10]) for contact in essential_contact)
+        if contact_in_header:
+            section_order_score += 8
+        else:
+            issues.append("Contact information should appear at the top of the resume.")
+            recommendations.append("Place contact information in the header section.")
+        
+        # Check for clear section headers
+        section_headers = []
+        for line in lines:
+            line_stripped = line.strip()
+            if len(line_stripped) < 30 and any(section in line_stripped for section in required_sections + optional_sections):
+                section_headers.append(line_stripped)
+        
+        if len(section_headers) >= 3:
+            section_order_score += 7
+        else:
+            issues.append("Missing clear section headers.")
+            recommendations.append("Use clear section headings like 'EXPERIENCE', 'EDUCATION', 'SKILLS'.")
+        
+        score += section_order_score
+        
+        # 5. Professional summary presence (bonus 5 points)
+        summary_keywords = ['summary', 'profile', 'objective', 'about']
+        has_summary = any(keyword in text for keyword in summary_keywords)
+        if has_summary:
+            score += 5
+            recommendations.append("✓ Professional summary present.")
+        else:
+            recommendations.append("Consider adding a professional summary section.")
         
         return {
             'score': min(score, 100),
-            'sections_found': found_sections,
-            'word_count': word_count
+            'sections_found': found_required,
+            'optional_sections_found': found_optional,
+            'word_count': word_count,
+            'word_count_optimal': optimal_range[0] <= word_count <= optimal_range[1],
+            'contact_completeness': f"{essential_found}/{len(essential_contact)} essential, {additional_found} additional",
+            'has_professional_summary': has_summary,
+            'section_headers_count': len(section_headers),
+            'issues': issues,
+            'recommendations': recommendations,
+            'format_grade': self._get_format_grade(min(score, 100))
         }
+    
+    def _get_format_grade(self, score: int) -> str:
+        """Get format analysis grade"""
+        if score >= 90:
+            return "A+ (Excellent Structure)"
+        elif score >= 80:
+            return "A (Very Good Structure)"
+        elif score >= 70:
+            return "B (Good Structure)"
+        elif score >= 60:
+            return "C (Fair Structure)"
+        elif score >= 50:
+            return "D (Poor Structure)"
+        else:
+            return "F (Very Poor Structure)"
     
     def _analyze_content(self, text: str, word_count: int) -> Dict[str, Any]:
         """
@@ -371,29 +540,152 @@ class ATSAnalyzer:
     
     def _analyze_ats_compatibility(self, parsed_resume: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Analyze ATS-friendly formatting
+        Enhanced ATS compatibility analysis based on industry standards
         """
         formatting = parsed_resume.get('formatting_analysis', {})
+        text = parsed_resume.get('text', '').lower()
         score = 100  # Start with perfect score
+        issues = []
+        warnings = []
+        recommendations = []
         
-        # Deduct points for issues
+        # Industry-standard ATS compatibility checks
+        
+        # 1. Images (Major ATS blocker)
         images_count = formatting.get('images_count', 0)
-        if images_count > 0:
-            score -= 30
+        if images_count > self.ats_standards['max_images']:
+            score -= 40
+            issues.append(f"Contains {images_count} image(s). ATS cannot parse images.")
+            recommendations.append("Remove all images, logos, and graphics for ATS compatibility.")
         
+        # 2. Tables (Major ATS blocker)
         tables_detected = formatting.get('tables_detected', False)
         if tables_detected:
-            score -= 20
+            score -= 35
+            issues.append("Contains tables. ATS may not parse table content correctly.")
+            recommendations.append("Convert table content to simple text format.")
         
+        # 3. Font compatibility
         fonts_count = formatting.get('fonts_count', 1)
-        if fonts_count > 3:
+        if fonts_count > self.ats_standards['max_fonts']:
+            score -= 20
+            issues.append(f"Uses {fonts_count} different fonts. Stick to 1-2 standard fonts.")
+            recommendations.append("Use only Arial, Calibri, or Times New Roman fonts.")
+        
+        # 4. File format check (if available)
+        file_format = parsed_resume.get('file_format', '')
+        if file_format and file_format.lower() not in ['docx', 'doc']:
             score -= 15
+            warnings.append(f"File format: {file_format}. .docx is preferred for ATS compatibility.")
+        
+        # 5. Section structure validation
+        standard_sections = self.ats_standards['standard_sections']
+        found_sections = []
+        for section in standard_sections:
+            if section in text:
+                found_sections.append(section)
+        
+        if len(found_sections) < 3:
+            score -= 25
+            issues.append(f"Missing standard sections. Found: {', '.join(found_sections)}")
+            recommendations.append("Include clear sections: Experience, Education, Skills, Summary.")
+        
+        # 6. Contact information completeness
+        contact_required = ['email', 'phone']
+        contact_found = sum(1 for contact in contact_required if contact in text)
+        if contact_found < len(contact_required):
+            score -= 15
+            issues.append("Missing essential contact information.")
+            recommendations.append("Include email and phone number at the top of resume.")
+        
+        # 7. Bullet point consistency
+        bullet_patterns = ['•', '●', '◦', '▪', '▸', '→', '-', '*', '✓', '►']
+        bullet_counts = {}
+        lines = text.split('\n')
+        for line in lines:
+            line_stripped = line.strip()
+            for bullet in bullet_patterns:
+                if line_stripped.startswith(bullet):
+                    bullet_counts[bullet] = bullet_counts.get(bullet, 0) + 1
+        
+        if len(bullet_counts) > 2:
+            score -= 10
+            warnings.append(f"Using {len(bullet_counts)} different bullet types. Use 1-2 for consistency.")
+            recommendations.append("Use consistent bullet points (• or -) throughout.")
+        
+        # 8. Text formatting issues
+        # Check for excessive caps
+        caps_words = [word for word in text.split() if word.isupper() and len(word) > 1]
+        if len(caps_words) > len(text.split()) * 0.15:  # More than 15% all caps
+            score -= 10
+            warnings.append("Excessive use of ALL CAPS. Use title case for better readability.")
+        
+        # Check for special characters that might confuse ATS
+        special_chars = re.findall(r'[^\w\s\.,\-\(\)\[\]\/\@\#\&]', text)
+        if len(special_chars) > 20:
+            score -= 5
+            warnings.append("High number of special characters may confuse ATS parsing.")
+        
+        # 9. Word count optimization
+        word_count = parsed_resume.get('word_count', 0)
+        optimal_range = self.ats_standards['optimal_word_count']
+        acceptable_range = self.ats_standards['acceptable_word_count']
+        
+        if optimal_range[0] <= word_count <= optimal_range[1]:
+            recommendations.append("✓ Optimal word count for ATS parsing.")
+        elif acceptable_range[0] <= word_count <= acceptable_range[1]:
+            warnings.append("Word count is acceptable but could be optimized.")
+        else:
+            score -= 15
+            if word_count < acceptable_range[0]:
+                issues.append(f"Resume too short ({word_count} words). Add more details.")
+                recommendations.append("Expand resume to 400-800 words for better ATS evaluation.")
+            else:
+                issues.append(f"Resume too long ({word_count} words). Consider condensing.")
+                recommendations.append("Condense resume to 400-800 words for optimal ATS parsing.")
+        
+        # 10. Date format consistency
+        date_formats_found = []
+        for pattern in self.ats_standards['date_formats']:
+            if re.search(pattern, text):
+                date_formats_found.append(pattern)
+        
+        if len(date_formats_found) > 2:
+            score -= 5
+            warnings.append("Multiple date formats detected. Use consistent MM/YYYY format.")
+            recommendations.append("Use consistent date format (MM/YYYY) throughout resume.")
+        
+        # Calculate final score and determine ATS friendliness
+        final_score = max(score, 0)
+        ats_friendly = final_score >= 70
         
         return {
-            'score': max(score, 0),
-            'ats_friendly': formatting.get('ats_friendly', True),
-            'issues': formatting.get('formatting_issues', [])
+            'score': final_score,
+            'ats_friendly': ats_friendly,
+            'issues': issues,
+            'warnings': warnings,
+            'recommendations': recommendations,
+            'compatibility_grade': self._get_compatibility_grade(final_score),
+            'sections_found': found_sections,
+            'contact_completeness': f"{contact_found}/{len(contact_required)}",
+            'bullet_consistency': len(bullet_counts) <= 2,
+            'word_count_optimal': optimal_range[0] <= word_count <= optimal_range[1]
         }
+    
+    def _get_compatibility_grade(self, score: int) -> str:
+        """Get ATS compatibility grade"""
+        if score >= 90:
+            return "A+ (Excellent)"
+        elif score >= 80:
+            return "A (Very Good)"
+        elif score >= 70:
+            return "B (Good)"
+        elif score >= 60:
+            return "C (Fair)"
+        elif score >= 50:
+            return "D (Poor)"
+        else:
+            return "F (Very Poor)"
     
     def _calculate_overall_score(self, keyword_analysis: Dict, semantic_analysis: Dict,
                                 format_analysis: Dict, content_analysis: Dict, 
