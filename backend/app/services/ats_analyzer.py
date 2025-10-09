@@ -13,13 +13,13 @@ from app.services.job_detector import job_detector
 from app.services.project_extractor import project_extractor
 from app.services.job_description_generator import job_description_generator
 
-# Try to import sentence-transformers, fall back to basic matching if not available
+# Import sentence-transformers - required for AI-powered analysis
 try:
     from sentence_transformers import SentenceTransformer, util
     EMBEDDINGS_AVAILABLE = True
 except ImportError:
     EMBEDDINGS_AVAILABLE = False
-    print("Warning: sentence-transformers not available. Using keyword-only matching.")
+    print("❌ ERROR: sentence-transformers is required for AI-powered analysis. Please install it.")
 
 class ATSAnalyzer:
     """
@@ -27,16 +27,16 @@ class ATSAnalyzer:
     """
     
     def __init__(self):
-        """Initialize with embeddings model if available"""
-        # Load sentence transformer model for semantic matching
-        if EMBEDDINGS_AVAILABLE:
-            try:
-                self.model = SentenceTransformer('all-MiniLM-L6-v2')  # Lightweight, fast model
-                self.use_embeddings = True
-            except:
-                self.use_embeddings = False
-        else:
-            self.use_embeddings = False
+        """Initialize with embeddings model - required for AI analysis"""
+        if not EMBEDDINGS_AVAILABLE:
+            raise Exception("AI-powered analysis requires sentence-transformers. Please install it.")
+        
+        try:
+            self.model = SentenceTransformer('all-MiniLM-L6-v2')  # Lightweight, fast model
+            self.use_embeddings = True
+            print("✅ ATS Analyzer: AI embeddings model loaded successfully")
+        except Exception as e:
+            raise Exception(f"Failed to load AI embeddings model: {e}")
         
         # Enhanced scoring weights based on industry standards
         self.weights = {
@@ -340,13 +340,9 @@ class ATSAnalyzer:
         """
         Analyze semantic similarity using embeddings (concept matching)
         """
+        # AI embeddings are required - no fallback
         if not self.use_embeddings:
-            # Fallback to basic matching
-            return {
-                'similarity_score': 0,
-                'score': 50,  # Neutral score
-                'method': 'embeddings_unavailable'
-            }
+            raise Exception("AI embeddings are required for semantic analysis")
         
         try:
             # Split into sentences for better matching

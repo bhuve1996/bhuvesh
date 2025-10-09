@@ -35,7 +35,7 @@ class JobDescriptionGenerator:
         global GEMINI_AVAILABLE
         if GEMINI_AVAILABLE:
             try:
-                self.model = genai.GenerativeModel('gemini-1.5-flash')
+                self.model = genai.GenerativeModel('gemini-2.0-flash')
             except Exception as e:
                 print(f"⚠️  Failed to initialize Gemini model: {e}")
                 GEMINI_AVAILABLE = False
@@ -61,11 +61,11 @@ class JobDescriptionGenerator:
             if response and response.text:
                 return self._clean_generated_jd(response.text)
             else:
-                return self._get_fallback_job_description(job_type, experience_level)
+                raise Exception("AI failed to generate job description")
                 
         except Exception as e:
-            print(f"⚠️  Error generating job description with AI: {e}")
-            return self._get_fallback_job_description(job_type, experience_level)
+            print(f"❌ Error generating job description with AI: {e}")
+            raise Exception(f"AI job description generation failed: {e}")
     
     def _create_generation_prompt(self, job_type: str, experience_level: str) -> str:
         """Create a prompt for generating job descriptions"""
@@ -100,133 +100,7 @@ Start directly with the job title and requirements.
         
         return '\n'.join(cleaned_lines)
     
-    def _get_fallback_job_description(self, job_type: str, experience_level: str) -> str:
-        """
-        Fallback job descriptions when AI is not available
-        """
-        job_descriptions = {
-            "DevOps Engineer": f"""
-{job_type} - {experience_level.title()}
-
-We are seeking a {experience_level} {job_type} to join our team.
-
-Requirements:
-- 3+ years of experience in DevOps, infrastructure, and automation
-- Strong proficiency in cloud platforms (AWS, Azure, GCP)
-- Experience with containerization (Docker, Kubernetes)
-- Knowledge of CI/CD pipelines and automation tools
-- Experience with Infrastructure as Code (Terraform, CloudFormation)
-- Proficiency in scripting languages (Python, Bash, PowerShell)
-- Experience with monitoring and logging tools
-- Knowledge of security best practices
-- Strong problem-solving and communication skills
-- Experience with version control systems (Git)
-- Knowledge of Linux/Unix systems administration
-- Experience with configuration management tools
-""",
-            
-            "Software Engineer": f"""
-{job_type} - {experience_level.title()}
-
-We are looking for a {experience_level} {job_type} to develop and maintain software applications.
-
-Requirements:
-- 3+ years of software development experience
-- Strong proficiency in programming languages (Java, Python, JavaScript, C++)
-- Experience with web development frameworks
-- Knowledge of databases (SQL, NoSQL)
-- Experience with version control systems (Git)
-- Understanding of software development lifecycle
-- Experience with testing frameworks and methodologies
-- Knowledge of cloud platforms and services
-- Strong problem-solving and analytical skills
-- Experience with agile development methodologies
-- Knowledge of API development and integration
-- Strong communication and teamwork skills
-""",
-            
-            "Data Scientist": f"""
-{job_type} - {experience_level.title()}
-
-We are seeking a {experience_level} {job_type} to analyze data and build predictive models.
-
-Requirements:
-- 3+ years of experience in data science and analytics
-- Strong proficiency in Python and R
-- Experience with machine learning frameworks (scikit-learn, TensorFlow, PyTorch)
-- Knowledge of statistical analysis and modeling
-- Experience with data visualization tools
-- Proficiency in SQL and database management
-- Experience with big data technologies
-- Knowledge of cloud platforms for data processing
-- Strong analytical and problem-solving skills
-- Experience with data preprocessing and feature engineering
-- Knowledge of business intelligence tools
-- Strong communication skills for presenting insights
-""",
-            
-            "Product Manager": f"""
-{job_type} - {experience_level.title()}
-
-We are looking for a {experience_level} {job_type} to lead product development and strategy.
-
-Requirements:
-- 3+ years of product management experience
-- Strong understanding of product development lifecycle
-- Experience with agile methodologies and frameworks
-- Knowledge of market research and competitive analysis
-- Experience with user research and customer feedback
-- Strong analytical and data-driven decision making
-- Experience with project management tools
-- Knowledge of business strategy and planning
-- Strong communication and leadership skills
-- Experience with cross-functional team collaboration
-- Knowledge of product metrics and KPIs
-- Understanding of technology and development processes
-""",
-            
-            "UX/UI Designer": f"""
-{job_type} - {experience_level.title()}
-
-We are seeking a {experience_level} {job_type} to create user-centered design solutions.
-
-Requirements:
-- 3+ years of UX/UI design experience
-- Proficiency in design tools (Figma, Sketch, Adobe Creative Suite)
-- Experience with user research and usability testing
-- Knowledge of design systems and component libraries
-- Experience with prototyping and wireframing
-- Understanding of user-centered design principles
-- Knowledge of accessibility standards and guidelines
-- Experience with responsive and mobile design
-- Strong visual design and typography skills
-- Experience with design collaboration tools
-- Knowledge of front-end development basics
-- Strong communication and presentation skills
-"""
-        }
-        
-        # Return specific JD if available, otherwise generic
-        if job_type in job_descriptions:
-            return job_descriptions[job_type]
-        else:
-            return f"""
-{job_type} - {experience_level.title()}
-
-We are seeking a {experience_level} {job_type} to join our team.
-
-Requirements:
-- 3+ years of relevant experience in {job_type.lower()}
-- Strong technical skills and domain expertise
-- Experience with industry-standard tools and technologies
-- Knowledge of best practices and methodologies
-- Strong problem-solving and analytical skills
-- Excellent communication and teamwork abilities
-- Experience with project management and delivery
-- Continuous learning and adaptability
-- Attention to detail and quality focus
-- Leadership and mentoring capabilities
-"""
+# Fallback method removed - AI-only system
     
     def determine_experience_level(self, resume_text: str) -> str:
         """

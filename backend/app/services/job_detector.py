@@ -6,10 +6,8 @@ Uses parallel execution for Gemini + Semantic for best results
 
 import re
 import os
-import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Tuple, Optional, Dict, Any
-import numpy as np
 
 # Try to import sentence-transformers
 try:
@@ -27,10 +25,10 @@ try:
     api_key = os.getenv('GEMINI_API_KEY')
     if api_key and api_key != 'your_api_key_here' and len(api_key) > 20:
         genai.configure(api_key=api_key)
-        print("✅ Google Gemini configured (fallback for unknown roles)")
+        print("✅ Google Gemini configured for AI job detection")
     else:
         GEMINI_AVAILABLE = False
-        print("ℹ️  Google Gemini available but no valid API key set. Add GEMINI_API_KEY to .env for LLM fallback")
+        print("❌ Google Gemini available but no valid API key set. AI job detection is required.")
 except ImportError:
     GEMINI_AVAILABLE = False
     print("ℹ️  Google Gemini not installed. Run: pip install google-generativeai")
@@ -402,20 +400,20 @@ class JobTypeDetector:
             confidence = role_scores[best_role]
             return best_role, confidence
         
-        # Default if nothing detected
-        return "General Professional", 0.5
+        # No fallback - AI is required
+        raise Exception("AI job detection is required. Please configure GEMINI_API_KEY in .env file")
     
     def _gemini_detection(self, resume_text: str) -> Tuple[str, float]:
         """
-        Use Google Gemini LLM to detect job type (fallback for unknown roles)
+        Use Google Gemini LLM to detect job type
         FREE tier: 15 requests/minute, 1500 requests/day
         """
         if not GEMINI_AVAILABLE:
-            return "General Professional", 0.5
+            raise Exception("AI job detection is required. Please configure GEMINI_API_KEY in .env file")
         
         try:
             # Create model
-            model = genai.GenerativeModel('gemini-pro')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             
             # Extract first 1000 characters for analysis
             resume_sample = resume_text[:1000]
@@ -452,14 +450,14 @@ Job Title:"""
             
             # Validate it's a reasonable job title (not too long)
             if len(job_title) > 50 or len(job_title) < 3:
-                return "General Professional", 0.5
+                raise Exception("AI generated invalid job title. Please check GEMINI_API_KEY configuration")
             
             # Return with high confidence since LLM should be accurate
             return job_title, 0.85
             
         except Exception as e:
-            print(f"Gemini detection error: {e}")
-            return "General Professional", 0.5
+            print(f"❌ Gemini detection error: {e}")
+            raise Exception(f"AI job detection failed: {e}")
 
 
 # Create global instance
