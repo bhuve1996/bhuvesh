@@ -370,7 +370,7 @@ class JobTypeDetector:
     
     def _keyword_based_detection(self, resume_text: str) -> Tuple[str, float]:
         """
-        Fallback: keyword-based job detection
+        Keyword-based job detection (AI-only system)
         """
         text_lower = resume_text.lower()
         
@@ -400,7 +400,7 @@ class JobTypeDetector:
             confidence = role_scores[best_role]
             return best_role, confidence
         
-        # No fallback - AI is required
+        # AI is required - no fallback
         raise Exception("AI job detection is required. Please configure GEMINI_API_KEY in .env file")
     
     def _gemini_detection(self, resume_text: str) -> Tuple[str, float]:

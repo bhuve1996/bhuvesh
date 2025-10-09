@@ -1,7 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
+import { ImprovementPlan } from '@/components/resume/ImprovementPlan';
+import type {
+  ImprovementItem,
+  ImprovementSummary,
+} from '@/components/resume/ImprovementPlan/types';
 import { Card } from '@/components/ui/Card';
 import type { AnalysisResult } from '@/types/ats';
 
@@ -11,6 +16,44 @@ interface ResultsDisplayProps {
 }
 
 export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
+  const [improvementPlan, setImprovementPlan] = useState<{
+    improvements: ImprovementItem[];
+    summary: ImprovementSummary;
+    quick_wins: ImprovementItem[];
+  } | null>(null);
+  const [loadingImprovements, setLoadingImprovements] = useState(false);
+
+  const fetchImprovementPlan = useCallback(async () => {
+    if (!result.extraction_details) return;
+
+    setLoadingImprovements(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/upload/improvement-plan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          analysis_result: result,
+          extracted_data: result.extraction_details,
+          job_description: null,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setImprovementPlan(data.data);
+        }
+      }
+    } catch {
+      // Silently fail - improvement plan is optional
+    } finally {
+      setLoadingImprovements(false);
+    }
+  }, [result]);
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-400';
     if (score >= 60) return 'text-yellow-400';
@@ -437,6 +480,40 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             )}
           </div>
         </Card>
+      )}
+
+      {/* Improvement Plan Section */}
+      <div className='text-center mb-6'>
+        {!improvementPlan && (
+          <button
+            onClick={fetchImprovementPlan}
+            disabled={loadingImprovements}
+            className='px-8 py-3 text-lg bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg'
+          >
+            {loadingImprovements ? (
+              <span className='flex items-center gap-2'>
+                <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
+                Generating Plan...
+              </span>
+            ) : (
+              <span className='flex items-center gap-2'>
+                📈 Get Detailed Improvement Plan
+              </span>
+            )}
+          </button>
+        )}
+      </div>
+
+      {/* Improvement Plan Display */}
+      {improvementPlan && (
+        <div className='mb-8'>
+          <ImprovementPlan
+            improvements={improvementPlan.improvements}
+            summary={improvementPlan.summary}
+            quick_wins={improvementPlan.quick_wins}
+            currentScore={result.atsScore}
+          />
+        </div>
       )}
 
       {/* Action Buttons */}

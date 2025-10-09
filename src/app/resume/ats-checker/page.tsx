@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
@@ -12,12 +11,12 @@ import type { AnalysisResult, ATSAnalysisBackendResponse } from '@/types/ats';
 // Note: Metadata is defined in layout.tsx
 
 export default function ATSCheckerPage() {
-  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
     null
   );
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'upload' | 'results'>('upload');
 
   const handleFileUpload = (uploadedFile: File) => {
     setFile(uploadedFile);
@@ -33,12 +32,19 @@ export default function ATSCheckerPage() {
     try {
       const result = await analyzeResumeWithBackend(file, jobDescription);
 
-      // Store result in sessionStorage and redirect to results page
-      sessionStorage.setItem('ats_analysis_result', JSON.stringify(result));
-      router.push('/resume/ats-checker/results');
+      // Set the analysis result to display inline and switch to results tab
+      setAnalysisResult(result);
+      setActiveTab('results');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed');
     }
+  };
+
+  const handleNewUpload = () => {
+    setFile(null);
+    setAnalysisResult(null);
+    setError(null);
+    setActiveTab('upload');
   };
 
   const analyzeResumeWithBackend = async (
@@ -71,9 +77,10 @@ export default function ATSCheckerPage() {
         }
 
         // Map enhanced backend response to frontend format
-        const detectedJob = apiResult.data.detected_job_type
-          ? `${apiResult.data.detected_job_type} (${Math.round((apiResult.data.job_detection_confidence || 0) * 100)}% confidence)`
-          : 'General Analysis';
+        if (!apiResult.data.detected_job_type) {
+          throw new Error('AI job detection failed - no job type detected');
+        }
+        const detectedJob = `${apiResult.data.detected_job_type} (${Math.round((apiResult.data.job_detection_confidence || 0) * 100)}% confidence)`;
 
         return {
           jobType: detectedJob,
@@ -125,9 +132,10 @@ export default function ATSCheckerPage() {
         }
 
         // Return analysis with AI-generated specific job description
-        const detectedJob = apiResult.data.detected_job_type
-          ? `${apiResult.data.detected_job_type} (${Math.round((apiResult.data.job_detection_confidence || 0) * 100)}% confidence)`
-          : 'General Analysis';
+        if (!apiResult.data.detected_job_type) {
+          throw new Error('AI job detection failed - no job type detected');
+        }
+        const detectedJob = `${apiResult.data.detected_job_type} (${Math.round((apiResult.data.job_detection_confidence || 0) * 100)}% confidence)`;
 
         return {
           jobType: detectedJob,
@@ -172,7 +180,7 @@ export default function ATSCheckerPage() {
   return (
     <div className='min-h-screen bg-black text-white'>
       <Section id='ats-checker' className='py-20'>
-        <div className='max-w-4xl mx-auto px-6'>
+        <div className='max-w-6xl mx-auto px-6'>
           {/* Header */}
           <div className='text-center mb-12'>
             <h1 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent'>
@@ -184,26 +192,75 @@ export default function ATSCheckerPage() {
             </p>
           </div>
 
-          {/* File Upload Section */}
+          {/* Tabs */}
           <div className='mb-8'>
-            <FileUpload onFileUpload={handleFileUpload} />
+            <div className='flex space-x-1 bg-gray-800/50 p-1 rounded-lg w-fit mx-auto'>
+              <button
+                onClick={() => setActiveTab('upload')}
+                className={`px-6 py-3 rounded-md font-medium transition-all ${
+                  activeTab === 'upload'
+                    ? 'bg-cyan-500 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                }`}
+              >
+                📄 Upload Resume
+              </button>
+              {analysisResult && (
+                <button
+                  onClick={() => setActiveTab('results')}
+                  className={`px-6 py-3 rounded-md font-medium transition-all ${
+                    activeTab === 'results'
+                      ? 'bg-cyan-500 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                  }`}
+                >
+                  📊 Analysis Results
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Analysis Section */}
-          {file && (
-            <div className='mb-8'>
-              <ATSAnalysis
-                file={file}
-                onAnalyze={handleAnalysis}
-                error={error}
-              />
+          {/* Tab Content */}
+          {activeTab === 'upload' && (
+            <div className='space-y-8'>
+              {/* File Upload Section */}
+              {!file && (
+                <div>
+                  <FileUpload onFileUpload={handleFileUpload} />
+                </div>
+              )}
+
+              {/* Analysis Section */}
+              {file && (
+                <div>
+                  <ATSAnalysis
+                    file={file}
+                    onAnalyze={handleAnalysis}
+                    error={error}
+                  />
+                </div>
+              )}
             </div>
           )}
 
-          {/* Results Section */}
-          {analysisResult && (
-            <div>
-              <ResultsDisplay result={analysisResult} />
+          {/* Results Tab */}
+          {activeTab === 'results' && analysisResult && (
+            <div className='space-y-6'>
+              {/* New Upload Button */}
+              <div className='text-center'>
+                <button
+                  onClick={handleNewUpload}
+                  className='px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg'
+                >
+                  📄 Analyze Another Resume
+                </button>
+              </div>
+
+              {/* Results Display */}
+              <ResultsDisplay
+                result={analysisResult}
+                onTryAgain={handleNewUpload}
+              />
             </div>
           )}
         </div>

@@ -46,16 +46,38 @@ class ProjectExtractor:
             raise Exception("AI work experience extraction is required. Please configure GEMINI_API_KEY in .env file")
         
         try:
-            # Simple prompt
-            prompt = f"""Extract work experience from this resume. Return ONLY valid JSON.
+            # Enhanced prompt with proper time calculation
+            prompt = f"""Extract work experience from this resume. Calculate exact time periods and identify current company. Return ONLY valid JSON.
+
+CRITICAL RULES:
+1. Calculate total_experience_years as decimal (e.g., 2.5 for 2 years 6 months)
+2. Mark current company with "current": true (look for "Present", "Current", or most recent dates)
+3. Use exact dates from resume for start_date and end_date
+4. Group multiple positions at same company under one entry
+5. Extract all technologies and skills used at each company
 
 {{
   "work_experience": [
     {{
       "company": "Company Name",
-      "positions": [{{"title": "Job Title", "location": "City, Country", "duration": "MM/YYYY - MM/YYYY", "start_date": "MM/YYYY", "end_date": "MM/YYYY"}}],
+      "positions": [
+        {{
+          "title": "Job Title", 
+          "location": "City, Country", 
+          "duration": "MM/YYYY - MM/YYYY or Present", 
+          "start_date": "MM/YYYY", 
+          "end_date": "MM/YYYY or Present"
+        }}
+      ],
       "responsibilities": ["responsibility 1"],
-      "projects": [{{"name": "Project Name", "description": "description", "technologies": ["tech1"], "achievements": ["achievement1"]}}],
+      "projects": [
+        {{
+          "name": "Project Name", 
+          "description": "description", 
+          "technologies": ["tech1"], 
+          "achievements": ["achievement1"]
+        }}
+      ],
       "achievements": ["achievement 1"],
       "skills_used": ["skill1", "skill2"],
       "total_experience_years": 2.5,
@@ -73,7 +95,7 @@ class ProjectExtractor:
 }}
 
 Resume text:
-{resume_text[:2000]}"""
+{resume_text[:3000]}"""
 
             response = self.model.generate_content(prompt)
             

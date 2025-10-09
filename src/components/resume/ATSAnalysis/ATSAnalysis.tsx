@@ -20,8 +20,13 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
 }) => {
   const [jobDescription, setJobDescription] = useState('');
   const [showJDInput, setShowJDInput] = useState(false);
-  const { progress, startAnalysis, updateStep, completeStep } =
-    useAnalysisProgress();
+  const {
+    progress,
+    startAnalysis,
+    updateStep,
+    completeStep,
+    completeAnalysis,
+  } = useAnalysisProgress();
 
   const handleAnalyze = async () => {
     if (jobDescription.trim().length < 50 && showJDInput) {
@@ -50,6 +55,11 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
 
       // Step 4: Results
       updateStep(3, 'active');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      completeStep(3);
+
+      // Complete analysis
+      completeAnalysis();
       onAnalyze(jobDescription);
     } catch {
       // Error handling is managed by the parent component
