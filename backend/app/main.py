@@ -7,6 +7,10 @@ This is like the main server file in Node.js/Express
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
+
 # Import our API routes
 from app.api.upload import router as upload_router
 

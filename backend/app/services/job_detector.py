@@ -25,12 +25,12 @@ try:
     GEMINI_AVAILABLE = True
     # Try to configure with API key from environment
     api_key = os.getenv('GEMINI_API_KEY')
-    if api_key:
+    if api_key and api_key != 'your_api_key_here' and len(api_key) > 20:
         genai.configure(api_key=api_key)
         print("✅ Google Gemini configured (fallback for unknown roles)")
     else:
         GEMINI_AVAILABLE = False
-        print("ℹ️  Google Gemini available but no API key set. Add GEMINI_API_KEY to .env for LLM fallback")
+        print("ℹ️  Google Gemini available but no valid API key set. Add GEMINI_API_KEY to .env for LLM fallback")
 except ImportError:
     GEMINI_AVAILABLE = False
     print("ℹ️  Google Gemini not installed. Run: pip install google-generativeai")

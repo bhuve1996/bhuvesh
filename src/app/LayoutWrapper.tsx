@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 
-import { Navigation } from '@/components/layout';
+import { Footer, Navigation } from '@/components/layout';
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -18,7 +18,8 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navigation />
-      {children}
+      <main className='min-h-screen'>{children}</main>
+      <Footer />
     </>
   );
 }

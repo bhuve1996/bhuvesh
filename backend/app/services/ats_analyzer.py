@@ -11,6 +11,7 @@ import numpy as np
 # Import job detector and project extractor
 from app.services.job_detector import job_detector
 from app.services.project_extractor import project_extractor
+from app.services.job_description_generator import job_description_generator
 
 # Try to import sentence-transformers, fall back to basic matching if not available
 try:
@@ -81,9 +82,19 @@ class ATSAnalyzer:
             Comprehensive analysis with scores and recommendations
         """
         resume_text = parsed_resume.get('text', '').lower()
-        jd_text = job_description.lower()
         
-        # Extract keywords from job description
+        # Detect job type first
+        detected_job, job_confidence = job_detector.detect_job_type(resume_text)
+        
+        # Generate specific job description based on detected job type
+        experience_level = job_description_generator.determine_experience_level(resume_text)
+        specific_jd = job_description_generator.generate_job_description(detected_job, experience_level)
+        
+        # Use the generated specific JD for analysis instead of the provided one
+        analysis_jd = specific_jd if detected_job != "Unknown" else job_description
+        jd_text = analysis_jd.lower()
+        
+        # Extract keywords from the analysis job description
         jd_keywords = self._extract_keywords(jd_text)
         jd_requirements = self._extract_requirements(jd_text)
         
@@ -104,8 +115,7 @@ class ATSAnalyzer:
             ats_analysis
         )
         
-        # Detect job type using AI
-        detected_job, job_confidence = job_detector.detect_job_type(resume_text)
+        # Job type already detected above
         
         # Generate recommendations
         recommendations = self._generate_recommendations_with_jd(

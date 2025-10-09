@@ -295,78 +295,146 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             🤖 AI-Enhanced Experience Analysis
           </h3>
           <div className='space-y-4'>
-            {result.structured_experience.work_experience.map((job, index) => (
-              <div
-                key={index}
-                className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
-              >
-                <div className='flex justify-between items-start mb-2'>
-                  <div>
-                    <h4 className='text-white font-medium'>{job.position}</h4>
-                    <p className='text-gray-300 text-sm'>{job.company}</p>
-                    <p className='text-gray-400 text-xs'>
-                      {job.location} • {job.duration}
-                    </p>
-                  </div>
-                </div>
-
-                {job.projects && job.projects.length > 0 && (
-                  <div className='mt-3'>
-                    <h5 className='text-cyan-400 text-sm font-medium mb-2'>
-                      Projects ({job.projects.length})
-                    </h5>
-                    <div className='space-y-2'>
-                      {job.projects.map((project, pIndex) => (
-                        <div
-                          key={pIndex}
-                          className='bg-gray-700/30 rounded p-3'
-                        >
-                          <h6 className='text-white text-sm font-medium'>
-                            {project.name}
-                          </h6>
-                          <p className='text-gray-300 text-xs mt-1'>
-                            {project.description}
-                          </p>
-                          {project.technologies &&
-                            project.technologies.length > 0 && (
-                              <div className='mt-2'>
-                                <span className='text-gray-400 text-xs'>
-                                  Technologies:{' '}
-                                </span>
-                                <span className='text-blue-400 text-xs'>
-                                  {project.technologies.join(', ')}
-                                </span>
-                              </div>
-                            )}
+            {result.structured_experience.work_experience.map(
+              (company, index) => (
+                <div
+                  key={index}
+                  className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
+                >
+                  <div className='flex justify-between items-start mb-2'>
+                    <div className='flex-1'>
+                      <div className='flex items-center gap-2 mb-1'>
+                        <h4 className='text-white font-medium'>
+                          {company.company}
+                        </h4>
+                        {company.current && (
+                          <span className='bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs font-medium'>
+                            Current
+                          </span>
+                        )}
+                        <span className='bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs'>
+                          {company.total_experience_years} years
+                        </span>
+                      </div>
+                      {company.positions && company.positions.length > 0 && (
+                        <div className='mt-1'>
+                          {company.positions.map((position, pIndex) => (
+                            <div key={pIndex} className='text-gray-300 text-sm'>
+                              <span className='font-medium'>
+                                {position.title}
+                              </span>
+                              <span className='text-gray-400 text-xs ml-2'>
+                                {position.location} • {position.duration}
+                              </span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </div>
                   </div>
-                )}
 
-                {job.responsibilities && job.responsibilities.length > 0 && (
-                  <div className='mt-3'>
-                    <h5 className='text-green-400 text-sm font-medium mb-2'>
-                      Key Responsibilities
-                    </h5>
-                    <ul className='text-gray-300 text-xs space-y-1'>
-                      {job.responsibilities.slice(0, 3).map((resp, rIndex) => (
-                        <li key={rIndex} className='flex items-start'>
-                          <span className='text-green-400 mr-2'>•</span>
-                          <span>{resp}</span>
-                        </li>
-                      ))}
-                      {job.responsibilities.length > 3 && (
-                        <li className='text-gray-400 text-xs'>
-                          +{job.responsibilities.length - 3} more
-                          responsibilities
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            ))}
+                  {company.skills_used && company.skills_used.length > 0 && (
+                    <div className='mt-3'>
+                      <h5 className='text-blue-400 text-sm font-medium mb-2'>
+                        Technologies & Skills Used
+                      </h5>
+                      <div className='flex flex-wrap gap-1'>
+                        {company.skills_used.map((skill, sIndex) => (
+                          <span
+                            key={sIndex}
+                            className='bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs'
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {company.projects && company.projects.length > 0 && (
+                    <div className='mt-3'>
+                      <h5 className='text-cyan-400 text-sm font-medium mb-2'>
+                        Projects ({company.projects.length})
+                      </h5>
+                      <div className='space-y-2'>
+                        {company.projects.map((project, pIndex) => (
+                          <div
+                            key={pIndex}
+                            className='bg-gray-700/30 rounded p-3'
+                          >
+                            <h6 className='text-white text-sm font-medium'>
+                              {project.name}
+                            </h6>
+                            <p className='text-gray-300 text-xs mt-1'>
+                              {project.description}
+                            </p>
+                            {project.technologies &&
+                              project.technologies.length > 0 && (
+                                <div className='mt-2'>
+                                  <span className='text-gray-400 text-xs'>
+                                    Technologies:{' '}
+                                  </span>
+                                  <span className='text-blue-400 text-xs'>
+                                    {project.technologies.join(', ')}
+                                  </span>
+                                </div>
+                              )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {company.responsibilities &&
+                    company.responsibilities.length > 0 && (
+                      <div className='mt-3'>
+                        <h5 className='text-green-400 text-sm font-medium mb-2'>
+                          Key Responsibilities
+                        </h5>
+                        <ul className='text-gray-300 text-xs space-y-1'>
+                          {company.responsibilities
+                            .slice(0, 3)
+                            .map((resp, rIndex) => (
+                              <li key={rIndex} className='flex items-start'>
+                                <span className='text-green-400 mr-2'>•</span>
+                                <span>{resp}</span>
+                              </li>
+                            ))}
+                          {company.responsibilities.length > 3 && (
+                            <li className='text-gray-400 text-xs'>
+                              +{company.responsibilities.length - 3} more
+                              responsibilities
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+
+                  {company.achievements && company.achievements.length > 0 && (
+                    <div className='mt-3'>
+                      <h5 className='text-yellow-400 text-sm font-medium mb-2'>
+                        Key Achievements
+                      </h5>
+                      <ul className='text-gray-300 text-xs space-y-1'>
+                        {company.achievements
+                          .slice(0, 3)
+                          .map((achievement, aIndex) => (
+                            <li key={aIndex} className='flex items-start'>
+                              <span className='text-yellow-400 mr-2'>🏆</span>
+                              <span>{achievement}</span>
+                            </li>
+                          ))}
+                        {company.achievements.length > 3 && (
+                          <li className='text-gray-400 text-xs'>
+                            +{company.achievements.length - 3} more achievements
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )
+            )}
           </div>
         </Card>
       )}

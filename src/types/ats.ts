@@ -206,16 +206,23 @@ export interface Project {
   achievements: string[];
 }
 
-export interface StructuredWorkExperience {
-  company: string;
-  position: string;
+export interface Position {
+  title: string;
   location: string;
   duration: string;
   start_date: string;
   end_date: string;
+}
+
+export interface StructuredWorkExperience {
+  company: string;
+  positions: Position[];
   responsibilities: string[];
   projects: Project[];
   achievements: string[];
+  skills_used: string[];
+  total_experience_years: number;
+  current: boolean;
 }
 
 export interface StructuredContactInfo {
@@ -270,12 +277,12 @@ export interface AnalysisResult {
   characterCount: number;
   extraction_details?: ExtractionDetails | undefined;
   // Enhanced analysis data
-  ats_compatibility?: ATSCompatibility;
-  format_analysis?: FormatAnalysis;
-  detailed_scores?: DetailedScores;
-  semantic_similarity?: number;
-  match_category?: string;
-  ats_friendly?: boolean;
-  formatting_issues?: string[];
-  structured_experience?: StructuredExperience;
+  ats_compatibility?: ATSCompatibility | undefined;
+  format_analysis?: FormatAnalysis | undefined;
+  detailed_scores?: DetailedScores | undefined;
+  semantic_similarity?: number | undefined;
+  match_category?: string | undefined;
+  ats_friendly?: boolean | undefined;
+  formatting_issues?: string[] | undefined;
+  structured_experience?: StructuredExperience | undefined;
 }

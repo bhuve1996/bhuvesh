@@ -57,9 +57,9 @@ export const Navigation: React.FC<NavigationProps> = ({
             <Image
               src='/logo.png'
               alt='Bhuvesh Logo'
-              width={64}
-              height={64}
-              className='w-16 h-16 rounded-lg object-cover'
+              width={128}
+              height={50}
+              className='w-32 h-[50px] rounded-lg object-cover'
               priority
             />
           </Link>

@@ -97,9 +97,29 @@ export default function ATSResultsPage() {
     );
   }
 
-  const { atsScore, extraction_details, jobType } = analysisData;
+  const { atsScore, extraction_details, jobType, structured_experience } =
+    analysisData;
   const categorized = extraction_details?.categorized_resume || {};
-  const contact = categorized.contact_info;
+  // Prefer structured_experience contact info over categorized contact info
+  const contact = structured_experience?.contact_info
+    ? {
+        full_name: structured_experience.contact_info.full_name,
+        first_name: structured_experience.contact_info.full_name.split(' ')[0],
+        last_name: structured_experience.contact_info.full_name
+          .split(' ')
+          .slice(1)
+          .join(' '),
+        email: structured_experience.contact_info.email,
+        phone: { raw: structured_experience.contact_info.phone },
+        linkedin: structured_experience.contact_info.linkedin
+          ? { username: structured_experience.contact_info.linkedin }
+          : undefined,
+        github: structured_experience.contact_info.github
+          ? { username: structured_experience.contact_info.github }
+          : undefined,
+        location: { full: structured_experience.contact_info.location },
+      }
+    : categorized.contact_info;
   const education = categorized.education || [];
   const experience = categorized.work_experience || [];
   const skills = extraction_details?.skills_found || {};
@@ -128,6 +148,89 @@ export default function ATSResultsPage() {
             📄 Upload New Resume
           </Button>
         </div>
+      </div>
+
+      {/* ATS Score Overview - All scores in one place */}
+      <Card className='p-6 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-500/30 mb-6'>
+        <div className='text-center mb-6'>
+          <h2 className='text-3xl font-bold text-white mb-2'>
+            ATS Analysis Results
+          </h2>
+          <p className='text-gray-400'>Comprehensive scoring breakdown</p>
+        </div>
+
+        {/* Main ATS Score */}
+        <div className='text-center mb-8'>
+          <div className='inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 mb-4'>
+            <span className='text-4xl font-bold text-white'>
+              {analysisData.atsScore}
+            </span>
+          </div>
+          <h3 className='text-2xl font-bold text-white mb-2'>
+            Overall ATS Score
+          </h3>
+          <p className='text-gray-300'>{analysisData.match_category}</p>
+        </div>
+
+        {/* Detailed Scores Grid */}
+        <div className='grid grid-cols-2 md:grid-cols-5 gap-4 mb-6'>
+          <div className='text-center p-4 bg-gray-800/50 rounded-lg'>
+            <div className='text-2xl font-bold text-green-400'>
+              {analysisData.detailed_scores?.keyword_score || 0}
+            </div>
+            <div className='text-sm text-gray-400'>Keyword Match</div>
+          </div>
+          <div className='text-center p-4 bg-gray-800/50 rounded-lg'>
+            <div className='text-2xl font-bold text-blue-400'>
+              {analysisData.detailed_scores?.semantic_score || 0}
+            </div>
+            <div className='text-sm text-gray-400'>Semantic Match</div>
+          </div>
+          <div className='text-center p-4 bg-gray-800/50 rounded-lg'>
+            <div className='text-2xl font-bold text-purple-400'>
+              {analysisData.detailed_scores?.format_score || 0}
+            </div>
+            <div className='text-sm text-gray-400'>Format Score</div>
+          </div>
+          <div className='text-center p-4 bg-gray-800/50 rounded-lg'>
+            <div className='text-2xl font-bold text-yellow-400'>
+              {analysisData.detailed_scores?.content_score || 0}
+            </div>
+            <div className='text-sm text-gray-400'>Content Score</div>
+          </div>
+          <div className='text-center p-4 bg-gray-800/50 rounded-lg'>
+            <div className='text-2xl font-bold text-cyan-400'>
+              {analysisData.detailed_scores?.ats_score || 0}
+            </div>
+            <div className='text-sm text-gray-400'>ATS Compatibility</div>
+          </div>
+        </div>
+
+        {/* Job Type Detection */}
+        <div className='text-center p-4 bg-gray-800/30 rounded-lg'>
+          <h4 className='text-lg font-semibold text-white mb-2'>
+            Detected Job Type
+          </h4>
+          <p className='text-cyan-400 font-medium'>{analysisData.jobType}</p>
+        </div>
+      </Card>
+
+      {/* Improvement Plan Button */}
+      <div className='text-center mb-6'>
+        <Button
+          onClick={() => fetchImprovementPlan(analysisData)}
+          disabled={loadingImprovements}
+          className='px-8 py-3 text-lg bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
+        >
+          {loadingImprovements ? (
+            <div className='flex items-center space-x-2'>
+              <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
+              <span>Generating Improvement Plan...</span>
+            </div>
+          ) : (
+            <span>📈 Get Detailed Improvement Plan</span>
+          )}
+        </Button>
       </div>
 
       {/* ATS Score Card */}
@@ -227,10 +330,10 @@ export default function ATSResultsPage() {
                 <span className='text-gray-400'>First Name:</span>{' '}
                 {contact?.first_name}
               </p>
-              {contact?.middle_name && (
+              {contact && 'middle_name' in contact && contact.middle_name && (
                 <p className='text-white'>
                   <span className='text-gray-400'>Middle Name:</span>{' '}
-                  {contact?.middle_name}
+                  {contact.middle_name}
                 </p>
               )}
               <p className='text-white'>
@@ -250,24 +353,30 @@ export default function ATSResultsPage() {
               <p className='text-white'>
                 <span className='text-gray-400'>Phone:</span>{' '}
                 {contact?.phone?.raw}
-                {contact?.phone?.country_code && (
-                  <span className='text-gray-500 ml-2'>
-                    ({contact?.phone.country_code})
-                  </span>
-                )}
+                {contact?.phone &&
+                  'country_code' in contact.phone &&
+                  contact.phone.country_code && (
+                    <span className='text-gray-500 ml-2'>
+                      ({contact.phone.country_code})
+                    </span>
+                  )}
               </p>
-              {contact?.linkedin?.url && (
-                <p className='text-white'>
-                  <span className='text-gray-400'>LinkedIn:</span>{' '}
-                  {contact?.linkedin.username || contact?.linkedin.url}
-                </p>
-              )}
-              {contact?.github?.url && (
-                <p className='text-white'>
-                  <span className='text-gray-400'>GitHub:</span>{' '}
-                  {contact?.github.username || contact?.github.url}
-                </p>
-              )}
+              {contact?.linkedin &&
+                'url' in contact.linkedin &&
+                contact.linkedin.url && (
+                  <p className='text-white'>
+                    <span className='text-gray-400'>LinkedIn:</span>{' '}
+                    {contact.linkedin.username || contact.linkedin.url}
+                  </p>
+                )}
+              {contact?.github &&
+                'url' in contact.github &&
+                contact.github.url && (
+                  <p className='text-white'>
+                    <span className='text-gray-400'>GitHub:</span>{' '}
+                    {contact.github.username || contact.github.url}
+                  </p>
+                )}
             </div>
           </div>
           <div>
@@ -279,24 +388,30 @@ export default function ATSResultsPage() {
                 <span className='text-gray-400'>Full:</span>{' '}
                 {contact?.location?.full}
               </p>
-              {contact?.location?.city && (
-                <p className='text-white'>
-                  <span className='text-gray-400'>City:</span>{' '}
-                  {contact?.location.city}
-                </p>
-              )}
-              {contact?.location?.state && (
-                <p className='text-white'>
-                  <span className='text-gray-400'>State:</span>{' '}
-                  {contact?.location.state}
-                </p>
-              )}
-              {contact?.location?.country && (
-                <p className='text-white'>
-                  <span className='text-gray-400'>Country:</span>{' '}
-                  {contact?.location.country}
-                </p>
-              )}
+              {contact?.location &&
+                'city' in contact.location &&
+                contact.location.city && (
+                  <p className='text-white'>
+                    <span className='text-gray-400'>City:</span>{' '}
+                    {contact.location.city}
+                  </p>
+                )}
+              {contact?.location &&
+                'state' in contact.location &&
+                contact.location.state && (
+                  <p className='text-white'>
+                    <span className='text-gray-400'>State:</span>{' '}
+                    {contact.location.state}
+                  </p>
+                )}
+              {contact?.location &&
+                'country' in contact.location &&
+                contact.location.country && (
+                  <p className='text-white'>
+                    <span className='text-gray-400'>Country:</span>{' '}
+                    {contact.location.country}
+                  </p>
+                )}
             </div>
           </div>
         </div>

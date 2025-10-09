@@ -88,23 +88,25 @@ export default function ATSCheckerPage() {
           characterCount:
             apiResult.data.extraction_details?.full_resume_text?.length || 0,
           extraction_details: apiResult.data.extraction_details,
+          // Enhanced analysis data
+          ats_compatibility: apiResult.data.ats_compatibility || undefined,
+          format_analysis: apiResult.data.format_analysis || undefined,
+          detailed_scores: apiResult.data.detailed_scores || undefined,
+          semantic_similarity: apiResult.data.semantic_similarity || undefined,
+          match_category: apiResult.data.match_category || undefined,
+          ats_friendly: apiResult.data.ats_friendly || undefined,
+          formatting_issues: apiResult.data.formatting_issues || undefined,
+          structured_experience:
+            apiResult.data.structured_experience || undefined,
         };
       } else {
-        // Basic analysis without job description - use generic job description
+        // Quick analysis - backend will generate specific JD based on detected job type
         const formData = new FormData();
         formData.append('file', file);
-
-        // Create a generic job description for basic analysis
-        const genericJD = `Professional role requiring:
-- Strong communication and collaboration skills
-- Problem-solving abilities
-- Relevant experience in your field
-- Technical or domain expertise
-- Ability to work independently and in teams
-- Attention to detail
-- Project management capabilities`;
-
-        formData.append('job_description', genericJD);
+        formData.append(
+          'job_description',
+          'Quick Analysis - AI will generate specific job description'
+        );
 
         const response = await fetch(`${API_URL}/api/upload/analyze`, {
           method: 'POST',
@@ -122,7 +124,7 @@ export default function ATSCheckerPage() {
           throw new Error(apiResult.message || 'Failed to analyze resume');
         }
 
-        // Return basic analysis with note about improving with JD
+        // Return analysis with AI-generated specific job description
         const detectedJob = apiResult.data.detected_job_type
           ? `${apiResult.data.detected_job_type} (${Math.round((apiResult.data.job_detection_confidence || 0) * 100)}% confidence)`
           : 'General Analysis';
@@ -131,11 +133,11 @@ export default function ATSCheckerPage() {
           jobType: detectedJob,
           atsScore: apiResult.data.ats_score,
           keywordMatches: apiResult.data.keyword_matches || [],
-          missingKeywords: [],
+          missingKeywords: apiResult.data.missing_keywords || [],
           suggestions: [
-            '💡 Add a specific job description for more accurate analysis',
-            '🎯 Enable job description comparison above for semantic matching',
-            '📊 Get tailored keyword suggestions from the actual job posting',
+            '🤖 AI analyzed your resume against a specific job description for your role',
+            '📊 Results are based on industry-standard requirements for your position',
+            '💡 Add a custom job description above for even more targeted analysis',
             ...(apiResult.data.suggestions || []),
           ],
           strengths: apiResult.data.strengths || [],
@@ -145,6 +147,16 @@ export default function ATSCheckerPage() {
           characterCount:
             apiResult.data.extraction_details?.full_resume_text?.length || 0,
           extraction_details: apiResult.data.extraction_details,
+          // Enhanced analysis data
+          ats_compatibility: apiResult.data.ats_compatibility || undefined,
+          format_analysis: apiResult.data.format_analysis || undefined,
+          detailed_scores: apiResult.data.detailed_scores || undefined,
+          semantic_similarity: apiResult.data.semantic_similarity || undefined,
+          match_category: apiResult.data.match_category || undefined,
+          ats_friendly: apiResult.data.ats_friendly || undefined,
+          formatting_issues: apiResult.data.formatting_issues || undefined,
+          structured_experience:
+            apiResult.data.structured_experience || undefined,
         };
       }
     } catch (error) {

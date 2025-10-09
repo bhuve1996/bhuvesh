@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { Navigation } from '@/components/layout';
+import { Footer, Navigation } from '@/components/layout';
 import {
   AboutSection,
   ContactSection,
@@ -77,6 +77,8 @@ export default function Home() {
       <ProjectsSection />
 
       <ContactSection />
+
+      <Footer />
     </div>
   );
 }
