@@ -86,7 +86,7 @@ export interface ResumeSection {
   title: string;
   order: number;
   visible: boolean;
-  content: any;
+  content: unknown;
   settings: SectionSettings;
 }
 
@@ -119,7 +119,7 @@ export interface SectionSettings {
     | 'custom';
   groupBy?: string;
   filterBy?: string[];
-  customFields?: Record<string, any>;
+  customFields?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -308,7 +308,7 @@ export interface ExportOptions {
   quality?: 'draft' | 'standard' | 'high' | 'print';
   watermark?: string;
   password?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -436,7 +436,7 @@ export interface AnalyticsInsights {
   impact: 'high' | 'medium' | 'low';
   actionable: boolean;
   category: string;
-  data: any;
+  data: unknown;
   createdAt: Date;
 }
 

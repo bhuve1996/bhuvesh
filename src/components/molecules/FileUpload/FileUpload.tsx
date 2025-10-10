@@ -1,7 +1,9 @@
 import React, { useCallback, useState } from 'react';
+
 import { Alert } from '../../atoms/Alert/Alert';
 import { Button } from '../../atoms/Button/Button';
 import { Progress } from '../../atoms/Progress/Progress';
+
 import { FileUploadProps } from './types';
 
 export const FileUpload: React.FC<FileUploadProps> = ({
@@ -133,7 +135,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   };
 
   const getFileIcon = (file: File): string => {

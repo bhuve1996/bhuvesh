@@ -9,4 +9,3 @@ export { Tabs } from './Tabs/Tabs';
 // Export types for existing components
 export type * from './FileUpload/types';
 export type * from './Tabs/types';
-

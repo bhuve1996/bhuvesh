@@ -235,10 +235,10 @@ Upload a resume with rare roles like:
 
 ## 🎓 What This Demonstrates
 
-✅ **Advanced NLP** - Semantic embeddings for job detection  
-✅ **User-Centric Design** - Better UX for edge cases  
-✅ **Production Quality** - Graceful fallbacks, confidence scoring  
-✅ **Scalability** - Universal job detection, not hardcoded  
+✅ **Advanced NLP** - Semantic embeddings for job detection
+✅ **User-Centric Design** - Better UX for edge cases
+✅ **Production Quality** - Graceful fallbacks, confidence scoring
+✅ **Scalability** - Universal job detection, not hardcoded
 ✅ **Modern AI** - BERT embeddings, transformer models
 
 ---
@@ -305,6 +305,6 @@ Upload a resume with rare roles like:
 
 ---
 
-**Status:** ✅ Complete and Tested  
-**Date:** October 5, 2025  
+**Status:** ✅ Complete and Tested
+**Date:** October 5, 2025
 **Version:** 2.1.0

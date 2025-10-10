@@ -332,6 +332,6 @@ Building a comprehensive ATS (Applicant Tracking System) resume checker that ana
 
 ---
 
-**Status**: 🚧 In Development  
-**Last Updated**: January 2024  
+**Status**: 🚧 In Development
+**Last Updated**: January 2024
 **Next Review**: Weekly updates during development

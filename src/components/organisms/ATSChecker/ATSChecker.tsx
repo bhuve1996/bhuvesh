@@ -1,10 +1,13 @@
-import { AnalysisResult } from '@/shared/types/ats';
 import React, { useCallback, useState } from 'react';
+
+import { AnalysisResult } from '@/shared/types/ats';
+
 import { Alert } from '../../atoms/Alert/Alert';
 import { Button } from '../../atoms/Button/Button';
 import { FileUpload } from '../../molecules/FileUpload/FileUpload';
 import { Tabs } from '../../molecules/Tabs/Tabs';
 import { Card } from '../../ui/Card/Card';
+
 import { ATSResults } from './ATSResults/ATSResults';
 import { ATSCheckerProps } from './types';
 

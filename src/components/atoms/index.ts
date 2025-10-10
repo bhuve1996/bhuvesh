@@ -17,4 +17,3 @@ export type * from './Alert/types';
 export type * from './Button/types';
 export type * from './Input/types';
 export type * from './Progress/types';
-

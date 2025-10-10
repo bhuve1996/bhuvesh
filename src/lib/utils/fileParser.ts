@@ -40,24 +40,24 @@ const parsePDF = async (_file: File): Promise<ParsedContent> => {
 
   // This is a placeholder that will work for testing
   const text = `PDF parsing is not yet implemented. Please use DOCX or TXT files for now.
-  
+
   This is a sample resume content for testing purposes:
-  
+
   John Doe
   Software Engineer
   Email: john.doe@email.com
   Phone: (555) 123-4567
-  
+
   Experience:
   - 3+ years of software development experience
   - Proficient in JavaScript, React, Node.js, Python
   - Experience with AWS, Docker, Kubernetes
   - Strong problem-solving and communication skills
-  
+
   Education:
   - Bachelor of Science in Computer Science
   - University of Technology
-  
+
   Skills:
   - Programming Languages: JavaScript, TypeScript, Python, Java
   - Frameworks: React, Vue.js, Express.js, Django

@@ -9,6 +9,8 @@ import {
   ResumeAnalysisResponse,
   SupportedFormatsResponse,
 } from '@/shared/types/api';
+import { AnalysisResult } from '@/shared/types/ats';
+import { ResumeDocument } from '@/shared/types/resume';
 
 // ============================================================================
 // API CONFIGURATION
@@ -81,14 +83,14 @@ class ATSApiClient {
         );
       }
 
-        throw new ApiError(
-          'NETWORK_ERROR',
-          error instanceof Error ? error.message : 'Network error occurred',
-          { originalError: error },
-          new Date().toISOString(),
-          endpoint,
-          options.method || 'GET'
-        );
+      throw new ApiError(
+        'NETWORK_ERROR',
+        error instanceof Error ? error.message : 'Network error occurred',
+        { originalError: error },
+        new Date().toISOString(),
+        endpoint,
+        options.method || 'GET'
+      );
     }
   }
 
@@ -134,8 +136,8 @@ class ATSApiClient {
   }
 
   async getImprovementPlan(
-    analysisResult: any,
-    extractedData: any,
+    analysisResult: AnalysisResult,
+    extractedData: ResumeDocument,
     jobDescription?: string
   ): Promise<ImprovementPlanResponse> {
     return this.request<ImprovementPlanResponse>(
@@ -192,8 +194,8 @@ export const extractResumeExperience = (file: File) =>
   atsApi.extractExperience(file);
 
 export const getResumeImprovementPlan = (
-  analysisResult: any,
-  extractedData: any,
+  analysisResult: AnalysisResult,
+  extractedData: ResumeDocument,
   jobDescription?: string
 ) => atsApi.getImprovementPlan(analysisResult, extractedData, jobDescription);
 
@@ -209,7 +211,7 @@ export const getApiVersion = () => atsApi.getApiVersion();
 
 export class ATSApiError extends Error {
   public code: string;
-  public details?: any;
+  public details?: Record<string, unknown>;
   public timestamp: string;
   public endpoint?: string;
   public method?: string;
@@ -217,7 +219,7 @@ export class ATSApiError extends Error {
   constructor(
     code: string,
     message: string,
-    details?: any,
+    details?: Record<string, unknown>,
     timestamp: string = new Date().toISOString(),
     endpoint?: string,
     method?: string
@@ -236,19 +238,19 @@ export class ATSApiError extends Error {
 // TYPE GUARDS
 // ============================================================================
 
-export const isATSApiError = (error: any): error is ATSApiError => {
+export const isATSApiError = (error: unknown): error is ATSApiError => {
   return error instanceof ATSApiError;
 };
 
-export const isNetworkError = (error: any): boolean => {
+export const isNetworkError = (error: unknown): boolean => {
   return error.code === 'NETWORK_ERROR' || error.code === 'TIMEOUT';
 };
 
-export const isValidationError = (error: any): boolean => {
+export const isValidationError = (error: unknown): boolean => {
   return error.code === 'VALIDATION_ERROR' || error.code === 'BAD_REQUEST';
 };
 
-export const isServerError = (error: any): boolean => {
+export const isServerError = (error: unknown): boolean => {
   return (
     error.code === 'INTERNAL_SERVER_ERROR' ||
     error.code === 'SERVICE_UNAVAILABLE'
@@ -275,7 +277,9 @@ export const withRetry = async <T>(
       // Don't retry on validation errors or client errors
       if (
         isValidationError(error) ||
-        ((error as any).status >= 400 && (error as any).status < 500)
+        ((error as Error & { status?: number }).status &&
+          (error as Error & { status?: number }).status! >= 400 &&
+          (error as Error & { status?: number }).status! < 500)
       ) {
         throw error;
       }
@@ -299,7 +303,10 @@ export const withRetry = async <T>(
 // CACHING
 // ============================================================================
 
-const cache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+const cache = new Map<
+  string,
+  { data: unknown; timestamp: number; ttl: number }
+>();
 
 export const withCache = async <T>(
   key: string,

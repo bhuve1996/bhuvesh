@@ -181,7 +181,7 @@ export interface Project {
     revenue?: number;
     performance?: string;
     efficiency?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   duration?: {
     start_date: string;

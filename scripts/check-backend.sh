@@ -28,7 +28,7 @@ fi
 # Check if nixpacks.toml is valid
 if [ -f "backend/nixpacks.toml" ]; then
     echo "✅ nixpacks.toml found"
-    
+
     # Check for common errors in nixpacks.toml
     if grep -q "pip" backend/nixpacks.toml && grep -q "nixPkgs" backend/nixpacks.toml; then
         # Check if using bare 'pip' (wrong) vs 'python39Packages.pip' (correct)
@@ -95,4 +95,3 @@ fi
 
 echo "✅ Backend validation passed!"
 echo ""
-

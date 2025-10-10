@@ -1,4 +1,3 @@
 # Backend directory (deployed separately to Railway)
 # Just tell Vercel to ignore this during frontend builds
 backend/
-

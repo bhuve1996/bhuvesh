@@ -10,8 +10,8 @@ The frontend uses environment variables to configure the backend API URL. This a
 
 ### `NEXT_PUBLIC_API_URL`
 
-**Purpose:** Backend API endpoint URL  
-**Required:** ✅ YES (has default fallback)  
+**Purpose:** Backend API endpoint URL
+**Required:** ✅ YES (has default fallback)
 **Default:** `http://localhost:8000`
 
 **Values by Environment:**

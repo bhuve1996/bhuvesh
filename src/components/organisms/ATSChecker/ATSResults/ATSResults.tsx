@@ -1,5 +1,7 @@
-import { AnalysisResult } from '@/shared/types/ats';
 import React from 'react';
+
+import { AnalysisResult } from '@/shared/types/ats';
+
 import { Button } from '../../../atoms/Button/Button';
 import { Card } from '../../../ui/Card/Card';
 

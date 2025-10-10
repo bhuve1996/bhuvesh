@@ -64,7 +64,7 @@ export const ComponentName: React.FC<ComponentNameProps> = ({
   // Destructure props
 }) => {
   // Component logic
-  
+
   return (
     // JSX
   );

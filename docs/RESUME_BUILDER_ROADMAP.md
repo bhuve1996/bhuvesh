@@ -10,7 +10,7 @@ Transform the ATS Checker into a complete Resume Management Platform with AI-pow
 
 ### 1.1 AI-Powered Actionable Recommendations
 
-**Current State**: Basic suggestions in analysis results  
+**Current State**: Basic suggestions in analysis results
 **Goal**: Specific, actionable, personalized recommendations
 
 #### Backend Enhancements (`backend/app/services/resume_improver.py`)

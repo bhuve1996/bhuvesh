@@ -2,6 +2,17 @@
 // API TYPES
 // ============================================================================
 
+import {
+  ATSCompatibility,
+  AnalysisResult,
+  CategorizedResume,
+  DetailedScores,
+  ExtractionDetails,
+  FormatAnalysis,
+  StructuredExperience,
+} from './ats';
+import { ResumeDocument } from './resume';
+
 import { ApiResponse } from './index';
 
 // ============================================================================
@@ -31,8 +42,8 @@ export interface ResumeAnalysisRequest {
 }
 
 export interface ImprovementPlanRequest {
-  analysisResult: any;
-  extractedData: any;
+  analysisResult: AnalysisResult;
+  extractedData: ResumeDocument;
   jobDescription?: string;
   preferences?: {
     focusAreas?: string[];
@@ -59,8 +70,8 @@ export interface FileUploadResponse extends ApiResponse {
     text: string;
     wordCount: number;
     characterCount: number;
-    formattingAnalysis: any;
-    parsedContent: any;
+    formattingAnalysis: FormatAnalysis;
+    parsedContent: CategorizedResume;
   };
 }
 
@@ -79,12 +90,12 @@ export interface ResumeAnalysisResponse extends ApiResponse {
     formattingIssues?: string[];
     atsFriendly?: boolean;
     wordCount?: number;
-    detailedScores?: any;
-    atsCompatibility?: any;
-    formatAnalysis?: any;
-    structuredExperience?: any;
-    extractionDetails?: any;
-    categorizedResume?: any;
+    detailedScores?: DetailedScores;
+    atsCompatibility?: ATSCompatibility;
+    formatAnalysis?: FormatAnalysis;
+    structuredExperience?: StructuredExperience;
+    extractionDetails?: ExtractionDetails;
+    categorizedResume?: CategorizedResume;
     processingTime: number;
     analysisVersion: string;
     generatedAt: string;
@@ -93,9 +104,9 @@ export interface ResumeAnalysisResponse extends ApiResponse {
 
 export interface ImprovementPlanResponse extends ApiResponse {
   data: {
-    improvements: any[];
-    summary: any;
-    quickWins: any[];
+    improvements: unknown[];
+    summary: unknown;
+    quickWins: unknown[];
     currentScore: number;
     targetScore: number;
     estimatedImpact: number;
@@ -114,7 +125,7 @@ export interface JobDescriptionAnalysisResponse extends ApiResponse {
     education: string;
     industry: string;
     jobLevel: string;
-    analysis: any;
+    analysis: Record<string, unknown>;
   };
 }
 
@@ -132,7 +143,7 @@ export interface SupportedFormatsResponse extends ApiResponse {
 
 export class ApiError extends Error {
   public code: string;
-  public details?: any;
+  public details?: Record<string, unknown>;
   public timestamp: string;
   public path?: string;
   public method?: string;
@@ -140,7 +151,7 @@ export class ApiError extends Error {
   constructor(
     code: string,
     message: string,
-    details?: any,
+    details?: Record<string, unknown>,
     timestamp: string = new Date().toISOString(),
     path?: string,
     method?: string
@@ -157,7 +168,7 @@ export class ApiError extends Error {
 
 export interface ValidationError extends ApiError {
   field: string;
-  value: any;
+  value: unknown;
   constraint: string;
 }
 
@@ -183,7 +194,7 @@ export interface ApiEndpoint {
   path: string;
   description: string;
   parameters?: ApiParameter[];
-  requestBody?: any;
+  requestBody?: Record<string, unknown>;
   responses: ApiResponseSchema[];
   tags?: string[];
   deprecated?: boolean;
@@ -194,15 +205,15 @@ export interface ApiParameter {
   type: string;
   required: boolean;
   description: string;
-  example?: any;
-  schema?: any;
+  example?: unknown;
+  schema?: Record<string, unknown>;
 }
 
 export interface ApiResponseSchema {
   status: number;
   description: string;
-  schema: any;
-  example?: any;
+  schema: Record<string, unknown>;
+  example?: unknown;
 }
 
 // ============================================================================
@@ -216,22 +227,40 @@ export interface ApiConfig {
   retryDelay: number;
   headers: Record<string, string>;
   interceptors?: {
-    request?: (config: any) => any;
-    response?: (response: any) => any;
-    error?: (error: any) => any;
+    request?: (config: Record<string, unknown>) => Record<string, unknown>;
+    response?: (response: Record<string, unknown>) => Record<string, unknown>;
+    error?: (error: Error) => Error;
   };
 }
 
 export interface ApiClient {
-  get: <T = any>(url: string, config?: any) => Promise<T>;
-  post: <T = any>(url: string, data?: any, config?: any) => Promise<T>;
-  put: <T = any>(url: string, data?: any, config?: any) => Promise<T>;
-  delete: <T = any>(url: string, config?: any) => Promise<T>;
-  patch: <T = any>(url: string, data?: any, config?: any) => Promise<T>;
-  upload: <T = any>(
+  get: <T = unknown>(
+    url: string,
+    config?: Record<string, unknown>
+  ) => Promise<T>;
+  post: <T = unknown>(
+    url: string,
+    data?: unknown,
+    config?: Record<string, unknown>
+  ) => Promise<T>;
+  put: <T = unknown>(
+    url: string,
+    data?: unknown,
+    config?: Record<string, unknown>
+  ) => Promise<T>;
+  delete: <T = unknown>(
+    url: string,
+    config?: Record<string, unknown>
+  ) => Promise<T>;
+  patch: <T = unknown>(
+    url: string,
+    data?: unknown,
+    config?: Record<string, unknown>
+  ) => Promise<T>;
+  upload: <T = unknown>(
     url: string,
     formData: FormData,
-    config?: any
+    config?: Record<string, unknown>
   ) => Promise<T>;
 }
 
@@ -241,7 +270,7 @@ export interface ApiClient {
 
 export interface WebSocketMessage {
   type: string;
-  data: any;
+  data: unknown;
   timestamp: string;
   id?: string;
 }
@@ -268,7 +297,7 @@ export interface CacheConfig {
   strategy: 'lru' | 'fifo' | 'lfu'; // Cache eviction strategy
 }
 
-export interface CacheItem<T = any> {
+export interface CacheItem<T = unknown> {
   key: string;
   value: T;
   timestamp: number;
@@ -277,8 +306,8 @@ export interface CacheItem<T = any> {
 }
 
 export interface CacheManager {
-  get: <T = any>(key: string) => Promise<T | null>;
-  set: <T = any>(key: string, value: T, ttl?: number) => Promise<void>;
+  get: <T = unknown>(key: string) => Promise<T | null>;
+  set: <T = unknown>(key: string, value: T, ttl?: number) => Promise<void>;
   delete: (key: string) => Promise<void>;
   clear: () => Promise<void>;
   has: (key: string) => Promise<boolean>;
@@ -295,7 +324,7 @@ export interface RateLimitConfig {
   maxRequests: number; // Maximum requests per window
   skipSuccessfulRequests?: boolean;
   skipFailedRequests?: boolean;
-  keyGenerator?: (req: any) => string;
+  keyGenerator?: (req: Record<string, unknown>) => string;
 }
 
 export interface RateLimitInfo {

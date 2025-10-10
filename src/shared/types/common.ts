@@ -39,7 +39,7 @@ export interface PaginationParams {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   search?: string;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
 }
 
 export interface PaginationMeta {
@@ -93,12 +93,12 @@ export interface FilterParams {
     | 'startsWith'
     | 'endsWith'
     | 'regex';
-  value: any;
+  value: unknown;
 }
 
 export interface FilterOption {
   label: string;
-  value: any;
+  value: unknown;
   count?: number;
   disabled?: boolean;
 }
@@ -206,7 +206,7 @@ export interface Notification {
   read: boolean;
   persistent?: boolean;
   actions?: NotificationAction[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface NotificationAction {
@@ -224,11 +224,11 @@ export interface Event {
   type: string;
   timestamp: Date;
   source: string;
-  data: any;
-  metadata?: Record<string, any>;
+  data: unknown;
+  metadata?: Record<string, unknown>;
 }
 
-export interface EventHandler<T = any> {
+export interface EventHandler<T = unknown> {
   (event: Event & { data: T }): void | Promise<void>;
 }
 
@@ -274,7 +274,7 @@ export interface FeatureFlag {
     users?: string[];
     groups?: string[];
   };
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -287,7 +287,7 @@ export interface Permission {
   description: string;
   resource: string;
   action: string;
-  conditions?: Record<string, any>;
+  conditions?: Record<string, unknown>;
 }
 
 export interface Role {
@@ -309,8 +309,8 @@ export interface AuditLog {
   resourceId: string;
   userId: string;
   timestamp: Date;
-  changes?: Record<string, { from: any; to: any }>;
-  metadata?: Record<string, any>;
+  changes?: Record<string, { from: unknown; to: unknown }>;
+  metadata?: Record<string, unknown>;
   ipAddress?: string;
   userAgent?: string;
 }
@@ -328,7 +328,7 @@ export interface Metadata {
   tags?: string[];
   category?: string;
   description?: string;
-  custom?: Record<string, any>;
+  custom?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -340,7 +340,7 @@ export interface ValidationRule {
   rule: string;
   message: string;
   severity: 'error' | 'warning' | 'info';
-  condition?: (value: any) => boolean;
+  condition?: (value: unknown) => boolean;
 }
 
 export interface ValidationResult {
@@ -354,7 +354,7 @@ export interface ValidationResult {
 // CACHE TYPES
 // ============================================================================
 
-export interface CacheEntry<T = any> {
+export interface CacheEntry<T = unknown> {
   key: string;
   value: T;
   timestamp: number;
@@ -401,17 +401,17 @@ export interface PerformanceProfile {
 export interface AppError {
   code: string;
   message: string;
-  details?: any;
+  details?: unknown;
   stack?: string;
   timestamp: Date;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   severity: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export interface ErrorBoundaryState {
   hasError: boolean;
   error?: AppError;
-  errorInfo?: any;
+  errorInfo?: unknown;
 }
 
 // ============================================================================
@@ -469,7 +469,7 @@ export interface Translation {
   value: string;
   locale: string;
   namespace?: string;
-  interpolation?: Record<string, any>;
+  interpolation?: Record<string, unknown>;
 }
 
 // ============================================================================
