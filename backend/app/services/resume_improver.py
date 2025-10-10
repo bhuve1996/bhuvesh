@@ -4,6 +4,7 @@ Generates specific, actionable suggestions to boost ATS score
 """
 
 import logging
+import os
 import re
 from typing import Any, Optional
 
@@ -27,8 +28,12 @@ class ResumeImprover:
         self.use_ai = GEMINI_AVAILABLE
         if self.use_ai:
             try:
-                # Configure Gemini (API key should be set in environment)
-                genai.configure(api_key=None)  # Will use GOOGLE_API_KEY env var
+                # Configure Gemini with API key from environment
+                api_key = os.getenv("GEMINI_API_KEY")
+                if api_key and api_key != "your_api_key_here" and len(api_key) > 20:
+                    genai.configure(api_key=api_key)
+                else:
+                    raise Exception("GEMINI_API_KEY not properly configured")
                 self.model = genai.GenerativeModel("gemini-pro")
                 print("✅ Resume Improver: AI analysis enabled with Gemini")
             except Exception as e:
