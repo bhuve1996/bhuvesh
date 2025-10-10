@@ -3,15 +3,16 @@ Simple test script to verify our API is working
 This is like a basic test to make sure everything is set up correctly
 """
 
+
 import requests
-import json
+
 
 # Test the API endpoints
 def test_api():
     base_url = "http://localhost:8000"
-    
+
     print("🧪 Testing ATS Resume Checker API...")
-    
+
     # Test 1: Root endpoint
     try:
         response = requests.get(f"{base_url}/")
@@ -19,7 +20,7 @@ def test_api():
         print(f"   Response: {response.json()}")
     except Exception as e:
         print(f"❌ Root endpoint failed: {e}")
-    
+
     # Test 2: Health check
     try:
         response = requests.get(f"{base_url}/health")
@@ -27,7 +28,7 @@ def test_api():
         print(f"   Response: {response.json()}")
     except Exception as e:
         print(f"❌ Health check failed: {e}")
-    
+
     # Test 3: Supported formats
     try:
         response = requests.get(f"{base_url}/api/upload/supported-formats")
@@ -35,8 +36,9 @@ def test_api():
         print(f"   Response: {response.json()}")
     except Exception as e:
         print(f"❌ Supported formats failed: {e}")
-    
+
     print("\n🎉 API testing complete!")
+
 
 if __name__ == "__main__":
     test_api()

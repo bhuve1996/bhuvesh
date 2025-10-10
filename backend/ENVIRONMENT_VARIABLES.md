@@ -10,9 +10,9 @@ All sensitive configuration and secrets are stored in environment variables, not
 
 ### 🔑 Google Gemini API Key
 
-**Variable:** `GEMINI_API_KEY`  
-**Value:** Your Google Gemini API key  
-**Required:** ✅ YES  
+**Variable:** `GEMINI_API_KEY`
+**Value:** Your Google Gemini API key
+**Required:** ✅ YES
 **Purpose:** Powers AI-based job role detection (Tier 3 fallback)
 
 **How to get:**
@@ -36,9 +36,9 @@ AIzaSy************************************Zqs
 
 ### 🌐 Frontend URL
 
-**Variable:** `FRONTEND_URL`  
-**Value:** Additional frontend domain(s) to allow  
-**Required:** ❌ NO (defaults are already set)  
+**Variable:** `FRONTEND_URL`
+**Value:** Additional frontend domain(s) to allow
+**Required:** ❌ NO (defaults are already set)
 **Purpose:** Allow CORS from additional custom domains
 
 **Default allowed domains (already configured):**
@@ -66,9 +66,9 @@ FRONTEND_URL=https://staging.bhuvesh.com,https://beta.bhuvesh.com,https://dev.bh
 
 ### 🚀 Server Configuration
 
-**Variable:** `PORT`  
-**Value:** Port number for server  
-**Required:** ❌ NO (Railway sets this automatically)  
+**Variable:** `PORT`
+**Value:** Port number for server
+**Required:** ❌ NO (Railway sets this automatically)
 **Purpose:** Configure which port the server listens on
 
 **Default:** `8000` (local), Railway sets `$PORT` automatically
@@ -77,9 +77,9 @@ FRONTEND_URL=https://staging.bhuvesh.com,https://beta.bhuvesh.com,https://dev.bh
 
 ### 🏗️ Environment
 
-**Variable:** `ENVIRONMENT`  
-**Value:** `development`, `staging`, or `production`  
-**Required:** ❌ NO  
+**Variable:** `ENVIRONMENT`
+**Value:** `development`, `staging`, or `production`
+**Required:** ❌ NO
 **Purpose:** Configure behavior based on environment (future use)
 
 **Default:** `production`
@@ -271,5 +271,5 @@ ENVIRONMENT=production
 
 ---
 
-**Last Updated:** October 5, 2025  
+**Last Updated:** October 5, 2025
 **Security:** All secrets managed via environment variables ✅

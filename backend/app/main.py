@@ -3,12 +3,13 @@ Main FastAPI application file
 This is like the main server file in Node.js/Express
 """
 
+# Load environment variables
+from dotenv import load_dotenv
+
 # Import FastAPI (like importing Express in Node.js)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Load environment variables
-from dotenv import load_dotenv
 load_dotenv()
 
 # Import our API routes
@@ -18,7 +19,7 @@ from app.api.upload import router as upload_router
 app = FastAPI(
     title="ATS Resume Checker API",
     description="Advanced ATS resume analysis and scoring system",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # Configure CORS (Cross-Origin Resource Sharing)
@@ -45,7 +46,9 @@ origins = [
 custom_domains = os.getenv("FRONTEND_URL")
 if custom_domains:
     # Split by comma and add each domain
-    additional_domains = [domain.strip() for domain in custom_domains.split(",") if domain.strip()]
+    additional_domains = [
+        domain.strip() for domain in custom_domains.split(",") if domain.strip()
+    ]
     origins.extend(additional_domains)
 
 app.add_middleware(
@@ -56,6 +59,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
+
 # Define a route (like app.get() in Express)
 @app.get("/")
 async def root():
@@ -64,6 +68,7 @@ async def root():
     Returns a simple message to test if the API is working
     """
     return {"message": "ATS Resume Checker API is running!"}
+
 
 # Health check endpoint
 @app.get("/health")
@@ -75,8 +80,9 @@ async def health_check():
     return {
         "status": "healthy",
         "message": "API is running successfully",
-        "version": "1.0.0"
+        "version": "1.0.0",
     }
+
 
 # Include API routes
 app.include_router(upload_router)
@@ -85,4 +91,5 @@ app.include_router(upload_router)
 # But we'll run it with uvicorn command instead
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

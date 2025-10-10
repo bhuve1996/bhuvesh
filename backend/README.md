@@ -134,6 +134,6 @@ python test_api.py
 
 ---
 
-**Status**: 🚧 In Development  
-**Version**: 1.0.0  
+**Status**: 🚧 In Development
+**Version**: 1.0.0
 **Python Version**: 3.9+

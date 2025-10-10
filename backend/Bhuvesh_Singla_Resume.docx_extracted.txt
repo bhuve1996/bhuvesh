@@ -6,7 +6,7 @@ Senior Software Developer / Frontend Engineer with 7+ years of experience buildi
 WORK EXPERIENCE
 
 AKQA, India                                                                                                                                                       09/2022 – present
-Senior Software Developer / Senior Frontend Engineer                                                                               Gurugram, India 
+Senior Software Developer / Senior Frontend Engineer                                                                               Gurugram, India
 
  The Kusnacht Practice (Luxury Swiss Health & Rehabilitation Clinic)
 Engineered scalable UI components, reusable Storybook modules, and integrated Contentful CMS to enable dynamic, global content delivery. (Next.js, SCSS, Contentful, Storybook)
@@ -23,8 +23,8 @@ Integrated Mapbox for interactive maps, customized React components for destinat
 Bunnings (Leading Australian Home Improvement Retailer)
 Rebuilt catalog and checkout flows with Next.js and GraphQL, optimized performance with Vercel deployments, and ensured responsive customer journeys. (Next.js, Vercel, GraphQL, Storybook)
 
-JOSH Software, India                                                                                                                                  10/2021 – 09/2022 
-Senior Software Developer / Frontend Engineer                                                                                            Bengaluru, India 
+JOSH Software, India                                                                                                                                  10/2021 – 09/2022
+Senior Software Developer / Frontend Engineer                                                                                            Bengaluru, India
 
 ADIB Bank (Abu Dhabi Islamic Bank, UAE)
 Delivered secure and responsive banking modules with Angular and React, implemented dynamic forms, and integrated APIs for digital banking services. (Angular.js, React.js, SCSS, Postman, GitHub, Jira)
@@ -36,7 +36,7 @@ Implemented React UI dashboards enriched with GSAP animations, improving user en
 
 
 KDMS India                                                                                                                                                      05/2018 – 10/2021
-Software Developer / Frontend Engineer                                                                                                       Chandigarh, India 
+Software Developer / Frontend Engineer                                                                                                       Chandigarh, India
 
 GreatMocks (EdTech Platform, Mock Test Solutions)
 Designed responsive learning modules, integrated APIs, and implemented dynamic forms to improve student experience. (React.js, REST APIs, React Bootstrap, JavaScript, CSS)

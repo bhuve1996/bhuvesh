@@ -3,8 +3,8 @@ Resume Improvement Service
 Generates specific, actionable suggestions to boost ATS score
 """
 
-from typing import Dict, List, Any, Optional
 import logging
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -14,10 +14,10 @@ class ResumeImprover:
 
     def generate_improvement_plan(
         self,
-        analysis_result: Dict[str, Any],
-        extracted_data: Dict[str, Any],
-        job_description: Optional[str] = None
-    ) -> Dict[str, Any]:
+        analysis_result: dict[str, Any],
+        extracted_data: dict[str, Any],
+        job_description: Optional[str] = None,
+    ) -> dict[str, Any]:
         """
         Generate comprehensive improvement plan
 
@@ -76,7 +76,7 @@ class ResumeImprover:
             }
 
         except Exception as e:
-            logger.error(f"Error generating improvement plan: {str(e)}")
+            logger.exception("Error generating improvement plan")
             return {
                 "improvements": [],
                 "summary": {
@@ -88,8 +88,8 @@ class ResumeImprover:
             }
 
     def _generate_keyword_improvements(
-        self, analysis_result: Dict, job_description: Optional[str] = None
-    ) -> List[Dict]:
+        self, analysis_result: dict, job_description: Optional[str] = None
+    ) -> list[dict]:
         """Generate keyword-specific improvements"""
         improvements = []
         missing_keywords = analysis_result.get("missing_keywords", [])
@@ -157,8 +157,8 @@ class ResumeImprover:
         return improvements
 
     def _generate_formatting_improvements(
-        self, formatting_analysis: Dict
-    ) -> List[Dict]:
+        self, formatting_analysis: dict
+    ) -> list[dict]:
         """Generate formatting-specific improvements"""
         improvements = []
 
@@ -244,8 +244,8 @@ class ResumeImprover:
         return improvements
 
     def _generate_content_improvements(
-        self, extracted_data: Dict, analysis_result: Dict
-    ) -> List[Dict]:
+        self, extracted_data: dict, analysis_result: dict
+    ) -> list[dict]:
         """Generate content-specific improvements"""
         improvements = []
         work_experience = extracted_data.get("work_experience", [])
@@ -361,7 +361,7 @@ class ResumeImprover:
 
         return improvements
 
-    def _generate_structure_improvements(self, extracted_data: Dict) -> List[Dict]:
+    def _generate_structure_improvements(self, extracted_data: dict) -> list[dict]:
         """Generate structure-specific improvements"""
         improvements = []
 
@@ -438,7 +438,7 @@ class ResumeImprover:
 
         return improvements
 
-    def _generate_ats_improvements(self, formatting_analysis: Dict) -> List[Dict]:
+    def _generate_ats_improvements(self, formatting_analysis: dict) -> list[dict]:
         """Generate ATS-specific improvements"""
         improvements = []
 
@@ -505,7 +505,7 @@ class ResumeImprover:
 
         return improvements
 
-    def _generate_summary(self, improvements: List[Dict]) -> Dict:
+    def _generate_summary(self, improvements: list[dict]) -> dict:
         """Generate summary statistics"""
         total = len(improvements)
         by_priority = {
@@ -522,7 +522,7 @@ class ResumeImprover:
             "estimated_total_boost": min(total_boost, 35),  # Cap at realistic +35
         }
 
-    def _identify_quick_wins(self, improvements: List[Dict]) -> List[Dict]:
+    def _identify_quick_wins(self, improvements: list[dict]) -> list[dict]:
         """Identify top 3 quick wins (high impact, easy to fix)"""
         # Quick wins: critical/high priority + high score impact
         quick_wins = [
@@ -532,4 +532,3 @@ class ResumeImprover:
         ]
         # Sort by score impact (highest first)
         return sorted(quick_wins, key=lambda x: -x["score_impact"])[:3]
-

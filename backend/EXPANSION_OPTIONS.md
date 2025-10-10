@@ -20,8 +20,8 @@
 
 ### **Easy Win: Add More Job Titles**
 
-**Cost:** FREE  
-**Effort:** LOW (just add more titles to list)  
+**Cost:** FREE
+**Effort:** LOW (just add more titles to list)
 **Result:** Covers 95%+ of jobs
 
 ```python
@@ -57,8 +57,8 @@ self.job_database = [
 
 ### **Connect to Government Job Database**
 
-**Cost:** FREE (US Dept of Labor)  
-**Effort:** MEDIUM (API integration)  
+**Cost:** FREE (US Dept of Labor)
+**Effort:** MEDIUM (API integration)
 **Result:** 900+ standardized occupations
 
 **Steps:**
@@ -91,8 +91,8 @@ def fetch_onet_occupations():
 
 ### **Use LLM for Detection**
 
-**Cost:** FREE tier (15 requests/min)  
-**Effort:** MEDIUM (API integration)  
+**Cost:** FREE tier (15 requests/min)
+**Effort:** MEDIUM (API integration)
 **Result:** Can detect ANY job, even brand new roles
 
 **Steps:**
@@ -133,8 +133,8 @@ def detect_job_with_gemini(resume_text: str) -> str:
 
 ### **Most Powerful but Costs Money**
 
-**Cost:** ~$0.002 per analysis (affordable but not free)  
-**Effort:** MEDIUM (API integration)  
+**Cost:** ~$0.002 per analysis (affordable but not free)
+**Effort:** MEDIUM (API integration)
 **Result:** Best accuracy, can detect anything
 
 **Pricing:**
@@ -240,20 +240,20 @@ def detect_job_intelligent(resume_text: str) -> Tuple[str, float, str]:
 
 ### **1. Expand Database to 500+ Titles (30 minutes)**
 
-→ Add emerging roles, industry-specific titles  
-→ Cost: $0  
+→ Add emerging roles, industry-specific titles
+→ Cost: $0
 → Covers 95% of cases
 
 ### **2. Integrate Google Gemini Free Tier (2 hours)**
 
-→ Fallback for unknown roles  
-→ Cost: $0 (free tier)  
+→ Fallback for unknown roles
+→ Cost: $0 (free tier)
 → Covers remaining 5%
 
 ### **3. Optional: Add O\*NET (4 hours)**
 
-→ For US market comprehensive coverage  
-→ Cost: $0  
+→ For US market comprehensive coverage
+→ Cost: $0
 → Standard occupations
 
 ---

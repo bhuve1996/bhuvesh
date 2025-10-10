@@ -170,7 +170,7 @@ When you start the backend, you should see:
 
 Upload a resume for a rare role (e.g., "Prompt Engineer", "Climate Tech Engineer").
 
-**With Gemini:** Should detect correctly  
+**With Gemini:** Should detect correctly
 **Without Gemini:** Might fall back to closest match (e.g., "Software Engineer")
 
 ---
@@ -228,18 +228,18 @@ Yes! Just don't set the `GEMINI_API_KEY`. The system will skip Tier 3.
 
 ## Summary
 
-✅ **FREE** Google Gemini integration  
-✅ **200+ job titles** in database  
-✅ **3-tier detection** system  
-✅ Can detect **ANY job role**  
-✅ Fast for 90% of cases  
-✅ No credit card required  
+✅ **FREE** Google Gemini integration
+✅ **200+ job titles** in database
+✅ **3-tier detection** system
+✅ Can detect **ANY job role**
+✅ Fast for 90% of cases
+✅ No credit card required
 ✅ Optional - works without it too
 
 **Get your free API key:** https://makersuite.google.com/app/apikey
 
 ---
 
-**Status:** ✅ Implemented and Ready  
-**Cost:** $0 (free tier)  
+**Status:** ✅ Implemented and Ready
+**Cost:** $0 (free tier)
 **Setup Time:** 5 minutes

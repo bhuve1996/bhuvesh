@@ -1,0 +1,211 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "resume-analyzer-backend"
+version = "0.1.0"
+description = "FastAPI backend for resume analysis and ATS checking"
+authors = [{name = "Bhuvesh Singla", email = "bhuvesh@example.com"}]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.104.1",
+    "uvicorn[standard]>=0.24.0",
+    "python-multipart>=0.0.6",
+    "PyMuPDF>=1.23.8",
+    "python-docx>=1.1.0",
+    "python-magic>=0.4.27",
+    "pdfplumber>=0.10.3",
+    "Pillow>=10.1.0",
+    "torch>=2.1.1",
+    "sentence-transformers>=2.2.2",
+    "scikit-learn>=1.3.2",
+    "keybert>=0.8.3",
+    "transformers>=4.35.2",
+    "google-generativeai>=0.3.2",
+    "pandas>=2.1.3",
+    "numpy>=1.25.2",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "fastapi-cors>=0.0.6",
+    "httpx>=0.25.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.11.0",
+    "isort>=5.12.0",
+    "ruff>=0.1.6",
+    "mypy>=1.7.1",
+    "pre-commit>=3.6.0",
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+]
+
+# Black configuration
+[tool.black]
+line-length = 88
+target-version = ['py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+# isort configuration
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["app"]
+known_third_party = ["fastapi", "uvicorn", "pydantic", "pandas", "numpy"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+
+# Ruff configuration (replaces flake8, isort, and more)
+[tool.ruff]
+target-version = "py39"
+line-length = 88
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking
+    "PIE", # flake8-pie
+    "A",  # flake8-builtins
+    "COM", # flake8-commas
+    "C90", # mccabe
+    "ICN", # flake8-import-conventions
+    "G",  # flake8-logging-format
+    "INP", # flake8-no-pep420
+    "PTH", # flake8-use-pathlib
+    "ERA", # eradicate
+    "PD",  # pandas-vet
+    "PGH", # pygrep-hooks
+    "PL",  # pylint
+    "TRY", # tryceratops
+    "FLY", # flynt
+    "NPY", # numpy
+    "AIR", # airflow
+    "PERF", # perflint
+    "RUF", # ruff-specific rules
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "W191",  # indentation contains tabs
+    "PLR0913", # too many arguments
+    "PLR0912", # too many branches
+    "PLR0915", # too many statements
+    "COM812", # missing trailing comma
+    "ISC001", # implicitly concatenated string literals
+    "PLR2004", # magic value used in comparison
+    "TRY002", # create your own exception
+    "TRY003", # avoid specifying long messages outside exception class
+    "TRY200", # use raise from to specify exception cause
+    "TRY300", # consider moving statement to else block
+    "TRY301", # abstract raise to inner function
+    "B904", # within except clause, raise exceptions with raise ... from err
+    "E402", # module level import not at top of file
+    "E722", # do not use bare except
+    "E741", # ambiguous variable name
+    "F841", # local variable assigned but never used
+    "B007", # loop control variable not used within loop body
+    "B033", # sets should not contain duplicate items
+    "PLW0603", # using global statement is discouraged
+    "PLW2901", # for loop variable overwritten by assignment target
+    "RUF012", # mutable class attributes should be annotated with typing.ClassVar
+    "RUF013", # PEP 484 prohibits implicit Optional
+    "RUF001", # string contains ambiguous characters
+    "PERF401", # use list comprehension to create transformed list
+    "PERF203", # try-except within loop incurs performance overhead
+    "SIM102", # use single if statement instead of nested if statements
+    "SIM105", # use contextlib.suppress instead of try-except-pass
+    "PTH120", # os.path.dirname should be replaced by Path.parent
+    "PTH100", # os.path.abspath should be replaced by Path.resolve
+    "PTH202", # os.path.getsize should be replaced by Path.stat().st_size
+    "PTH123", # open should be replaced by Path.open
+    "PLR1714", # consider merging multiple comparisons
+    "PLR5501", # use elif instead of else then if
+    "C414", # unnecessary list call within sorted
+    "ERA001", # found commented-out code
+    "G004", # logging statement uses f-string
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]  # Allow unused imports in __init__.py
+"tests/**/*.py" = ["PLR2004", "S101"]  # Allow magic values in tests
+
+[tool.ruff.isort]
+known-first-party = ["app"]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = false
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = false
+show_error_codes = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "torch.*",
+    "transformers.*",
+    "sentence_transformers.*",
+    "keybert.*",
+    "sklearn.*",
+    "PIL.*",
+    "fitz.*",
+    "docx.*",
+    "magic.*",
+    "pdfplumber.*",
+    "google.generativeai.*",
+]
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+    "--tb=short",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
