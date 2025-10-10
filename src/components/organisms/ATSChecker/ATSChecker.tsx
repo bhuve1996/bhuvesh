@@ -2,9 +2,9 @@ import { AnalysisResult } from '@/shared/types/ats';
 import React, { useCallback, useState } from 'react';
 import { Alert } from '../../atoms/Alert/Alert';
 import { Button } from '../../atoms/Button/Button';
-import { Card } from '../../atoms/Card/Card';
 import { FileUpload } from '../../molecules/FileUpload/FileUpload';
 import { Tabs } from '../../molecules/Tabs/Tabs';
+import { Card } from '../../ui/Card/Card';
 import { ATSResults } from './ATSResults/ATSResults';
 import { ATSCheckerProps } from './types';
 
@@ -24,7 +24,7 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
   const [jobDescription, setJobDescription] = useState('');
 
   const handleFileUpload = useCallback((files: File[]) => {
-    if (files.length > 0) {
+    if (files.length > 0 && files[0]) {
       setFile(files[0]);
       setError(null);
       setAnalysisResult(null);
@@ -237,7 +237,9 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
       <Tabs
         tabs={tabs}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(tabId: string) =>
+          setActiveTab(tabId as 'upload' | 'results')
+        }
         className='max-w-6xl mx-auto'
       />
     </div>

@@ -234,9 +234,55 @@ export interface StructuredContactInfo {
   github: string;
 }
 
+export interface Skill {
+  name: string;
+  proficiency: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+}
+
+export interface SkillCategory {
+  category: string;
+  skills: Skill[];
+}
+
+export interface StructuredEducation {
+  degree: string;
+  institution: string;
+  location: string;
+  graduation_year: string;
+  gpa?: string;
+  relevant_coursework?: string[];
+}
+
+export interface Certification {
+  name: string;
+  issuer: string;
+  date: string;
+  expiry?: string;
+}
+
+export interface Award {
+  name: string;
+  issuer: string;
+  date: string;
+  description?: string;
+}
+
+export interface Automation {
+  name: string;
+  description: string;
+  technologies: string[];
+  impact?: string;
+}
+
 export interface StructuredExperience {
   work_experience: StructuredWorkExperience[];
   contact_info: StructuredContactInfo;
+  summary?: string;
+  skills?: SkillCategory[];
+  education?: StructuredEducation[];
+  certifications?: Certification[];
+  awards?: Award[];
+  automations?: Automation[];
 }
 
 export interface ATSAnalysisBackendResponse {
@@ -261,6 +307,7 @@ export interface ATSAnalysisBackendResponse {
     format_analysis?: FormatAnalysis;
     structured_experience?: StructuredExperience;
     extraction_details?: ExtractionDetails;
+    job_description?: string;
   };
 }
 

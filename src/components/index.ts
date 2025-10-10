@@ -17,7 +17,5 @@ export * from './resume';
 export * from './sections';
 export * from './ui';
 
-// Export types
-export type * from '@/shared/types/ats';
-export type * from '@/shared/types/resume';
-export type * from '@/shared/types/ui';
+// Export types (avoid conflicts by not re-exporting shared types)
+// Types are available directly from @/shared/types/*

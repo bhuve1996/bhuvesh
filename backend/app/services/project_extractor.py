@@ -57,8 +57,38 @@ CRITICAL RULES:
 5. Group multiple positions at same company under one entry
 6. Extract all technologies and skills used at each company
 7. Include ALL work experience entries, even if they seem less relevant
+8. Extract ALL sections: Summary, Contact Info, Skills (with proficiency), Education, Certifications, Awards, Automations
+9. For skills, include proficiency levels (Beginner, Intermediate, Advanced, Expert) when mentioned
+10. Extract all certifications with issuer and dates
+11. Extract all awards and recognitions
+12. Extract automation projects and their impact
 
 {{
+  "summary": "Professional summary or objective from the top of resume",
+  "contact_info": {{
+    "full_name": "Full Name",
+    "email": "email@domain.com", 
+    "phone": "phone number",
+    "location": "City, Country",
+    "linkedin": "username",
+    "github": "username",
+    "portfolio": "portfolio website"
+  }},
+  "skills": [
+    {{
+      "category": "Technical Skills",
+      "skills": [
+        {{
+          "name": "Python",
+          "proficiency": "Advanced"
+        }},
+        {{
+          "name": "AWS",
+          "proficiency": "Expert"
+        }}
+      ]
+    }}
+  ],
   "work_experience": [
     {{
       "company": "Company Name",
@@ -86,14 +116,40 @@ CRITICAL RULES:
       "current": false
     }}
   ],
-  "contact_info": {{
-    "full_name": "Full Name",
-    "email": "email@domain.com", 
-    "phone": "phone number",
-    "location": "City, Country",
-    "linkedin": "username",
-    "github": "username"
-  }}
+  "education": [
+    {{
+      "degree": "Bachelor of Science in Computer Science",
+      "institution": "University Name",
+      "location": "City, Country",
+      "graduation_year": "2020",
+      "gpa": "3.8",
+      "relevant_coursework": ["course1", "course2"]
+    }}
+  ],
+  "certifications": [
+    {{
+      "name": "AWS Certified Solutions Architect",
+      "issuer": "Amazon Web Services",
+      "date": "2023",
+      "expiry": "2026"
+    }}
+  ],
+  "awards": [
+    {{
+      "name": "Employee of the Year",
+      "issuer": "Company Name",
+      "date": "2023",
+      "description": "Recognition for outstanding performance"
+    }}
+  ],
+  "automations": [
+    {{
+      "name": "CI/CD Pipeline Automation",
+      "description": "Automated deployment process",
+      "technologies": ["Jenkins", "Docker"],
+      "impact": "Reduced deployment time by 60%"
+    }}
+  ]
 }}
 
 Resume text:

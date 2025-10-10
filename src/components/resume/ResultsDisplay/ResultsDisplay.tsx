@@ -449,6 +449,312 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         </ul>
       </Card>
 
+      {/* Contact Information */}
+      {result.structured_experience?.contact_info && (
+        <Card className='p-6'>
+          <h3 className='text-xl font-bold mb-4 text-blue-400'>
+            📞 Contact Information
+          </h3>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div>
+              <p className='text-gray-300'>
+                <span className='text-blue-400 font-medium'>Name:</span>{' '}
+                {result.structured_experience.contact_info.full_name}
+              </p>
+              <p className='text-gray-300'>
+                <span className='text-blue-400 font-medium'>Email:</span>{' '}
+                {result.structured_experience.contact_info.email}
+              </p>
+              <p className='text-gray-300'>
+                <span className='text-blue-400 font-medium'>Phone:</span>{' '}
+                {result.structured_experience.contact_info.phone}
+              </p>
+            </div>
+            <div>
+              <p className='text-gray-300'>
+                <span className='text-blue-400 font-medium'>Location:</span>{' '}
+                {result.structured_experience.contact_info.location}
+              </p>
+              {result.structured_experience.contact_info.linkedin && (
+                <p className='text-gray-300'>
+                  <span className='text-blue-400 font-medium'>LinkedIn:</span>{' '}
+                  {result.structured_experience.contact_info.linkedin}
+                </p>
+              )}
+              {result.structured_experience.contact_info.github && (
+                <p className='text-gray-300'>
+                  <span className='text-blue-400 font-medium'>GitHub:</span>{' '}
+                  {result.structured_experience.contact_info.github}
+                </p>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Professional Summary */}
+      {result.structured_experience?.summary && (
+        <Card className='p-6'>
+          <h3 className='text-xl font-bold mb-4 text-green-400'>
+            📝 Professional Summary
+          </h3>
+          <p className='text-gray-300 leading-relaxed'>
+            {result.structured_experience.summary}
+          </p>
+        </Card>
+      )}
+
+      {/* Skills Section */}
+      {result.structured_experience?.skills &&
+        result.structured_experience.skills.length > 0 && (
+          <Card className='p-6'>
+            <h3 className='text-xl font-bold mb-4 text-yellow-400'>
+              🛠️ Skills & Proficiencies
+            </h3>
+            <div className='space-y-4'>
+              {result.structured_experience.skills.map(
+                (skillCategory, index) => (
+                  <div key={index} className='bg-gray-800/50 rounded-lg p-4'>
+                    <h4 className='text-lg font-semibold text-yellow-400 mb-3'>
+                      {skillCategory.category}
+                    </h4>
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
+                      {skillCategory.skills.map((skill, skillIndex) => (
+                        <div
+                          key={skillIndex}
+                          className='flex justify-between items-center bg-gray-700/30 rounded-lg p-3'
+                        >
+                          <span className='text-gray-300 font-medium'>
+                            {skill.name}
+                          </span>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              skill.proficiency === 'Expert'
+                                ? 'bg-red-500/20 text-red-400'
+                                : skill.proficiency === 'Advanced'
+                                  ? 'bg-orange-500/20 text-orange-400'
+                                  : skill.proficiency === 'Intermediate'
+                                    ? 'bg-yellow-500/20 text-yellow-400'
+                                    : 'bg-green-500/20 text-green-400'
+                            }`}
+                          >
+                            {skill.proficiency}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          </Card>
+        )}
+
+      {/* Education */}
+      {result.structured_experience?.education &&
+        result.structured_experience.education.length > 0 && (
+          <Card className='p-6'>
+            <h3 className='text-xl font-bold mb-4 text-indigo-400'>
+              🎓 Education
+            </h3>
+            <div className='space-y-4'>
+              {result.structured_experience.education.map((edu, index) => (
+                <div
+                  key={index}
+                  className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
+                >
+                  <h4 className='text-lg font-semibold text-white mb-2'>
+                    {edu.degree}
+                  </h4>
+                  <p className='text-gray-300 mb-1'>
+                    <span className='text-indigo-400 font-medium'>
+                      Institution:
+                    </span>{' '}
+                    {String(edu.institution)}
+                  </p>
+                  <p className='text-gray-300 mb-1'>
+                    <span className='text-indigo-400 font-medium'>
+                      Location:
+                    </span>{' '}
+                    {edu.location}
+                  </p>
+                  <p className='text-gray-300 mb-1'>
+                    <span className='text-indigo-400 font-medium'>
+                      Graduation:
+                    </span>{' '}
+                    {edu.graduation_year}
+                  </p>
+                  {edu.gpa && (
+                    <p className='text-gray-300 mb-1'>
+                      <span className='text-indigo-400 font-medium'>GPA:</span>{' '}
+                      {edu.gpa}
+                    </p>
+                  )}
+                  {edu.relevant_coursework &&
+                    edu.relevant_coursework.length > 0 && (
+                      <div className='mt-3'>
+                        <p className='text-indigo-400 font-medium mb-2'>
+                          Relevant Coursework:
+                        </p>
+                        <div className='flex flex-wrap gap-2'>
+                          {edu.relevant_coursework.map(
+                            (course, courseIndex) => (
+                              <span
+                                key={courseIndex}
+                                className='px-2 py-1 bg-indigo-500/20 text-indigo-400 rounded-full text-xs'
+                              >
+                                {course}
+                              </span>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+      {/* Certifications */}
+      {result.structured_experience?.certifications &&
+        result.structured_experience.certifications.length > 0 && (
+          <Card className='p-6'>
+            <h3 className='text-xl font-bold mb-4 text-purple-400'>
+              🏆 Certifications
+            </h3>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              {result.structured_experience.certifications.map(
+                (cert, index) => (
+                  <div
+                    key={index}
+                    className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
+                  >
+                    <h4 className='text-lg font-semibold text-white mb-2'>
+                      {cert.name}
+                    </h4>
+                    <p className='text-gray-300 mb-1'>
+                      <span className='text-purple-400 font-medium'>
+                        Issuer:
+                      </span>{' '}
+                      {cert.issuer}
+                    </p>
+                    <p className='text-gray-300 mb-1'>
+                      <span className='text-purple-400 font-medium'>Date:</span>{' '}
+                      {cert.date}
+                    </p>
+                    {cert.expiry && (
+                      <p className='text-gray-300'>
+                        <span className='text-purple-400 font-medium'>
+                          Expires:
+                        </span>{' '}
+                        {cert.expiry}
+                      </p>
+                    )}
+                  </div>
+                )
+              )}
+            </div>
+          </Card>
+        )}
+
+      {/* Awards */}
+      {result.structured_experience?.awards &&
+        result.structured_experience.awards.length > 0 && (
+          <Card className='p-6'>
+            <h3 className='text-xl font-bold mb-4 text-yellow-400'>
+              🏅 Awards & Recognition
+            </h3>
+            <div className='space-y-3'>
+              {result.structured_experience.awards.map((award, index) => (
+                <div
+                  key={index}
+                  className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
+                >
+                  <div className='flex items-start space-x-3'>
+                    <span className='text-yellow-400 text-xl'>🏆</span>
+                    <div className='flex-1'>
+                      <h4 className='text-lg font-semibold text-white mb-1'>
+                        {award.name}
+                      </h4>
+                      <p className='text-gray-300 mb-1'>
+                        <span className='text-yellow-400 font-medium'>
+                          Issuer:
+                        </span>{' '}
+                        {award.issuer}
+                      </p>
+                      <p className='text-gray-300 mb-1'>
+                        <span className='text-yellow-400 font-medium'>
+                          Date:
+                        </span>{' '}
+                        {award.date}
+                      </p>
+                      {award.description && (
+                        <p className='text-gray-300 text-sm'>
+                          {award.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+      {/* Automations */}
+      {result.structured_experience?.automations &&
+        result.structured_experience.automations.length > 0 && (
+          <Card className='p-6'>
+            <h3 className='text-xl font-bold mb-4 text-cyan-400'>
+              ⚙️ Automation Projects
+            </h3>
+            <div className='space-y-4'>
+              {result.structured_experience.automations.map(
+                (automation, index) => (
+                  <div
+                    key={index}
+                    className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
+                  >
+                    <h4 className='text-lg font-semibold text-white mb-2'>
+                      {automation.name}
+                    </h4>
+                    <p className='text-gray-300 mb-3'>
+                      {automation.description}
+                    </p>
+                    {automation.technologies &&
+                      automation.technologies.length > 0 && (
+                        <div className='mb-3'>
+                          <p className='text-cyan-400 font-medium mb-2'>
+                            Technologies Used:
+                          </p>
+                          <div className='flex flex-wrap gap-2'>
+                            {automation.technologies.map((tech, techIndex) => (
+                              <span
+                                key={techIndex}
+                                className='px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs'
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    {automation.impact && (
+                      <p className='text-gray-300'>
+                        <span className='text-cyan-400 font-medium'>
+                          Impact:
+                        </span>{' '}
+                        {automation.impact}
+                      </p>
+                    )}
+                  </div>
+                )
+              )}
+            </div>
+          </Card>
+        )}
+
       {/* Structured Experience Analysis */}
       {result.structured_experience && (
         <Card className='p-6'>

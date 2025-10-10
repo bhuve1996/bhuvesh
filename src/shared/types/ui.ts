@@ -96,10 +96,10 @@ export interface CardFooterProps extends BaseComponentProps {
 // ============================================================================
 
 export interface FormProps extends BaseComponentProps {
-  onSubmit?: (data: Record<string, any>) => void;
+  onSubmit?: (data: Record<string, unknown>) => void;
   onReset?: () => void;
-  initialValues?: Record<string, any>;
-  validationSchema?: any;
+  initialValues?: Record<string, unknown>;
+  validationSchema?: Record<string, unknown>;
   loading?: boolean;
 }
 
@@ -323,7 +323,7 @@ export interface ProgressStep {
 // ============================================================================
 
 export interface TableProps extends BaseComponentProps {
-  data: Record<string, any>[];
+  data: Record<string, unknown>[];
   columns: TableColumn[];
   loading?: boolean;
   empty?: ReactNode;
@@ -338,8 +338,8 @@ export interface TableColumn {
   title: string;
   dataIndex?: string;
   render?: (
-    value: any,
-    record: Record<string, any>,
+    value: unknown,
+    record: Record<string, unknown>,
     index: number
   ) => ReactNode;
   sortable?: boolean;
@@ -353,8 +353,8 @@ export interface TableAction {
   key: string;
   label: string;
   icon?: ReactNode;
-  onClick: (record: Record<string, any>) => void;
-  disabled?: (record: Record<string, any>) => boolean;
+  onClick: (record: Record<string, unknown>) => void;
+  disabled?: (record: Record<string, unknown>) => boolean;
   variant?: 'default' | 'primary' | 'danger';
 }
 
@@ -378,7 +378,7 @@ export interface SelectionProps {
   selectedRowKeys: string[];
   onSelectionChange: (
     selectedRowKeys: string[],
-    selectedRows: Record<string, any>[]
+    selectedRows: Record<string, unknown>[]
   ) => void;
   type?: 'checkbox' | 'radio';
 }
@@ -528,9 +528,9 @@ export interface FilePreviewProps extends BaseComponentProps {
 // ============================================================================
 
 export interface ChartProps extends BaseComponentProps {
-  data: any;
+  data: Record<string, unknown>;
   type: 'line' | 'bar' | 'pie' | 'doughnut' | 'radar' | 'polar' | 'scatter';
-  options?: any;
+  options?: Record<string, unknown>;
   height?: number;
   width?: number;
   responsive?: boolean;

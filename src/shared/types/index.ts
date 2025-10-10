@@ -2,12 +2,11 @@
 // SHARED TYPES - Comprehensive TypeScript type definitions
 // ============================================================================
 
-// Re-export all types for easy importing
+// Re-export all types for easy importing (avoid conflicts)
 export * from './api';
 export * from './ats';
 export * from './common';
-export * from './resume';
-export * from './ui';
+// Note: resume and ui types are exported separately to avoid conflicts
 
 // ============================================================================
 // COMMON TYPES

@@ -150,8 +150,8 @@ export class ApiError extends Error {
     this.code = code;
     this.details = details;
     this.timestamp = timestamp;
-    this.path = path;
-    this.method = method;
+    if (path !== undefined) this.path = path;
+    if (method !== undefined) this.method = method;
   }
 }
 
