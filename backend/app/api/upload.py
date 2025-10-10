@@ -138,11 +138,10 @@ async def quick_analyze_resume(
         parsed_resume = file_parser.parse_file(file_content, file.filename)
         
         # Detect job type using AI
-        from app.services.job_detector import JobDetector
-        job_detector = JobDetector()
-        job_detection_result = job_detector.detect_job_type(parsed_resume.get('text', ''))
+        from app.services.job_detector import job_detector
+        job_title, confidence = job_detector.detect_job_type(parsed_resume.get('text', ''))
         
-        if not job_detection_result.get('job_type'):
+        if not job_title:
             raise HTTPException(
                 status_code=400, 
                 detail="Could not detect job type from resume. Please try again or provide a custom job description."
@@ -154,13 +153,13 @@ async def quick_analyze_resume(
         
         # Determine experience level from resume
         experience_level = "mid-level"  # Default
-        if "senior" in job_detection_result.get('job_type', '').lower():
+        if "senior" in job_title.lower():
             experience_level = "senior-level"
-        elif "junior" in job_detection_result.get('job_type', '').lower() or "entry" in job_detection_result.get('job_type', '').lower():
+        elif "junior" in job_title.lower() or "entry" in job_title.lower():
             experience_level = "entry-level"
         
         generated_job_description = jd_generator.generate_job_description(
-            job_detection_result['job_type'], 
+            job_title, 
             experience_level
         )
         
@@ -175,8 +174,8 @@ async def quick_analyze_resume(
         
         # Add job detection results and generated job description
         analysis_result.update({
-            "detected_job_type": job_detection_result['job_type'],
-            "job_detection_confidence": job_detection_result.get('confidence', 0.0),
+            "detected_job_type": job_title,
+            "job_detection_confidence": confidence,
             "structured_experience": structured_experience,
             "filename": file.filename,
             "file_size": len(file_content),
