@@ -301,10 +301,9 @@ class FileParser:
             return True
 
         # Check for mixed case issues
-        if re.search(r"[A-Z]{5,}", text):  # 5 or more consecutive uppercase letters
-            return True
-
-        return False
+        return (
+            re.search(r"[A-Z]{5,}", text) is not None
+        )  # 5 or more consecutive uppercase letters
 
 
 # Create global instance

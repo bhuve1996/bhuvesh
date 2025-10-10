@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { TabsProps } from './types';
+import type { TabsProps } from '@/types';
 
 export const Tabs: React.FC<TabsProps> = ({
   tabs,

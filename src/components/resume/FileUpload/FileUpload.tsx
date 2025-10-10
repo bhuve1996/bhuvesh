@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
+import toast from 'react-hot-toast';
 
 import { Card } from '@/components/ui/Card';
 
@@ -30,9 +31,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
       const files = Array.from(e.dataTransfer.files);
       const file = files[0];
 
-      if (file && isValidFileType(file)) {
-        setUploadedFile(file);
-        onFileUpload(file);
+      if (file) {
+        if (isValidFileType(file)) {
+          if (file.size > 10 * 1024 * 1024) {
+            // 10MB limit
+            toast.error('File size must be less than 10MB');
+            return;
+          }
+          setUploadedFile(file);
+          onFileUpload(file);
+        } else {
+          toast.error('Please upload a PDF, DOCX, DOC, or TXT file');
+        }
       }
     },
     [onFileUpload]
@@ -41,9 +51,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
   const handleFileSelect = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (file && isValidFileType(file)) {
-        setUploadedFile(file);
-        onFileUpload(file);
+      if (file) {
+        if (isValidFileType(file)) {
+          if (file.size > 10 * 1024 * 1024) {
+            // 10MB limit
+            toast.error('File size must be less than 10MB');
+            return;
+          }
+          setUploadedFile(file);
+          onFileUpload(file);
+        } else {
+          toast.error('Please upload a PDF, DOCX, DOC, or TXT file');
+        }
       }
     },
     [onFileUpload]

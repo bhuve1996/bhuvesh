@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
 import { FileUpload } from '@/components/resume/FileUpload';
@@ -22,12 +23,14 @@ export default function ATSCheckerPage() {
     setFile(uploadedFile);
     setAnalysisResult(null);
     setError(null);
+    toast.success(`File "${uploadedFile.name}" uploaded successfully!`);
   };
 
   const handleAnalysis = async (jobDescription: string) => {
     if (!file) return;
 
     setError(null);
+    const loadingToast = toast.loading('Analyzing your resume...');
 
     try {
       const result = await analyzeResumeWithBackend(file, jobDescription);
@@ -35,8 +38,16 @@ export default function ATSCheckerPage() {
       // Set the analysis result to display inline and switch to results tab
       setAnalysisResult(result);
       setActiveTab('results');
+
+      toast.dismiss(loadingToast);
+      toast.success(`Analysis complete! ATS Score: ${result.atsScore}/100`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Analysis failed');
+      const errorMessage =
+        err instanceof Error ? err.message : 'Analysis failed';
+      setError(errorMessage);
+
+      toast.dismiss(loadingToast);
+      toast.error(errorMessage);
     }
   };
 
@@ -45,6 +56,7 @@ export default function ATSCheckerPage() {
     setAnalysisResult(null);
     setError(null);
     setActiveTab('upload');
+    toast.success('Ready for new analysis!');
   };
 
   const analyzeResumeWithBackend = async (

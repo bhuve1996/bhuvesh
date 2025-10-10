@@ -17,5 +17,5 @@ export * from './resume';
 export * from './sections';
 export * from './ui';
 
-// Export types (avoid conflicts by not re-exporting shared types)
-// Types are available directly from @/shared/types/*
+// Export types from centralized location
+export * from '@/types';

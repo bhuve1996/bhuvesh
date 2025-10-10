@@ -1,2 +1,2 @@
 export { Button, default } from './Button';
-export type { ButtonProps } from './types';
+// Types are now centralized in @/types

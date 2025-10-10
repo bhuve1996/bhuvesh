@@ -1,135 +1,197 @@
-# Bhuvesh Portfolio
+# 🚀 Bhuvesh Portfolio - ATS Resume Checker
 
-A modern, responsive portfolio website built with Next.js 15, TypeScript, and Tailwind CSS.
+A modern, full-stack portfolio website featuring an advanced ATS (Applicant Tracking System) resume checker powered by AI and semantic matching.
 
-## 🚀 Features
+## ✨ Features
 
-- **Modern Tech Stack**: Next.js 15, TypeScript, Tailwind CSS
-- **Responsive Design**: Mobile-first approach with beautiful animations
-- **Component Architecture**: Modular, reusable React components
-- **Performance Optimized**: Fast loading with Turbopack
-- **SEO Ready**: Optimized for search engines
-- **Accessibility**: WCAG compliant design
+### 🎯 Portfolio Website
 
-## 🛠️ Tech Stack
+- **Modern Design**: Clean, responsive UI with dark theme
+- **Interactive Sections**: Hero, About, Projects, Contact
+- **Smooth Animations**: Framer Motion powered transitions
+- **SEO Optimized**: Next.js 15 with App Router
+
+### 📄 ATS Resume Checker
+
+- **AI-Powered Analysis**: Google Gemini integration for job detection
+- **Semantic Matching**: Sentence transformers for concept matching
+- **Comprehensive Scoring**: Multi-dimensional ATS compatibility analysis
+- **Real-time Feedback**: Toast notifications and progress indicators
+- **File Support**: PDF, DOCX, DOC, and TXT files
+
+## 🏗️ Tech Stack
+
+### Frontend
 
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Animations**: Custom CSS animations
+- **Animations**: Framer Motion
+- **Notifications**: React Hot Toast
 - **Build Tool**: Turbopack
-- **Deployment**: Vercel
+
+### Backend
+
+- **Framework**: FastAPI (Python)
+- **AI/ML**: Google Gemini, Sentence Transformers
+- **File Processing**: PyMuPDF, python-docx
+- **NLP**: scikit-learn, keybert
+- **Validation**: Pydantic
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- Python 3.9+
+- Google Gemini API key (optional)
+
+### Frontend Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+### Backend Setup
+
+```bash
+cd backend
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env and add your GEMINI_API_KEY
+
+# Start development server
+python -m uvicorn app.main:app --reload --port 8000
+```
+
+### Environment Variables
+
+Create `.env` files in both root and backend directories:
+
+**Frontend (.env.local)**:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+**Backend (.env)**:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
 
 ## 📁 Project Structure
 
 ```
-src/
-├── app/                    # Next.js App Router pages
-├── components/             # Reusable React components
-│   ├── ui/                # UI components (Button, Card, Section, Loading, SVG)
-│   ├── layout/            # Layout components (Navigation)
-│   └── sections/          # Page sections (Hero, About, Projects, Contact)
-├── lib/                   # Utility functions and data
-├── styles/                # Custom CSS styles
-├── types/                 # TypeScript type definitions
-└── assets/               # Static assets
+├── src/                    # Frontend source code
+│   ├── app/               # Next.js App Router pages
+│   ├── components/        # React components
+│   │   ├── ui/           # Reusable UI components
+│   │   ├── layout/       # Layout components
+│   │   └── sections/     # Page sections
+│   ├── lib/              # Utility functions
+│   └── types/            # TypeScript definitions
+├── backend/               # Backend source code
+│   ├── app/              # FastAPI application
+│   │   ├── api/          # API endpoints
+│   │   ├── services/     # Business logic
+│   │   └── utils/        # Utility functions
+│   └── docs/             # Backend documentation
+├── docs/                  # Project documentation
+│   ├── frontend/         # Frontend docs
+│   ├── backend/          # Backend docs
+│   └── architecture/     # System architecture
+└── public/               # Static assets
 ```
 
-## 🚀 Getting Started
+## 🎨 Key Components
 
-### Prerequisites
+### ATS Checker Features
 
-- Node.js 18+
-- npm, yarn, pnpm, or bun
+- **File Upload**: Drag & drop with validation
+- **Job Detection**: AI-powered role identification
+- **Semantic Analysis**: Concept matching beyond keywords
+- **Format Analysis**: ATS compatibility checking
+- **Improvement Suggestions**: Actionable recommendations
+- **Progress Tracking**: Real-time analysis status
 
-### Installation
+### UI Components
 
-1. Clone the repository:
+- **Toast Notifications**: Success/error feedback
+- **Progress Indicators**: Loading states
+- **File Upload**: Drag & drop interface
+- **Results Display**: Comprehensive analysis results
+- **Responsive Design**: Mobile-first approach
+
+## 🔧 Development
+
+### Available Scripts
 
 ```bash
-git clone https://github.com/bhuve1996/bhuvesh.git
-cd bhuvesh
+# Frontend
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run lint         # Run ESLint
+npm run format       # Format with Prettier
+npm run type-check   # TypeScript type checking
+
+# Backend
+make dev-setup       # Complete development setup
+make format          # Format code with Black/isort
+make lint            # Run Ruff linter
+make type-check      # Run MyPy type checker
+make test            # Run tests
 ```
 
-2. Install dependencies:
+### Code Quality
 
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-```
-
-3. Run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+- **TypeScript**: Strict type checking
+- **ESLint**: Code linting with Next.js config
+- **Prettier**: Code formatting
+- **Black/isort**: Python code formatting
+- **Ruff**: Fast Python linting
+- **MyPy**: Python type checking
 
 ## 📚 Documentation
 
-Comprehensive documentation is available in the [`docs/`](./docs/) directory:
-
-- **[Project Structure](./docs/PROJECT_STRUCTURE.md)** - Detailed project organization
-- **[Development Guidelines](./.cursorrules)** - Coding standards and best practices
-- **[Styles Documentation](./docs/styles-README.md)** - CSS organization and animations
-- **[Component Documentation](./docs/components/README.md)** - Component usage and guidelines
-
-## 🎨 Customization
-
-### Adding New Components
-
-1. Create component in appropriate directory (`ui/`, `layout/`, or `sections/`)
-2. Define TypeScript interfaces in `types/index.ts`
-3. Add component to index file for easy imports
-4. Update documentation
-
-### Styling
-
-- Use Tailwind CSS classes
-- Add custom animations in `styles/loading-animations.css`
-- Follow the established color scheme (cyan-400, blue-500)
-- Maintain responsive design principles
-
-### Data Management
-
-- Store static data in `lib/data.ts`
-- Use TypeScript interfaces for type safety
-- Keep data separate from components
+- [Frontend Documentation](docs/frontend/)
+- [Backend Documentation](docs/backend/)
+- [Architecture Overview](docs/ARCHITECTURE.md)
+- [Development Setup](docs/DEVELOPMENT_SETUP.md)
+- [API Documentation](docs/backend/README.md)
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
-
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Deploy automatically on every push
-
-### Other Platforms
-
-The project can be deployed to any platform that supports Next.js:
-
-- Netlify
-- AWS Amplify
-- Railway
-- DigitalOcean App Platform
-
-## 📝 Available Scripts
+### Frontend (Vercel)
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run lint:fix     # Fix ESLint errors
-npm run format       # Format code with Prettier
+# Deploy to Vercel
+vercel --prod
+```
+
+### Backend (Railway)
+
+```bash
+# Deploy to Railway
+railway login
+railway link
+railway up
 ```
 
 ## 🤝 Contributing
@@ -137,20 +199,21 @@ npm run format       # Format code with Prettier
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
+4. Run tests and linting
 5. Submit a pull request
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is licensed under the MIT License.
 
 ## 👨‍💻 Author
 
 **Bhuvesh Singla**
 
-- GitHub: [@bhuve1996](https://github.com/bhuve1996)
-- Portfolio: [bhuvesh.dev](https://bhuvesh.dev)
+- Portfolio: [bhuvesh.com](https://bhuvesh.com)
+- LinkedIn: [linkedin.com/in/bhuvesh-singla](https://linkedin.com/in/bhuvesh-singla)
+- GitHub: [github.com/bhuvesh-singla](https://github.com/bhuvesh-singla)
 
 ---
 
-Built with ❤️ using Next.js and modern web technologies.
+Built with ❤️ using Next.js, FastAPI, and modern web technologies.

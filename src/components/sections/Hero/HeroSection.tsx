@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/Button';
 import { Section } from '@/components/ui/Section';
 
-import { HeroSectionProps } from './types';
+import type { HeroSectionProps } from '@/types';
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onGetStarted,

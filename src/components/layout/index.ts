@@ -2,5 +2,4 @@
 export { Footer } from './Footer';
 export { Navigation } from './Navigation';
 
-// Export all layout component types
-export type { NavigationProps } from './Navigation';
+// Types are now centralized in @/types

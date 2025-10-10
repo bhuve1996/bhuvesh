@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 import { Icons } from '@/components/ui/SVG';
 
-import { ImprovementItem, ImprovementPlanProps } from './types';
+import type { ImprovementItem, ImprovementPlanProps } from '@/types';
 
 export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
   improvements,

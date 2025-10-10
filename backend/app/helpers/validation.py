@@ -4,6 +4,7 @@
 
 import mimetypes
 import os
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -296,8 +297,6 @@ class DataValidator:
             # Validate dates
             if exp.get("start_date") and exp.get("end_date"):
                 try:
-                    from datetime import datetime
-
                     start = datetime.strptime(exp["start_date"], "%m/%Y")
                     end = datetime.strptime(exp["end_date"], "%m/%Y")
                     if start > end:

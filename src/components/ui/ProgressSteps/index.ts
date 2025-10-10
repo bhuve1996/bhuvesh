@@ -1,1 +1,1 @@
-export { ProgressSteps, default, type ProgressStep } from './ProgressSteps';
+export { ProgressSteps } from './ProgressSteps';

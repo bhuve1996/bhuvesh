@@ -8,8 +8,8 @@ import { FileUpload } from '../../molecules/FileUpload/FileUpload';
 import { Tabs } from '../../molecules/Tabs/Tabs';
 import { Card } from '../../ui/Card/Card';
 
+import type { ATSCheckerProps } from '@/types';
 import { ATSResults } from './ATSResults/ATSResults';
-import { ATSCheckerProps } from './types';
 
 export const ATSChecker: React.FC<ATSCheckerProps> = ({
   onAnalysisComplete,

@@ -5,5 +5,4 @@
 // Only export components that actually exist
 export { ATSChecker } from './ATSChecker/ATSChecker';
 
-// Export types for existing components
-export type * from './ATSChecker/types';
+// Types are now centralized in @/types

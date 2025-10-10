@@ -227,7 +227,7 @@ export class ATSApiError extends Error {
     super(message);
     this.name = 'ATSApiError';
     this.code = code;
-    this.details = details;
+    if (details !== undefined) this.details = details;
     this.timestamp = timestamp;
     if (endpoint !== undefined) this.endpoint = endpoint;
     if (method !== undefined) this.method = method;
@@ -243,17 +243,30 @@ export const isATSApiError = (error: unknown): error is ATSApiError => {
 };
 
 export const isNetworkError = (error: unknown): boolean => {
-  return error.code === 'NETWORK_ERROR' || error.code === 'TIMEOUT';
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error.code === 'NETWORK_ERROR' || error.code === 'TIMEOUT')
+  );
 };
 
 export const isValidationError = (error: unknown): boolean => {
-  return error.code === 'VALIDATION_ERROR' || error.code === 'BAD_REQUEST';
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error.code === 'VALIDATION_ERROR' || error.code === 'BAD_REQUEST')
+  );
 };
 
 export const isServerError = (error: unknown): boolean => {
   return (
-    error.code === 'INTERNAL_SERVER_ERROR' ||
-    error.code === 'SERVICE_UNAVAILABLE'
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error.code === 'INTERNAL_SERVER_ERROR' ||
+      error.code === 'SERVICE_UNAVAILABLE')
   );
 };
 
@@ -316,7 +329,7 @@ export const withCache = async <T>(
   const cached = cache.get(key);
 
   if (cached && Date.now() - cached.timestamp < cached.ttl) {
-    return cached.data;
+    return cached.data as T;
   }
 
   const data = await operation();

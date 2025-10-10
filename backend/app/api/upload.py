@@ -14,6 +14,8 @@ from pydantic import BaseModel
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.services.ats_analyzer import ats_analyzer
+from app.services.job_description_generator import JobDescriptionGenerator
+from app.services.job_detector import job_detector
 from app.services.resume_improver import ResumeImprover
 from app.utils.file_parser import file_parser
 
@@ -139,8 +141,6 @@ async def quick_analyze_resume(file: UploadFile = File(...)) -> dict[str, Any]:
         parsed_resume = file_parser.parse_file(file_content, file.filename)
 
         # Detect job type using AI
-        from app.services.job_detector import job_detector
-
         job_title, confidence = job_detector.detect_job_type(
             parsed_resume.get("text", "")
         )
@@ -152,8 +152,6 @@ async def quick_analyze_resume(file: UploadFile = File(...)) -> dict[str, Any]:
             )
 
         # Generate specific job description for detected job type
-        from app.services.job_description_generator import JobDescriptionGenerator
-
         jd_generator = JobDescriptionGenerator()
 
         # Determine experience level from resume

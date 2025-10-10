@@ -4,7 +4,7 @@ import { Alert } from '../../atoms/Alert/Alert';
 import { Button } from '../../atoms/Button/Button';
 import { Progress } from '../../atoms/Progress/Progress';
 
-import { FileUploadProps } from './types';
+import type { FileUploadProps } from '@/types';
 
 export const FileUpload: React.FC<FileUploadProps> = ({
   accept = '.pdf,.docx,.doc,.txt',

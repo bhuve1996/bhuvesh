@@ -6,6 +6,7 @@ to provide accurate ATS scoring instead of using generic descriptions.
 """
 
 import os
+import re
 
 # Try to import Google Gemini
 try:
@@ -132,8 +133,6 @@ Start directly with the job title and requirements.
         entry_indicators = ["junior", "entry", "associate", "intern", "trainee"]
 
         # Count years of experience mentions
-        import re
-
         years_pattern = r"(\d+)\+?\s*years?\s*(?:of\s*)?experience"
         years_matches = re.findall(years_pattern, text_lower)
 

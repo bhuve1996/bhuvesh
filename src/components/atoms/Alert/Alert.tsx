@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AlertProps } from './types';
+import type { AlertProps } from '@/types';
 
 export const Alert: React.FC<AlertProps> = ({
   variant = 'info',

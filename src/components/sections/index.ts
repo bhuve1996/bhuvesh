@@ -1,8 +1,7 @@
 // Export all section components
-export { HeroSection } from './Hero';
 export { AboutSection } from './About';
-export { ProjectsSection } from './Projects';
 export { ContactSection } from './Contact';
+export { HeroSection } from './Hero';
+export { ProjectsSection } from './Projects';
 
-// Export all section component types
-export type { HeroSectionProps } from './Hero';
+// Types are now centralized in @/types

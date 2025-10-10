@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { LoadingProps } from './types';
+import type { LoadingProps } from '@/types';
 
 export const Loading: React.FC<LoadingProps> = ({
   message = 'Loading Portfolio',

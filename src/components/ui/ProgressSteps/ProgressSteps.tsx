@@ -2,19 +2,7 @@
 
 import React from 'react';
 
-export interface ProgressStep {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  status: 'pending' | 'active' | 'completed' | 'error';
-}
-
-interface ProgressStepsProps {
-  steps: ProgressStep[];
-  currentStep: number;
-  className?: string;
-}
+import type { ProgressStepsProps, ProgressStep } from '@/types';
 
 export const ProgressSteps: React.FC<ProgressStepsProps> = ({
   steps,

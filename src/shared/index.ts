@@ -3,6 +3,6 @@
 // ============================================================================
 
 // Export all types
-export * from './types';
+// Types are now centralized in @/types
 
 // Note: utils, constants, and helpers modules don't exist yet

@@ -5,6 +5,7 @@ Uses semantic embeddings for concept matching, not just keywords
 
 import re
 from collections import Counter
+from datetime import datetime
 from typing import Any
 
 from app.services.job_description_generator import job_description_generator
@@ -1676,8 +1677,6 @@ class ATSAnalyzer:
                     if date_match.group(5):  # present/current
                         current_job["end_date"] = "Present"
                         # Calculate duration to present
-                        from datetime import datetime
-
                         start = datetime(int(start_year), int(start_month), 1)
                         now = datetime.now()
                         months = (now.year - start.year) * 12 + (
@@ -2419,7 +2418,7 @@ class ATSAnalyzer:
                 skills["tools_software"].append(tool.title())
 
         # Remove duplicates and sort
-        for category in skills:
+        for category in list(skills.keys()):
             skills[category] = sorted(list(set(skills[category])))
 
         return skills

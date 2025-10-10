@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 
 import { Footer, Navigation } from '@/components/layout';
+import { Toast } from '@/components/ui';
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -12,7 +13,12 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const isHomePage = pathname === '/';
 
   if (isHomePage) {
-    return <>{children}</>;
+    return (
+      <>
+        {children}
+        <Toast />
+      </>
+    );
   }
 
   return (
@@ -20,6 +26,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       <Navigation />
       <main className='min-h-screen'>{children}</main>
       <Footer />
+      <Toast />
     </>
   );
 }

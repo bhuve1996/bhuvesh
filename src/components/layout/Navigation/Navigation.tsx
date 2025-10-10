@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { Icons } from '@/components/ui/SVG';
 import { NavItem } from '@/lib/data-types';
 
-import { NavigationProps } from './types';
+import type { NavigationProps } from '@/types';
 
 export const Navigation: React.FC<NavigationProps> = ({
   activeSection = 'home',

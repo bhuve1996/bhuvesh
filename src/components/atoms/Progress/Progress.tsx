@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ProgressProps } from './types';
+import type { ProgressProps } from '@/types';
 
 export const Progress: React.FC<ProgressProps> = ({
   value,

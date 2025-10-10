@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SVGProps } from './types';
+import type { SVGProps } from '@/types';
 
 interface SVGComponentProps extends SVGProps {
   children: React.ReactNode;
