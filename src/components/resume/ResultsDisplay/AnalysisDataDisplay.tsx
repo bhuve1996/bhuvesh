@@ -17,7 +17,7 @@ export const AnalysisDataDisplay: React.FC<AnalysisDataDisplayProps> = ({
       {/* Keyword Analysis */}
       {(result.keywordMatches.length > 0 ||
         result.missingKeywords.length > 0) && (
-        <div className='grid md:grid-cols-2 gap-6'>
+        <div className='grid md:grid-cols-3 gap-6'>
           {/* Matched Keywords */}
           {result.keywordMatches.length > 0 && (
             <Card className='p-6'>
@@ -93,7 +93,7 @@ export const AnalysisDataDisplay: React.FC<AnalysisDataDisplayProps> = ({
 
       {/* Enhanced ATS Compatibility Analysis */}
       {result.ats_compatibility && (
-        <div className='grid md:grid-cols-2 gap-6'>
+        <div className='grid md:grid-cols-3 gap-6'>
           {/* ATS Issues & Warnings */}
           <Card className='p-6'>
             <h3 className='text-xl font-bold mb-4 text-orange-400'>
@@ -227,7 +227,7 @@ export const AnalysisDataDisplay: React.FC<AnalysisDataDisplayProps> = ({
         <h3 className='text-xl font-bold mb-4 text-blue-400'>
           📊 Resume Statistics
         </h3>
-        <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+        <div className='grid grid-cols-3 md:grid-cols-5 gap-4'>
           <div className='text-center'>
             <p className='text-sm text-gray-400 mb-1'>Word Count</p>
             <p className='text-lg font-semibold text-blue-400'>

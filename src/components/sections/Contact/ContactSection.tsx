@@ -21,7 +21,7 @@ export const ContactSection: React.FC = () => {
           </p>
         </div>
 
-        <div className='grid lg:grid-cols-2 gap-12'>
+        <div className='grid lg:grid-cols-3 gap-12'>
           <Card>
             <h3 className='text-2xl font-bold text-white mb-6'>
               Send me a message

@@ -20,7 +20,7 @@ export const AboutSection: React.FC = () => {
           </p>
         </div>
 
-        <div className='grid lg:grid-cols-2 gap-12 items-center'>
+        <div className='grid lg:grid-cols-3 gap-12 items-center'>
           <div className='space-y-6'>
             <Card>
               <h3 className='text-2xl font-bold text-white mb-4'>My Journey</h3>
@@ -40,7 +40,7 @@ export const AboutSection: React.FC = () => {
               <h3 className='text-2xl font-bold text-white mb-6'>
                 Skills & Technologies
               </h3>
-              <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
+              <div className='grid grid-cols-3 md:grid-cols-4 gap-4'>
                 {skillsList.map(skill => (
                   <div
                     key={skill}

@@ -307,7 +307,7 @@ export default function Services() {
           <h2 className='text-3xl font-bold text-white mb-8 text-center'>
             What I Offer
           </h2>
-          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          <div className='grid md:grid-cols-3 lg:grid-cols-4 gap-6'>
             {services.map(service => (
               <div
                 key={service.id}
@@ -373,7 +373,7 @@ export default function Services() {
         <section className='px-6 pb-16'>
           <div className='max-w-6xl mx-auto'>
             <div className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8'>
-              <div className='grid lg:grid-cols-2 gap-8'>
+              <div className='grid lg:grid-cols-3 gap-8'>
                 <div>
                   <div className='flex items-center space-x-4 mb-6'>
                     <div className='text-5xl'>{selectedServiceData.icon}</div>
@@ -461,7 +461,7 @@ export default function Services() {
           <h2 className='text-3xl font-bold text-white mb-12 text-center'>
             My Development Process
           </h2>
-          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
+          <div className='grid md:grid-cols-3 lg:grid-cols-4 gap-8'>
             {process.map(step => (
               <div
                 key={step.step}

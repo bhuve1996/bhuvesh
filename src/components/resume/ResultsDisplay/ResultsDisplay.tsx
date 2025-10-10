@@ -1,13 +1,14 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import React, { useCallback, useState } from 'react';
 
 import { ImprovementPlan } from '@/components/resume/ImprovementPlan';
-import { Card } from '@/components/ui/Card';
+import { AnimatedScore, Card, DataVisualization, Tabs } from '@/components/ui';
 import type { AnalysisResult, ImprovementItem } from '@/types';
 
 import { AnalysisDataDisplay } from './AnalysisDataDisplay';
-import { ParsedDataDisplay } from './ParsedDataDisplay';
+import { TabbedParsedDataDisplay } from './TabbedParsedDataDisplay';
 
 interface ResultsDisplayProps {
   result: AnalysisResult;
@@ -26,8 +27,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
     quick_wins: ImprovementItem[];
   } | null>(null);
   const [loadingImprovements, setLoadingImprovements] = useState(false);
-  const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false);
-  const [showParsedData, setShowParsedData] = useState(false);
 
   const fetchImprovementPlan = useCallback(async () => {
     if (!result.extraction_details) return;
@@ -59,18 +58,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
       setLoadingImprovements(false);
     }
   }, [result]);
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-400';
-    if (score >= 60) return 'text-yellow-400';
-    return 'text-red-400';
-  };
-
-  const getScoreBgColor = (score: number) => {
-    if (score >= 80) return 'bg-green-500/20 border-green-500/30';
-    if (score >= 60) return 'bg-yellow-500/20 border-yellow-500/30';
-    return 'bg-red-500/20 border-red-500/30';
-  };
 
   const getScoreGrade = (score: number) => {
     if (score >= 90) return 'A+';
@@ -113,221 +100,254 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
       )}
 
       {/* Enhanced ATS Score Display */}
-      <Card className='p-6'>
+      <Card className='p-6' delay={0.2}>
         <div className='text-center'>
-          <h3 className='text-xl font-bold mb-4 text-white'>
-            ATS Compatibility Score
+          <h3 className='text-xl font-bold mb-6 text-white'>
+            🎯 ATS Compatibility Score
           </h3>
-          <div
-            className={`inline-flex items-center justify-center w-32 h-32 rounded-full border-4 ${getScoreBgColor(result.atsScore)}`}
-          >
-            <span
-              className={`text-4xl font-bold ${getScoreColor(result.atsScore)}`}
-            >
-              {result.atsScore}
-            </span>
-          </div>
-          <div className='text-xl text-gray-300 mb-4'>
-            Grade:{' '}
-            <span className={`font-bold ${getScoreColor(result.atsScore)}`}>
-              {getScoreGrade(result.atsScore)}
-            </span>
-          </div>
-          <p className='text-gray-300 mt-4'>
+
+          {/* Animated Score Display */}
+          <AnimatedScore
+            score={result.atsScore}
+            size='xl'
+            showGrade={true}
+            className='mb-6'
+          />
+
+          <p className='text-gray-300 mt-4 max-w-md mx-auto'>
             {result.atsScore >= 80 &&
-              'Excellent! Your resume is highly ATS-compatible.'}
+              '🎉 Excellent! Your resume is highly ATS-compatible and ready to impress recruiters.'}
             {result.atsScore >= 60 &&
               result.atsScore < 80 &&
-              'Good! Your resume has good ATS compatibility with room for improvement.'}
+              '👍 Good! Your resume has solid ATS compatibility with room for strategic improvements.'}
             {result.atsScore < 60 &&
               result.atsScore >= 0 &&
-              'Your resume needs improvements for better ATS compatibility.'}
+              '🔧 Your resume needs targeted improvements for better ATS compatibility and visibility.'}
           </p>
 
           {/* Enhanced Analysis Grades */}
           {result.ats_compatibility && (
-            <div className='mt-6 grid grid-cols-2 gap-4'>
-              <div className='text-center'>
-                <p className='text-sm text-gray-400 mb-1'>ATS Compatibility</p>
-                <p className='text-lg font-semibold text-cyan-400'>
+            <div className='mt-8 grid grid-cols-3 gap-6'>
+              <div className='text-center p-4 bg-gray-800/30 rounded-lg border border-gray-700'>
+                <p className='text-sm text-gray-400 mb-2'>ATS Compatibility</p>
+                <p className='text-2xl font-bold text-cyan-400'>
                   {getScoreGrade(result.atsScore)}
                 </p>
               </div>
-              <div className='text-center'>
-                <p className='text-sm text-gray-400 mb-1'>Format Structure</p>
-                <p className='text-lg font-semibold text-blue-400'>
+              <div className='text-center p-4 bg-gray-800/30 rounded-lg border border-gray-700'>
+                <p className='text-sm text-gray-400 mb-2'>Format Structure</p>
+                <p className='text-2xl font-bold text-blue-400'>
                   {result.format_analysis?.grade || 'N/A'}
                 </p>
               </div>
             </div>
           )}
 
-          {/* Detailed Scores */}
+          {/* Detailed Scores with Data Visualization */}
           {result.detailed_scores && (
-            <div className='mt-6 grid grid-cols-2 md:grid-cols-4 gap-4'>
-              <div className='text-center'>
-                <p className='text-sm text-gray-400 mb-1'>Keyword Score</p>
-                <p className='text-lg font-semibold text-blue-400'>
-                  {result.detailed_scores.keyword_score || 0}%
-                </p>
-              </div>
-              <div className='text-center'>
-                <p className='text-sm text-gray-400 mb-1'>Semantic Score</p>
-                <p className='text-lg font-semibold text-purple-400'>
-                  {result.detailed_scores.semantic_score || 0}%
-                </p>
-              </div>
-              <div className='text-center'>
-                <p className='text-sm text-gray-400 mb-1'>Format Score</p>
-                <p className='text-lg font-semibold text-green-400'>
-                  {result.detailed_scores.format_score || 0}%
-                </p>
-              </div>
-              <div className='text-center'>
-                <p className='text-sm text-gray-400 mb-1'>Content Score</p>
-                <p className='text-lg font-semibold text-yellow-400'>
-                  {result.detailed_scores.content_score || 0}%
-                </p>
-              </div>
+            <div className='mt-8'>
+              <DataVisualization
+                title='📊 Detailed Analysis Breakdown'
+                data={[
+                  {
+                    label: 'Keyword Optimization',
+                    value: result.detailed_scores.keyword_score || 0,
+                    icon: '🔍',
+                    color: 'from-blue-400 to-cyan-500',
+                  },
+                  {
+                    label: 'Semantic Matching',
+                    value: result.detailed_scores.semantic_score || 0,
+                    icon: '🧠',
+                    color: 'from-purple-400 to-pink-500',
+                  },
+                  {
+                    label: 'Format Structure',
+                    value: result.detailed_scores.format_score || 0,
+                    icon: '📋',
+                    color: 'from-green-400 to-emerald-500',
+                  },
+                  {
+                    label: 'Content Quality',
+                    value: result.detailed_scores.content_score || 0,
+                    icon: '✨',
+                    color: 'from-yellow-400 to-orange-500',
+                  },
+                ]}
+                type='bar'
+                className='mt-6'
+              />
             </div>
           )}
 
-          {/* Match Category */}
-          {result.match_category && (
-            <div className='mt-4'>
-              <p className='text-sm text-gray-400 mb-1'>Match Category</p>
-              <p className='text-lg font-semibold text-cyan-400'>
-                {result.match_category}
-              </p>
-            </div>
-          )}
-
-          {/* Semantic Similarity */}
-          {result.semantic_similarity && (
-            <div className='mt-4'>
-              <p className='text-sm text-gray-400 mb-1'>Semantic Similarity</p>
-              <p className='text-lg font-semibold text-purple-400'>
-                {Math.round(result.semantic_similarity * 100)}%
-              </p>
+          {/* Match Category & Semantic Similarity */}
+          {(result.match_category || result.semantic_similarity) && (
+            <div className='mt-8 grid grid-cols-1 md:grid-cols-3 gap-6'>
+              {result.match_category && (
+                <div className='text-center p-4 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-lg border border-cyan-500/20'>
+                  <p className='text-sm text-gray-400 mb-2'>
+                    🎯 Match Category
+                  </p>
+                  <p className='text-lg font-semibold text-cyan-400'>
+                    {result.match_category}
+                  </p>
+                </div>
+              )}
+              {result.semantic_similarity && (
+                <div className='text-center p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg border border-purple-500/20'>
+                  <p className='text-sm text-gray-400 mb-2'>
+                    🧠 Semantic Similarity
+                  </p>
+                  <p className='text-lg font-semibold text-purple-400'>
+                    {Math.round(result.semantic_similarity * 100)}%
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
       </Card>
 
       {/* Parsed Data Summary */}
-      <Card className='p-6'>
-        <h3 className='text-xl font-bold mb-4 text-white'>📋 Resume Summary</h3>
-        <div className='grid md:grid-cols-3 gap-6'>
-          <div className='text-center'>
-            <p className='text-sm text-gray-400 mb-1'>Job Type Detected</p>
+      <Card className='p-6' delay={0.4}>
+        <h3 className='text-xl font-bold mb-6 text-white'>📋 Resume Summary</h3>
+
+        <DataVisualization
+          title='📊 Key Metrics'
+          data={[
+            {
+              label: 'Job Type Detected',
+              value: 100,
+              icon: '🎯',
+              color: 'from-cyan-400 to-blue-500',
+            },
+            {
+              label: 'Keyword Matches',
+              value: Math.min((result.keywordMatches.length / 20) * 100, 100),
+              icon: '✅',
+              color: 'from-green-400 to-emerald-500',
+            },
+            {
+              label: 'Missing Keywords',
+              value: Math.min((result.missingKeywords.length / 10) * 100, 100),
+              icon: '❌',
+              color: 'from-red-400 to-pink-500',
+            },
+          ]}
+          type='radial'
+          className='mb-6'
+        />
+
+        <div className='grid md:grid-cols-3 gap-6 mb-6'>
+          <div className='text-center p-4 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-lg border border-cyan-500/20'>
+            <p className='text-sm text-gray-400 mb-2'>🎯 Job Type Detected</p>
             <p className='text-lg font-semibold text-cyan-400'>
               {result.jobType}
             </p>
           </div>
-          <div className='text-center'>
-            <p className='text-sm text-gray-400 mb-1'>Keyword Matches</p>
+          <div className='text-center p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-lg border border-green-500/20'>
+            <p className='text-sm text-gray-400 mb-2'>✅ Keyword Matches</p>
             <p className='text-lg font-semibold text-green-400'>
               {result.keywordMatches.length}
             </p>
           </div>
-          <div className='text-center'>
-            <p className='text-sm text-gray-400 mb-1'>Missing Keywords</p>
+          <div className='text-center p-4 bg-gradient-to-br from-red-500/10 to-pink-500/10 rounded-lg border border-red-500/20'>
+            <p className='text-sm text-gray-400 mb-2'>❌ Missing Keywords</p>
             <p className='text-lg font-semibold text-red-400'>
               {result.missingKeywords.length}
             </p>
           </div>
         </div>
-        <div className='mt-4 text-center'>
+
+        <div className='text-center p-4 bg-gradient-to-r from-gray-800/30 to-gray-700/30 rounded-lg border border-gray-600'>
           <p className='text-gray-300'>
             {result.atsScore >= 80 &&
-              'Your resume shows excellent ATS compatibility!'}
+              '🎉 Your resume shows excellent ATS compatibility and is ready to impress recruiters!'}
             {result.atsScore >= 60 &&
               result.atsScore < 80 &&
-              'Your resume has good ATS compatibility with room for improvement.'}
+              '👍 Your resume has good ATS compatibility with strategic room for improvement.'}
             {result.atsScore < 60 &&
-              'Your resume needs improvements for better ATS compatibility.'}
+              '🔧 Your resume needs targeted improvements for better ATS compatibility and visibility.'}
           </p>
         </div>
       </Card>
 
-      {/* Action Buttons */}
-      <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-        <button
-          onClick={() => setShowParsedData(!showParsedData)}
-          className='px-8 py-3 text-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg'
-        >
-          {showParsedData ? (
-            <span className='flex items-center gap-2'>📄 Hide Parsed Data</span>
-          ) : (
-            <span className='flex items-center gap-2'>📄 Show Parsed Data</span>
-          )}
-        </button>
+      {/* Main Results Tabs */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+      >
+        <Tabs
+          items={[
+            {
+              id: 'parsed',
+              label: 'Parsed Data',
+              icon: '📄',
+              content: <TabbedParsedDataDisplay result={result} />,
+            },
+            {
+              id: 'analysis',
+              label: 'Analysis Details',
+              icon: '📊',
+              content: <AnalysisDataDisplay result={result} />,
+            },
+            {
+              id: 'improvement',
+              label: 'Improvement Plan',
+              icon: '📈',
+              content: (
+                <div className='space-y-6'>
+                  {!improvementPlan && (
+                    <div className='text-center'>
+                      <button
+                        onClick={fetchImprovementPlan}
+                        disabled={loadingImprovements}
+                        className='px-8 py-3 text-lg bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg'
+                      >
+                        {loadingImprovements ? (
+                          <span className='flex items-center gap-2'>
+                            <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
+                            Generating Plan...
+                          </span>
+                        ) : (
+                          <span className='flex items-center gap-2'>
+                            📈 Get Detailed Improvement Plan
+                          </span>
+                        )}
+                      </button>
+                    </div>
+                  )}
 
-        <button
-          onClick={() => setShowDetailedAnalysis(!showDetailedAnalysis)}
-          className='px-8 py-3 text-lg bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg'
-        >
-          {showDetailedAnalysis ? (
-            <span className='flex items-center gap-2'>
-              📊 Hide Analysis Details
-            </span>
-          ) : (
-            <span className='flex items-center gap-2'>
-              📈 View Analysis Details
-            </span>
-          )}
-        </button>
-      </div>
-
-      {/* Parsed Data - Only show when button is clicked */}
-      {showParsedData && <ParsedDataDisplay result={result} />}
-
-      {/* Analysis Data - Only show when button is clicked */}
-      {showDetailedAnalysis && <AnalysisDataDisplay result={result} />}
-
-      {/* Improvement Plan Section */}
-      <div className='text-center mb-6'>
-        {!improvementPlan && (
-          <button
-            onClick={fetchImprovementPlan}
-            disabled={loadingImprovements}
-            className='px-8 py-3 text-lg bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg'
-          >
-            {loadingImprovements ? (
-              <span className='flex items-center gap-2'>
-                <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
-                Generating Plan...
-              </span>
-            ) : (
-              <span className='flex items-center gap-2'>
-                📈 Get Detailed Improvement Plan
-              </span>
-            )}
-          </button>
-        )}
-      </div>
-
-      {/* Improvement Plan Display */}
-      {improvementPlan && (
-        <div className='mb-8'>
-          <ImprovementPlan
-            improvements={improvementPlan.improvements}
-            summary={improvementPlan.summary}
-            quick_wins={improvementPlan.quick_wins}
-            currentScore={result.atsScore}
-          />
-        </div>
-      )}
+                  {improvementPlan && (
+                    <ImprovementPlan
+                      improvements={improvementPlan.improvements}
+                      summary={improvementPlan.summary}
+                      quick_wins={improvementPlan.quick_wins}
+                      currentScore={result.atsScore}
+                    />
+                  )}
+                </div>
+              ),
+            },
+          ]}
+          defaultActiveTab='parsed'
+          variant='underline'
+          className='w-full'
+        />
+      </motion.div>
 
       {/* Action Buttons - Commented out as they are not functional yet */}
-      {/* <div className='text-center space-x-4'>
+      {/*
+      <div className='text-center space-x-4'>
         <button className='px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-lg hover:from-cyan-500 hover:to-blue-600 transition-all font-medium'>
           Download Report
         </button>
         <button className='px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:border-gray-500 hover:text-white transition-all font-medium'>
           Analyze Another Resume
         </button>
-      </div> */}
+      </div>
+      */}
     </div>
   );
 };

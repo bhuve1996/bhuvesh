@@ -10,6 +10,12 @@ from typing import Any
 
 from app.services.job_description_generator import job_description_generator
 
+# Import GEMINI_AVAILABLE for AI operations
+try:
+    from app.services.job_description_generator import GEMINI_AVAILABLE
+except ImportError:
+    GEMINI_AVAILABLE = False
+
 # Import job detector and project extractor
 from app.services.job_detector import job_detector
 from app.services.project_extractor import project_extractor
@@ -33,21 +39,10 @@ class ATSAnalyzer:
 
     def __init__(self):
         """Initialize with embeddings model - required for AI analysis"""
-        if not EMBEDDINGS_AVAILABLE:
-            print(
-                "⚠️  WARNING: sentence-transformers not available. Using keyword-only matching."
-            )
-            self.model = None
-            return
 
-        try:
-            self.model = SentenceTransformer(
-                "all-MiniLM-L6-v2"
-            )  # Lightweight, fast model
-            self.use_embeddings = True
-            print("✅ ATS Analyzer: AI embeddings model loaded successfully")
-        except Exception as e:
-            raise Exception(f"Failed to load AI embeddings model: {e}")
+        # Always initialize these attributes first
+        self.model = None
+        self.use_embeddings = False
 
         # Enhanced scoring weights based on industry standards
         self.weights = {
@@ -76,6 +71,25 @@ class ATSAnalyzer:
             "standard_bullets": ["•", "-", "*"],
             "date_formats": [r"\d{1,2}/\d{4}", r"\d{4}", r"\d{1,2}-\d{4}"],
         }
+
+        # Try to load embeddings model if available
+        if not EMBEDDINGS_AVAILABLE:
+            print(
+                "⚠️  WARNING: sentence-transformers not available. Using keyword-only matching."
+            )
+            return
+
+        try:
+            self.model = SentenceTransformer(
+                "all-MiniLM-L6-v2"
+            )  # Lightweight, fast model
+            self.use_embeddings = True
+            print("✅ ATS Analyzer: AI embeddings model loaded successfully")
+        except Exception as e:
+            print(
+                f"⚠️  WARNING: Failed to load AI embeddings model: {e}. Using keyword-only matching."
+            )
+            # Don't raise exception, just use keyword-only mode
 
     def extract_structured_experience(self, resume_text: str) -> dict[str, Any]:
         """
@@ -118,7 +132,9 @@ class ATSAnalyzer:
         jd_requirements = self._extract_requirements(jd_text)
 
         # Perform all analyses
-        keyword_analysis = self._analyze_keywords_vs_jd(resume_text, jd_keywords)
+        keyword_analysis = self._analyze_keywords_vs_jd(
+            resume_text, jd_keywords, jd_text
+        )
         semantic_analysis = self._analyze_semantic_match(resume_text, jd_text)
 
         format_analysis = self._analyze_format(parsed_resume)
@@ -319,6 +335,496 @@ class ATSAnalyzer:
             "get",
             "got",
             "getting",
+            # Additional generic words that don't add value to ATS scoring
+            "specific",
+            "company",
+            "brief",
+            "include",
+            "tailor",
+            "technologies",
+            "various",
+            "different",
+            "multiple",
+            "several",
+            "many",
+            "some",
+            "any",
+            "all",
+            "every",
+            "each",
+            "both",
+            "either",
+            "neither",
+            "other",
+            "another",
+            "same",
+            "similar",
+            "new",
+            "old",
+            "good",
+            "better",
+            "best",
+            "great",
+            "excellent",
+            "outstanding",
+            "amazing",
+            "wonderful",
+            "fantastic",
+            "important",
+            "significant",
+            "major",
+            "minor",
+            "main",
+            "primary",
+            "secondary",
+            "basic",
+            "advanced",
+            "intermediate",
+            "beginner",
+            "expert",
+            "professional",
+            "personal",
+            "individual",
+            "team",
+            "group",
+            "organization",
+            "business",
+            "work",
+            "job",
+            "position",
+            "role",
+            "career",
+            "field",
+            "industry",
+            "area",
+            "sector",
+            "domain",
+            "subject",
+            "topic",
+            "matter",
+            "issue",
+            "problem",
+            "solution",
+            "approach",
+            "method",
+            "way",
+            "manner",
+            "style",
+            "type",
+            "kind",
+            "sort",
+            "category",
+            "class",
+            "level",
+            "degree",
+            "amount",
+            "number",
+            "quantity",
+            "size",
+            "scale",
+            "scope",
+            "range",
+            "extent",
+            "limit",
+            "boundary",
+            "edge",
+            "side",
+            "part",
+            "section",
+            "portion",
+            "piece",
+            "bit",
+            "element",
+            "component",
+            "feature",
+            "aspect",
+            "characteristic",
+            "property",
+            "attribute",
+            "quality",
+            "nature",
+            "form",
+            "shape",
+            "structure",
+            "pattern",
+            "design",
+            "model",
+            "framework",
+            "system",
+            "process",
+            "procedure",
+            "step",
+            "stage",
+            "phase",
+            "period",
+            "time",
+            "moment",
+            "point",
+            "place",
+            "location",
+            "position",
+            "site",
+            "region",
+            "zone",
+            "space",
+            "room",
+            "environment",
+            "setting",
+            "context",
+            "situation",
+            "condition",
+            "state",
+            "status",
+            "circumstance",
+            "case",
+            "instance",
+            "example",
+            "sample",
+            "specimen",
+            "item",
+            "object",
+            "thing",
+            "stuff",
+            "material",
+            "substance",
+            "content",
+            "information",
+            "data",
+            "details",
+            "facts",
+            "figures",
+            "numbers",
+            "statistics",
+            "results",
+            "outcomes",
+            "consequences",
+            "effects",
+            "impacts",
+            "benefits",
+            "advantages",
+            "disadvantages",
+            "pros",
+            "cons",
+            "strengths",
+            "weaknesses",
+            "opportunities",
+            "threats",
+            "challenges",
+            "risks",
+            "goals",
+            "objectives",
+            "targets",
+            "aims",
+            "purposes",
+            "reasons",
+            "causes",
+            "factors",
+            "elements",
+            "components",
+            "parts",
+            "pieces",
+            "aspects",
+            "features",
+            "characteristics",
+            "properties",
+            "attributes",
+            "qualities",
+            "traits",
+            "skills",
+            "abilities",
+            "capabilities",
+            "competencies",
+            "knowledge",
+            "experience",
+            "background",
+            "history",
+            "record",
+            "track",
+            "performance",
+            "achievement",
+            "success",
+            "accomplishment",
+            "result",
+            "outcome",
+            "impact",
+            "contribution",
+            "value",
+            "worth",
+            "benefit",
+            "advantage",
+            "strength",
+            "asset",
+            "resource",
+            "tool",
+            "instrument",
+            "equipment",
+            "technology",
+            "platform",
+            "software",
+            "application",
+            "program",
+            "project",
+            "initiative",
+            "effort",
+            "endeavor",
+            "venture",
+            "enterprise",
+            "operation",
+            "activity",
+            "task",
+            "duty",
+            "responsibility",
+            "function",
+            "profession",
+            "occupation",
+            "specialty",
+            "expertise",
+            "focus",
+            "concentration",
+            "emphasis",
+            "priority",
+            "importance",
+            "significance",
+            "relevance",
+            "applicability",
+            "usefulness",
+            "utility",
+            "effectiveness",
+            "efficiency",
+            "productivity",
+            "standard",
+            "magnitude",
+            "intensity",
+            "power",
+            "force",
+            "energy",
+            "capacity",
+            "potential",
+            "talent",
+            "gift",
+            "merit",
+            "virtue",
+            "excellence",
+            "superiority",
+            "distinction",
+            "uniqueness",
+            "originality",
+            "creativity",
+            "innovation",
+            "invention",
+            "discovery",
+            "breakthrough",
+            "advancement",
+            "progress",
+            "development",
+            "growth",
+            "improvement",
+            "enhancement",
+            "upgrade",
+            "refinement",
+            "optimization",
+            "maximization",
+            "minimization",
+            "reduction",
+            "increase",
+            "decrease",
+            "change",
+            "modification",
+            "adjustment",
+            "adaptation",
+            "transformation",
+            "evolution",
+            "revolution",
+            "modernization",
+            "updating",
+            "upgrading",
+            "enhancing",
+            "improving",
+            "developing",
+            "growing",
+            "expanding",
+            "extending",
+            "broadening",
+            "deepening",
+            "strengthening",
+            "reinforcing",
+            "supporting",
+            "maintaining",
+            "sustaining",
+            "preserving",
+            "protecting",
+            "securing",
+            "ensuring",
+            "guaranteeing",
+            "promising",
+            "committing",
+            "dedicating",
+            "devoting",
+            "focusing",
+            "concentrating",
+            "specializing",
+            "expertising",
+            "mastering",
+            "learning",
+            "studying",
+            "researching",
+            "investigating",
+            "exploring",
+            "discovering",
+            "finding",
+            "identifying",
+            "recognizing",
+            "understanding",
+            "comprehending",
+            "grasping",
+            "appreciating",
+            "valuing",
+            "respecting",
+            "honoring",
+            "celebrating",
+            "acknowledging",
+            "accepting",
+            "embracing",
+            "welcoming",
+            "receiving",
+            "obtaining",
+            "acquiring",
+            "gaining",
+            "earning",
+            "achieving",
+            "accomplishing",
+            "completing",
+            "finishing",
+            "concluding",
+            "ending",
+            "stopping",
+            "starting",
+            "beginning",
+            "initiating",
+            "launching",
+            "introducing",
+            "presenting",
+            "offering",
+            "providing",
+            "delivering",
+            "supplying",
+            "furnishing",
+            "equipping",
+            "preparing",
+            "organizing",
+            "arranging",
+            "structuring",
+            "designing",
+            "planning",
+            "strategizing",
+            "thinking",
+            "considering",
+            "evaluating",
+            "assessing",
+            "analyzing",
+            "examining",
+            "reviewing",
+            "checking",
+            "verifying",
+            "confirming",
+            "validating",
+            "testing",
+            "trying",
+            "attempting",
+            "experimenting",
+            "practicing",
+            "training",
+            "coaching",
+            "mentoring",
+            "teaching",
+            "instructing",
+            "guiding",
+            "leading",
+            "managing",
+            "supervising",
+            "overseeing",
+            "controlling",
+            "directing",
+            "commanding",
+            "governing",
+            "ruling",
+            "regulating",
+            "monitoring",
+            "tracking",
+            "following",
+            "pursuing",
+            "chasing",
+            "seeking",
+            "searching",
+            "looking",
+            "uncovering",
+            "revealing",
+            "exposing",
+            "showing",
+            "displaying",
+            "demonstrating",
+            "proving",
+            "establishing",
+            "authenticating",
+            "certifying",
+            "accrediting",
+            "approving",
+            "endorsing",
+            "recommending",
+            "suggesting",
+            "proposing",
+            "submitting",
+            "furnishing",
+            "equipping",
+            "preparing",
+            "organizing",
+            "arranging",
+            "structuring",
+            "designing",
+            "planning",
+            "strategizing",
+            "thinking",
+            "considering",
+            "evaluating",
+            "assessing",
+            "analyzing",
+            "examining",
+            "reviewing",
+            "checking",
+            "verifying",
+            "confirming",
+            "validating",
+            "testing",
+            "trying",
+            "attempting",
+            "experimenting",
+            "practicing",
+            "training",
+            "coaching",
+            "mentoring",
+            "teaching",
+            "instructing",
+            "guiding",
+            "leading",
+            "managing",
+            "supervising",
+            "overseeing",
+            "controlling",
+            "directing",
+            "commanding",
+            "governing",
+            "ruling",
+            "regulating",
+            "monitoring",
+            "tracking",
+            "following",
+            "pursuing",
+            "chasing",
+            "seeking",
+            "searching",
+            "looking",
+            "finding",
+            "discovering",
         }
 
         # Extract words and phrases with better patterns
@@ -418,38 +924,1097 @@ class ATSAnalyzer:
         return requirements
 
     def _analyze_keywords_vs_jd(
-        self, resume_text: str, jd_keywords: list[str]
+        self, resume_text: str, jd_keywords: list[str], jd_text: str = ""
     ) -> dict[str, Any]:
         """
-        Analyze keyword matching between resume and JD
+        Analyze keyword matching between resume and JD with improved filtering
         """
-        # Extract keywords from resume for comparison
-        resume_keywords = self._extract_keywords(resume_text)
+        # Extract keywords from resume for comparison - use AI if available
+        resume_keywords = self._extract_keywords_with_ai(resume_text)
+
+        # Filter out generic/non-meaningful keywords (including placeholder text keywords)
+        generic_keywords = {
+            "specific",
+            "company",
+            "brief",
+            "include",
+            "tailor",
+            "technologies",
+            "various",
+            "different",
+            "multiple",
+            "several",
+            "many",
+            "some",
+            "any",
+            "all",
+            "every",
+            "each",
+            "both",
+            "either",
+            "neither",
+            "other",
+            "another",
+            "same",
+            "similar",
+            "different",
+            "new",
+            "old",
+            "good",
+            "better",
+            "best",
+            "great",
+            "excellent",
+            "outstanding",
+            "amazing",
+            "wonderful",
+            "fantastic",
+            "strong",
+            "reliable",
+            "dedicated",
+            "passionate",
+            "motivated",
+            "committed",
+            "hardworking",
+            "diligent",
+            "thorough",
+            "careful",
+            "attentive",
+            "focused",
+            # Placeholder text keywords
+            "insert",
+            "engaging",
+            "paragraph",
+            "mission",
+            "culture",
+            "concise",
+            "seeking",
+            "motivated",
+            "experienced",
+            "growing",
+            "team",
+            "responsible",
+            "designing",
+            "implementing",
+            "managing",
+            "infrastructure",
+            "services",
+            "closely",
+            "development",
+            "operations",
+            "security",
+            "teams",
+            "ensure",
+            "solutions",
+            "scalable",
+            "secure",
+            "reliable",
+            "cost-effective",
+            "play",
+            "critical",
+            "role",
+            "defining",
+            "strategy",
+            "driving",
+            "innovation",
+            "overview",
+            "benefits",
+            "package",
+            "standard",
+            "equal",
+            "opportunity",
+            "employer",
+            "statement",
+            "communication",
+            "proficiency",
+            "native",
+            "deep",
+            "understanding",
+            "platforms",
+            "designing",
+            "microservices",
+            "expertise",
+            "section",
+            "architectures",
+            "functions",
+            "serverless",
+            "business",
+            "determined",
+            "persistent",
+            "resilient",
+            "adaptable",
+            "flexible",
+            "versatile",
+            "creative",
+            "innovative",
+            "proactive",
+            "self-motivated",
+            "independent",
+            "collaborative",
+            "team-oriented",
+            "people-oriented",
+            "customer-focused",
+            "results-driven",
+            "goal-oriented",
+            "detail-oriented",
+            "quality-focused",
+            "experienced",
+            "skilled",
+            "proficient",
+            "knowledgeable",
+            "capable",
+            "competent",
+            "qualified",
+            "trained",
+            "educated",
+            "certified",
+            "licensed",
+            "accredited",
+            "approved",
+            "validated",
+            "verified",
+            "tested",
+            "proven",
+            "established",
+            "recognized",
+            "accepted",
+            "standard",
+            "common",
+            "typical",
+            "usual",
+            "normal",
+            "regular",
+            "routine",
+            "standard",
+            "conventional",
+            "important",
+            "significant",
+            "major",
+            "minor",
+            "main",
+            "primary",
+            "secondary",
+            "basic",
+            "advanced",
+            "intermediate",
+            "beginner",
+            "expert",
+            "professional",
+            "personal",
+            "individual",
+            "team",
+            "group",
+            "organization",
+            "business",
+            "work",
+            "job",
+            "position",
+            "role",
+            "career",
+            "field",
+            "industry",
+            "area",
+            "sector",
+            "domain",
+            "subject",
+            "topic",
+            "matter",
+            "issue",
+            "problem",
+            "solution",
+            "approach",
+            "method",
+            "way",
+            "manner",
+            "style",
+            "type",
+            "kind",
+            "sort",
+            "category",
+            "class",
+            "level",
+            "degree",
+            "amount",
+            "number",
+            "quantity",
+            "size",
+            "scale",
+            "scope",
+            "range",
+            "extent",
+            "limit",
+            "boundary",
+            "edge",
+            "side",
+            "part",
+            "section",
+            "portion",
+            "piece",
+            "bit",
+            "element",
+            "component",
+            "feature",
+            "aspect",
+            "characteristic",
+            "property",
+            "attribute",
+            "quality",
+            "nature",
+            "form",
+            "shape",
+            "structure",
+            "pattern",
+            "design",
+            "model",
+            "framework",
+            "system",
+            "process",
+            "procedure",
+            "step",
+            "stage",
+            "phase",
+            "period",
+            "time",
+            "moment",
+            "point",
+            "place",
+            "location",
+            "position",
+            "site",
+            "area",
+            "region",
+            "zone",
+            "space",
+            "room",
+            "environment",
+            "setting",
+            "context",
+            "situation",
+            "condition",
+            "state",
+            "status",
+            "situation",
+            "circumstance",
+            "case",
+            "instance",
+            "example",
+            "sample",
+            "specimen",
+            "item",
+            "object",
+            "thing",
+            "stuff",
+            "material",
+            "substance",
+            "content",
+            "information",
+            "data",
+            "details",
+            "facts",
+            "figures",
+            "numbers",
+            "statistics",
+            "results",
+            "outcomes",
+            "consequences",
+            "effects",
+            "impacts",
+            "benefits",
+            "advantages",
+            "disadvantages",
+            "pros",
+            "cons",
+            "strengths",
+            "weaknesses",
+            "opportunities",
+            "threats",
+            "challenges",
+            "risks",
+            "goals",
+            "objectives",
+            "targets",
+            "aims",
+            "purposes",
+            "reasons",
+            "causes",
+            "factors",
+            "elements",
+            "components",
+            "parts",
+            "pieces",
+            "aspects",
+            "features",
+            "characteristics",
+            "properties",
+            "attributes",
+            "qualities",
+            "traits",
+            "skills",
+            "abilities",
+            "capabilities",
+            "competencies",
+            "knowledge",
+            "experience",
+            "background",
+            "history",
+            "record",
+            "track",
+            "performance",
+            "achievement",
+            "success",
+            "accomplishment",
+            "result",
+            "outcome",
+            "impact",
+            "contribution",
+            "value",
+            "worth",
+            "benefit",
+            "advantage",
+            "strength",
+            "asset",
+            "resource",
+            "tool",
+            "instrument",
+            "equipment",
+            "technology",
+            "system",
+            "platform",
+            "software",
+            "application",
+            "program",
+            "project",
+            "initiative",
+            "effort",
+            "endeavor",
+            "venture",
+            "enterprise",
+            "operation",
+            "activity",
+            "task",
+            "duty",
+            "responsibility",
+            "function",
+            "role",
+            "position",
+            "job",
+            "career",
+            "profession",
+            "occupation",
+            "field",
+            "industry",
+            "sector",
+            "domain",
+            "area",
+            "specialty",
+            "expertise",
+            "focus",
+            "concentration",
+            "emphasis",
+            "priority",
+            "importance",
+            "significance",
+            "relevance",
+            "applicability",
+            "usefulness",
+            "utility",
+            "effectiveness",
+            "efficiency",
+            "productivity",
+            "performance",
+            "quality",
+            "standard",
+            "level",
+            "degree",
+            "extent",
+            "scope",
+            "scale",
+            "size",
+            "magnitude",
+            "intensity",
+            "strength",
+            "power",
+            "force",
+            "energy",
+            "capacity",
+            "potential",
+            "ability",
+            "capability",
+            "competency",
+            "skill",
+            "talent",
+            "gift",
+            "strength",
+            "advantage",
+            "benefit",
+            "value",
+            "worth",
+            "merit",
+            "virtue",
+            "excellence",
+            "superiority",
+            "distinction",
+            "uniqueness",
+            "originality",
+            "creativity",
+            "innovation",
+            "invention",
+            "discovery",
+            "breakthrough",
+            "advancement",
+            "progress",
+            "development",
+            "growth",
+            "improvement",
+            "enhancement",
+            "upgrade",
+            "refinement",
+            "optimization",
+            "maximization",
+            "minimization",
+            "reduction",
+            "increase",
+            "decrease",
+            "change",
+            "modification",
+            "adjustment",
+            "adaptation",
+            "transformation",
+            "evolution",
+            "revolution",
+            "innovation",
+            "modernization",
+            "updating",
+            "upgrading",
+            "enhancing",
+            "improving",
+            "developing",
+            "growing",
+            "expanding",
+            "extending",
+            "broadening",
+            "deepening",
+            "strengthening",
+            "reinforcing",
+            "supporting",
+            "maintaining",
+            "sustaining",
+            "preserving",
+            "protecting",
+            "securing",
+            "ensuring",
+            "guaranteeing",
+            "promising",
+            "committing",
+            "dedicating",
+            "devoting",
+            "focusing",
+            "concentrating",
+            "specializing",
+            "expertising",
+            "mastering",
+            "learning",
+            "studying",
+            "researching",
+            "investigating",
+            "exploring",
+            "discovering",
+            "finding",
+            "identifying",
+            "recognizing",
+            "understanding",
+            "comprehending",
+            "grasping",
+            "appreciating",
+            "valuing",
+            "respecting",
+            "honoring",
+            "celebrating",
+            "acknowledging",
+            "accepting",
+            "embracing",
+            "welcoming",
+            "receiving",
+            "obtaining",
+            "acquiring",
+            "gaining",
+            "earning",
+            "achieving",
+            "accomplishing",
+            "completing",
+            "finishing",
+            "concluding",
+            "ending",
+            "stopping",
+            "starting",
+            "beginning",
+            "initiating",
+            "launching",
+            "introducing",
+            "presenting",
+            "offering",
+            "providing",
+            "delivering",
+            "supplying",
+            "furnishing",
+            "equipping",
+            "preparing",
+            "organizing",
+            "arranging",
+            "structuring",
+            "designing",
+            "planning",
+            "strategizing",
+            "thinking",
+            "considering",
+            "evaluating",
+            "assessing",
+            "analyzing",
+            "examining",
+            "reviewing",
+            "checking",
+            "verifying",
+            "confirming",
+            "validating",
+            "testing",
+            "trying",
+            "attempting",
+            "experimenting",
+            "practicing",
+            "training",
+            "coaching",
+            "mentoring",
+            "teaching",
+            "instructing",
+            "guiding",
+            "leading",
+            "managing",
+            "supervising",
+            "overseeing",
+            "controlling",
+            "directing",
+            "commanding",
+            "governing",
+            "ruling",
+            "regulating",
+            "monitoring",
+            "tracking",
+            "following",
+            "pursuing",
+            "chasing",
+            "seeking",
+            "searching",
+            "looking",
+            "finding",
+            "discovering",
+            "uncovering",
+            "revealing",
+            "exposing",
+            "showing",
+            "displaying",
+            "demonstrating",
+            "proving",
+            "establishing",
+            "confirming",
+            "verifying",
+            "validating",
+            "authenticating",
+            "certifying",
+            "accrediting",
+            "approving",
+            "endorsing",
+            "recommending",
+            "suggesting",
+            "proposing",
+            "offering",
+            "presenting",
+            "submitting",
+            "delivering",
+            "providing",
+            "supplying",
+            "furnishing",
+            "equipping",
+            "preparing",
+            "organizing",
+            "arranging",
+            "structuring",
+            "designing",
+            "planning",
+            "strategizing",
+            "thinking",
+            "considering",
+            "evaluating",
+            "assessing",
+            "analyzing",
+            "examining",
+            "reviewing",
+            "checking",
+            "verifying",
+            "confirming",
+            "validating",
+            "testing",
+            "trying",
+            "attempting",
+            "experimenting",
+            "practicing",
+            "training",
+            "coaching",
+            "mentoring",
+            "teaching",
+            "instructing",
+            "guiding",
+            "leading",
+            "managing",
+            "supervising",
+            "overseeing",
+            "controlling",
+            "directing",
+            "commanding",
+            "governing",
+            "ruling",
+            "regulating",
+            "monitoring",
+            "tracking",
+            "following",
+            "pursuing",
+            "chasing",
+            "seeking",
+            "searching",
+            "looking",
+            "finding",
+            "discovering",
+        }
+
+        # Use AI to classify keywords as technical vs non-technical
+        technical_keywords = self._classify_technical_keywords(jd_keywords, jd_text)
+
+        # Check if job description contains placeholder text
+        placeholder_indicators = [
+            "[insert",
+            "[add",
+            "insert a",
+            "add a",
+            "brief, engaging",
+            "concise overview",
+        ]
+        has_placeholder_text = any(
+            indicator in jd_text.lower() for indicator in placeholder_indicators
+        )
+
+        if has_placeholder_text:
+            # If placeholder text detected, be more aggressive with filtering
+            print(
+                "⚠️  Detected placeholder text in job description - applying aggressive keyword filtering"
+            )
+            # Only keep AI-classified technical keywords
+            meaningful_jd_keywords = [
+                kw for kw in jd_keywords if kw.lower() in technical_keywords
+            ]
+        else:
+            # Use AI classification + basic filtering
+            meaningful_jd_keywords = [
+                kw
+                for kw in jd_keywords
+                if (
+                    kw.lower() in technical_keywords
+                    and kw.lower() not in generic_keywords
+                )
+            ]
+
+        # If we filtered out too many keywords, keep some of the original ones
+        if (
+            len(meaningful_jd_keywords) < len(jd_keywords) * 0.3
+        ):  # If less than 30% remain
+            # Keep the most important ones (longer words, technical terms)
+            meaningful_jd_keywords = [
+                kw
+                for kw in jd_keywords
+                if len(kw) > 4
+                or kw.lower()
+                in {
+                    "api",
+                    "sql",
+                    "git",
+                    "aws",
+                    "ai",
+                    "ml",
+                    "ui",
+                    "ux",
+                    "qa",
+                    "ci",
+                    "cd",
+                    "devops",
+                }
+            ]
 
         matched_keywords = []
         missing_keywords = []
 
-        for keyword in jd_keywords:
-            if keyword in resume_text:
+        for keyword in meaningful_jd_keywords:
+            if keyword.lower() in resume_text.lower():
                 matched_keywords.append(keyword)
             else:
                 missing_keywords.append(keyword)
 
-        # Calculate score
-        if len(jd_keywords) > 0:
-            score = (len(matched_keywords) / len(jd_keywords)) * 100
+        # Calculate score based on meaningful keywords only
+        if len(meaningful_jd_keywords) > 0:
+            score = (len(matched_keywords) / len(meaningful_jd_keywords)) * 100
         else:
-            score = 50  # Default if no keywords extracted
+            score = 50  # Default if no meaningful keywords extracted
 
         return {
-            "matched_keywords": matched_keywords,  # ALL matched keywords (not limited)
-            "missing_keywords": missing_keywords,  # ALL missing keywords (not limited)
+            "matched_keywords": matched_keywords,  # Meaningful matched keywords
+            "missing_keywords": missing_keywords,  # Meaningful missing keywords
             "match_percentage": round(
-                (len(matched_keywords) / max(len(jd_keywords), 1)) * 100, 1
+                (len(matched_keywords) / max(len(meaningful_jd_keywords), 1)) * 100, 1
             ),
             "score": min(score, 100),
             "resume_keywords": resume_keywords,  # All keywords found in resume
+            "filtered_generic_keywords": [
+                kw for kw in jd_keywords if kw.lower() in generic_keywords
+            ],  # Show what was filtered out
+            "technical_keywords_used": technical_keywords,  # Show which keywords were classified as technical
         }
+
+    def _classify_technical_keywords(
+        self, keywords: list[str], jd_text: str
+    ) -> set[str]:
+        """
+        Use AI to classify keywords as technical vs non-technical with enhanced analysis
+        """
+        if not GEMINI_AVAILABLE or not self.model:
+            # Fallback to rule-based classification
+            return self._rule_based_technical_classification(keywords)
+
+        try:
+            # Prepare keywords for AI analysis
+            keywords_text = ", ".join(keywords[:50])  # Limit to avoid token limits
+
+            prompt = f"""
+            You are an expert ATS (Applicant Tracking System) analyst. Analyze these keywords extracted from a job description and classify them as TECHNICAL or NON-TECHNICAL.
+
+            Job Description Context: {jd_text[:500]}...
+
+            Keywords to analyze: {keywords_text}
+
+            TECHNICAL keywords are:
+            - Programming languages (Python, Java, JavaScript, TypeScript, Go, Rust, C++, C#, PHP, Ruby, Swift, Kotlin, Scala, R, MATLAB, etc.)
+            - Frameworks and libraries (React, Angular, Vue, Django, Flask, Spring, Laravel, Rails, Express, Node.js, etc.)
+            - Databases (PostgreSQL, MySQL, MongoDB, Redis, Oracle, SQLite, Elasticsearch, Cassandra, etc.)
+            - Cloud platforms and services (AWS, Azure, GCP, Docker, Kubernetes, Terraform, Jenkins, GitLab, etc.)
+            - APIs and protocols (REST, GraphQL, gRPC, OAuth, JWT, SAML, etc.)
+            - DevOps and tools (CI/CD, Git, Bash, PowerShell, Ansible, Helm, Prometheus, etc.)
+            - Data and AI/ML (Pandas, NumPy, TensorFlow, PyTorch, Scikit-learn, Jupyter, Spark, etc.)
+            - Testing frameworks (Jest, Pytest, Selenium, Cypress, etc.)
+            - Methodologies (Agile, Scrum, Kanban, TDD, BDD, Microservices, etc.)
+            - Security tools (SSL, TLS, OAuth, RBAC, IAM, Vault, etc.)
+            - Architecture patterns (Serverless, Lambda, Containers, Load Balancing, etc.)
+
+            NON-TECHNICAL keywords are:
+            - Generic business terms (communication, leadership, teamwork, collaboration, etc.)
+            - Soft skills (motivated, passionate, dedicated, hardworking, etc.)
+            - Generic job terms (experience, years, team, company, position, role, etc.)
+            - Placeholder text (brief, engaging, insert, add, include, etc.)
+            - Vague descriptors (strong, excellent, outstanding, amazing, etc.)
+            - Generic actions (working, developing, creating, building, etc.)
+
+            IMPORTANT RULES:
+            1. Be VERY strict - only include truly technical terms that ATS systems would match
+            2. Exclude any generic business language or placeholder text
+            3. Focus on specific technologies, tools, and methodologies
+            4. Consider the job context - if it's a technical role, be more inclusive of technical terms
+            5. If a keyword could be both technical and non-technical, err on the side of excluding it
+
+            Return ONLY a JSON array of the TECHNICAL keywords (lowercase):
+            ["python", "react", "aws", "docker", "kubernetes", "postgresql", "rest", "git", "jenkins"]
+
+            Example: If keywords are ["python", "communication", "react", "teamwork", "aws", "motivated"],
+            return: ["python", "react", "aws"]
+            """
+
+            response = self.model.generate_content(prompt)
+
+            if response and response.text:
+                # Parse the JSON response
+                import json
+
+                try:
+                    technical_list = json.loads(response.text.strip())
+                    print(
+                        f"✅ AI classified {len(technical_list)} technical keywords from {len(keywords)} total keywords"
+                    )
+                    return set(technical_list)
+                except json.JSONDecodeError:
+                    print(
+                        "⚠️  Failed to parse AI keyword classification, using fallback"
+                    )
+                    return self._rule_based_technical_classification(keywords)
+            else:
+                return self._rule_based_technical_classification(keywords)
+
+        except Exception as e:
+            print(f"⚠️  AI keyword classification failed: {e}, using fallback")
+            return self._rule_based_technical_classification(keywords)
+
+    def _rule_based_technical_classification(self, keywords: list[str]) -> set[str]:
+        """
+        Rule-based fallback for technical keyword classification
+        """
+        technical_terms = {
+            # Programming Languages
+            "python",
+            "java",
+            "javascript",
+            "typescript",
+            "c++",
+            "c#",
+            "go",
+            "rust",
+            "php",
+            "ruby",
+            "swift",
+            "kotlin",
+            "scala",
+            "r",
+            "matlab",
+            "perl",
+            "bash",
+            "powershell",
+            "sql",
+            "html",
+            "css",
+            "sass",
+            "less",
+            # Frameworks & Libraries
+            "react",
+            "angular",
+            "vue",
+            "node",
+            "express",
+            "django",
+            "flask",
+            "spring",
+            "laravel",
+            "rails",
+            "asp",
+            "net",
+            "jquery",
+            "bootstrap",
+            "tailwind",
+            "material",
+            "ui",
+            "redux",
+            "mobx",
+            "graphql",
+            # Databases
+            "mongodb",
+            "postgresql",
+            "mysql",
+            "oracle",
+            "sqlite",
+            "redis",
+            "elasticsearch",
+            "cassandra",
+            "dynamodb",
+            "firebase",
+            "supabase",
+            "prisma",
+            "sequelize",
+            "mongoose",
+            # Cloud & DevOps
+            "aws",
+            "azure",
+            "gcp",
+            "docker",
+            "kubernetes",
+            "terraform",
+            "ansible",
+            "jenkins",
+            "gitlab",
+            "github",
+            "circleci",
+            "travis",
+            "bamboo",
+            "helm",
+            "prometheus",
+            "grafana",
+            "elk",
+            "splunk",
+            # Data & AI/ML
+            "pandas",
+            "numpy",
+            "scikit",
+            "tensorflow",
+            "pytorch",
+            "keras",
+            "jupyter",
+            "spark",
+            "hadoop",
+            "kafka",
+            "airflow",
+            "dbt",
+            "tableau",
+            "powerbi",
+            "looker",
+            "machine",
+            "learning",
+            "deep",
+            # Mobile & Web
+            "ios",
+            "android",
+            "react",
+            "native",
+            "flutter",
+            "xamarin",
+            "cordova",
+            "ionic",
+            "pwa",
+            "responsive",
+            "design",
+            "ux",
+            "ui",
+            "figma",
+            "sketch",
+            "adobe",
+            "photoshop",
+            # Methodologies & Practices
+            "agile",
+            "scrum",
+            "kanban",
+            "devops",
+            "ci",
+            "cd",
+            "tdd",
+            "bdd",
+            "microservices",
+            "api",
+            "rest",
+            "soap",
+            "oauth",
+            "jwt",
+            "ldap",
+            "saml",
+            "oauth2",
+            # Tools & Platforms
+            "git",
+            "svn",
+            "mercurial",
+            "jira",
+            "confluence",
+            "slack",
+            "teams",
+            "zoom",
+            "figma",
+            "sketch",
+            "postman",
+            "insomnia",
+            "swagger",
+            "openapi",
+            "kubernetes",
+            "openshift",
+            "rancher",
+            # Security
+            "security",
+            "encryption",
+            "ssl",
+            "tls",
+            "oauth",
+            "saml",
+            "ldap",
+            "rbac",
+            "iam",
+            "vault",
+            "penetration",
+            "testing",
+            "vulnerability",
+            "assessment",
+            "compliance",
+            "gdpr",
+            "hipaa",
+            # Architecture & Design
+            "microservices",
+            "monolith",
+            "serverless",
+            "lambda",
+            "functions",
+            "containers",
+            "orchestration",
+            "load",
+            "balancing",
+            "caching",
+            "cdn",
+            "edge",
+            "computing",
+            "distributed",
+            "systems",
+        }
+
+        # Return keywords that match technical terms
+        return {kw.lower() for kw in keywords if kw.lower() in technical_terms}
+
+    def _extract_keywords_with_ai(self, resume_text: str) -> list[str]:
+        """
+        Extract keywords from resume using AI for better technical term identification
+        """
+        if not GEMINI_AVAILABLE or not self.model:
+            # Fallback to regular keyword extraction
+            return self._extract_keywords(resume_text)
+
+        try:
+            # Limit text to avoid token limits
+            text_sample = resume_text[:2000] if len(resume_text) > 2000 else resume_text
+
+            prompt = f"""
+            You are an expert ATS analyst. Extract ALL technical keywords from this resume text that would be relevant for job matching.
+
+            Resume text: {text_sample}
+
+            Extract technical keywords including:
+            - Programming languages (Python, Java, JavaScript, etc.)
+            - Frameworks and libraries (React, Django, Spring, etc.)
+            - Databases (PostgreSQL, MongoDB, etc.)
+            - Cloud platforms (AWS, Azure, GCP, etc.)
+            - DevOps tools (Docker, Kubernetes, etc.)
+            - APIs and protocols (REST, GraphQL, etc.)
+            - Testing frameworks (Jest, Pytest, etc.)
+            - Methodologies (Agile, Scrum, etc.)
+            - Tools and platforms (Git, Jenkins, etc.)
+            - Technical skills and concepts
+
+            IMPORTANT:
+            1. Extract ALL technical terms mentioned in the resume
+            2. Include variations (e.g., "JS" and "JavaScript")
+            3. Include version numbers if mentioned (e.g., "Python 3.9", "React 18")
+            4. Include specific technologies, tools, and frameworks
+            5. Exclude generic business terms and soft skills
+            6. Be comprehensive - extract everything technical
+
+            Return ONLY a JSON array of technical keywords (lowercase):
+            ["python", "react", "aws", "docker", "postgresql", "rest", "git", "jenkins", "agile"]
+            """
+
+            response = self.model.generate_content(prompt)
+
+            if response and response.text:
+                import json
+
+                try:
+                    ai_keywords = json.loads(response.text.strip())
+                    print(
+                        f"✅ AI extracted {len(ai_keywords)} technical keywords from resume"
+                    )
+                    return ai_keywords
+                except json.JSONDecodeError:
+                    print(
+                        "⚠️  Failed to parse AI resume keyword extraction, using fallback"
+                    )
+                    return self._extract_keywords(resume_text)
+            else:
+                return self._extract_keywords(resume_text)
+
+        except Exception as e:
+            print(f"⚠️  AI resume keyword extraction failed: {e}, using fallback")
+            return self._extract_keywords(resume_text)
 
     def _analyze_semantic_match(self, resume_text: str, jd_text: str) -> dict[str, Any]:
         """
@@ -2441,8 +4006,16 @@ def get_ats_analyzer():
     if ats_analyzer is None:
         try:
             ats_analyzer = ATSAnalyzer()
+            print("✅ ATS Analyzer initialized successfully")
         except Exception as e:
             print(f"⚠️  Failed to initialize ATS Analyzer: {e}")
-            # Create a fallback analyzer that doesn't use embeddings
-            ats_analyzer = ATSAnalyzer()
+            # The ATSAnalyzer should now handle initialization gracefully
+            # and not raise exceptions, but just in case:
+            try:
+                ats_analyzer = ATSAnalyzer()
+            except Exception as e2:
+                print(
+                    f"❌ Critical error: ATS Analyzer initialization completely failed: {e2}"
+                )
+                raise Exception(f"ATS Analyzer initialization failed: {e2}")
     return ats_analyzer

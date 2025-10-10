@@ -50,7 +50,7 @@ export const ATSResults: React.FC<ATSResultsProps> = ({
       </Card>
 
       {/* Keywords Analysis */}
-      <div className='grid md:grid-cols-2 gap-6'>
+      <div className='grid md:grid-cols-3 gap-6'>
         <Card className='p-6'>
           <h3 className='text-lg font-semibold mb-4 text-green-600'>
             ✅ Matched Keywords ({result.keywordMatches.length})
@@ -85,7 +85,7 @@ export const ATSResults: React.FC<ATSResultsProps> = ({
       </div>
 
       {/* Strengths and Weaknesses */}
-      <div className='grid md:grid-cols-2 gap-6'>
+      <div className='grid md:grid-cols-3 gap-6'>
         <Card className='p-6'>
           <h3 className='text-lg font-semibold mb-4 text-green-600'>
             💪 Strengths

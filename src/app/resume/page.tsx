@@ -434,7 +434,7 @@ export default function Resume() {
               <h2 className='text-3xl font-bold text-white mb-8'>
                 Technical Skills
               </h2>
-              <div className='grid md:grid-cols-2 gap-8'>
+              <div className='grid md:grid-cols-3 gap-8'>
                 {Object.entries(skills).map(([category, skillList]) => (
                   <div
                     key={category}
@@ -465,7 +465,7 @@ export default function Resume() {
               <h2 className='text-3xl font-bold text-white mb-8'>
                 Certifications
               </h2>
-              <div className='grid md:grid-cols-2 gap-6'>
+              <div className='grid md:grid-cols-3 gap-6'>
                 {certifications.map(cert => (
                   <div
                     key={cert.id}

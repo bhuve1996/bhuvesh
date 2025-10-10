@@ -30,7 +30,7 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
 
   const completedImpact = improvements
     .filter(i => completed.has(i.id))
-    .reduce((sum, i) => sum + i.impact, 0);
+    .reduce((sum, i) => sum + (i.score_impact || i.impact || 0), 0);
 
   const projectedScore = Math.min((currentScore || 0) + completedImpact, 100);
 
@@ -51,10 +51,32 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
   const categoryIcons = {
     keyword: '🔑',
     format: '📝',
+    formatting: '📝',
     content: '✍️',
     experience: '💼',
     skills: '🛠️',
     education: '🎓',
+    ats: '🤖',
+    structure: '🏗️',
+    other: '📋',
+  };
+
+  const categoryColors = {
+    ats: 'from-red-500/20 to-pink-500/20 border-red-500/30',
+    keyword: 'from-blue-500/20 to-cyan-500/20 border-blue-500/30',
+    formatting: 'from-green-500/20 to-emerald-500/20 border-green-500/30',
+    content: 'from-purple-500/20 to-violet-500/20 border-purple-500/30',
+    structure: 'from-orange-500/20 to-amber-500/20 border-orange-500/30',
+    other: 'from-gray-500/20 to-slate-500/20 border-gray-500/30',
+  };
+
+  const categoryLabels = {
+    ats: 'ATS Compatibility',
+    keyword: 'Keyword Optimization',
+    formatting: 'Formatting',
+    content: 'Content Quality',
+    structure: 'Structure',
+    other: 'Other',
   };
 
   return (
@@ -135,7 +157,7 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
                 </div>
                 <div className='text-right flex-shrink-0'>
                   <div className='text-2xl font-bold text-green-400'>
-                    +{item.impact}
+                    +{item.score_impact || item.impact || 0}
                   </div>
                   <div className='text-xs text-gray-400'>points</div>
                 </div>
@@ -145,8 +167,9 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
         </div>
       )}
 
-      {/* Priority Summary */}
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+      {/* Enhanced Summary Cards */}
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+        {/* Priority Summary */}
         {(['critical', 'high', 'medium', 'low'] as const).map(priority => (
           <div
             key={priority}
@@ -165,6 +188,48 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
         ))}
       </div>
 
+      {/* Category Breakdown */}
+      <div className='bg-gray-800/30 rounded-xl p-6 border border-gray-700'>
+        <h3 className='text-xl font-bold text-white mb-4'>
+          📊 Improvement Categories
+        </h3>
+        <div className='grid grid-cols-3 md:grid-cols-4 gap-4'>
+          {Object.entries(categoryLabels).map(([category, label]) => {
+            const categoryImprovements = improvements.filter(
+              i => i.category === category
+            );
+            if (categoryImprovements.length === 0) return null;
+
+            const totalImpact = categoryImprovements.reduce(
+              (sum, i) => sum + (i.score_impact || i.impact || 0),
+              0
+            );
+
+            return (
+              <div
+                key={category}
+                className={`bg-gradient-to-br ${categoryColors[category as keyof typeof categoryColors]} rounded-lg p-4 border`}
+              >
+                <div className='flex items-center gap-2 mb-2'>
+                  <span className='text-xl'>
+                    {categoryIcons[category as keyof typeof categoryIcons]}
+                  </span>
+                  <span className='font-semibold text-white text-sm'>
+                    {label}
+                  </span>
+                </div>
+                <div className='text-2xl font-bold text-white'>
+                  {categoryImprovements.length}
+                </div>
+                <div className='text-xs text-gray-300'>
+                  +{totalImpact} points potential
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Improvements List */}
       <div className='space-y-4'>
         <h3 className='text-xl font-bold text-white'>All Improvements</h3>
@@ -180,6 +245,8 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
               isCompleted={isCompleted}
               priorityColors={priorityColors}
               categoryIcons={categoryIcons}
+              categoryColors={categoryColors}
+              categoryLabels={categoryLabels}
               onToggleComplete={() => toggleComplete(item.id)}
               onToggleExpand={() => toggleExpand(item.id)}
             />
@@ -197,6 +264,8 @@ interface ImprovementCardProps {
   isCompleted: boolean;
   priorityColors: Record<string, string>;
   categoryIcons: Record<string, string>;
+  categoryColors: Record<string, string>;
+  categoryLabels: Record<string, string>;
   onToggleComplete: () => void;
   onToggleExpand: () => void;
 }
@@ -207,15 +276,20 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
   isCompleted,
   priorityColors,
   categoryIcons,
+  categoryColors,
+  categoryLabels,
   onToggleComplete,
   onToggleExpand,
 }) => {
+  const categoryColor = categoryColors[item.category] || categoryColors.other;
+  const categoryLabel = categoryLabels[item.category] || 'Other';
+
   return (
     <div
       className={`border-2 rounded-xl overflow-hidden transition-all ${
         isCompleted
           ? 'border-green-500/50 bg-green-500/5'
-          : priorityColors[item.priority]
+          : `bg-gradient-to-br ${categoryColor} border`
       }`}
     >
       {/* Header */}
@@ -251,13 +325,20 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
                   <span className='text-lg font-semibold text-white break-words'>
                     {item.title}
                   </span>
-                  <span
-                    className={`text-xs px-2 py-1 rounded ${
-                      priorityColors[item.priority]
-                    } flex-shrink-0`}
-                  >
-                    {item.priority}
-                  </span>
+                  <div className='flex gap-2 flex-shrink-0'>
+                    <span
+                      className={`text-xs px-2 py-1 rounded bg-white/10 text-white border border-white/20`}
+                    >
+                      {categoryLabel}
+                    </span>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${
+                        priorityColors[item.priority]
+                      }`}
+                    >
+                      {item.priority}
+                    </span>
+                  </div>
                 </div>
                 <p className='text-gray-300 text-sm break-words'>
                   {item.description}
@@ -265,7 +346,7 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
               </div>
               <div className='text-right flex-shrink-0'>
                 <div className='text-2xl font-bold text-green-400'>
-                  +{item.impact}
+                  +{item.score_impact || item.impact || 0}
                 </div>
                 <div className='text-xs text-gray-400'>points</div>
               </div>
@@ -291,7 +372,7 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
         <div className='border-t border-white/10 p-4 space-y-4 bg-black/20'>
           {/* Before/After Examples */}
           {item.before && item.after && (
-            <div className='grid md:grid-cols-2 gap-4'>
+            <div className='grid md:grid-cols-3 gap-4'>
               <div className='bg-red-500/10 border border-red-500/30 rounded-lg p-4'>
                 <div className='text-sm font-semibold text-red-400 mb-2'>
                   ❌ Before

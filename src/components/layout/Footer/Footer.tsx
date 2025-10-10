@@ -47,7 +47,7 @@ export const Footer: React.FC = () => {
     <footer className='bg-black/90 backdrop-blur-sm border-t border-cyan-400/20'>
       <div className='max-w-6xl mx-auto px-6 py-12'>
         {/* Main Footer Content */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8'>
+        <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-8'>
           {/* Brand Section */}
           <div className='lg:col-span-1'>
             <Link

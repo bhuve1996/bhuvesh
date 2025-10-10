@@ -7,6 +7,7 @@ import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
 import { FileUpload } from '@/components/resume/FileUpload';
 import { ResultsDisplay } from '@/components/resume/ResultsDisplay';
 import { Section } from '@/components/ui/Section';
+import { useAnalysisProgress } from '@/hooks/useAnalysisProgress';
 import type { AnalysisResult, ATSAnalysisBackendResponse } from '@/types';
 
 // Note: Metadata is defined in layout.tsx
@@ -19,6 +20,16 @@ export default function ATSCheckerPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'upload' | 'results'>('upload');
 
+  // Progress tracking
+  const {
+    progress,
+    startAnalysis,
+    updateStep,
+    completeStep,
+    completeAnalysis,
+    setError: setProgressError,
+  } = useAnalysisProgress();
+
   const handleFileUpload = (uploadedFile: File) => {
     setFile(uploadedFile);
     setAnalysisResult(null);
@@ -30,10 +41,38 @@ export default function ATSCheckerPage() {
     if (!file) return;
 
     setError(null);
+    // Progress error will be reset when startAnalysis is called
+
+    // Start progress tracking
+    startAnalysis();
     const loadingToast = toast.loading('Analyzing your resume...');
 
     try {
+      // Step 1: Upload
+      updateStep(0, 'active');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      completeStep(0);
+
+      // Step 2: Parsing
+      updateStep(1, 'active');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      completeStep(1);
+
+      // Step 3: Analyzing
+      updateStep(2, 'active');
       const result = await analyzeResumeWithBackend(file, jobDescription);
+      completeStep(2);
+
+      // Step 4: Results
+      updateStep(3, 'active');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      completeStep(3);
+
+      // Complete analysis
+      completeAnalysis();
+
+      // Show completion state briefly before switching to results
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Set the analysis result to display inline and switch to results tab
       setAnalysisResult(result);
@@ -45,6 +84,7 @@ export default function ATSCheckerPage() {
       const errorMessage =
         err instanceof Error ? err.message : 'Analysis failed';
       setError(errorMessage);
+      setProgressError(errorMessage, 2); // Mark analyzing step as error
 
       toast.dismiss(loadingToast);
       toast.error(errorMessage);
@@ -56,6 +96,7 @@ export default function ATSCheckerPage() {
     setAnalysisResult(null);
     setError(null);
     setActiveTab('upload');
+    // Progress state will be reset when a new analysis starts
     toast.success('Ready for new analysis!');
   };
 
@@ -253,7 +294,8 @@ export default function ATSCheckerPage() {
           </div>
 
           {/* Results Tab - Only show when we have results */}
-          {analysisResult && (
+          {/* Hidden the Analysis Results button as requested */}
+          {false && analysisResult && (
             <div className='mb-8'>
               <div className='flex space-x-1 bg-gray-800/50 p-1 rounded-lg w-fit mx-auto'>
                 <button
@@ -287,6 +329,7 @@ export default function ATSCheckerPage() {
                     file={file}
                     onAnalyze={handleAnalysis}
                     error={error}
+                    progress={progress}
                   />
                 </div>
               )}

@@ -72,25 +72,62 @@ class JobDescriptionGenerator:
 
         except Exception as e:
             print(f"❌ Error generating job description with AI: {e}")
-            raise Exception(f"AI job description generation failed: {e}")
+            # Fallback to template-based generation
+            return self._generate_template_jd(job_type, experience_level)
 
     def _create_generation_prompt(self, job_type: str, experience_level: str) -> str:
         """Create a prompt for generating job descriptions"""
         return f"""
-Generate a realistic, comprehensive job description for a {experience_level} {job_type} position.
+You are an expert technical recruiter and hiring manager. Generate a comprehensive, realistic job description for a {experience_level} {job_type} position that would be posted on LinkedIn, Indeed, or company career pages.
 
-Requirements:
-1. Include 8-12 specific technical requirements relevant to {job_type}
-2. Include 4-6 soft skills and behavioral requirements
-3. Include 2-3 years of experience requirements appropriate for {experience_level}
-4. Include specific technologies, tools, and frameworks commonly used in {job_type} roles
-5. Include responsibilities that are typical for {job_type} positions
-6. Make it realistic and industry-standard
-7. Focus on keywords that ATS systems would look for
-8. Keep it professional and detailed
+JOB DESCRIPTION STRUCTURE:
+1. **Job Title & Company Overview** (2-3 sentences)
+2. **Key Responsibilities** (6-8 detailed bullet points)
+3. **Required Technical Skills** (12-15 specific technologies)
+4. **Preferred Qualifications** (5-7 additional skills)
+5. **Experience Requirements** (2-3 specific requirements)
+6. **Soft Skills & Behavioral Traits** (4-5 qualities)
+7. **What We Offer** (3-4 benefits/opportunities)
 
-Format the response as a clean job description without any meta-commentary or explanations.
-Start directly with the job title and requirements.
+CRITICAL REQUIREMENTS:
+- Make it 400-600 words long (comprehensive but not overwhelming)
+- Include SPECIFIC technologies, tools, and frameworks (not just categories)
+- Use realistic industry terminology and job market language
+- Include specific cloud services, databases, and development tools
+- Mention actual methodologies, practices, and industry standards
+- Include version numbers where relevant (e.g., "React 18+", "Python 3.9+")
+- Use action verbs and specific technical language
+- Make it sound like a real job posting from a tech company
+
+TECHNICAL DEPTH FOR {job_type}:
+- **Programming Languages**: Include 3-4 specific languages with proficiency levels
+- **Frameworks & Libraries**: Mention 4-5 specific frameworks with use cases
+- **Databases**: Include 2-3 specific databases with experience levels
+- **Cloud Platforms**: Specify actual services (AWS S3, EC2, Lambda, etc.)
+- **DevOps & Tools**: Include specific CI/CD, containerization, and monitoring tools
+- **APIs & Protocols**: Mention specific protocols and integration experience
+- **Testing**: Include specific testing frameworks and methodologies
+- **Architecture**: Mention specific patterns, design principles, and best practices
+
+EXAMPLE TECHNICAL REQUIREMENTS FOR {job_type}:
+- "3+ years of experience with Python 3.9+ and Django/Flask frameworks"
+- "Proficiency in React 18+ with TypeScript and modern state management (Redux Toolkit)"
+- "Experience with AWS services including EC2, S3, RDS, and Lambda functions"
+- "Strong knowledge of PostgreSQL and Redis for data storage and caching"
+- "Experience with Docker containerization and Kubernetes orchestration"
+- "Familiarity with RESTful APIs, GraphQL, and microservices architecture"
+- "Proficiency in Git version control and CI/CD pipelines using Jenkins or GitLab"
+
+IMPORTANT GUIDELINES:
+- Do NOT use placeholder text like "[Insert...]" or generic statements
+- Write in present tense, active voice
+- Use specific, measurable requirements where possible
+- Include realistic salary ranges or experience levels
+- Make it sound professional but engaging
+- Focus on what the candidate will actually DO, not just what they should know
+- Include both hard technical skills and practical experience requirements
+
+Generate a complete, ready-to-post job description that sounds like it came from a real tech company.
 """
 
     def _clean_generated_jd(self, generated_text: str) -> str:
@@ -112,7 +149,215 @@ Start directly with the job title and requirements.
 
         return "\n".join(cleaned_lines)
 
-    # Fallback method removed - AI-only system
+    def _generate_template_jd(self, job_type: str, experience_level: str) -> str:
+        """Generate a template-based job description with specific technical requirements"""
+
+        # Define specific technical requirements for common job types
+        job_templates = {
+            "Software Engineer": {
+                "technologies": [
+                    "Python",
+                    "Java",
+                    "JavaScript",
+                    "React",
+                    "Node.js",
+                    "SQL",
+                    "MongoDB",
+                    "AWS",
+                    "Docker",
+                    "Kubernetes",
+                    "Git",
+                    "REST APIs",
+                    "microservices",
+                ],
+                "skills": [
+                    "Object-oriented programming",
+                    "Database design",
+                    "API development",
+                    "Version control",
+                    "Testing frameworks",
+                    "Agile methodologies",
+                ],
+                "responsibilities": [
+                    "Design and develop scalable software applications",
+                    "Write clean, maintainable code following best practices",
+                    "Collaborate with cross-functional teams to deliver features",
+                    "Participate in code reviews and technical discussions",
+                    "Debug and troubleshoot production issues",
+                    "Implement automated testing and CI/CD pipelines",
+                ],
+            },
+            "DevOps Engineer": {
+                "technologies": [
+                    "AWS",
+                    "Azure",
+                    "Docker",
+                    "Kubernetes",
+                    "Terraform",
+                    "Jenkins",
+                    "GitLab CI",
+                    "Ansible",
+                    "Python",
+                    "Bash",
+                    "Linux",
+                    "Monitoring tools",
+                ],
+                "skills": [
+                    "Infrastructure as Code",
+                    "CI/CD pipelines",
+                    "Cloud architecture",
+                    "Container orchestration",
+                    "Monitoring and logging",
+                    "Security best practices",
+                ],
+                "responsibilities": [
+                    "Design and implement cloud infrastructure solutions",
+                    "Automate deployment and scaling processes",
+                    "Monitor system performance and reliability",
+                    "Implement security best practices and compliance",
+                    "Collaborate with development teams on DevOps practices",
+                    "Troubleshoot infrastructure and deployment issues",
+                ],
+            },
+            "Data Scientist": {
+                "technologies": [
+                    "Python",
+                    "R",
+                    "SQL",
+                    "Pandas",
+                    "NumPy",
+                    "Scikit-learn",
+                    "TensorFlow",
+                    "PyTorch",
+                    "Jupyter",
+                    "AWS",
+                    "Docker",
+                    "Git",
+                ],
+                "skills": [
+                    "Machine learning",
+                    "Statistical analysis",
+                    "Data visualization",
+                    "Feature engineering",
+                    "Model deployment",
+                    "A/B testing",
+                ],
+                "responsibilities": [
+                    "Develop and implement machine learning models",
+                    "Analyze large datasets to extract insights",
+                    "Create data visualizations and reports",
+                    "Collaborate with stakeholders to define business requirements",
+                    "Deploy models to production environments",
+                    "Monitor model performance and iterate on improvements",
+                ],
+            },
+            "Cloud Architect": {
+                "technologies": [
+                    "AWS",
+                    "Azure",
+                    "GCP",
+                    "Terraform",
+                    "CloudFormation",
+                    "Docker",
+                    "Kubernetes",
+                    "Python",
+                    "Bash",
+                    "Monitoring tools",
+                    "Security tools",
+                ],
+                "skills": [
+                    "Cloud architecture design",
+                    "Infrastructure as Code",
+                    "Security architecture",
+                    "Cost optimization",
+                    "Disaster recovery",
+                    "Performance optimization",
+                ],
+                "responsibilities": [
+                    "Design scalable and secure cloud architectures",
+                    "Implement infrastructure as code solutions",
+                    "Optimize cloud costs and performance",
+                    "Ensure compliance and security standards",
+                    "Mentor teams on cloud best practices",
+                    "Evaluate and recommend cloud technologies",
+                ],
+            },
+        }
+
+        # Get template for the job type or use a generic one
+        template = job_templates.get(job_type, job_templates["Software Engineer"])
+
+        # Generate a more elaborate job description
+        jd_parts = [
+            f"{job_type} - {experience_level.title()}",
+            "",
+            "About the Role:",
+            f"We are seeking a talented and experienced {experience_level} {job_type} to join our dynamic engineering team. The ideal candidate will have a strong foundation in modern software development practices and a passion for building scalable, high-quality solutions. You will work closely with cross-functional teams to design, develop, and maintain cutting-edge applications that serve millions of users.",
+            "",
+            "Key Responsibilities:",
+        ]
+
+        # Add detailed responsibilities
+        for resp in template["responsibilities"]:
+            jd_parts.append(f"• {resp}")
+
+        jd_parts.extend(
+            [
+                "",
+                "Required Technical Skills:",
+            ]
+        )
+
+        # Add technical requirements with more detail
+        for tech in template["technologies"][:10]:  # More technical skills
+            jd_parts.append(f"• {tech}")
+
+        jd_parts.extend(
+            [
+                "",
+                "Preferred Qualifications:",
+            ]
+        )
+
+        # Add additional technical skills
+        additional_techs = (
+            template["technologies"][10:] if len(template["technologies"]) > 10 else []
+        )
+        for tech in additional_techs[:5]:
+            jd_parts.append(f"• {tech}")
+
+        jd_parts.extend(
+            [
+                "",
+                "Soft Skills & Behavioral Traits:",
+            ]
+        )
+
+        # Add soft skills
+        for skill in template["skills"]:
+            jd_parts.append(f"• {skill}")
+
+        jd_parts.extend(
+            [
+                "",
+                "Experience Requirements:",
+                f"• {experience_level.replace('-', ' ')} experience in software development or related field",
+                "• Proven track record of delivering high-quality software solutions",
+                "• Experience working in Agile/Scrum development environments",
+                "• Strong understanding of software development lifecycle and best practices",
+                "",
+                "What We Offer:",
+                "• Competitive salary and comprehensive benefits package",
+                "• Opportunity to work with cutting-edge technologies and innovative projects",
+                "• Collaborative and inclusive work environment",
+                "• Professional development and career growth opportunities",
+                "• Flexible work arrangements and work-life balance",
+                "",
+                "Join our team and help us build the next generation of software solutions that will impact millions of users worldwide.",
+            ]
+        )
+
+        return "\n".join(jd_parts)
 
     def determine_experience_level(self, resume_text: str) -> str:
         """

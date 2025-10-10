@@ -110,3 +110,61 @@ export interface ProgressProps {
   striped?: boolean;
   className?: string;
 }
+
+// Enhanced Card Props with animation support
+export interface EnhancedCardProps extends CardProps {
+  delay?: number;
+}
+
+// Animated Score Component Types
+export interface AnimatedScoreProps {
+  score: number;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  showGrade?: boolean;
+  className?: string;
+}
+
+// Data Visualization Component Types
+export interface DataVisualizationItem {
+  label: string;
+  value: number;
+  color?: string;
+  icon?: string;
+}
+
+export interface DataVisualizationProps {
+  title: string;
+  data: DataVisualizationItem[];
+  type?: 'bar' | 'radial' | 'donut';
+  className?: string;
+}
+
+// Animated Progress Component Types
+export interface AnimatedProgressStep {
+  id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'active' | 'completed' | 'error';
+}
+
+export interface AnimatedProgressProps {
+  steps: AnimatedProgressStep[];
+  currentStep: number;
+  className?: string;
+}
+
+// Tab Component Types
+export interface TabItem {
+  id: string;
+  label: string;
+  icon?: string;
+  badge?: string | number;
+  content: React.ReactNode;
+}
+
+export interface TabsProps {
+  items: TabItem[];
+  defaultActiveTab?: string;
+  className?: string;
+  variant?: 'default' | 'pills' | 'underline';
+}

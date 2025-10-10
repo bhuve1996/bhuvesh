@@ -59,15 +59,20 @@ export interface ImprovementItem {
   category:
     | 'keyword'
     | 'format'
+    | 'formatting'
     | 'content'
     | 'experience'
     | 'skills'
-    | 'education';
-  priority: 'high' | 'medium' | 'low';
+    | 'education'
+    | 'ats'
+    | 'structure'
+    | 'other';
+  priority: 'critical' | 'high' | 'medium' | 'low';
   title: string;
   description: string;
   impact: number; // 0-100
-  effort: 'low' | 'medium' | 'high';
+  score_impact?: number; // Alternative field name used by backend
+  effort?: 'low' | 'medium' | 'high';
   before?: string;
   after?: string;
   action_steps?: string[];
@@ -75,7 +80,7 @@ export interface ImprovementItem {
   suggested_verbs?: string[];
   examples?: string[];
   resources?: string[];
-  completed: boolean;
+  completed?: boolean;
 }
 
 export interface ImprovementPlan {
