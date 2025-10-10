@@ -47,14 +47,16 @@ class ProjectExtractor:
         
         try:
             # Enhanced prompt with proper time calculation
-            prompt = f"""Extract work experience from this resume. Calculate exact time periods and identify current company. Return ONLY valid JSON.
+            prompt = f"""Extract ALL work experience from this resume. Calculate exact time periods and identify current company. Return ONLY valid JSON.
 
 CRITICAL RULES:
-1. Calculate total_experience_years as decimal (e.g., 2.5 for 2 years 6 months)
-2. Mark current company with "current": true (look for "Present", "Current", or most recent dates)
-3. Use exact dates from resume for start_date and end_date
-4. Group multiple positions at same company under one entry
-5. Extract all technologies and skills used at each company
+1. Extract EVERY company and position mentioned in the resume - do not miss any
+2. Calculate total_experience_years as decimal (e.g., 2.5 for 2 years 6 months)
+3. Mark current company with "current": true (look for "Present", "Current", or most recent dates)
+4. Use exact dates from resume for start_date and end_date
+5. Group multiple positions at same company under one entry
+6. Extract all technologies and skills used at each company
+7. Include ALL work experience entries, even if they seem less relevant
 
 {{
   "work_experience": [
@@ -95,7 +97,7 @@ CRITICAL RULES:
 }}
 
 Resume text:
-{resume_text[:3000]}"""
+{resume_text}"""
 
             response = self.model.generate_content(prompt)
             
@@ -117,7 +119,8 @@ Resume text:
             # Parse JSON
             try:
                 structured_data = json.loads(json_text)
-                print("✅ AI extraction successful")
+                work_exp_count = len(structured_data.get('work_experience', []))
+                print(f"✅ AI extraction successful - Found {work_exp_count} work experience entries")
                 return structured_data
             except json.JSONDecodeError as e:
                 print(f"❌ JSON parsing error: {e}")

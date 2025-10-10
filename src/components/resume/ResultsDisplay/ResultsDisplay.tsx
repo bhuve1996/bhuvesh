@@ -558,7 +558,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
                     company.responsibilities.length > 0 && (
                       <div className='mt-3'>
                         <h5 className='text-green-400 text-sm font-medium mb-2'>
-                          Key Responsibilities ({company.responsibilities.length})
+                          Key Responsibilities (
+                          {company.responsibilities.length})
                         </h5>
                         <ul className='text-gray-300 text-xs space-y-1'>
                           {company.responsibilities.map((resp, rIndex) => (
