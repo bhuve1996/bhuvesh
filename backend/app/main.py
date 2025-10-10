@@ -80,9 +80,10 @@ async def startup_check():
     Returns immediately to verify the app is starting
     """
     return {
-        "status": "starting",
-        "message": "Application is starting up",
+        "status": "ready",
+        "message": "Application is ready to accept requests",
         "timestamp": time.time(),
+        "version": "1.0.0",
     }
 
 

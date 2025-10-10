@@ -41,6 +41,7 @@ def main():
     host = "0.0.0.0"
 
     logger.info(f"📡 Server will start on {host}:{port}")
+    logger.info(f"🔧 Environment: {os.getenv('RAILWAY_ENVIRONMENT', 'development')}")
 
     # Preload models in background (non-blocking)
     import threading
@@ -62,6 +63,7 @@ def main():
             workers=1,  # Single worker for Railway
             log_level="info",
             access_log=True,
+            loop="asyncio",  # Use asyncio loop for better compatibility
         )
 
     except Exception as e:
