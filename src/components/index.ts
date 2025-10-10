@@ -17,5 +17,4 @@ export * from './resume';
 export * from './sections';
 export * from './ui';
 
-// Export types from centralized location
-export * from '@/types';
+// Types are available from @/types directly

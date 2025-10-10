@@ -3,12 +3,8 @@
 import React, { useCallback, useState } from 'react';
 
 import { ImprovementPlan } from '@/components/resume/ImprovementPlan';
-import type {
-  ImprovementItem,
-  ImprovementSummary,
-} from '@/components/resume/ImprovementPlan/types';
 import { Card } from '@/components/ui/Card';
-import type { AnalysisResult } from '@/types/ats';
+import type { AnalysisResult, ImprovementItem } from '@/types';
 
 interface ResultsDisplayProps {
   result: AnalysisResult;
@@ -18,7 +14,12 @@ interface ResultsDisplayProps {
 export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
   const [improvementPlan, setImprovementPlan] = useState<{
     improvements: ImprovementItem[];
-    summary: ImprovementSummary;
+    summary: {
+      total_improvements: number;
+      high_priority: number;
+      estimated_impact: number;
+      estimated_time: string;
+    };
     quick_wins: ImprovementItem[];
   } | null>(null);
   const [loadingImprovements, setLoadingImprovements] = useState(false);
@@ -129,7 +130,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
               <div className='text-center'>
                 <p className='text-sm text-gray-400 mb-1'>ATS Compatibility</p>
                 <p className='text-lg font-semibold text-cyan-400'>
-                  {result.ats_compatibility.grade || 'N/A'}
+                  {result.ats_compatibility?.grade || 'N/A'}
                 </p>
               </div>
               <div className='text-center'>

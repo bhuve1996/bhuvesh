@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 
 import { Icons } from '@/components/ui/SVG';
 import { NavItem } from '@/lib/data-types';
-
 import type { NavigationProps } from '@/types';
 
 export const Navigation: React.FC<NavigationProps> = ({

@@ -311,26 +311,4 @@ export interface ATSAnalysisBackendResponse {
   };
 }
 
-export interface AnalysisResult {
-  jobType: string;
-  atsScore: number;
-  keywordMatches: string[];
-  missingKeywords: string[];
-  suggestions: string[];
-  strengths: string[];
-  weaknesses: string[];
-  keywordDensity?: Record<string, number> | undefined;
-  wordCount: number;
-  characterCount: number;
-  extraction_details?: ExtractionDetails | undefined;
-  // Enhanced analysis data
-  ats_compatibility?: ATSCompatibility | undefined;
-  format_analysis?: FormatAnalysis | undefined;
-  detailed_scores?: DetailedScores | undefined;
-  semantic_similarity?: number | undefined;
-  match_category?: string | undefined;
-  ats_friendly?: boolean | undefined;
-  formatting_issues?: string[] | undefined;
-  structured_experience?: StructuredExperience | undefined;
-  job_description?: string | undefined; // AI-generated job description
-}
+// AnalysisResult is now defined in resume.ts

@@ -1,8 +1,23 @@
 // Component-specific Types
-export interface FileUploadProps {
-  onFileUpload: (file: File) => void;
-  acceptedTypes?: string[];
+import type { AnalysisResult } from './resume';
+
+export interface FileUploadComponentProps {
+  onFileUpload: (files: File[]) => void;
+  accept?: string;
+  multiple?: boolean;
   maxSize?: number;
+  maxFiles?: number;
+  onUpload?: (files: File[]) => void;
+  onError?: (error: string) => void;
+  loading?: boolean;
+  disabled?: boolean;
+  dragAndDrop?: boolean;
+  preview?: boolean;
+  validation?: {
+    allowedTypes?: string[];
+    maxSize?: number;
+    custom?: (file: File) => string | null;
+  };
   className?: string;
 }
 
@@ -21,10 +36,14 @@ export interface Tab {
 }
 
 export interface NavigationProps {
+  activeSection?: string;
+  onSectionClick?: (sectionId: string) => void;
   className?: string;
 }
 
 export interface HeroSectionProps {
+  onGetStarted?: () => void;
+  onViewProjects?: () => void;
   className?: string;
 }
 
@@ -49,6 +68,11 @@ export interface ImprovementItem {
   description: string;
   impact: number; // 0-100
   effort: 'low' | 'medium' | 'high';
+  before?: string;
+  after?: string;
+  action_steps?: string[];
+  keywords?: string[];
+  suggested_verbs?: string[];
   examples?: string[];
   resources?: string[];
   completed: boolean;
@@ -72,11 +96,19 @@ export interface ImprovementPlan {
 
 export interface ImprovementPlanProps {
   improvements: ImprovementItem[];
-  summary?: string;
-  quick_wins?: string[];
+  summary?: {
+    total_improvements: number;
+    high_priority: number;
+    estimated_impact: number;
+    estimated_time: string;
+  };
+  quick_wins?: ImprovementItem[];
+  currentScore?: number;
   className?: string;
 }
 
 export interface ATSCheckerProps {
+  onAnalysisComplete?: (result: AnalysisResult) => void;
+  onError?: (error: string) => void;
   className?: string;
 }

@@ -1,5 +1,7 @@
 // API and Data Types
-export interface ApiResponse<T = any> {
+import type { AnalysisResult } from './resume';
+
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
@@ -58,4 +60,29 @@ export interface HealthCheckResponse {
     ai_models: boolean;
     file_processing: boolean;
   };
+}
+
+export interface ResumeAnalysisResponse {
+  success: boolean;
+  data: AnalysisResult;
+  message: string;
+}
+
+export interface ImprovementPlanResponse {
+  success: boolean;
+  data: {
+    improvements: string[];
+    summary: string;
+    quick_wins: string[];
+  };
+  message: string;
+}
+
+export interface SupportedFormatsResponse {
+  success: boolean;
+  data: {
+    formats: string[];
+    max_size: number;
+  };
+  message: string;
 }

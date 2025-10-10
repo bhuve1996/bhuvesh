@@ -3,14 +3,13 @@
 // ============================================================================
 
 import {
-  ApiError,
   FileUploadResponse,
-  ImprovementPlanResponse,
+  AnalysisResult,
+  ResumeDocument,
   ResumeAnalysisResponse,
+  ImprovementPlanResponse,
   SupportedFormatsResponse,
-} from '@/shared/types/api';
-import { AnalysisResult } from '@/shared/types/ats';
-import { ResumeDocument } from '@/shared/types/resume';
+} from '@/types';
 
 // ============================================================================
 // API CONFIGURATION
@@ -53,7 +52,7 @@ class ATSApiClient {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new ApiError(
+        throw new ATSApiError(
           errorData.code || 'API_ERROR',
           errorData.message ||
             `HTTP ${response.status}: ${response.statusText}`,
@@ -68,12 +67,12 @@ class ATSApiClient {
     } catch (error) {
       clearTimeout(timeoutId);
 
-      if (error instanceof ApiError) {
+      if (error instanceof ATSApiError) {
         throw error;
       }
 
       if (error instanceof Error && error.name === 'AbortError') {
-        throw new ApiError(
+        throw new ATSApiError(
           'TIMEOUT',
           'Request timed out',
           { timeout: this.timeout },
@@ -83,7 +82,7 @@ class ATSApiClient {
         );
       }
 
-      throw new ApiError(
+      throw new ATSApiError(
         'NETWORK_ERROR',
         error instanceof Error ? error.message : 'Network error occurred',
         { originalError: error },

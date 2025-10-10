@@ -6,7 +6,7 @@
 export * from './endpoints/ats';
 
 // Export API types
-export type * from '@/shared/types/api';
+export type * from '@/types';
 
 // Export API utilities
 export { withCache, withProgress, withRetry } from './endpoints/ats';

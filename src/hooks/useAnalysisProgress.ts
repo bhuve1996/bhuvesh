@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { ProgressStep } from '@/components/ui/ProgressSteps';
+import { ProgressStep } from '@/types';
 
 export interface AnalysisProgress {
   currentStep: number;

@@ -2,8 +2,6 @@
 
 import { Toaster } from 'react-hot-toast';
 
-import type { ToastOptions } from '@/types';
-
 export const Toast: React.FC = () => {
   return (
     <Toaster

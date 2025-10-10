@@ -1,4 +1,24 @@
 // Resume and ATS Analysis Types
+import type {
+  ATSCompatibility,
+  FormatAnalysis,
+  DetailedScores,
+  StructuredExperience,
+  ExtractionDetails
+} from './ats';
+
+export interface ResumeDocument {
+  id: string;
+  title: string;
+  content: string;
+  metadata: Record<string, unknown>;
+  sections: Record<string, string>;
+  wordCount: number;
+  characterCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AnalysisResult {
   jobType: string;
   atsScore: number;
@@ -7,10 +27,10 @@ export interface AnalysisResult {
   suggestions: string[];
   strengths: string[];
   weaknesses: string[];
-  keywordDensity: Record<string, number>;
+  keywordDensity?: Record<string, number>;
   wordCount: number;
   characterCount: number;
-  extraction_details?: any;
+  extraction_details?: ExtractionDetails;
   ats_compatibility?: ATSCompatibility;
   format_analysis?: FormatAnalysis;
   detailed_scores?: DetailedScores;
@@ -22,33 +42,15 @@ export interface AnalysisResult {
   job_description?: string;
 }
 
-export interface ATSCompatibility {
-  score: number;
-  issues: string[];
-  recommendations: string[];
-}
+// ATSCompatibility imported from ./ats
 
-export interface FormatAnalysis {
-  has_images: boolean;
-  has_tables: boolean;
-  font_issues: string[];
-  layout_score: number;
-}
+// FormatAnalysis imported from ./ats
 
-export interface DetailedScores {
-  keyword_score: number;
-  semantic_score: number;
-  format_score: number;
-  content_score: number;
-  ats_score: number;
-}
+// DetailedScores imported from ./ats
 
-export interface StructuredExperience {
-  companies: Company[];
-  total_experience_months: number;
-  current_company?: string;
-}
+// StructuredExperience imported from ./ats
 
+// Company interface - keeping this one as it's different from the one in ats.ts
 export interface Company {
   name: string;
   position: string;
@@ -60,28 +62,4 @@ export interface Company {
   skills: string[];
 }
 
-export interface ATSAnalysisBackendResponse {
-  success: boolean;
-  data: {
-    ats_score: number;
-    detected_job_type: string;
-    job_detection_confidence: number;
-    keyword_matches: string[];
-    missing_keywords: string[];
-    suggestions: string[];
-    strengths: string[];
-    weaknesses: string[];
-    word_count: number;
-    extraction_details: any;
-    ats_compatibility: ATSCompatibility;
-    format_analysis: FormatAnalysis;
-    detailed_scores: DetailedScores;
-    semantic_similarity: number;
-    match_category: string;
-    ats_friendly: boolean;
-    formatting_issues: string[];
-    structured_experience: StructuredExperience;
-    job_description: string;
-  };
-  message: string;
-}
+// ATSAnalysisBackendResponse imported from ./ats

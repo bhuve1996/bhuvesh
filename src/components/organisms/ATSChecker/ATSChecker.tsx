@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { AnalysisResult } from '@/shared/types/ats';
+import type { AnalysisResult, ATSCheckerProps } from '@/types';
 
 import { Alert } from '../../atoms/Alert/Alert';
 import { Button } from '../../atoms/Button/Button';
@@ -8,7 +8,6 @@ import { FileUpload } from '../../molecules/FileUpload/FileUpload';
 import { Tabs } from '../../molecules/Tabs/Tabs';
 import { Card } from '../../ui/Card/Card';
 
-import type { ATSCheckerProps } from '@/types';
 import { ATSResults } from './ATSResults/ATSResults';
 
 export const ATSChecker: React.FC<ATSCheckerProps> = ({
@@ -63,9 +62,7 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
 
       if (result.success) {
         const analysisData: AnalysisResult = {
-          id: `analysis_${Date.now()}`,
           jobType: result.data.detected_job_type || 'General Professional',
-          jobTypeConfidence: result.data.job_detection_confidence || 0,
           atsScore: result.data.ats_score || 0,
           keywordMatches: result.data.keyword_matches || [],
           missingKeywords: result.data.missing_keywords || [],
@@ -83,14 +80,6 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
           ats_friendly: result.data.ats_friendly,
           formatting_issues: result.data.formatting_issues,
           structured_experience: result.data.structured_experience,
-          categorized_resume: result.data.categorized_resume,
-          metadata: {
-            analyzed_at: new Date(),
-            file_name: file.name,
-            file_size: file.size,
-            processing_time: result.data.processing_time || 0,
-            analysis_version: result.data.analysis_version || '1.0.0',
-          },
         };
 
         setAnalysisResult(analysisData);
@@ -140,7 +129,7 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
           <FileUpload
             accept='.pdf,.docx,.doc,.txt'
             maxSize={10 * 1024 * 1024} // 10MB
-            onUpload={handleFileUpload}
+            onFileUpload={handleFileUpload}
             onError={error => setError(error)}
             loading={loading}
             dragAndDrop

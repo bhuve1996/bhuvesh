@@ -7,7 +7,7 @@ import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
 import { FileUpload } from '@/components/resume/FileUpload';
 import { ResultsDisplay } from '@/components/resume/ResultsDisplay';
 import { Section } from '@/components/ui/Section';
-import type { AnalysisResult, ATSAnalysisBackendResponse } from '@/types/ats';
+import type { AnalysisResult, ATSAnalysisBackendResponse } from '@/types';
 
 // Note: Metadata is defined in layout.tsx
 
@@ -94,7 +94,7 @@ export default function ATSCheckerPage() {
         }
         const detectedJob = `${apiResult.data.detected_job_type} (${Math.round((apiResult.data.job_detection_confidence || 0) * 100)}% confidence)`;
 
-        return {
+        const result: AnalysisResult = {
           jobType: detectedJob,
           atsScore: apiResult.data.ats_score,
           keywordMatches: apiResult.data.keyword_matches || [],
@@ -105,20 +105,44 @@ export default function ATSCheckerPage() {
           keywordDensity: {},
           wordCount: apiResult.data.word_count || 0,
           characterCount:
-            apiResult.data.extraction_details?.full_resume_text?.length || 0,
-          extraction_details: apiResult.data.extraction_details,
-          // Enhanced analysis data
-          ats_compatibility: apiResult.data.ats_compatibility || undefined,
-          format_analysis: apiResult.data.format_analysis || undefined,
-          detailed_scores: apiResult.data.detailed_scores || undefined,
-          semantic_similarity: apiResult.data.semantic_similarity || undefined,
-          match_category: apiResult.data.match_category || undefined,
-          ats_friendly: apiResult.data.ats_friendly || undefined,
-          formatting_issues: apiResult.data.formatting_issues || undefined,
-          structured_experience:
-            apiResult.data.structured_experience || undefined,
-          job_description: apiResult.data.job_description || undefined,
+            typeof apiResult.data.extraction_details?.full_resume_text === 'string'
+              ? apiResult.data.extraction_details.full_resume_text.length
+              : 0,
         };
+
+        // Add optional properties only if they exist
+        if (apiResult.data.extraction_details) {
+          result.extraction_details = apiResult.data.extraction_details;
+        }
+        if (apiResult.data.ats_compatibility) {
+          result.ats_compatibility = apiResult.data.ats_compatibility;
+        }
+        if (apiResult.data.format_analysis) {
+          result.format_analysis = apiResult.data.format_analysis;
+        }
+        if (apiResult.data.detailed_scores) {
+          result.detailed_scores = apiResult.data.detailed_scores;
+        }
+        if (apiResult.data.semantic_similarity !== undefined) {
+          result.semantic_similarity = apiResult.data.semantic_similarity;
+        }
+        if (apiResult.data.match_category) {
+          result.match_category = apiResult.data.match_category;
+        }
+        if (apiResult.data.ats_friendly !== undefined) {
+          result.ats_friendly = apiResult.data.ats_friendly;
+        }
+        if (apiResult.data.formatting_issues) {
+          result.formatting_issues = apiResult.data.formatting_issues;
+        }
+        if (apiResult.data.structured_experience) {
+          result.structured_experience = apiResult.data.structured_experience;
+        }
+        if (apiResult.data.job_description) {
+          result.job_description = apiResult.data.job_description;
+        }
+
+        return result;
       } else {
         // Quick analysis - backend will generate specific JD based on detected job type
         const formData = new FormData();
@@ -146,7 +170,7 @@ export default function ATSCheckerPage() {
         }
         const detectedJob = `${apiResult.data.detected_job_type} (${Math.round((apiResult.data.job_detection_confidence || 0) * 100)}% confidence)`;
 
-        return {
+        const result: AnalysisResult = {
           jobType: detectedJob,
           atsScore: apiResult.data.ats_score,
           keywordMatches: apiResult.data.keyword_matches || [],
@@ -162,20 +186,44 @@ export default function ATSCheckerPage() {
           keywordDensity: {},
           wordCount: apiResult.data.word_count || 0,
           characterCount:
-            apiResult.data.extraction_details?.full_resume_text?.length || 0,
-          extraction_details: apiResult.data.extraction_details,
-          // Enhanced analysis data
-          ats_compatibility: apiResult.data.ats_compatibility || undefined,
-          format_analysis: apiResult.data.format_analysis || undefined,
-          detailed_scores: apiResult.data.detailed_scores || undefined,
-          semantic_similarity: apiResult.data.semantic_similarity || undefined,
-          match_category: apiResult.data.match_category || undefined,
-          ats_friendly: apiResult.data.ats_friendly || undefined,
-          formatting_issues: apiResult.data.formatting_issues || undefined,
-          structured_experience:
-            apiResult.data.structured_experience || undefined,
-          job_description: apiResult.data.job_description || undefined,
+            typeof apiResult.data.extraction_details?.full_resume_text === 'string'
+              ? apiResult.data.extraction_details.full_resume_text.length
+              : 0,
         };
+
+        // Add optional properties only if they exist
+        if (apiResult.data.extraction_details) {
+          result.extraction_details = apiResult.data.extraction_details;
+        }
+        if (apiResult.data.ats_compatibility) {
+          result.ats_compatibility = apiResult.data.ats_compatibility;
+        }
+        if (apiResult.data.format_analysis) {
+          result.format_analysis = apiResult.data.format_analysis;
+        }
+        if (apiResult.data.detailed_scores) {
+          result.detailed_scores = apiResult.data.detailed_scores;
+        }
+        if (apiResult.data.semantic_similarity !== undefined) {
+          result.semantic_similarity = apiResult.data.semantic_similarity;
+        }
+        if (apiResult.data.match_category) {
+          result.match_category = apiResult.data.match_category;
+        }
+        if (apiResult.data.ats_friendly !== undefined) {
+          result.ats_friendly = apiResult.data.ats_friendly;
+        }
+        if (apiResult.data.formatting_issues) {
+          result.formatting_issues = apiResult.data.formatting_issues;
+        }
+        if (apiResult.data.structured_experience) {
+          result.structured_experience = apiResult.data.structured_experience;
+        }
+        if (apiResult.data.job_description) {
+          result.job_description = apiResult.data.job_description;
+        }
+
+        return result;
       }
     } catch (error) {
       if (error instanceof Error) {

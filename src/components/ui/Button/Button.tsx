@@ -20,6 +20,8 @@ export const Button: React.FC<ButtonProps> = ({
       'bg-white/10 text-white border border-cyan-400/30 hover:bg-white/20',
     outline:
       'border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black',
+    ghost:
+      'text-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-300',
   };
 
   const sizeClasses = {

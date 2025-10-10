@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 
 import { Icons } from '@/components/ui/SVG';
-
 import type { ImprovementItem, ImprovementPlanProps } from '@/types';
 
 export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
@@ -31,9 +30,9 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
 
   const completedImpact = improvements
     .filter(i => completed.has(i.id))
-    .reduce((sum, i) => sum + i.score_impact, 0);
+    .reduce((sum, i) => sum + i.impact, 0);
 
-  const projectedScore = Math.min(currentScore + completedImpact, 100);
+  const projectedScore = Math.min((currentScore || 0) + completedImpact, 100);
 
   const priorityColors = {
     critical: 'border-red-500 bg-red-500/10',
@@ -51,10 +50,11 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
 
   const categoryIcons = {
     keyword: '🔑',
-    formatting: '📝',
+    format: '📝',
     content: '✍️',
-    structure: '🏗️',
-    ats: '🤖',
+    experience: '💼',
+    skills: '🛠️',
+    education: '🎓',
   };
 
   return (
@@ -67,8 +67,9 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
               📈 Improvement Plan
             </h2>
             <p className='text-gray-300'>
-              Complete these {summary.total_improvements} improvements to boost
-              your ATS score
+              Complete these{' '}
+              {summary?.total_improvements || improvements.length} improvements
+              to boost your ATS score
             </p>
           </div>
           <div className='text-right'>
@@ -87,7 +88,8 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
         <div className='mt-6'>
           <div className='flex justify-between text-sm text-gray-300 mb-2'>
             <span>
-              Progress: {completed.size} / {summary.total_improvements}
+              Progress: {completed.size} /{' '}
+              {summary?.total_improvements || improvements.length}
             </span>
             <span>+{completedImpact} points so far</span>
           </div>
@@ -95,7 +97,7 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
             <div
               className='bg-gradient-to-r from-cyan-400 to-blue-500 h-3 rounded-full transition-all duration-500'
               style={{
-                width: `${(completed.size / summary.total_improvements) * 100}%`,
+                width: `${(completed.size / (summary?.total_improvements || improvements.length)) * 100}%`,
               }}
             />
           </div>
@@ -103,7 +105,7 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
       </div>
 
       {/* Quick Wins Section */}
-      {quick_wins.length > 0 && (
+      {quick_wins && quick_wins.length > 0 && (
         <div className='bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6'>
           <h3 className='text-xl font-bold text-yellow-400 mb-4'>
             ⚡ Quick Wins - Start Here!
@@ -133,7 +135,7 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
                 </div>
                 <div className='text-right flex-shrink-0'>
                   <div className='text-2xl font-bold text-green-400'>
-                    +{item.score_impact}
+                    +{item.impact}
                   </div>
                   <div className='text-xs text-gray-400'>points</div>
                 </div>
@@ -157,7 +159,7 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
               </span>
             </div>
             <div className='text-3xl font-bold text-white'>
-              {summary.by_priority[priority]}
+              {improvements.filter(i => i.priority === priority).length}
             </div>
           </div>
         ))}
@@ -263,7 +265,7 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
               </div>
               <div className='text-right flex-shrink-0'>
                 <div className='text-2xl font-bold text-green-400'>
-                  +{item.score_impact}
+                  +{item.impact}
                 </div>
                 <div className='text-xs text-gray-400'>points</div>
               </div>
@@ -315,7 +317,7 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
               📋 Action Steps:
             </div>
             <ol className='list-decimal list-inside space-y-2 text-gray-300 text-sm'>
-              {item.action_steps.map((step, idx) => (
+              {item.action_steps?.map((step, idx) => (
                 <li key={idx} className='break-words'>
                   {step}
                 </li>

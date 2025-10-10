@@ -1,12 +1,12 @@
 import React, { useCallback, useState } from 'react';
 
+import type { FileUploadComponentProps } from '@/types';
+
 import { Alert } from '../../atoms/Alert/Alert';
 import { Button } from '../../atoms/Button/Button';
 import { Progress } from '../../atoms/Progress/Progress';
 
-import type { FileUploadProps } from '@/types';
-
-export const FileUpload: React.FC<FileUploadProps> = ({
+export const FileUpload: React.FC<FileUploadComponentProps> = ({
   accept = '.pdf,.docx,.doc,.txt',
   multiple = false,
   maxSize = 10 * 1024 * 1024, // 10MB
