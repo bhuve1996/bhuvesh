@@ -21,12 +21,13 @@ export interface FileUploadComponentProps {
   className?: string;
 }
 
-export interface TabsProps {
-  tabs: Tab[];
-  activeTab: string;
-  onTabChange: (tabId: string) => void;
-  className?: string;
-}
+// TabsProps moved to ui.ts to avoid conflicts
+// export interface TabsProps {
+//   tabs: Tab[];
+//   activeTab: string;
+//   onTabChange: (tabId: string) => void;
+//   className?: string;
+// }
 
 export interface Tab {
   id: string;

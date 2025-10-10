@@ -15,6 +15,20 @@ export * from './organisms';
 export * from './layout';
 export * from './resume';
 export * from './sections';
-export * from './ui';
+
+// Export UI components with explicit names to avoid conflicts
+export {
+  AnimatedProgress,
+  AnimatedScore,
+  Card,
+  DataVisualization,
+  Loading,
+  ProgressSteps,
+  Icons,
+  SVG,
+  Section,
+  Tabs,
+  Toast
+} from './ui';
 
 // Types are available from @/types directly

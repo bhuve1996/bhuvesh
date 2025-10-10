@@ -15,14 +15,7 @@ export const TabbedParsedDataDisplay: React.FC<
 > = ({ result }) => {
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: 'easeOut',
-      },
-    },
+    visible: { opacity: 1, y: 0 },
   };
 
   // Contact Information Component
@@ -525,17 +518,17 @@ export const TabbedParsedDataDisplay: React.FC<
       case 'summary':
         return result.structured_experience?.summary;
       case 'skills':
-        return result.structured_experience?.skills?.length > 0;
+        return (result.structured_experience?.skills?.length ?? 0) > 0;
       case 'education':
-        return result.structured_experience?.education?.length > 0;
+        return (result.structured_experience?.education?.length ?? 0) > 0;
       case 'certifications':
-        return result.structured_experience?.certifications?.length > 0;
+        return (result.structured_experience?.certifications?.length ?? 0) > 0;
       case 'awards':
-        return result.structured_experience?.awards?.length > 0;
+        return (result.structured_experience?.awards?.length ?? 0) > 0;
       case 'projects':
-        return result.structured_experience?.automations?.length > 0;
+        return (result.structured_experience?.automations?.length ?? 0) > 0;
       case 'experience':
-        return result.structured_experience?.work_experience?.length > 0;
+        return (result.structured_experience?.work_experience?.length ?? 0) > 0;
       default:
         return true;
     }
@@ -545,7 +538,7 @@ export const TabbedParsedDataDisplay: React.FC<
     <div className='space-y-6'>
       <Tabs
         items={tabItems}
-        defaultActiveTab={tabItems[0]?.id}
+        defaultActiveTab={tabItems[0]?.id || 'contact'}
         variant='pills'
         className='w-full'
       />

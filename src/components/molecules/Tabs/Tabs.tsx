@@ -1,35 +1,38 @@
 import React from 'react';
 
-import type { TabsProps } from '@/types';
+import type { TabsProps } from '@/types/ui';
 
 export const Tabs: React.FC<TabsProps> = ({
-  tabs,
-  activeTab,
-  onTabChange,
+  items,
+  defaultActiveTab,
   className = '',
+  variant: _variant = 'default',
   ...props
 }) => {
+  const [activeTab, setActiveTab] = React.useState(
+    defaultActiveTab || items[0]?.id || ''
+  );
+
   return (
     <div className={`tabs ${className}`} {...props}>
       {/* Tab Navigation */}
       <div className='border-b border-gray-200'>
         <nav className='-mb-px flex space-x-8'>
-          {tabs.map(tab => (
+          {items.map(item => (
             <button
-              key={tab.id}
-              onClick={() => !tab.disabled && onTabChange?.(tab.id)}
-              disabled={tab.disabled}
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
               className={`
                 py-2 px-1 border-b-2 font-medium text-sm transition-colors
                 ${
-                  activeTab === tab.id
+                  activeTab === item.id
                     ? 'border-cyan-500 text-cyan-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }
-                ${tab.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                cursor-pointer
               `}
             >
-              {tab.label}
+              {item.label}
             </button>
           ))}
         </nav>
@@ -37,7 +40,7 @@ export const Tabs: React.FC<TabsProps> = ({
 
       {/* Tab Content */}
       <div className='mt-6'>
-        {tabs.find(tab => tab.id === activeTab)?.content}
+        {items.find(item => item.id === activeTab)?.content}
       </div>
     </div>
   );

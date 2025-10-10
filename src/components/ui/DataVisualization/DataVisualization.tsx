@@ -26,14 +26,7 @@ export const DataVisualization: React.FC<DataVisualizationProps> = ({
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: 'easeOut',
-      },
-    },
+    visible: { opacity: 1, y: 0 },
   };
 
   const getColor = (index: number, customColor?: string) => {
@@ -135,8 +128,6 @@ export const DataVisualization: React.FC<DataVisualizationProps> = ({
             viewBox='0 0 100 100'
           >
             {data.map((item, index) => {
-              const percentage =
-                (item.value / data.reduce((sum, d) => sum + d.value, 0)) * 100;
               const startAngle = data
                 .slice(0, index)
                 .reduce(

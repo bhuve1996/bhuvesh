@@ -10,6 +10,11 @@ export const AnimatedProgress: React.FC<AnimatedProgressProps> = ({
   currentStep: _currentStep,
   className = '',
 }) => {
+  // Convert ProgressStep[] to AnimatedProgressStep[] by ensuring description is present
+  const animatedSteps = steps.map(step => ({
+    ...step,
+    description: step.description || step.title, // Use title as fallback if description is missing
+  }));
   const getStepIcon = (status: string, index: number) => {
     switch (status) {
       case 'completed':
@@ -109,7 +114,7 @@ export const AnimatedProgress: React.FC<AnimatedProgressProps> = ({
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {steps.map((step, index) => (
+      {animatedSteps.map((step, index) => (
         <motion.div
           key={step.id}
           className='flex items-start space-x-4'
@@ -141,7 +146,7 @@ export const AnimatedProgress: React.FC<AnimatedProgressProps> = ({
           </div>
 
           {/* Connecting Line - Hidden */}
-          {/* {index < steps.length - 1 && step.status === 'completed' && (
+          {/* {index < animatedSteps.length - 1 && step.status === 'completed' && (
             <motion.div
               className='absolute left-4 top-12 w-0.5 h-16 bg-green-500'
               initial={{ scaleY: 0 }}
@@ -152,7 +157,7 @@ export const AnimatedProgress: React.FC<AnimatedProgressProps> = ({
               }}
             />
           )}
-          {index < steps.length - 1 && step.status !== 'completed' && (
+          {index < animatedSteps.length - 1 && step.status !== 'completed' && (
             <motion.div
               className='absolute left-4 top-12 w-0.5 h-16 bg-gray-600'
               initial={{ scaleY: 0 }}

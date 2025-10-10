@@ -119,7 +119,7 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
     }
   }, [file, handleAnalysis]);
 
-  const tabs = [
+  const tabItems = [
     {
       id: 'upload',
       label: '📄 Upload Resume',
@@ -189,7 +189,6 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
           <p className='text-gray-500'>No analysis results available</p>
         </div>
       ),
-      disabled: !analysisResult,
     },
   ];
 
@@ -227,11 +226,8 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
 
       {/* Tabs */}
       <Tabs
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={(tabId: string) =>
-          setActiveTab(tabId as 'upload' | 'results')
-        }
+        items={tabItems}
+        defaultActiveTab={activeTab}
         className='max-w-6xl mx-auto'
       />
     </div>

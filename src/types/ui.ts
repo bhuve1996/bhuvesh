@@ -148,7 +148,7 @@ export interface AnimatedProgressStep {
 }
 
 export interface AnimatedProgressProps {
-  steps: AnimatedProgressStep[];
+  steps: ProgressStep[];
   currentStep: number;
   className?: string;
 }
