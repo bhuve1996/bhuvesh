@@ -23,6 +23,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
     quick_wins: ImprovementItem[];
   } | null>(null);
   const [loadingImprovements, setLoadingImprovements] = useState(false);
+  const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false);
 
   const fetchImprovementPlan = useCallback(async () => {
     if (!result.extraction_details) return;
@@ -65,6 +66,15 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
     if (score >= 80) return 'bg-green-500/20 border-green-500/30';
     if (score >= 60) return 'bg-yellow-500/20 border-yellow-500/30';
     return 'bg-red-500/20 border-red-500/30';
+  };
+
+  const getScoreGrade = (score: number) => {
+    if (score >= 90) return 'A+';
+    if (score >= 80) return 'A';
+    if (score >= 70) return 'B';
+    if (score >= 60) return 'C';
+    if (score >= 50) return 'D';
+    return 'F';
   };
 
   return (
@@ -111,6 +121,12 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
               className={`text-4xl font-bold ${getScoreColor(result.atsScore)}`}
             >
               {result.atsScore}
+            </span>
+          </div>
+          <div className='text-xl text-gray-300 mb-4'>
+            Grade:{' '}
+            <span className={`font-bold ${getScoreColor(result.atsScore)}`}>
+              {getScoreGrade(result.atsScore)}
             </span>
           </div>
           <p className='text-gray-300 mt-4'>
@@ -194,235 +210,19 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         </div>
       </Card>
 
-      {/* Keyword Analysis */}
-      {(result.keywordMatches.length > 0 ||
-        result.missingKeywords.length > 0) && (
-        <div className='grid md:grid-cols-2 gap-6'>
-          {/* Matched Keywords */}
-          {result.keywordMatches.length > 0 && (
-            <Card className='p-6'>
-              <h3 className='text-xl font-bold mb-4 text-green-400'>
-                ✅ Matched Keywords
-              </h3>
-              <div className='flex flex-wrap gap-2'>
-                {result.keywordMatches.map((keyword, index) => (
-                  <span
-                    key={index}
-                    className='px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm border border-green-500/30'
-                  >
-                    {keyword}
-                  </span>
-                ))}
-              </div>
-            </Card>
-          )}
-
-          {/* Missing Keywords */}
-          {result.missingKeywords.length > 0 && (
-            <Card className='p-6'>
-              <h3 className='text-xl font-bold mb-4 text-red-400'>
-                ❌ Missing Keywords
-              </h3>
-              <div className='flex flex-wrap gap-2'>
-                {result.missingKeywords.map((keyword, index) => (
-                  <span
-                    key={index}
-                    className='px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm border border-red-500/30'
-                  >
-                    {keyword}
-                  </span>
-                ))}
-              </div>
-            </Card>
-          )}
-        </div>
-      )}
-
-      {/* Strengths and Weaknesses */}
-      <div className='grid md:grid-cols-2 gap-6'>
-        {/* Strengths */}
-        <Card className='p-6'>
-          <h3 className='text-xl font-bold mb-4 text-green-400'>
-            💪 Strengths
-          </h3>
-          <ul className='space-y-2'>
-            {result.strengths.map((strength, index) => (
-              <li key={index} className='flex items-start space-x-2'>
-                <span className='text-green-400 mt-1'>•</span>
-                <span className='text-gray-300'>{strength}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-
-        {/* Weaknesses */}
-        <Card className='p-6'>
-          <h3 className='text-xl font-bold mb-4 text-red-400'>
-            ⚠️ Areas for Improvement
-          </h3>
-          <ul className='space-y-2'>
-            {result.weaknesses.map((weakness, index) => (
-              <li key={index} className='flex items-start space-x-2'>
-                <span className='text-red-400 mt-1'>•</span>
-                <span className='text-gray-300'>{weakness}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </div>
-
-      {/* Enhanced ATS Compatibility Analysis */}
-      {result.ats_compatibility && (
-        <div className='grid md:grid-cols-2 gap-6'>
-          {/* ATS Issues & Warnings */}
-          <Card className='p-6'>
-            <h3 className='text-xl font-bold mb-4 text-orange-400'>
-              ⚠️ ATS Compatibility Issues
-            </h3>
-            <div className='space-y-4'>
-              {/* Critical Issues */}
-              {result.ats_compatibility.issues?.length > 0 && (
-                <div>
-                  <h4 className='text-red-400 font-semibold mb-2'>
-                    Critical Issues:
-                  </h4>
-                  <ul className='space-y-2'>
-                    {result.ats_compatibility.issues.map(
-                      (issue: string, index: number) => (
-                        <li key={index} className='flex items-start space-x-2'>
-                          <span className='text-red-400 mt-1'>•</span>
-                          <span className='text-gray-300 text-sm'>{issue}</span>
-                        </li>
-                      )
-                    )}
-                  </ul>
-                </div>
-              )}
-
-              {/* Warnings */}
-              {result.ats_compatibility.warnings?.length > 0 && (
-                <div>
-                  <h4 className='text-yellow-400 font-semibold mb-2'>
-                    Warnings:
-                  </h4>
-                  <ul className='space-y-2'>
-                    {result.ats_compatibility.warnings.map(
-                      (warning: string, index: number) => (
-                        <li key={index} className='flex items-start space-x-2'>
-                          <span className='text-yellow-400 mt-1'>•</span>
-                          <span className='text-gray-300 text-sm'>
-                            {warning}
-                          </span>
-                        </li>
-                      )
-                    )}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </Card>
-
-          {/* ATS Recommendations */}
-          <Card className='p-6'>
-            <h3 className='text-xl font-bold mb-4 text-green-400'>
-              ✅ ATS Optimization Tips
-            </h3>
-            <ul className='space-y-2'>
-              {result.ats_compatibility.recommendations?.map(
-                (rec: string, index: number) => (
-                  <li key={index} className='flex items-start space-x-2'>
-                    <span className='text-green-400 mt-1'>•</span>
-                    <span className='text-gray-300 text-sm'>{rec}</span>
-                  </li>
-                )
-              )}
-            </ul>
-          </Card>
-        </div>
-      )}
-
-      {/* Format Analysis Details */}
-      {result.format_analysis && (
-        <Card className='p-6'>
-          <h3 className='text-xl font-bold mb-4 text-blue-400'>
-            📋 Resume Structure Analysis
-          </h3>
-          <div className='grid md:grid-cols-3 gap-4 mb-4'>
-            <div className='text-center'>
-              <p className='text-2xl font-bold text-blue-400'>
-                {result.format_analysis.sections_found || 0}
-              </p>
-              <p className='text-sm text-gray-400'>Required Sections</p>
-            </div>
-            <div className='text-center'>
-              <p className='text-2xl font-bold text-green-400'>
-                {result.format_analysis.optional_sections_found || 0}
-              </p>
-              <p className='text-sm text-gray-400'>Optional Sections</p>
-            </div>
-            <div className='text-center'>
-              <p className='text-2xl font-bold text-cyan-400'>
-                {result.format_analysis.section_headers_count || 0}
-              </p>
-              <p className='text-sm text-gray-400'>Section Headers</p>
-            </div>
-          </div>
-
-          <div className='space-y-2'>
-            <p className='text-gray-300'>
-              <span className='text-blue-400 font-semibold'>Contact Info:</span>{' '}
-              {result.format_analysis.contact_completeness || 'N/A'}
-            </p>
-            <p className='text-gray-300'>
-              <span className='text-blue-400 font-semibold'>
-                Professional Summary:
-              </span>{' '}
-              {result.format_analysis.has_professional_summary
-                ? '✅ Present'
-                : '❌ Missing'}
-            </p>
-          </div>
-        </Card>
-      )}
-
-      {/* Formatting Issues */}
-      {result.formatting_issues && result.formatting_issues.length > 0 && (
-        <Card className='p-6'>
-          <h3 className='text-xl font-bold mb-4 text-orange-400'>
-            🔧 Formatting Issues
-          </h3>
-          <ul className='space-y-2'>
-            {result.formatting_issues.map((issue, index) => (
-              <li key={index} className='flex items-start space-x-2'>
-                <span className='text-orange-400 mt-1'>⚠️</span>
-                <span className='text-gray-300'>{issue}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
-
-      {/* Resume Statistics */}
+      {/* Parsed Data Summary */}
       <Card className='p-6'>
-        <h3 className='text-xl font-bold mb-4 text-blue-400'>
-          📊 Resume Statistics
-        </h3>
-        <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+        <h3 className='text-xl font-bold mb-4 text-white'>📋 Resume Summary</h3>
+        <div className='grid md:grid-cols-3 gap-6'>
           <div className='text-center'>
-            <p className='text-sm text-gray-400 mb-1'>Word Count</p>
-            <p className='text-lg font-semibold text-blue-400'>
-              {result.wordCount}
-            </p>
-          </div>
-          <div className='text-center'>
-            <p className='text-sm text-gray-400 mb-1'>Character Count</p>
-            <p className='text-lg font-semibold text-green-400'>
-              {result.characterCount}
+            <p className='text-sm text-gray-400 mb-1'>Job Type Detected</p>
+            <p className='text-lg font-semibold text-cyan-400'>
+              {result.jobType}
             </p>
           </div>
           <div className='text-center'>
             <p className='text-sm text-gray-400 mb-1'>Keyword Matches</p>
-            <p className='text-lg font-semibold text-cyan-400'>
+            <p className='text-lg font-semibold text-green-400'>
               {result.keywordMatches.length}
             </p>
           </div>
@@ -433,472 +233,779 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             </p>
           </div>
         </div>
-      </Card>
-
-      {/* Suggestions */}
-      <Card className='p-6'>
-        <h3 className='text-xl font-bold mb-4 text-cyan-400'>
-          💡 Optimization Suggestions
-        </h3>
-        <ul className='space-y-3'>
-          {result.suggestions.map((suggestion, index) => (
-            <li key={index} className='flex items-start space-x-3'>
-              <span className='text-cyan-400 mt-1'>→</span>
-              <span className='text-gray-300'>{suggestion}</span>
-            </li>
-          ))}
-        </ul>
-      </Card>
-
-      {/* Contact Information */}
-      {result.structured_experience?.contact_info && (
-        <Card className='p-6'>
-          <h3 className='text-xl font-bold mb-4 text-blue-400'>
-            📞 Contact Information
-          </h3>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div>
-              <p className='text-gray-300'>
-                <span className='text-blue-400 font-medium'>Name:</span>{' '}
-                {result.structured_experience.contact_info.full_name}
-              </p>
-              <p className='text-gray-300'>
-                <span className='text-blue-400 font-medium'>Email:</span>{' '}
-                {result.structured_experience.contact_info.email}
-              </p>
-              <p className='text-gray-300'>
-                <span className='text-blue-400 font-medium'>Phone:</span>{' '}
-                {result.structured_experience.contact_info.phone}
-              </p>
-            </div>
-            <div>
-              <p className='text-gray-300'>
-                <span className='text-blue-400 font-medium'>Location:</span>{' '}
-                {result.structured_experience.contact_info.location}
-              </p>
-              {result.structured_experience.contact_info.linkedin && (
-                <p className='text-gray-300'>
-                  <span className='text-blue-400 font-medium'>LinkedIn:</span>{' '}
-                  {result.structured_experience.contact_info.linkedin}
-                </p>
-              )}
-              {result.structured_experience.contact_info.github && (
-                <p className='text-gray-300'>
-                  <span className='text-blue-400 font-medium'>GitHub:</span>{' '}
-                  {result.structured_experience.contact_info.github}
-                </p>
-              )}
-            </div>
-          </div>
-        </Card>
-      )}
-
-      {/* Professional Summary */}
-      {result.structured_experience?.summary && (
-        <Card className='p-6'>
-          <h3 className='text-xl font-bold mb-4 text-green-400'>
-            📝 Professional Summary
-          </h3>
-          <p className='text-gray-300 leading-relaxed'>
-            {result.structured_experience.summary}
+        <div className='mt-4 text-center'>
+          <p className='text-gray-300'>
+            {result.atsScore >= 80 &&
+              'Your resume shows excellent ATS compatibility!'}
+            {result.atsScore >= 60 &&
+              result.atsScore < 80 &&
+              'Your resume has good ATS compatibility with room for improvement.'}
+            {result.atsScore < 60 &&
+              'Your resume needs improvements for better ATS compatibility.'}
           </p>
-        </Card>
-      )}
+        </div>
+      </Card>
 
-      {/* Skills Section */}
-      {result.structured_experience?.skills &&
-        result.structured_experience.skills.length > 0 && (
-          <Card className='p-6'>
-            <h3 className='text-xl font-bold mb-4 text-yellow-400'>
-              🛠️ Skills & Proficiencies
-            </h3>
-            <div className='space-y-4'>
-              {result.structured_experience.skills.map(
-                (skillCategory, index) => (
-                  <div key={index} className='bg-gray-800/50 rounded-lg p-4'>
-                    <h4 className='text-lg font-semibold text-yellow-400 mb-3'>
-                      {skillCategory.category}
-                    </h4>
-                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
-                      {skillCategory.skills.map((skill, skillIndex) => (
-                        <div
-                          key={skillIndex}
-                          className='flex justify-between items-center bg-gray-700/30 rounded-lg p-3'
-                        >
-                          <span className='text-gray-300 font-medium'>
-                            {skill.name}
-                          </span>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              skill.proficiency === 'Expert'
-                                ? 'bg-red-500/20 text-red-400'
-                                : skill.proficiency === 'Advanced'
-                                  ? 'bg-orange-500/20 text-orange-400'
-                                  : skill.proficiency === 'Intermediate'
-                                    ? 'bg-yellow-500/20 text-yellow-400'
-                                    : 'bg-green-500/20 text-green-400'
-                            }`}
-                          >
-                            {skill.proficiency}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+      {/* View Detailed Analysis Button */}
+      <div className='text-center'>
+        <button
+          onClick={() => setShowDetailedAnalysis(!showDetailedAnalysis)}
+          className='px-8 py-3 text-lg bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg'
+        >
+          {showDetailedAnalysis ? (
+            <span className='flex items-center gap-2'>
+              📊 Hide Detailed Analysis
+            </span>
+          ) : (
+            <span className='flex items-center gap-2'>
+              📈 View Detailed Analysis
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Detailed Analysis - Only show when button is clicked */}
+      {showDetailedAnalysis && (
+        <div className='space-y-6'>
+          {/* Keyword Analysis */}
+          {(result.keywordMatches.length > 0 ||
+            result.missingKeywords.length > 0) && (
+            <div className='grid md:grid-cols-2 gap-6'>
+              {/* Matched Keywords */}
+              {result.keywordMatches.length > 0 && (
+                <Card className='p-6'>
+                  <h3 className='text-xl font-bold mb-4 text-green-400'>
+                    ✅ Matched Keywords ({result.keywordMatches.length})
+                  </h3>
+                  <div className='flex flex-wrap gap-2'>
+                    {result.keywordMatches.map((keyword, index) => (
+                      <span
+                        key={index}
+                        className='px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm border border-green-500/30'
+                      >
+                        {keyword}
+                      </span>
+                    ))}
                   </div>
-                )
+                </Card>
+              )}
+
+              {/* Missing Keywords */}
+              {result.missingKeywords.length > 0 && (
+                <Card className='p-6'>
+                  <h3 className='text-xl font-bold mb-4 text-red-400'>
+                    ❌ Missing Keywords ({result.missingKeywords.length})
+                  </h3>
+                  <div className='flex flex-wrap gap-2'>
+                    {result.missingKeywords.map((keyword, index) => (
+                      <span
+                        key={index}
+                        className='px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm border border-red-500/30'
+                      >
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </Card>
               )}
             </div>
-          </Card>
-        )}
+          )}
 
-      {/* Education */}
-      {result.structured_experience?.education &&
-        result.structured_experience.education.length > 0 && (
-          <Card className='p-6'>
-            <h3 className='text-xl font-bold mb-4 text-indigo-400'>
-              🎓 Education
-            </h3>
-            <div className='space-y-4'>
-              {result.structured_experience.education.map((edu, index) => (
-                <div
-                  key={index}
-                  className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
-                >
-                  <h4 className='text-lg font-semibold text-white mb-2'>
-                    {edu.degree}
-                  </h4>
-                  <p className='text-gray-300 mb-1'>
-                    <span className='text-indigo-400 font-medium'>
-                      Institution:
-                    </span>{' '}
-                    {String(edu.institution)}
-                  </p>
-                  <p className='text-gray-300 mb-1'>
-                    <span className='text-indigo-400 font-medium'>
-                      Location:
-                    </span>{' '}
-                    {edu.location}
-                  </p>
-                  <p className='text-gray-300 mb-1'>
-                    <span className='text-indigo-400 font-medium'>
-                      Graduation:
-                    </span>{' '}
-                    {edu.graduation_year}
-                  </p>
-                  {edu.gpa && (
-                    <p className='text-gray-300 mb-1'>
-                      <span className='text-indigo-400 font-medium'>GPA:</span>{' '}
-                      {edu.gpa}
-                    </p>
-                  )}
-                  {edu.relevant_coursework &&
-                    edu.relevant_coursework.length > 0 && (
-                      <div className='mt-3'>
-                        <p className='text-indigo-400 font-medium mb-2'>
-                          Relevant Coursework:
-                        </p>
-                        <div className='flex flex-wrap gap-2'>
-                          {edu.relevant_coursework.map(
-                            (course, courseIndex) => (
-                              <span
-                                key={courseIndex}
-                                className='px-2 py-1 bg-indigo-500/20 text-indigo-400 rounded-full text-xs'
-                              >
-                                {course}
-                              </span>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
+          {/* Strengths and Weaknesses */}
+          <div className='grid md:grid-cols-2 gap-6'>
+            {/* Strengths */}
+            <Card className='p-6'>
+              <h3 className='text-xl font-bold mb-4 text-green-400'>
+                💪 Strengths
+              </h3>
+              <ul className='space-y-2'>
+                {result.strengths.map((strength, index) => (
+                  <li key={index} className='flex items-start space-x-2'>
+                    <span className='text-green-400 mt-1'>•</span>
+                    <span className='text-gray-300'>{strength}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
 
-      {/* Certifications */}
-      {result.structured_experience?.certifications &&
-        result.structured_experience.certifications.length > 0 && (
-          <Card className='p-6'>
-            <h3 className='text-xl font-bold mb-4 text-purple-400'>
-              🏆 Certifications
-            </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              {result.structured_experience.certifications.map(
-                (cert, index) => (
-                  <div
-                    key={index}
-                    className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
-                  >
-                    <h4 className='text-lg font-semibold text-white mb-2'>
-                      {cert.name}
-                    </h4>
-                    <p className='text-gray-300 mb-1'>
-                      <span className='text-purple-400 font-medium'>
-                        Issuer:
-                      </span>{' '}
-                      {cert.issuer}
-                    </p>
-                    <p className='text-gray-300 mb-1'>
-                      <span className='text-purple-400 font-medium'>Date:</span>{' '}
-                      {cert.date}
-                    </p>
-                    {cert.expiry && (
-                      <p className='text-gray-300'>
-                        <span className='text-purple-400 font-medium'>
-                          Expires:
-                        </span>{' '}
-                        {cert.expiry}
-                      </p>
-                    )}
-                  </div>
-                )
-              )}
-            </div>
-          </Card>
-        )}
-
-      {/* Awards */}
-      {result.structured_experience?.awards &&
-        result.structured_experience.awards.length > 0 && (
-          <Card className='p-6'>
-            <h3 className='text-xl font-bold mb-4 text-yellow-400'>
-              🏅 Awards & Recognition
-            </h3>
-            <div className='space-y-3'>
-              {result.structured_experience.awards.map((award, index) => (
-                <div
-                  key={index}
-                  className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
-                >
-                  <div className='flex items-start space-x-3'>
-                    <span className='text-yellow-400 text-xl'>🏆</span>
-                    <div className='flex-1'>
-                      <h4 className='text-lg font-semibold text-white mb-1'>
-                        {award.name}
-                      </h4>
-                      <p className='text-gray-300 mb-1'>
-                        <span className='text-yellow-400 font-medium'>
-                          Issuer:
-                        </span>{' '}
-                        {award.issuer}
-                      </p>
-                      <p className='text-gray-300 mb-1'>
-                        <span className='text-yellow-400 font-medium'>
-                          Date:
-                        </span>{' '}
-                        {award.date}
-                      </p>
-                      {award.description && (
-                        <p className='text-gray-300 text-sm'>
-                          {award.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
-
-      {/* Automations */}
-      {result.structured_experience?.automations &&
-        result.structured_experience.automations.length > 0 && (
-          <Card className='p-6'>
-            <h3 className='text-xl font-bold mb-4 text-cyan-400'>
-              ⚙️ Automation Projects
-            </h3>
-            <div className='space-y-4'>
-              {result.structured_experience.automations.map(
-                (automation, index) => (
-                  <div
-                    key={index}
-                    className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
-                  >
-                    <h4 className='text-lg font-semibold text-white mb-2'>
-                      {automation.name}
-                    </h4>
-                    <p className='text-gray-300 mb-3'>
-                      {automation.description}
-                    </p>
-                    {automation.technologies &&
-                      automation.technologies.length > 0 && (
-                        <div className='mb-3'>
-                          <p className='text-cyan-400 font-medium mb-2'>
-                            Technologies Used:
-                          </p>
-                          <div className='flex flex-wrap gap-2'>
-                            {automation.technologies.map((tech, techIndex) => (
-                              <span
-                                key={techIndex}
-                                className='px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs'
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    {automation.impact && (
-                      <p className='text-gray-300'>
-                        <span className='text-cyan-400 font-medium'>
-                          Impact:
-                        </span>{' '}
-                        {automation.impact}
-                      </p>
-                    )}
-                  </div>
-                )
-              )}
-            </div>
-          </Card>
-        )}
-
-      {/* Structured Experience Analysis */}
-      {result.structured_experience && (
-        <Card className='p-6'>
-          <h3 className='text-xl font-bold mb-4 text-purple-400'>
-            🤖 AI-Enhanced Experience Analysis
-          </h3>
-          <div className='mb-4 p-3 bg-gray-800/30 rounded-lg border border-gray-600'>
-            <p className='text-sm text-gray-300'>
-              <span className='text-cyan-400 font-medium'>
-                {result.structured_experience.work_experience.length} Companies
-              </span>{' '}
-              found in work experience
-            </p>
+            {/* Weaknesses */}
+            <Card className='p-6'>
+              <h3 className='text-xl font-bold mb-4 text-red-400'>
+                ⚠️ Areas for Improvement
+              </h3>
+              <ul className='space-y-2'>
+                {result.weaknesses.map((weakness, index) => (
+                  <li key={index} className='flex items-start space-x-2'>
+                    <span className='text-red-400 mt-1'>•</span>
+                    <span className='text-gray-300'>{weakness}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
           </div>
-          <div className='space-y-4'>
-            {result.structured_experience.work_experience.map(
-              (company, index) => (
-                <div
-                  key={index}
-                  className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
-                >
-                  <div className='flex justify-between items-start mb-2'>
-                    <div className='flex-1'>
-                      <div className='flex items-center gap-2 mb-1'>
-                        <h4 className='text-white font-medium'>
-                          {company.company}
-                        </h4>
-                        {company.current && (
-                          <span className='bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs font-medium'>
-                            Current
-                          </span>
-                        )}
-                        <span className='bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs'>
-                          {company.total_experience_years} years
-                        </span>
-                      </div>
-                      {company.positions && company.positions.length > 0 && (
-                        <div className='mt-1'>
-                          {company.positions.map((position, pIndex) => (
-                            <div key={pIndex} className='text-gray-300 text-sm'>
-                              <span className='font-medium'>
-                                {position.title}
+
+          {/* Enhanced ATS Compatibility Analysis */}
+          {result.ats_compatibility && (
+            <div className='grid md:grid-cols-2 gap-6'>
+              {/* ATS Issues & Warnings */}
+              <Card className='p-6'>
+                <h3 className='text-xl font-bold mb-4 text-orange-400'>
+                  ⚠️ ATS Compatibility Issues
+                </h3>
+                <div className='space-y-4'>
+                  {/* Critical Issues */}
+                  {result.ats_compatibility.issues?.length > 0 && (
+                    <div>
+                      <h4 className='text-red-400 font-semibold mb-2'>
+                        Critical Issues:
+                      </h4>
+                      <ul className='space-y-2'>
+                        {result.ats_compatibility.issues.map(
+                          (issue: string, index: number) => (
+                            <li
+                              key={index}
+                              className='flex items-start space-x-2'
+                            >
+                              <span className='text-red-400 mt-1'>•</span>
+                              <span className='text-gray-300 text-sm'>
+                                {issue}
                               </span>
-                              <span className='text-gray-400 text-xs ml-2'>
-                                {position.location} • {position.duration}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {company.skills_used && company.skills_used.length > 0 && (
-                    <div className='mt-3'>
-                      <h5 className='text-blue-400 text-sm font-medium mb-2'>
-                        Technologies & Skills Used
-                      </h5>
-                      <div className='flex flex-wrap gap-1'>
-                        {company.skills_used.map((skill, sIndex) => (
-                          <span
-                            key={sIndex}
-                            className='bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs'
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {company.projects && company.projects.length > 0 && (
-                    <div className='mt-3'>
-                      <h5 className='text-cyan-400 text-sm font-medium mb-2'>
-                        Projects ({company.projects.length})
-                      </h5>
-                      <div className='space-y-2'>
-                        {company.projects.map((project, pIndex) => (
-                          <div
-                            key={pIndex}
-                            className='bg-gray-700/30 rounded p-3'
-                          >
-                            <h6 className='text-white text-sm font-medium'>
-                              {project.name}
-                            </h6>
-                            <p className='text-gray-300 text-xs mt-1'>
-                              {project.description}
-                            </p>
-                            {project.technologies &&
-                              project.technologies.length > 0 && (
-                                <div className='mt-2'>
-                                  <span className='text-gray-400 text-xs'>
-                                    Technologies:{' '}
-                                  </span>
-                                  <span className='text-blue-400 text-xs'>
-                                    {project.technologies.join(', ')}
-                                  </span>
-                                </div>
-                              )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {company.responsibilities &&
-                    company.responsibilities.length > 0 && (
-                      <div className='mt-3'>
-                        <h5 className='text-green-400 text-sm font-medium mb-2'>
-                          Key Responsibilities (
-                          {company.responsibilities.length})
-                        </h5>
-                        <ul className='text-gray-300 text-xs space-y-1'>
-                          {company.responsibilities.map((resp, rIndex) => (
-                            <li key={rIndex} className='flex items-start'>
-                              <span className='text-green-400 mr-2'>•</span>
-                              <span>{resp}</span>
                             </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                          )
+                        )}
+                      </ul>
+                    </div>
+                  )}
 
-                  {company.achievements && company.achievements.length > 0 && (
-                    <div className='mt-3'>
-                      <h5 className='text-yellow-400 text-sm font-medium mb-2'>
-                        Key Achievements ({company.achievements.length})
-                      </h5>
-                      <ul className='text-gray-300 text-xs space-y-1'>
-                        {company.achievements.map((achievement, aIndex) => (
-                          <li key={aIndex} className='flex items-start'>
-                            <span className='text-yellow-400 mr-2'>🏆</span>
-                            <span>{achievement}</span>
-                          </li>
-                        ))}
+                  {/* Warnings */}
+                  {result.ats_compatibility.warnings?.length > 0 && (
+                    <div>
+                      <h4 className='text-yellow-400 font-semibold mb-2'>
+                        Warnings:
+                      </h4>
+                      <ul className='space-y-2'>
+                        {result.ats_compatibility.warnings.map(
+                          (warning: string, index: number) => (
+                            <li
+                              key={index}
+                              className='flex items-start space-x-2'
+                            >
+                              <span className='text-yellow-400 mt-1'>•</span>
+                              <span className='text-gray-300 text-sm'>
+                                {warning}
+                              </span>
+                            </li>
+                          )
+                        )}
                       </ul>
                     </div>
                   )}
                 </div>
-              )
+              </Card>
+
+              {/* ATS Recommendations */}
+              <Card className='p-6'>
+                <h3 className='text-xl font-bold mb-4 text-green-400'>
+                  ✅ ATS Optimization Tips
+                </h3>
+                <ul className='space-y-2'>
+                  {result.ats_compatibility.recommendations?.map(
+                    (rec: string, index: number) => (
+                      <li key={index} className='flex items-start space-x-2'>
+                        <span className='text-green-400 mt-1'>•</span>
+                        <span className='text-gray-300 text-sm'>{rec}</span>
+                      </li>
+                    )
+                  )}
+                </ul>
+              </Card>
+            </div>
+          )}
+
+          {/* Format Analysis Details */}
+          {result.format_analysis && (
+            <Card className='p-6'>
+              <h3 className='text-xl font-bold mb-4 text-blue-400'>
+                📋 Resume Structure Analysis
+              </h3>
+              <div className='grid md:grid-cols-3 gap-4 mb-4'>
+                <div className='text-center'>
+                  <p className='text-2xl font-bold text-blue-400'>
+                    {result.format_analysis.sections_found || 0}
+                  </p>
+                  <p className='text-sm text-gray-400'>Required Sections</p>
+                </div>
+                <div className='text-center'>
+                  <p className='text-2xl font-bold text-green-400'>
+                    {result.format_analysis.optional_sections_found || 0}
+                  </p>
+                  <p className='text-sm text-gray-400'>Optional Sections</p>
+                </div>
+                <div className='text-center'>
+                  <p className='text-2xl font-bold text-cyan-400'>
+                    {result.format_analysis.section_headers_count || 0}
+                  </p>
+                  <p className='text-sm text-gray-400'>Section Headers</p>
+                </div>
+              </div>
+
+              <div className='space-y-2'>
+                <p className='text-gray-300'>
+                  <span className='text-blue-400 font-semibold'>
+                    Contact Info:
+                  </span>{' '}
+                  {result.format_analysis.contact_completeness || 'N/A'}
+                </p>
+                <p className='text-gray-300'>
+                  <span className='text-blue-400 font-semibold'>
+                    Professional Summary:
+                  </span>{' '}
+                  {result.format_analysis.has_professional_summary
+                    ? '✅ Present'
+                    : '❌ Missing'}
+                </p>
+              </div>
+            </Card>
+          )}
+
+          {/* Formatting Issues */}
+          {result.formatting_issues && result.formatting_issues.length > 0 && (
+            <Card className='p-6'>
+              <h3 className='text-xl font-bold mb-4 text-orange-400'>
+                🔧 Formatting Issues
+              </h3>
+              <ul className='space-y-2'>
+                {result.formatting_issues.map((issue, index) => (
+                  <li key={index} className='flex items-start space-x-2'>
+                    <span className='text-orange-400 mt-1'>⚠️</span>
+                    <span className='text-gray-300'>{issue}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+
+          {/* Resume Statistics */}
+          <Card className='p-6'>
+            <h3 className='text-xl font-bold mb-4 text-blue-400'>
+              📊 Resume Statistics
+            </h3>
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+              <div className='text-center'>
+                <p className='text-sm text-gray-400 mb-1'>Word Count</p>
+                <p className='text-lg font-semibold text-blue-400'>
+                  {result.wordCount}
+                </p>
+              </div>
+              <div className='text-center'>
+                <p className='text-sm text-gray-400 mb-1'>Character Count</p>
+                <p className='text-lg font-semibold text-green-400'>
+                  {result.characterCount}
+                </p>
+              </div>
+              <div className='text-center'>
+                <p className='text-sm text-gray-400 mb-1'>Keyword Matches</p>
+                <p className='text-lg font-semibold text-cyan-400'>
+                  {result.keywordMatches.length}
+                </p>
+              </div>
+              <div className='text-center'>
+                <p className='text-sm text-gray-400 mb-1'>Missing Keywords</p>
+                <p className='text-lg font-semibold text-red-400'>
+                  {result.missingKeywords.length}
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Suggestions */}
+          <Card className='p-6'>
+            <h3 className='text-xl font-bold mb-4 text-cyan-400'>
+              💡 Optimization Suggestions
+            </h3>
+            <ul className='space-y-3'>
+              {result.suggestions.map((suggestion, index) => (
+                <li key={index} className='flex items-start space-x-3'>
+                  <span className='text-cyan-400 mt-1'>→</span>
+                  <span className='text-gray-300'>{suggestion}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+
+          {/* Contact Information */}
+          {result.structured_experience?.contact_info && (
+            <Card className='p-6'>
+              <h3 className='text-xl font-bold mb-4 text-blue-400'>
+                📞 Contact Information
+              </h3>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div>
+                  <p className='text-gray-300'>
+                    <span className='text-blue-400 font-medium'>Name:</span>{' '}
+                    {result.structured_experience.contact_info.full_name}
+                  </p>
+                  <p className='text-gray-300'>
+                    <span className='text-blue-400 font-medium'>Email:</span>{' '}
+                    {result.structured_experience.contact_info.email}
+                  </p>
+                  <p className='text-gray-300'>
+                    <span className='text-blue-400 font-medium'>Phone:</span>{' '}
+                    {result.structured_experience.contact_info.phone}
+                  </p>
+                </div>
+                <div>
+                  <p className='text-gray-300'>
+                    <span className='text-blue-400 font-medium'>Location:</span>{' '}
+                    {result.structured_experience.contact_info.location}
+                  </p>
+                  {result.structured_experience.contact_info.linkedin && (
+                    <p className='text-gray-300'>
+                      <span className='text-blue-400 font-medium'>
+                        LinkedIn:
+                      </span>{' '}
+                      {result.structured_experience.contact_info.linkedin}
+                    </p>
+                  )}
+                  {result.structured_experience.contact_info.github && (
+                    <p className='text-gray-300'>
+                      <span className='text-blue-400 font-medium'>GitHub:</span>{' '}
+                      {result.structured_experience.contact_info.github}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Professional Summary */}
+          {result.structured_experience?.summary && (
+            <Card className='p-6'>
+              <h3 className='text-xl font-bold mb-4 text-green-400'>
+                📝 Professional Summary
+              </h3>
+              <p className='text-gray-300 leading-relaxed'>
+                {result.structured_experience.summary}
+              </p>
+            </Card>
+          )}
+
+          {/* Skills Section */}
+          {result.structured_experience?.skills &&
+            result.structured_experience.skills.length > 0 && (
+              <Card className='p-6'>
+                <h3 className='text-xl font-bold mb-4 text-yellow-400'>
+                  🛠️ Skills & Proficiencies
+                </h3>
+                <div className='space-y-4'>
+                  {result.structured_experience.skills.map(
+                    (skillCategory, index) => (
+                      <div
+                        key={index}
+                        className='bg-gray-800/50 rounded-lg p-4'
+                      >
+                        <h4 className='text-lg font-semibold text-yellow-400 mb-3'>
+                          {skillCategory.category}
+                        </h4>
+                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
+                          {skillCategory.skills.map((skill, skillIndex) => (
+                            <div
+                              key={skillIndex}
+                              className='flex justify-between items-center bg-gray-700/30 rounded-lg p-3'
+                            >
+                              <span className='text-gray-300 font-medium'>
+                                {skill.name}
+                              </span>
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  skill.proficiency === 'Expert'
+                                    ? 'bg-red-500/20 text-red-400'
+                                    : skill.proficiency === 'Advanced'
+                                      ? 'bg-orange-500/20 text-orange-400'
+                                      : skill.proficiency === 'Intermediate'
+                                        ? 'bg-yellow-500/20 text-yellow-400'
+                                        : 'bg-green-500/20 text-green-400'
+                                }`}
+                              >
+                                {skill.proficiency}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              </Card>
             )}
-          </div>
-        </Card>
+
+          {/* Education */}
+          {result.structured_experience?.education &&
+            result.structured_experience.education.length > 0 && (
+              <Card className='p-6'>
+                <h3 className='text-xl font-bold mb-4 text-indigo-400'>
+                  🎓 Education
+                </h3>
+                <div className='space-y-4'>
+                  {result.structured_experience.education.map((edu, index) => (
+                    <div
+                      key={index}
+                      className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
+                    >
+                      <h4 className='text-lg font-semibold text-white mb-2'>
+                        {edu.degree}
+                      </h4>
+                      <p className='text-gray-300 mb-1'>
+                        <span className='text-indigo-400 font-medium'>
+                          Institution:
+                        </span>{' '}
+                        {String(edu.institution)}
+                      </p>
+                      <p className='text-gray-300 mb-1'>
+                        <span className='text-indigo-400 font-medium'>
+                          Location:
+                        </span>{' '}
+                        {edu.location}
+                      </p>
+                      <p className='text-gray-300 mb-1'>
+                        <span className='text-indigo-400 font-medium'>
+                          Graduation:
+                        </span>{' '}
+                        {edu.graduation_year}
+                      </p>
+                      {edu.gpa && (
+                        <p className='text-gray-300 mb-1'>
+                          <span className='text-indigo-400 font-medium'>
+                            GPA:
+                          </span>{' '}
+                          {edu.gpa}
+                        </p>
+                      )}
+                      {edu.relevant_coursework &&
+                        edu.relevant_coursework.length > 0 && (
+                          <div className='mt-3'>
+                            <p className='text-indigo-400 font-medium mb-2'>
+                              Relevant Coursework:
+                            </p>
+                            <div className='flex flex-wrap gap-2'>
+                              {edu.relevant_coursework.map(
+                                (course, courseIndex) => (
+                                  <span
+                                    key={courseIndex}
+                                    className='px-2 py-1 bg-indigo-500/20 text-indigo-400 rounded-full text-xs'
+                                  >
+                                    {course}
+                                  </span>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        )}
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+          {/* Certifications */}
+          {result.structured_experience?.certifications &&
+            result.structured_experience.certifications.length > 0 && (
+              <Card className='p-6'>
+                <h3 className='text-xl font-bold mb-4 text-purple-400'>
+                  🏆 Certifications
+                </h3>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  {result.structured_experience.certifications.map(
+                    (cert, index) => (
+                      <div
+                        key={index}
+                        className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
+                      >
+                        <h4 className='text-lg font-semibold text-white mb-2'>
+                          {cert.name}
+                        </h4>
+                        <p className='text-gray-300 mb-1'>
+                          <span className='text-purple-400 font-medium'>
+                            Issuer:
+                          </span>{' '}
+                          {cert.issuer}
+                        </p>
+                        <p className='text-gray-300 mb-1'>
+                          <span className='text-purple-400 font-medium'>
+                            Date:
+                          </span>{' '}
+                          {cert.date}
+                        </p>
+                        {cert.expiry && (
+                          <p className='text-gray-300'>
+                            <span className='text-purple-400 font-medium'>
+                              Expires:
+                            </span>{' '}
+                            {cert.expiry}
+                          </p>
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+              </Card>
+            )}
+
+          {/* Awards */}
+          {result.structured_experience?.awards &&
+            result.structured_experience.awards.length > 0 && (
+              <Card className='p-6'>
+                <h3 className='text-xl font-bold mb-4 text-yellow-400'>
+                  🏅 Awards & Recognition
+                </h3>
+                <div className='space-y-3'>
+                  {result.structured_experience.awards.map((award, index) => (
+                    <div
+                      key={index}
+                      className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
+                    >
+                      <div className='flex items-start space-x-3'>
+                        <span className='text-yellow-400 text-xl'>🏆</span>
+                        <div className='flex-1'>
+                          <h4 className='text-lg font-semibold text-white mb-1'>
+                            {award.name}
+                          </h4>
+                          <p className='text-gray-300 mb-1'>
+                            <span className='text-yellow-400 font-medium'>
+                              Issuer:
+                            </span>{' '}
+                            {award.issuer}
+                          </p>
+                          <p className='text-gray-300 mb-1'>
+                            <span className='text-yellow-400 font-medium'>
+                              Date:
+                            </span>{' '}
+                            {award.date}
+                          </p>
+                          {award.description && (
+                            <p className='text-gray-300 text-sm'>
+                              {award.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+          {/* Automations */}
+          {result.structured_experience?.automations &&
+            result.structured_experience.automations.length > 0 && (
+              <Card className='p-6'>
+                <h3 className='text-xl font-bold mb-4 text-cyan-400'>
+                  ⚙️ Automation Projects
+                </h3>
+                <div className='space-y-4'>
+                  {result.structured_experience.automations.map(
+                    (automation, index) => (
+                      <div
+                        key={index}
+                        className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
+                      >
+                        <h4 className='text-lg font-semibold text-white mb-2'>
+                          {automation.name}
+                        </h4>
+                        <p className='text-gray-300 mb-3'>
+                          {automation.description}
+                        </p>
+                        {automation.technologies &&
+                          automation.technologies.length > 0 && (
+                            <div className='mb-3'>
+                              <p className='text-cyan-400 font-medium mb-2'>
+                                Technologies Used:
+                              </p>
+                              <div className='flex flex-wrap gap-2'>
+                                {automation.technologies.map(
+                                  (tech, techIndex) => (
+                                    <span
+                                      key={techIndex}
+                                      className='px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs'
+                                    >
+                                      {tech}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        {automation.impact && (
+                          <p className='text-gray-300'>
+                            <span className='text-cyan-400 font-medium'>
+                              Impact:
+                            </span>{' '}
+                            {automation.impact}
+                          </p>
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+              </Card>
+            )}
+
+          {/* Structured Experience Analysis */}
+          {result.structured_experience && (
+            <Card className='p-6'>
+              <h3 className='text-xl font-bold mb-4 text-purple-400'>
+                🤖 AI-Enhanced Experience Analysis
+              </h3>
+              <div className='mb-4 p-3 bg-gray-800/30 rounded-lg border border-gray-600'>
+                <p className='text-sm text-gray-300'>
+                  <span className='text-cyan-400 font-medium'>
+                    {result.structured_experience.work_experience.length}{' '}
+                    Companies
+                  </span>{' '}
+                  found in work experience
+                </p>
+              </div>
+              <div className='space-y-4'>
+                {result.structured_experience.work_experience.map(
+                  (company, index) => (
+                    <div
+                      key={index}
+                      className='bg-gray-800/50 rounded-lg p-4 border border-gray-700'
+                    >
+                      <div className='flex justify-between items-start mb-2'>
+                        <div className='flex-1'>
+                          <div className='flex items-center gap-2 mb-1'>
+                            <h4 className='text-white font-medium'>
+                              {company.company}
+                            </h4>
+                            {company.current && (
+                              <span className='bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs font-medium'>
+                                Current
+                              </span>
+                            )}
+                            <span className='bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs'>
+                              {company.total_experience_years} years
+                            </span>
+                          </div>
+                          {company.positions &&
+                            company.positions.length > 0 && (
+                              <div className='mt-1'>
+                                {company.positions.map((position, pIndex) => (
+                                  <div
+                                    key={pIndex}
+                                    className='text-gray-300 text-sm'
+                                  >
+                                    <span className='font-medium'>
+                                      {position.title}
+                                    </span>
+                                    <span className='text-gray-400 text-xs ml-2'>
+                                      {position.location} • {position.duration}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                        </div>
+                      </div>
+
+                      {company.skills_used &&
+                        company.skills_used.length > 0 && (
+                          <div className='mt-3'>
+                            <h5 className='text-blue-400 text-sm font-medium mb-2'>
+                              Technologies & Skills Used
+                            </h5>
+                            <div className='flex flex-wrap gap-1'>
+                              {company.skills_used.map((skill, sIndex) => (
+                                <span
+                                  key={sIndex}
+                                  className='bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs'
+                                >
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                      {company.projects && company.projects.length > 0 && (
+                        <div className='mt-3'>
+                          <h5 className='text-cyan-400 text-sm font-medium mb-2'>
+                            Projects ({company.projects.length})
+                          </h5>
+                          <div className='space-y-2'>
+                            {company.projects.map((project, pIndex) => (
+                              <div
+                                key={pIndex}
+                                className='bg-gray-700/30 rounded p-3'
+                              >
+                                <h6 className='text-white text-sm font-medium'>
+                                  {project.name}
+                                </h6>
+                                <p className='text-gray-300 text-xs mt-1'>
+                                  {project.description}
+                                </p>
+                                {project.technologies &&
+                                  project.technologies.length > 0 && (
+                                    <div className='mt-2'>
+                                      <span className='text-gray-400 text-xs'>
+                                        Technologies:{' '}
+                                      </span>
+                                      <span className='text-blue-400 text-xs'>
+                                        {project.technologies.join(', ')}
+                                      </span>
+                                    </div>
+                                  )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {company.responsibilities &&
+                        company.responsibilities.length > 0 && (
+                          <div className='mt-3'>
+                            <h5 className='text-green-400 text-sm font-medium mb-2'>
+                              Key Responsibilities (
+                              {company.responsibilities.length})
+                            </h5>
+                            <ul className='text-gray-300 text-xs space-y-1'>
+                              {company.responsibilities.map((resp, rIndex) => (
+                                <li key={rIndex} className='flex items-start'>
+                                  <span className='text-green-400 mr-2'>•</span>
+                                  <span>{resp}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                      {company.achievements &&
+                        company.achievements.length > 0 && (
+                          <div className='mt-3'>
+                            <h5 className='text-yellow-400 text-sm font-medium mb-2'>
+                              Key Achievements ({company.achievements.length})
+                            </h5>
+                            <ul className='text-gray-300 text-xs space-y-1'>
+                              {company.achievements.map(
+                                (achievement, aIndex) => (
+                                  <li key={aIndex} className='flex items-start'>
+                                    <span className='text-yellow-400 mr-2'>
+                                      🏆
+                                    </span>
+                                    <span>{achievement}</span>
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                        )}
+                    </div>
+                  )
+                )}
+              </div>
+            </Card>
+          )}
+        </div>
       )}
 
       {/* Improvement Plan Section */}

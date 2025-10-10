@@ -105,7 +105,8 @@ export default function ATSCheckerPage() {
           keywordDensity: {},
           wordCount: apiResult.data.word_count || 0,
           characterCount:
-            typeof apiResult.data.extraction_details?.full_resume_text === 'string'
+            typeof apiResult.data.extraction_details?.full_resume_text ===
+            'string'
               ? apiResult.data.extraction_details.full_resume_text.length
               : 0,
         };
@@ -186,7 +187,8 @@ export default function ATSCheckerPage() {
           keywordDensity: {},
           wordCount: apiResult.data.word_count || 0,
           characterCount:
-            typeof apiResult.data.extraction_details?.full_resume_text === 'string'
+            typeof apiResult.data.extraction_details?.full_resume_text ===
+            'string'
               ? apiResult.data.extraction_details.full_resume_text.length
               : 0,
         };
@@ -269,7 +271,7 @@ export default function ATSCheckerPage() {
           )}
 
           {/* Upload Content - Show when no results or when upload tab is active */}
-          {(!analysisResult || activeTab === 'upload') && (
+          {!analysisResult && (
             <div className='space-y-8'>
               {/* File Upload Section */}
               {!file && (
