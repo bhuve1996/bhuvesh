@@ -58,11 +58,18 @@ python -m uvicorn app.main:app --reload --port 8000
 
 ### Environment Variables
 
-Create `.env` file:
+Create `.env` file in the backend directory:
 
 ```env
+# Google Gemini API Key for AI-powered job description generation
+# Get your API key from: https://makersuite.google.com/app/apikey
 GEMINI_API_KEY=your_gemini_api_key_here
+
+# Optional: Set to production for deployment
+ENVIRONMENT=development
 ```
+
+**Important**: The GEMINI_API_KEY is required for AI-powered job description generation. Without it, the system will return minimal fallback descriptions.
 
 ## 📡 API Endpoints
 

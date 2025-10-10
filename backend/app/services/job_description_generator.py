@@ -2,7 +2,7 @@
 Job Description Generator Service
 
 Generates specific, realistic job descriptions for detected job types
-to provide accurate ATS scoring instead of using generic descriptions.
+using AI only - no predefined templates.
 """
 
 import os
@@ -30,7 +30,7 @@ except ImportError:
 
 class JobDescriptionGenerator:
     """
-    Generates specific job descriptions for detected job types
+    Generates specific job descriptions for detected job types using AI only
     """
 
     def __init__(self):
@@ -47,7 +47,7 @@ class JobDescriptionGenerator:
         self, job_type: str, experience_level: str = "mid-level"
     ) -> str:
         """
-        Generate a specific job description for the detected job type
+        Generate a specific job description for the detected job type using AI only
 
         Args:
             job_type: The detected job type (e.g., "DevOps Engineer", "Software Engineer")
@@ -66,14 +66,18 @@ class JobDescriptionGenerator:
             response = self.model.generate_content(prompt)
 
             if response and response.text:
-                return self._clean_generated_jd(response.text)
+                cleaned_jd = self._clean_generated_jd(response.text)
+                if cleaned_jd.strip():  # Ensure we have actual content
+                    return cleaned_jd
+                else:
+                    raise Exception("AI generated empty content after cleaning")
             else:
                 raise Exception("AI failed to generate job description")
 
         except Exception as e:
             print(f"❌ Error generating job description with AI: {e}")
-            # Fallback to template-based generation
-            return self._generate_template_jd(job_type, experience_level)
+            # Return a minimal fallback instead of template
+            return f"Job Description for {job_type} ({experience_level}):\n\nThis position requires expertise in {job_type.lower()} with {experience_level} experience. Please configure GEMINI_API_KEY for detailed AI-generated job descriptions."
 
     def _create_generation_prompt(self, job_type: str, experience_level: str) -> str:
         """Create a prompt for generating job descriptions"""
@@ -138,226 +142,20 @@ Generate a complete, ready-to-post job description that sounds like it came from
 
         for line in lines:
             line = line.strip()
-            # Skip empty lines and meta-commentary
+            # Skip empty lines and meta-commentary, but keep content lines
             if (
                 line
-                and not line.startswith("**")
-                and not line.startswith("*")
-                and not line.startswith("#")
+                and not line.startswith("#")  # Only skip markdown headers
+                and not line.startswith("```")  # Skip code blocks
+                and not line.startswith("---")  # Skip separators
+                and not line.lower().startswith("here's")  # Skip AI meta-commentary
+                and not line.lower().startswith("i'll")  # Skip AI meta-commentary
             ):
-                cleaned_lines.append(line)
+                # Clean up markdown formatting but keep the content
+                cleaned_line = line.replace("**", "").replace("*", "•")
+                cleaned_lines.append(cleaned_line)
 
         return "\n".join(cleaned_lines)
-
-    def _generate_template_jd(self, job_type: str, experience_level: str) -> str:
-        """Generate a template-based job description with specific technical requirements"""
-
-        # Define specific technical requirements for common job types
-        job_templates = {
-            "Software Engineer": {
-                "technologies": [
-                    "Python",
-                    "Java",
-                    "JavaScript",
-                    "React",
-                    "Node.js",
-                    "SQL",
-                    "MongoDB",
-                    "AWS",
-                    "Docker",
-                    "Kubernetes",
-                    "Git",
-                    "REST APIs",
-                    "microservices",
-                ],
-                "skills": [
-                    "Object-oriented programming",
-                    "Database design",
-                    "API development",
-                    "Version control",
-                    "Testing frameworks",
-                    "Agile methodologies",
-                ],
-                "responsibilities": [
-                    "Design and develop scalable software applications",
-                    "Write clean, maintainable code following best practices",
-                    "Collaborate with cross-functional teams to deliver features",
-                    "Participate in code reviews and technical discussions",
-                    "Debug and troubleshoot production issues",
-                    "Implement automated testing and CI/CD pipelines",
-                ],
-            },
-            "DevOps Engineer": {
-                "technologies": [
-                    "AWS",
-                    "Azure",
-                    "Docker",
-                    "Kubernetes",
-                    "Terraform",
-                    "Jenkins",
-                    "GitLab CI",
-                    "Ansible",
-                    "Python",
-                    "Bash",
-                    "Linux",
-                    "Monitoring tools",
-                ],
-                "skills": [
-                    "Infrastructure as Code",
-                    "CI/CD pipelines",
-                    "Cloud architecture",
-                    "Container orchestration",
-                    "Monitoring and logging",
-                    "Security best practices",
-                ],
-                "responsibilities": [
-                    "Design and implement cloud infrastructure solutions",
-                    "Automate deployment and scaling processes",
-                    "Monitor system performance and reliability",
-                    "Implement security best practices and compliance",
-                    "Collaborate with development teams on DevOps practices",
-                    "Troubleshoot infrastructure and deployment issues",
-                ],
-            },
-            "Data Scientist": {
-                "technologies": [
-                    "Python",
-                    "R",
-                    "SQL",
-                    "Pandas",
-                    "NumPy",
-                    "Scikit-learn",
-                    "TensorFlow",
-                    "PyTorch",
-                    "Jupyter",
-                    "AWS",
-                    "Docker",
-                    "Git",
-                ],
-                "skills": [
-                    "Machine learning",
-                    "Statistical analysis",
-                    "Data visualization",
-                    "Feature engineering",
-                    "Model deployment",
-                    "A/B testing",
-                ],
-                "responsibilities": [
-                    "Develop and implement machine learning models",
-                    "Analyze large datasets to extract insights",
-                    "Create data visualizations and reports",
-                    "Collaborate with stakeholders to define business requirements",
-                    "Deploy models to production environments",
-                    "Monitor model performance and iterate on improvements",
-                ],
-            },
-            "Cloud Architect": {
-                "technologies": [
-                    "AWS",
-                    "Azure",
-                    "GCP",
-                    "Terraform",
-                    "CloudFormation",
-                    "Docker",
-                    "Kubernetes",
-                    "Python",
-                    "Bash",
-                    "Monitoring tools",
-                    "Security tools",
-                ],
-                "skills": [
-                    "Cloud architecture design",
-                    "Infrastructure as Code",
-                    "Security architecture",
-                    "Cost optimization",
-                    "Disaster recovery",
-                    "Performance optimization",
-                ],
-                "responsibilities": [
-                    "Design scalable and secure cloud architectures",
-                    "Implement infrastructure as code solutions",
-                    "Optimize cloud costs and performance",
-                    "Ensure compliance and security standards",
-                    "Mentor teams on cloud best practices",
-                    "Evaluate and recommend cloud technologies",
-                ],
-            },
-        }
-
-        # Get template for the job type or use a generic one
-        template = job_templates.get(job_type, job_templates["Software Engineer"])
-
-        # Generate a more elaborate job description
-        jd_parts = [
-            f"{job_type} - {experience_level.title()}",
-            "",
-            "About the Role:",
-            f"We are seeking a talented and experienced {experience_level} {job_type} to join our dynamic engineering team. The ideal candidate will have a strong foundation in modern software development practices and a passion for building scalable, high-quality solutions. You will work closely with cross-functional teams to design, develop, and maintain cutting-edge applications that serve millions of users.",
-            "",
-            "Key Responsibilities:",
-        ]
-
-        # Add detailed responsibilities
-        for resp in template["responsibilities"]:
-            jd_parts.append(f"• {resp}")
-
-        jd_parts.extend(
-            [
-                "",
-                "Required Technical Skills:",
-            ]
-        )
-
-        # Add technical requirements with more detail
-        for tech in template["technologies"][:10]:  # More technical skills
-            jd_parts.append(f"• {tech}")
-
-        jd_parts.extend(
-            [
-                "",
-                "Preferred Qualifications:",
-            ]
-        )
-
-        # Add additional technical skills
-        additional_techs = (
-            template["technologies"][10:] if len(template["technologies"]) > 10 else []
-        )
-        for tech in additional_techs[:5]:
-            jd_parts.append(f"• {tech}")
-
-        jd_parts.extend(
-            [
-                "",
-                "Soft Skills & Behavioral Traits:",
-            ]
-        )
-
-        # Add soft skills
-        for skill in template["skills"]:
-            jd_parts.append(f"• {skill}")
-
-        jd_parts.extend(
-            [
-                "",
-                "Experience Requirements:",
-                f"• {experience_level.replace('-', ' ')} experience in software development or related field",
-                "• Proven track record of delivering high-quality software solutions",
-                "• Experience working in Agile/Scrum development environments",
-                "• Strong understanding of software development lifecycle and best practices",
-                "",
-                "What We Offer:",
-                "• Competitive salary and comprehensive benefits package",
-                "• Opportunity to work with cutting-edge technologies and innovative projects",
-                "• Collaborative and inclusive work environment",
-                "• Professional development and career growth opportunities",
-                "• Flexible work arrangements and work-life balance",
-                "",
-                "Join our team and help us build the next generation of software solutions that will impact millions of users worldwide.",
-            ]
-        )
-
-        return "\n".join(jd_parts)
 
     def determine_experience_level(self, resume_text: str) -> str:
         """
@@ -403,5 +201,5 @@ Generate a complete, ready-to-post job description that sounds like it came from
             return "mid-level"
 
 
-# Global instance
-job_description_generator = JobDescriptionGenerator()
+# Create global instance
+jd_generator = JobDescriptionGenerator()
