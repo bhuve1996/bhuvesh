@@ -1,7 +1,7 @@
 [build]
-# Increase build timeout for ML dependencies
+# Use minimal requirements for faster deployment
 nixpacksVersion = "1.32.1"
-buildCommand = "pip install --no-cache-dir -r requirements.txt"
+buildCommand = "pip install --no-cache-dir -r requirements-minimal.txt"
 
 [deploy]
 startCommand = "python start.py"

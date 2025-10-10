@@ -12,7 +12,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 # Add the parent directory to the path so we can import our utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.services.ats_analyzer import ats_analyzer
+from app.services.ats_analyzer import get_ats_analyzer
 from app.services.job_description_generator import JobDescriptionGenerator
 from app.services.job_detector import job_detector
 from app.services.resume_improver import ResumeImprover
@@ -150,6 +150,7 @@ async def quick_analyze_resume(file: UploadFile = File(...)) -> dict[str, Any]:
         )
 
         # Extract structured experience data
+        ats_analyzer = get_ats_analyzer()
         structured_experience = ats_analyzer.extract_structured_experience(
             parsed_resume.get("text", "")
         )
@@ -233,6 +234,7 @@ async def analyze_resume_with_jd(
         parsed_resume = file_parser.parse_file(file_content, file.filename)
 
         # Extract structured experience data
+        ats_analyzer = get_ats_analyzer()
         structured_experience = ats_analyzer.extract_structured_experience(
             parsed_resume.get("text", "")
         )
@@ -303,6 +305,7 @@ async def extract_structured_experience(file: UploadFile = File(...)) -> dict[st
         parsed_resume = file_parser.parse_file(file_content, file.filename)
 
         # Extract structured experience
+        ats_analyzer = get_ats_analyzer()
         structured_experience = ats_analyzer.extract_structured_experience(
             parsed_resume.get("text", "")
         )

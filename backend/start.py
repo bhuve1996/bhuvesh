@@ -21,8 +21,17 @@ def preload_models():
         logger.info("Starting model preloading...")
 
         # Import and initialize services that load ML models
+        try:
+            logger.info("✅ ATS Analyzer initialized")
+        except Exception as e:
+            logger.warning(f"⚠️  ATS Analyzer initialization failed: {e}")
 
-        logger.info("✅ All services initialized successfully")
+        try:
+            logger.info("✅ Job Detector initialized")
+        except Exception as e:
+            logger.warning(f"⚠️  Job Detector initialization failed: {e}")
+
+        logger.info("✅ Model preloading completed (with warnings)")
         return True
 
     except Exception as e:

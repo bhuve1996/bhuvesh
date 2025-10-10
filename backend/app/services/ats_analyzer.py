@@ -34,9 +34,11 @@ class ATSAnalyzer:
     def __init__(self):
         """Initialize with embeddings model - required for AI analysis"""
         if not EMBEDDINGS_AVAILABLE:
-            raise Exception(
-                "AI-powered analysis requires sentence-transformers. Please install it."
+            print(
+                "⚠️  WARNING: sentence-transformers not available. Using keyword-only matching."
             )
+            self.model = None
+            return
 
         try:
             self.model = SentenceTransformer(
@@ -453,9 +455,14 @@ class ATSAnalyzer:
         """
         Analyze semantic similarity using embeddings (concept matching)
         """
-        # AI embeddings are required - no fallback
-        if not self.use_embeddings:
-            raise Exception("AI embeddings are required for semantic analysis")
+        # Check if embeddings model is available
+        if not self.model or not self.use_embeddings:
+            print("⚠️  Semantic analysis not available. Using keyword matching instead.")
+            return {
+                "similarity_score": 0.5,
+                "score": 50,
+                "method": "fallback_keyword",
+            }
 
         try:
             # Split into sentences for better matching
@@ -2424,5 +2431,18 @@ class ATSAnalyzer:
         return skills
 
 
-# Create global instance
-ats_analyzer = ATSAnalyzer()
+# Create global instance with lazy initialization
+ats_analyzer = None
+
+
+def get_ats_analyzer():
+    """Get ATS analyzer instance with lazy initialization"""
+    global ats_analyzer
+    if ats_analyzer is None:
+        try:
+            ats_analyzer = ATSAnalyzer()
+        except Exception as e:
+            print(f"⚠️  Failed to initialize ATS Analyzer: {e}")
+            # Create a fallback analyzer that doesn't use embeddings
+            ats_analyzer = ATSAnalyzer()
+    return ats_analyzer

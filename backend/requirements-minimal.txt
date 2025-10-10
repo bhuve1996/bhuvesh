@@ -1,21 +1,32 @@
-# Minimal requirements for faster Railway deployment
-# Core FastAPI dependencies
+# FastAPI and web framework
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
-python-dotenv==1.0.0
-pydantic==2.5.0
 
-# File processing (lightweight)
+# File processing - CORE ONLY
+PyMuPDF==1.23.8  # Better PDF parsing (also known as fitz)
 python-docx==1.1.0
-PyMuPDF==1.23.8
+python-magic==0.4.27
+pdfplumber==0.10.3  # Alternative PDF parser
+Pillow==10.1.0  # Image processing for format checks
 
-# Basic data processing
+# AI/LLM Integration (Optional)
+google-generativeai==0.3.2  # Google Gemini (FREE tier available)
+
+# Data processing - MINIMAL
 pandas==2.1.3
 numpy==1.25.2
 
-# CORS
+# Environment and configuration
+python-dotenv==1.0.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# CORS and middleware
 fastapi-cors==0.0.6
 
 # Testing
 httpx==0.25.2
+
+# NOTE: sentence-transformers and torch are excluded for faster deployment
+# The app will work with keyword-only matching and Gemini AI
