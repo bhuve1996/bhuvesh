@@ -324,7 +324,9 @@ class JobTypeDetector:
                     self.job_database, convert_to_tensor=True
                 )
                 self.use_embeddings = True
-                print(f"✅ Job detector loaded with {len(self.job_database)} job titles")
+                print(
+                    f"✅ Job detector loaded with {len(self.job_database)} job titles"
+                )
             except Exception as e:
                 print(f"Warning: Could not load embedding model: {e}")
                 self.use_embeddings = False
