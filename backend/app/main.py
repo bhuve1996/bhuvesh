@@ -3,6 +3,8 @@ Main FastAPI application file
 This is like the main server file in Node.js/Express
 """
 
+import time
+
 # Load environment variables
 from dotenv import load_dotenv
 
@@ -70,6 +72,20 @@ async def root():
     return {"message": "ATS Resume Checker API is running!"}
 
 
+# Startup endpoint for Railway
+@app.get("/startup")
+async def startup_check():
+    """
+    Startup endpoint for Railway deployment
+    Returns immediately to verify the app is starting
+    """
+    return {
+        "status": "starting",
+        "message": "Application is starting up",
+        "timestamp": time.time(),
+    }
+
+
 # Health check endpoint
 @app.get("/health")
 async def health_check():
@@ -77,10 +93,17 @@ async def health_check():
     Health check endpoint
     Returns the status of our API
     """
+    import os
+    import time
+
+    # Basic health check - just verify the app is running
+    # Don't load heavy ML models here to avoid timeout
     return {
         "status": "healthy",
         "message": "API is running successfully",
         "version": "1.0.0",
+        "timestamp": time.time(),
+        "environment": os.getenv("RAILWAY_ENVIRONMENT", "development"),
     }
 
 

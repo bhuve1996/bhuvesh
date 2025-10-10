@@ -5,10 +5,9 @@ Enhanced with job description comparison and semantic matching
 
 import os
 import sys
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
-from pydantic import BaseModel
 
 # Add the parent directory to the path so we can import our utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -17,26 +16,11 @@ from app.services.ats_analyzer import ats_analyzer
 from app.services.job_description_generator import JobDescriptionGenerator
 from app.services.job_detector import job_detector
 from app.services.resume_improver import ResumeImprover
+from app.types import ImprovementPlanRequest
 from app.utils.file_parser import file_parser
 
 # Initialize services
 resume_improver = ResumeImprover()
-
-
-# Pydantic models for request/response validation
-class JobDescriptionRequest(BaseModel):
-    """Request model for job description comparison"""
-
-    job_description: str
-    resume_text: Optional[str] = None
-
-
-class ImprovementPlanRequest(BaseModel):
-    """Request model for improvement plan generation"""
-
-    analysis_result: dict[str, Any]
-    extracted_data: dict[str, Any]
-    job_description: Optional[str] = None
 
 
 # Create a router (like Express router)

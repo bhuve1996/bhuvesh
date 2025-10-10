@@ -1,0 +1,21 @@
+# Minimal requirements for faster Railway deployment
+# Core FastAPI dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+python-dotenv==1.0.0
+pydantic==2.5.0
+
+# File processing (lightweight)
+python-docx==1.1.0
+PyMuPDF==1.23.8
+
+# Basic data processing
+pandas==2.1.3
+numpy==1.25.2
+
+# CORS
+fastapi-cors==0.0.6
+
+# Testing
+httpx==0.25.2
