@@ -1,0 +1,194 @@
+# Cursor Rules for Backend (FastAPI + Python)
+
+## Project Overview
+This is a FastAPI backend for the ATS (Applicant Tracking System) resume analyzer with Google Gemini AI integration.
+
+## Tech Stack
+- **Framework**: FastAPI
+- **Language**: Python 3.9+
+- **AI Integration**: Google Gemini AI
+- **File Processing**: PyPDF2, python-docx
+- **ML Libraries**: sentence-transformers, scikit-learn
+- **Linting**: Ruff, Black, isort
+- **Type Checking**: MyPy
+
+## Project Structure
+```
+backend/
+├── app/
+│   ├── api/                # API endpoints
+│   ├── core/              # Core configuration
+│   ├── helpers/           # Helper functions
+│   ├── models/            # Data models
+│   ├── schemas/           # Pydantic schemas
+│   ├── services/          # Business logic
+│   ├── types/             # Type definitions
+│   └── utils/             # Utility functions
+├── docs/                  # Documentation
+├── tests/                 # Test files
+└── requirements.txt       # Dependencies
+```
+
+## Coding Standards
+
+### Python Style
+- Follow PEP 8 guidelines
+- Use type hints for all functions
+- Use docstrings for all functions and classes
+- Use meaningful variable and function names
+- Keep functions small and focused
+
+### FastAPI Best Practices
+- Use Pydantic models for request/response validation
+- Use dependency injection for database connections
+- Implement proper error handling
+- Use async/await for I/O operations
+- Follow RESTful API design principles
+
+### File Organization
+- Group related functionality in modules
+- Use clear, descriptive file names
+- Keep imports organized and clean
+- Use absolute imports when possible
+
+### Error Handling
+- Use proper HTTP status codes
+- Provide meaningful error messages
+- Log errors appropriately
+- Handle edge cases gracefully
+
+### Type Hints
+```python
+from typing import List, Dict, Optional, Union
+from pydantic import BaseModel
+
+def process_resume(file_path: str) -> Dict[str, Union[str, int]]:
+    """Process resume file and return analysis results."""
+    pass
+
+class ResumeAnalysis(BaseModel):
+    score: int
+    suggestions: List[str]
+    errors: Optional[List[str]] = None
+```
+
+### API Endpoints
+```python
+from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi.responses import JSONResponse
+
+router = APIRouter(prefix="/api/v1", tags=["resume"])
+
+@router.post("/analyze")
+async def analyze_resume(file: UploadFile = File(...)) -> JSONResponse:
+    """Analyze uploaded resume file."""
+    try:
+        # Processing logic
+        result = await process_resume(file)
+        return JSONResponse(content=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+```
+
+### Service Layer
+```python
+class ResumeAnalyzer:
+    def __init__(self, gemini_client: GeminiClient):
+        self.gemini_client = gemini_client
+
+    async def analyze(self, resume_text: str) -> Dict[str, Any]:
+        """Analyze resume text using AI."""
+        # Implementation
+        pass
+```
+
+### Configuration
+- Use environment variables for configuration
+- Use Pydantic settings for type-safe configuration
+- Keep sensitive data in environment variables
+- Use proper logging configuration
+
+### Testing
+- Write unit tests for all functions
+- Use pytest for testing framework
+- Mock external dependencies
+- Test error cases and edge cases
+
+### Documentation
+- Use docstrings for all functions
+- Document API endpoints with OpenAPI
+- Keep README files updated
+- Document environment setup
+
+### Security
+- Validate all inputs
+- Sanitize file uploads
+- Use proper authentication
+- Follow security best practices
+
+### Performance
+- Use async/await for I/O operations
+- Implement proper caching
+- Optimize database queries
+- Monitor performance metrics
+
+### Dependencies
+- Keep dependencies up to date
+- Use virtual environments
+- Pin dependency versions
+- Document dependency requirements
+
+### Git Workflow
+- Use descriptive commit messages
+- Create feature branches
+- Keep commits atomic
+- Use conventional commit format
+
+### Code Quality
+- Run linting before commits
+- Use pre-commit hooks
+- Maintain code coverage
+- Follow SOLID principles
+
+### AI Integration
+- Handle API rate limits
+- Implement proper error handling
+- Cache AI responses when appropriate
+- Monitor AI usage and costs
+
+### File Processing
+- Validate file types and sizes
+- Handle different file formats
+- Implement proper error handling
+- Clean up temporary files
+
+### Environment Setup
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run development server
+uvicorn app.main:app --reload
+
+# Run tests
+pytest
+
+# Run linting
+ruff check .
+black .
+isort .
+mypy .
+```
+
+### Common Patterns
+- Use dependency injection
+- Implement proper logging
+- Use context managers for file operations
+- Handle exceptions gracefully
+- Use type hints consistently
+
+Remember: Focus on clean, maintainable code with proper error handling and documentation. The backend should be robust, secure, and performant.
