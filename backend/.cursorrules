@@ -1,9 +1,11 @@
 # Cursor Rules for Backend (FastAPI + Python)
 
 ## Project Overview
+
 This is a FastAPI backend for the ATS (Applicant Tracking System) resume analyzer with Google Gemini AI integration.
 
 ## Tech Stack
+
 - **Framework**: FastAPI
 - **Language**: Python 3.9+
 - **AI Integration**: Google Gemini AI
@@ -13,6 +15,7 @@ This is a FastAPI backend for the ATS (Applicant Tracking System) resume analyze
 - **Type Checking**: MyPy
 
 ## Project Structure
+
 ```
 backend/
 ├── app/
@@ -32,6 +35,7 @@ backend/
 ## Coding Standards
 
 ### Python Style
+
 - Follow PEP 8 guidelines
 - Use type hints for all functions
 - Use docstrings for all functions and classes
@@ -39,6 +43,7 @@ backend/
 - Keep functions small and focused
 
 ### FastAPI Best Practices
+
 - Use Pydantic models for request/response validation
 - Use dependency injection for database connections
 - Implement proper error handling
@@ -46,18 +51,21 @@ backend/
 - Follow RESTful API design principles
 
 ### File Organization
+
 - Group related functionality in modules
 - Use clear, descriptive file names
 - Keep imports organized and clean
 - Use absolute imports when possible
 
 ### Error Handling
+
 - Use proper HTTP status codes
 - Provide meaningful error messages
 - Log errors appropriately
 - Handle edge cases gracefully
 
 ### Type Hints
+
 ```python
 from typing import List, Dict, Optional, Union
 from pydantic import BaseModel
@@ -73,6 +81,7 @@ class ResumeAnalysis(BaseModel):
 ```
 
 ### API Endpoints
+
 ```python
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
@@ -91,6 +100,7 @@ async def analyze_resume(file: UploadFile = File(...)) -> JSONResponse:
 ```
 
 ### Service Layer
+
 ```python
 class ResumeAnalyzer:
     def __init__(self, gemini_client: GeminiClient):
@@ -103,66 +113,77 @@ class ResumeAnalyzer:
 ```
 
 ### Configuration
+
 - Use environment variables for configuration
 - Use Pydantic settings for type-safe configuration
 - Keep sensitive data in environment variables
 - Use proper logging configuration
 
 ### Testing
+
 - Write unit tests for all functions
 - Use pytest for testing framework
 - Mock external dependencies
 - Test error cases and edge cases
 
 ### Documentation
+
 - Use docstrings for all functions
 - Document API endpoints with OpenAPI
 - Keep README files updated
 - Document environment setup
 
 ### Security
+
 - Validate all inputs
 - Sanitize file uploads
 - Use proper authentication
 - Follow security best practices
 
 ### Performance
+
 - Use async/await for I/O operations
 - Implement proper caching
 - Optimize database queries
 - Monitor performance metrics
 
 ### Dependencies
+
 - Keep dependencies up to date
 - Use virtual environments
 - Pin dependency versions
 - Document dependency requirements
 
 ### Git Workflow
+
 - Use descriptive commit messages
 - Create feature branches
 - Keep commits atomic
 - Use conventional commit format
 
 ### Code Quality
+
 - Run linting before commits
 - Use pre-commit hooks
 - Maintain code coverage
 - Follow SOLID principles
 
 ### AI Integration
+
 - Handle API rate limits
 - Implement proper error handling
 - Cache AI responses when appropriate
 - Monitor AI usage and costs
 
 ### File Processing
+
 - Validate file types and sizes
 - Handle different file formats
 - Implement proper error handling
 - Clean up temporary files
 
 ### Environment Setup
+
 ```bash
 # Create virtual environment
 python -m venv venv
@@ -185,6 +206,7 @@ mypy .
 ```
 
 ### Common Patterns
+
 - Use dependency injection
 - Implement proper logging
 - Use context managers for file operations
