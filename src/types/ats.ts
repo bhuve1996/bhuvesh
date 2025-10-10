@@ -285,4 +285,5 @@ export interface AnalysisResult {
   ats_friendly?: boolean | undefined;
   formatting_issues?: string[] | undefined;
   structured_experience?: StructuredExperience | undefined;
+  job_description?: string | undefined;  // AI-generated job description
 }

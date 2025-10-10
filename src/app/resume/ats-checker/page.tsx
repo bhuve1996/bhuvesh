@@ -105,6 +105,7 @@ export default function ATSCheckerPage() {
           formatting_issues: apiResult.data.formatting_issues || undefined,
           structured_experience:
             apiResult.data.structured_experience || undefined,
+          job_description: apiResult.data.job_description || undefined,
         };
       } else {
         // Quick analysis - backend will generate specific JD based on detected job type
@@ -165,6 +166,7 @@ export default function ATSCheckerPage() {
           formatting_issues: apiResult.data.formatting_issues || undefined,
           structured_experience:
             apiResult.data.structured_experience || undefined,
+          job_description: apiResult.data.job_description || undefined,
         };
       }
     } catch (error) {
@@ -192,20 +194,10 @@ export default function ATSCheckerPage() {
             </p>
           </div>
 
-          {/* Tabs */}
-          <div className='mb-8'>
-            <div className='flex space-x-1 bg-gray-800/50 p-1 rounded-lg w-fit mx-auto'>
-              <button
-                onClick={() => setActiveTab('upload')}
-                className={`px-6 py-3 rounded-md font-medium transition-all ${
-                  activeTab === 'upload'
-                    ? 'bg-cyan-500 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-                }`}
-              >
-                📄 Upload Resume
-              </button>
-              {analysisResult && (
+          {/* Results Tab - Only show when we have results */}
+          {analysisResult && (
+            <div className='mb-8'>
+              <div className='flex space-x-1 bg-gray-800/50 p-1 rounded-lg w-fit mx-auto'>
                 <button
                   onClick={() => setActiveTab('results')}
                   className={`px-6 py-3 rounded-md font-medium transition-all ${
@@ -216,12 +208,12 @@ export default function ATSCheckerPage() {
                 >
                   📊 Analysis Results
                 </button>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Tab Content */}
-          {activeTab === 'upload' && (
+          {/* Upload Content - Show when no results or when upload tab is active */}
+          {(!analysisResult || activeTab === 'upload') && (
             <div className='space-y-8'>
               {/* File Upload Section */}
               {!file && (

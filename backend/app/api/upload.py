@@ -160,6 +160,7 @@ async def analyze_resume_with_jd(
             "filename": file.filename,
             "file_size": len(file_content),
             "jd_length": len(job_description),
+            "job_description": job_description,  # Include the AI-generated job description
         })
         
         return {
