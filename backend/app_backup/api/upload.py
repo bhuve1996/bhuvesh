@@ -227,9 +227,11 @@ async def extract_structured_experience(file: UploadFile = File(...)) -> dict[st
                 "structured_experience": structured_experience,
                 "filename": file.filename,
                 "file_size": len(file_content),
-                "raw_text": parsed_resume.get("text", "")[:500] + "..."
-                if len(parsed_resume.get("text", "")) > 500
-                else parsed_resume.get("text", ""),
+                "raw_text": (
+                    parsed_resume.get("text", "")[:500] + "..."
+                    if len(parsed_resume.get("text", "")) > 500
+                    else parsed_resume.get("text", "")
+                ),
             },
             "message": "Structured experience extracted successfully",
         }

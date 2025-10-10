@@ -215,9 +215,11 @@ class ATSAnalyzer:
                     parsed_resume.get("text", "")
                 ),
                 # Text samples for verification
-                "resume_text_sample": parsed_resume.get("text", "")[:1000] + "..."
-                if len(parsed_resume.get("text", "")) > 1000
-                else parsed_resume.get("text", ""),
+                "resume_text_sample": (
+                    parsed_resume.get("text", "")[:1000] + "..."
+                    if len(parsed_resume.get("text", "")) > 1000
+                    else parsed_resume.get("text", "")
+                ),
                 "full_resume_text": parsed_resume.get(
                     "text", ""
                 ),  # Complete text for advanced analysis
@@ -1012,9 +1014,11 @@ class ATSAnalyzer:
 
         return {
             "suggestions": suggestions,
-            "strengths": strengths
-            if strengths
-            else ["Review suggestions to improve your resume"],
+            "strengths": (
+                strengths
+                if strengths
+                else ["Review suggestions to improve your resume"]
+            ),
             "weaknesses": weaknesses if weaknesses else ["Good overall structure"],
         }
 
@@ -1161,10 +1165,10 @@ class ATSAnalyzer:
         # Detect emojis (basic check)
         emoji_pattern = re.compile(
             "["
-            "\U0001F600-\U0001F64F"  # emoticons
-            "\U0001F300-\U0001F5FF"  # symbols & pictographs
-            "\U0001F680-\U0001F6FF"  # transport & map symbols
-            "\U0001F1E0-\U0001F1FF"  # flags
+            "\U0001f600-\U0001f64f"  # emoticons
+            "\U0001f300-\U0001f5ff"  # symbols & pictographs
+            "\U0001f680-\U0001f6ff"  # transport & map symbols
+            "\U0001f1e0-\U0001f1ff"  # flags
             "]+",
             flags=re.UNICODE,
         )

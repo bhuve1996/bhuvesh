@@ -3,7 +3,6 @@ Simple test script to verify our API is working
 This is like a basic test to make sure everything is set up correctly
 """
 
-
 import requests
 
 

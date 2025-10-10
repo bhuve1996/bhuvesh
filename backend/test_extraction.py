@@ -1,6 +1,7 @@
 """
 Test script to debug resume extraction locally
 """
+
 import sys
 
 from app.utils.file_parser import file_parser

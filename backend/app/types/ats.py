@@ -296,9 +296,9 @@ class SkillsFound(BaseModel):
 class SkillCategoryInfo(BaseModel):
     name: str
     skills: list[str]
-    proficiency: Optional[
-        str
-    ] = None  # 'beginner', 'intermediate', 'advanced', 'expert'
+    proficiency: Optional[str] = (
+        None  # 'beginner', 'intermediate', 'advanced', 'expert'
+    )
     years_experience: Optional[int] = None
     last_used: Optional[str] = None
     relevance_score: Optional[float] = None
