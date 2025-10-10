@@ -455,6 +455,14 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           <h3 className='text-xl font-bold mb-4 text-purple-400'>
             🤖 AI-Enhanced Experience Analysis
           </h3>
+          <div className='mb-4 p-3 bg-gray-800/30 rounded-lg border border-gray-600'>
+            <p className='text-sm text-gray-300'>
+              <span className='text-cyan-400 font-medium'>
+                {result.structured_experience.work_experience.length} Companies
+              </span>{' '}
+              found in work experience
+            </p>
+          </div>
           <div className='space-y-4'>
             {result.structured_experience.work_experience.map(
               (company, index) => (
@@ -550,23 +558,15 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
                     company.responsibilities.length > 0 && (
                       <div className='mt-3'>
                         <h5 className='text-green-400 text-sm font-medium mb-2'>
-                          Key Responsibilities
+                          Key Responsibilities ({company.responsibilities.length})
                         </h5>
                         <ul className='text-gray-300 text-xs space-y-1'>
-                          {company.responsibilities
-                            .slice(0, 3)
-                            .map((resp, rIndex) => (
-                              <li key={rIndex} className='flex items-start'>
-                                <span className='text-green-400 mr-2'>•</span>
-                                <span>{resp}</span>
-                              </li>
-                            ))}
-                          {company.responsibilities.length > 3 && (
-                            <li className='text-gray-400 text-xs'>
-                              +{company.responsibilities.length - 3} more
-                              responsibilities
+                          {company.responsibilities.map((resp, rIndex) => (
+                            <li key={rIndex} className='flex items-start'>
+                              <span className='text-green-400 mr-2'>•</span>
+                              <span>{resp}</span>
                             </li>
-                          )}
+                          ))}
                         </ul>
                       </div>
                     )}
@@ -574,22 +574,15 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
                   {company.achievements && company.achievements.length > 0 && (
                     <div className='mt-3'>
                       <h5 className='text-yellow-400 text-sm font-medium mb-2'>
-                        Key Achievements
+                        Key Achievements ({company.achievements.length})
                       </h5>
                       <ul className='text-gray-300 text-xs space-y-1'>
-                        {company.achievements
-                          .slice(0, 3)
-                          .map((achievement, aIndex) => (
-                            <li key={aIndex} className='flex items-start'>
-                              <span className='text-yellow-400 mr-2'>🏆</span>
-                              <span>{achievement}</span>
-                            </li>
-                          ))}
-                        {company.achievements.length > 3 && (
-                          <li className='text-gray-400 text-xs'>
-                            +{company.achievements.length - 3} more achievements
+                        {company.achievements.map((achievement, aIndex) => (
+                          <li key={aIndex} className='flex items-start'>
+                            <span className='text-yellow-400 mr-2'>🏆</span>
+                            <span>{achievement}</span>
                           </li>
-                        )}
+                        ))}
                       </ul>
                     </div>
                   )}
