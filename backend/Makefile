@@ -19,17 +19,17 @@ dev-setup: install-dev ## Complete development setup
 	@echo "Run 'make test' to run tests"
 
 format: ## Format code with black and isort
-	/Users/Bhuvesh.Singla/Library/Python/3.9/bin/black .
-	/Users/Bhuvesh.Singla/Library/Python/3.9/bin/isort .
+	python3 -m black .
+	python3 -m isort .
 
 lint: ## Run ruff linter
-	/Users/Bhuvesh.Singla/Library/Python/3.9/bin/ruff check .
+	python3 -m ruff check .
 
 lint-fix: ## Run ruff linter and fix issues
-	/Users/Bhuvesh.Singla/Library/Python/3.9/bin/ruff check --fix .
+	python3 -m ruff check --fix .
 
 type-check: ## Run mypy type checker
-	/Users/Bhuvesh.Singla/Library/Python/3.9/bin/mypy .
+	python3 -m mypy .
 
 test: ## Run tests
 	pytest
