@@ -97,6 +97,107 @@ async def parse_resume(file: UploadFile = File(...)) -> Dict[str, Any]:
             detail=f"Error processing file: {str(e)}"
         )
 
+@router.post("/quick-analyze")
+async def quick_analyze_resume(
+    file: UploadFile = File(...)
+) -> Dict[str, Any]:
+    """
+    Quick ATS analysis: Parse resume, detect job type, generate job description, and analyze
+    Uses AI to generate specific job description based on detected role
+    
+    Args:
+        file: Resume file (PDF, DOCX, or TXT)
+        
+    Returns:
+        Comprehensive ATS analysis with AI-generated job description
+    """
+    try:
+        # Validate inputs
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="No file provided")
+        
+        # Check file type
+        file_extension = file.filename.lower().split('.')[-1]
+        if file_extension not in ['pdf', 'docx', 'doc', 'txt']:
+            raise HTTPException(
+                status_code=400, 
+                detail="Unsupported file type. Please upload PDF, DOCX, or TXT files."
+            )
+        
+        # Read and parse file
+        file_content = await file.read()
+        
+        # Check file size
+        if len(file_content) > 10 * 1024 * 1024:
+            raise HTTPException(
+                status_code=400, 
+                detail="File too large. Maximum size is 10MB."
+            )
+        
+        # Parse the resume
+        parsed_resume = file_parser.parse_file(file_content, file.filename)
+        
+        # Detect job type using AI
+        from app.services.job_detector import JobDetector
+        job_detector = JobDetector()
+        job_detection_result = job_detector.detect_job_type(parsed_resume.get('text', ''))
+        
+        if not job_detection_result.get('job_type'):
+            raise HTTPException(
+                status_code=400, 
+                detail="Could not detect job type from resume. Please try again or provide a custom job description."
+            )
+        
+        # Generate specific job description for detected job type
+        from app.services.job_description_generator import JobDescriptionGenerator
+        jd_generator = JobDescriptionGenerator()
+        
+        # Determine experience level from resume
+        experience_level = "mid-level"  # Default
+        if "senior" in job_detection_result.get('job_type', '').lower():
+            experience_level = "senior-level"
+        elif "junior" in job_detection_result.get('job_type', '').lower() or "entry" in job_detection_result.get('job_type', '').lower():
+            experience_level = "entry-level"
+        
+        generated_job_description = jd_generator.generate_job_description(
+            job_detection_result['job_type'], 
+            experience_level
+        )
+        
+        # Extract structured experience data
+        structured_experience = ats_analyzer.extract_structured_experience(parsed_resume.get('text', ''))
+        
+        # Perform comprehensive ATS analysis with generated job description
+        analysis_result = ats_analyzer.analyze_resume_with_job_description(
+            parsed_resume, 
+            generated_job_description
+        )
+        
+        # Add job detection results and generated job description
+        analysis_result.update({
+            "detected_job_type": job_detection_result['job_type'],
+            "job_detection_confidence": job_detection_result.get('confidence', 0.0),
+            "structured_experience": structured_experience,
+            "filename": file.filename,
+            "file_size": len(file_content),
+            "jd_length": len(generated_job_description),
+            "job_description": generated_job_description,  # Include the AI-generated job description
+        })
+        
+        return {
+            "success": True,
+            "data": analysis_result,
+            "message": "Quick analysis completed successfully with AI-generated job description"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error during quick analysis: {str(e)}"
+        )
+
 @router.post("/analyze")
 async def analyze_resume_with_jd(
     file: UploadFile = File(...),

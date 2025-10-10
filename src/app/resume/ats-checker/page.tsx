@@ -111,12 +111,8 @@ export default function ATSCheckerPage() {
         // Quick analysis - backend will generate specific JD based on detected job type
         const formData = new FormData();
         formData.append('file', file);
-        formData.append(
-          'job_description',
-          'Quick Analysis - AI will generate specific job description'
-        );
 
-        const response = await fetch(`${API_URL}/api/upload/analyze`, {
+        const response = await fetch(`${API_URL}/api/upload/quick-analyze`, {
           method: 'POST',
           body: formData,
         });
