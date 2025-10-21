@@ -1,0 +1,108 @@
+{
+  "id": "tech-software-engineer-ats",
+  "name": "Software Engineer (ATS Optimized)",
+  "description": "Clean, ATS-friendly template optimized for software engineering roles. Perfect for technical positions with emphasis on skills and experience.",
+  "category": "tech",
+  "experienceLevel": "mid",
+  "style": "ats-optimized",
+  "atsScore": 95,
+  "preview": "/resume-templates/previews/tech-ats-preview.png",
+  "layout": {
+    "sections": [
+      {
+        "type": "header",
+        "order": 1,
+        "optional": false,
+        "title": "Contact Information"
+      },
+      {
+        "type": "summary",
+        "order": 2,
+        "optional": true,
+        "title": "Professional Summary"
+      },
+      {
+        "type": "experience",
+        "order": 3,
+        "optional": false,
+        "title": "Professional Experience"
+      },
+      {
+        "type": "education",
+        "order": 4,
+        "optional": false,
+        "title": "Education"
+      },
+      {
+        "type": "skills",
+        "order": 5,
+        "optional": false,
+        "title": "Technical Skills"
+      },
+      {
+        "type": "projects",
+        "order": 6,
+        "optional": true,
+        "title": "Key Projects"
+      },
+      {
+        "type": "achievements",
+        "order": 7,
+        "optional": true,
+        "title": "Certifications & Achievements"
+      }
+    ],
+    "colors": {
+      "primary": "#2563eb",
+      "secondary": "#64748b",
+      "accent": "#0ea5e9",
+      "text": "#1f2937",
+      "background": "#ffffff"
+    },
+    "fonts": {
+      "heading": "Arial, sans-serif",
+      "body": "Calibri, sans-serif",
+      "size": {
+        "heading": "18px",
+        "subheading": "14px",
+        "body": "12px",
+        "small": "10px"
+      }
+    },
+    "spacing": {
+      "lineHeight": 1.4,
+      "sectionGap": "16px",
+      "margins": "1in",
+      "padding": "8px"
+    },
+    "columns": 1,
+    "sidebar": false
+  },
+  "sampleData": {
+    "personal": {
+      "fullName": "John Smith",
+      "email": "john.smith@email.com",
+      "phone": "(555) 123-4567",
+      "location": "San Francisco, CA",
+      "linkedin": "linkedin.com/in/johnsmith",
+      "github": "github.com/johnsmith"
+    },
+    "summary": "Experienced Software Engineer with 5+ years developing scalable web applications using React, Node.js, and cloud technologies. Proven track record of delivering high-quality software solutions and leading cross-functional teams.",
+    "skills": {
+      "technical": [
+        "JavaScript",
+        "TypeScript",
+        "React",
+        "Node.js",
+        "Python",
+        "AWS",
+        "Docker",
+        "Git"
+      ],
+      "business": ["Agile", "Scrum", "Project Management"],
+      "soft": ["Leadership", "Problem Solving", "Communication"],
+      "languages": ["English (Native)", "Spanish (Conversational)"],
+      "certifications": ["AWS Certified Developer", "Google Cloud Professional"]
+    }
+  }
+}

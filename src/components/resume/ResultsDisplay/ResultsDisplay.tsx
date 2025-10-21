@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import React, { useCallback, useState } from 'react';
 
 import { ImprovementPlan } from '@/components/resume/ImprovementPlan';
@@ -16,6 +17,7 @@ interface ResultsDisplayProps {
 }
 
 export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
+  const router = useRouter();
   const [improvementPlan, setImprovementPlan] = useState<{
     improvements: ImprovementItem[];
     summary: {
@@ -27,6 +29,233 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
     quick_wins: ImprovementItem[];
   } | null>(null);
   const [loadingImprovements, setLoadingImprovements] = useState(false);
+
+  const convertToResumeData = useCallback(() => {
+    if (!result.extraction_details) return null;
+
+    const extracted = result.extraction_details;
+
+    // Debug logging
+    console.log('🔍 ATS Extraction Debug:');
+    console.log('Full extraction_details:', extracted);
+    console.log('Categorized resume:', extracted.categorized_resume);
+    console.log('Structured experience:', result.structured_experience);
+    console.log('Contact info:', extracted.categorized_resume?.contact_info);
+    console.log(
+      'Work experience:',
+      extracted.categorized_resume?.work_experience
+    );
+    console.log('Education:', extracted.categorized_resume?.education);
+    console.log('Skills:', extracted.categorized_resume?.skills);
+
+    // Use structured_experience if available, otherwise fall back to categorized_resume
+    const structuredData = result.structured_experience;
+    const categorizedData = extracted.categorized_resume;
+
+    // Convert extracted data to ResumeData format
+    const resumeData = {
+      personal: {
+        fullName:
+          structuredData?.contact_info?.full_name ||
+          categorizedData?.contact_info?.full_name ||
+          '',
+        email:
+          structuredData?.contact_info?.email ||
+          categorizedData?.contact_info?.email ||
+          '',
+        phone:
+          structuredData?.contact_info?.phone ||
+          (typeof categorizedData?.contact_info?.phone === 'object'
+            ? categorizedData?.contact_info?.phone?.raw ||
+              categorizedData?.contact_info?.phone?.number ||
+              ''
+            : categorizedData?.contact_info?.phone || ''),
+        location:
+          structuredData?.contact_info?.location ||
+          (typeof categorizedData?.contact_info?.location === 'object'
+            ? categorizedData?.contact_info?.location?.full ||
+              `${categorizedData?.contact_info?.location?.city || ''}, ${categorizedData?.contact_info?.location?.state || ''}, ${categorizedData?.contact_info?.location?.country || ''}`
+                .replace(/^,\s*|,\s*$/g, '')
+                .replace(/,\s*,/g, ',')
+            : categorizedData?.contact_info?.location || ''),
+        linkedin:
+          structuredData?.contact_info?.linkedin ||
+          (typeof categorizedData?.contact_info?.linkedin === 'object'
+            ? categorizedData?.contact_info?.linkedin?.url || ''
+            : categorizedData?.contact_info?.linkedin || ''),
+        github:
+          structuredData?.contact_info?.github ||
+          (typeof categorizedData?.contact_info?.github === 'object'
+            ? categorizedData?.contact_info?.github?.url || ''
+            : categorizedData?.contact_info?.github || ''),
+        portfolio:
+          structuredData?.contact_info?.portfolio ||
+          (typeof categorizedData?.contact_info?.portfolio === 'object'
+            ? categorizedData?.contact_info?.portfolio?.url || ''
+            : categorizedData?.contact_info?.portfolio || ''),
+        website:
+          structuredData?.contact_info?.website ||
+          categorizedData?.contact_info?.website ||
+          '',
+      },
+      summary:
+        structuredData?.summary || categorizedData?.summary_profile || '',
+      experience:
+        structuredData?.work_experience?.map((exp: any, index: number) => ({
+          id: `job-${index}`,
+          position: exp.positions?.[0]?.title || '',
+          company: exp.company || '',
+          location: exp.location || '',
+          startDate: exp.start_date || '',
+          endDate: exp.end_date || '',
+          current: exp.current || false,
+          description:
+            exp.positions?.[0]?.description ||
+            exp.responsibilities?.join('\n') ||
+            '',
+          achievements: exp.achievements || [],
+        })) ||
+        categorizedData?.work_experience?.map((exp: any, index: number) => ({
+          id: exp.item_id || `job-${index}`,
+          position: exp.positions?.[0]?.title || exp.title || '',
+          company: exp.company || '',
+          location: exp.location || '',
+          startDate: exp.start_date || '',
+          endDate: exp.end_date || '',
+          current: exp.current || false,
+          description: exp.positions?.[0]?.description || exp.description || '',
+          achievements:
+            exp.positions?.[0]?.achievements || exp.achievements || [],
+        })) ||
+        [],
+      education:
+        structuredData?.education?.map((edu: any, index: number) => ({
+          id: `edu-${index}`,
+          degree: edu.degree_full || edu.degree || '',
+          institution:
+            edu.institution?.name || edu.school || edu.institution || '',
+          field: edu.major || edu.field || '',
+          location: edu.institution?.location || edu.location || '',
+          startDate: edu.duration?.start_date || edu.start_date || '',
+          endDate: edu.duration?.end_date || edu.end_date || '',
+          current: edu.duration?.current || edu.current || false,
+          gpa: edu.gpa?.value || edu.gpa || '',
+          honors: edu.grade?.honors || edu.honors || [],
+        })) ||
+        categorizedData?.education?.map((edu: any, index: number) => ({
+          id: edu.item_id || `edu-${index}`,
+          degree: edu.degree_full || edu.degree || '',
+          institution:
+            edu.institution?.name || edu.school || edu.institution || '',
+          field: edu.major || edu.field || '',
+          location: edu.institution?.location || edu.location || '',
+          startDate: edu.duration?.start_date || edu.start_date || '',
+          endDate: edu.duration?.end_date || edu.end_date || '',
+          current: edu.duration?.current || edu.current || false,
+          gpa: edu.gpa?.value || edu.gpa || '',
+          honors: edu.grade?.honors || edu.honors || [],
+        })) ||
+        [],
+      skills: {
+        technical:
+          structuredData?.skills?.technical ||
+          categorizedData?.skills?.technical ||
+          extracted.skills_found?.technical ||
+          [],
+        business:
+          structuredData?.skills?.business ||
+          categorizedData?.skills?.business ||
+          extracted.skills_found?.business ||
+          [],
+        soft:
+          structuredData?.skills?.soft ||
+          categorizedData?.skills?.soft ||
+          extracted.skills_found?.soft ||
+          [],
+        languages:
+          structuredData?.skills?.languages ||
+          categorizedData?.languages ||
+          extracted.skills_found?.languages ||
+          [],
+        certifications:
+          structuredData?.skills?.certifications ||
+          categorizedData?.certifications ||
+          categorizedData?.skills?.certifications ||
+          extracted.skills_found?.certifications ||
+          [],
+      },
+      projects:
+        structuredData?.projects?.map((project: any, index: number) => ({
+          id: project.item_id || `project-${index}`,
+          name: project.name || project.title || '',
+          description: project.description || '',
+          technologies: project.technologies || project.tech_stack || [],
+          url: project.url || project.link || '',
+          github: project.github || project.repository || '',
+          startDate: project.start_date || '',
+          endDate: project.end_date || '',
+        })) ||
+        categorizedData?.projects?.map((project: any, index: number) => ({
+          id: project.item_id || `project-${index}`,
+          name: project.name || project.title || '',
+          description: project.description || '',
+          technologies: project.technologies || project.tech_stack || [],
+          url: project.url || project.link || '',
+          github: project.github || project.repository || '',
+          startDate: project.start_date || '',
+          endDate: project.end_date || '',
+        })) ||
+        [],
+      achievements:
+        structuredData?.work_experience?.flatMap(
+          exp => exp.achievements || []
+        ) ||
+        categorizedData?.achievements ||
+        [],
+    };
+
+    console.log('✅ Converted Resume Data:', resumeData);
+    return resumeData;
+  }, [result.extraction_details]);
+
+  const handleEditInBuilder = useCallback(() => {
+    const resumeData = convertToResumeData();
+    console.log('Converting to resume data:', resumeData);
+    console.log('Original result:', result);
+    console.log('Extraction details:', result.extraction_details);
+
+    if (resumeData) {
+      try {
+        // Save the resume data to localStorage for the builder to pick up
+        localStorage.setItem('resume-builder-data', JSON.stringify(resumeData));
+
+        // Also save metadata about the source
+        localStorage.setItem(
+          'resume-builder-source',
+          JSON.stringify({
+            source: 'ats-checker',
+            timestamp: new Date().toISOString(),
+            originalJobType: result.jobType,
+            atsScore: result.ats_score,
+          })
+        );
+
+        // Show success message (optional - could be a toast notification)
+        console.log('Resume data saved successfully, navigating to builder...');
+        console.log('Saved data:', JSON.stringify(resumeData, null, 2));
+
+        // Navigate to the resume builder
+        router.push('/resume/builder');
+      } catch (error) {
+        console.error('Error saving resume data:', error);
+        // Still navigate even if localStorage fails
+        router.push('/resume/builder');
+      }
+    } else {
+      console.warn('No resume data to save, navigating to builder anyway...');
+      router.push('/resume/builder');
+    }
+  }, [convertToResumeData, router, result.jobType, result.ats_score]);
 
   const fetchImprovementPlan = useCallback(async () => {
     if (!result.extraction_details) return;
@@ -79,6 +308,150 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           Detected job type:{' '}
           <span className='text-cyan-400 font-medium'>{result.jobType}</span>
         </p>
+
+        {/* Resume Improvement Actions */}
+        {result.extraction_details && (
+          <div className='mt-8 space-y-4'>
+            <div className='text-center'>
+              <h3 className='text-xl font-semibold text-white mb-2'>
+                Ready to Improve Your Resume?
+              </h3>
+              <p className='text-gray-300 mb-6'>
+                Take action based on your ATS analysis results
+              </p>
+            </div>
+
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto'>
+              {/* Primary Action - Edit in Resume Builder */}
+              <button
+                onClick={handleEditInBuilder}
+                className='group relative overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl'
+              >
+                <div className='absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
+                <div className='relative flex items-center justify-center space-x-3'>
+                  <svg
+                    className='w-6 h-6'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
+                    />
+                  </svg>
+                  <div className='text-left'>
+                    <div className='text-lg font-bold'>
+                      Edit in Resume Builder
+                    </div>
+                    <div className='text-sm opacity-90'>
+                      Pre-filled with your data
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              {/* Secondary Action - Improve Design */}
+              <button
+                onClick={handleEditInBuilder}
+                className='group relative overflow-hidden bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl'
+              >
+                <div className='absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
+                <div className='relative flex items-center justify-center space-x-3'>
+                  <svg
+                    className='w-6 h-6'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z'
+                    />
+                  </svg>
+                  <div className='text-left'>
+                    <div className='text-lg font-bold'>Change Design</div>
+                    <div className='text-sm opacity-90'>
+                      New template & layout
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* Additional Options */}
+            <div className='flex flex-wrap justify-center gap-3 mt-6'>
+              <button
+                onClick={handleEditInBuilder}
+                className='inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors duration-200 text-sm'
+              >
+                <svg
+                  className='w-4 h-4 mr-2'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.824-2.709M15 6.291A7.962 7.962 0 0012 5c-2.34 0-4.29 1.009-5.824 2.709'
+                  />
+                </svg>
+                Improve Content
+              </button>
+              <button
+                onClick={handleEditInBuilder}
+                className='inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors duration-200 text-sm'
+              >
+                <svg
+                  className='w-4 h-4 mr-2'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4'
+                  />
+                </svg>
+                Optimize for ATS
+              </button>
+              <button
+                onClick={handleEditInBuilder}
+                className='inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors duration-200 text-sm'
+              >
+                <svg
+                  className='w-4 h-4 mr-2'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12'
+                  />
+                </svg>
+                Export Resume
+              </button>
+            </div>
+
+            <div className='text-center mt-4'>
+              <p className='text-sm text-gray-400'>
+                ✨ Your resume data will be automatically loaded into the
+                builder
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* AI-Generated Job Description */}

@@ -203,3 +203,4 @@ Generate a complete, ready-to-post job description that sounds like it came from
 
 # Create global instance
 jd_generator = JobDescriptionGenerator()
+job_description_generator = jd_generator  # Alias for backward compatibility

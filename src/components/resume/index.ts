@@ -1,3 +1,12 @@
+export { AIAssistant } from './AIAssistant';
 export { ATSAnalysis } from './ATSAnalysis';
+export { ATSIntegration } from './ATSIntegration';
+export { DOCXExporter } from './DOCXExporter';
+export { DragDropSections } from './DragDropSections';
 export { ImprovementPlan } from './ImprovementPlan';
+export { PDFExporter } from './PDFExporter';
 export { ResultsDisplay } from './ResultsDisplay';
+export { ResumeBuilder } from './ResumeBuilder';
+export { ResumeManager } from './ResumeManager';
+export { RichTextEditor } from './RichTextEditor';
+export { TemplateGallery } from './TemplateGallery';

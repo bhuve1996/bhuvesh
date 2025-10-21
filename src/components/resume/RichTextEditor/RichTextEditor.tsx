@@ -1,0 +1,221 @@
+'use client';
+
+import { Button } from '@/components/ui/Button';
+import Placeholder from '@tiptap/extension-placeholder';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import React from 'react';
+
+interface RichTextEditorProps {
+  content: string;
+  onChange: (content: string) => void;
+  placeholder?: string;
+  className?: string;
+  maxLength?: number;
+}
+
+export const RichTextEditor: React.FC<RichTextEditorProps> = ({
+  content,
+  onChange,
+  placeholder = 'Start typing...',
+  className = '',
+  maxLength = 500,
+}) => {
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
+      Placeholder.configure({
+        placeholder,
+      }),
+    ],
+    content,
+    immediatelyRender: false, // Fix SSR hydration issues
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      const text = editor.getText();
+
+      // Check length limit
+      if (text.length <= maxLength) {
+        onChange(html);
+      } else {
+        // Revert to previous content if over limit
+        editor.commands.setContent(content);
+      }
+    },
+    editorProps: {
+      attributes: {
+        class: `prose prose-sm max-w-none focus:outline-none ${className}`,
+      },
+    },
+  });
+
+  const toggleBold = () => {
+    editor?.chain().focus().toggleBold().run();
+  };
+
+  const toggleItalic = () => {
+    editor?.chain().focus().toggleItalic().run();
+  };
+
+  const toggleBulletList = () => {
+    editor?.chain().focus().toggleBulletList().run();
+  };
+
+  const toggleOrderedList = () => {
+    editor?.chain().focus().toggleOrderedList().run();
+  };
+
+  const insertBulletPoint = () => {
+    editor?.chain().focus().insertContent('• ').run();
+  };
+
+  const clearFormatting = () => {
+    editor?.chain().focus().clearNodes().unsetAllMarks().run();
+  };
+
+  if (!isClient || !editor) {
+    return (
+      <div className='border border-gray-300 rounded-lg p-4 min-h-[120px] bg-gray-50 animate-pulse'>
+        <div className='h-4 bg-gray-200 rounded w-1/4 mb-2'></div>
+        <div className='h-4 bg-gray-200 rounded w-3/4'></div>
+      </div>
+    );
+  }
+
+  const currentLength = editor.getText().length;
+  const isOverLimit = currentLength > maxLength;
+
+  return (
+    <div className='border border-gray-300 rounded-lg overflow-hidden'>
+      {/* Toolbar */}
+      <div className='flex items-center gap-1 p-2 bg-gray-50 border-b border-gray-200'>
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          onClick={toggleBold}
+          className={`h-8 w-8 p-0 ${editor.isActive('bold') ? 'bg-gray-200' : ''}`}
+          title='Bold'
+        >
+          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+            <path d='M5 4a1 1 0 011-1h5.5a3.5 3.5 0 013.5 3.5v.5a3 3 0 01-1.5 2.6A3.5 3.5 0 0115 13.5V14a3.5 3.5 0 01-3.5 3.5H6a1 1 0 01-1-1V4zm2 1v4h4.5a1.5 1.5 0 001.5-1.5V6.5A1.5 1.5 0 0011.5 5H7zm0 6v4h5.5a1.5 1.5 0 001.5-1.5v-.5a1.5 1.5 0 00-1.5-1.5H7z' />
+          </svg>
+        </Button>
+
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          onClick={toggleItalic}
+          className={`h-8 w-8 p-0 ${editor.isActive('italic') ? 'bg-gray-200' : ''}`}
+          title='Italic'
+        >
+          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+            <path d='M8 3a1 1 0 000 2h1.5l-3 10H5a1 1 0 100 2h6a1 1 0 100-2h-1.5l3-10H14a1 1 0 100-2H8z' />
+          </svg>
+        </Button>
+
+        <div className='w-px h-6 bg-gray-300 mx-1'></div>
+
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          onClick={toggleBulletList}
+          className={`h-8 w-8 p-0 ${editor.isActive('bulletList') ? 'bg-gray-200' : ''}`}
+          title='Bullet List'
+        >
+          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+            <path d='M3 4a1 1 0 100-2 1 1 0 000 2zm0 4a1 1 0 100-2 1 1 0 000 2zm0 4a1 1 0 100-2 1 1 0 000 2zm0 4a1 1 0 100-2 1 1 0 000 2zM11 4a1 1 0 10-2 0v12a1 1 0 102 0V4z' />
+          </svg>
+        </Button>
+
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          onClick={toggleOrderedList}
+          className={`h-8 w-8 p-0 ${editor.isActive('orderedList') ? 'bg-gray-200' : ''}`}
+          title='Numbered List'
+        >
+          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+            <path d='M2 3a1 1 0 011-1h2a1 1 0 110 2H4v1h1a1 1 0 110 2H3a1 1 0 01-1-1V3zm0 4a1 1 0 011-1h2a1 1 0 110 2H4v1h1a1 1 0 110 2H3a1 1 0 01-1-1V7zm0 4a1 1 0 011-1h2a1 1 0 110 2H4v1h1a1 1 0 110 2H3a1 1 0 01-1-1v-2zm0 4a1 1 0 011-1h2a1 1 0 110 2H4v1h1a1 1 0 110 2H3a1 1 0 01-1-1v-2z' />
+          </svg>
+        </Button>
+
+        <div className='w-px h-6 bg-gray-300 mx-1'></div>
+
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          onClick={insertBulletPoint}
+          className='h-8 w-8 p-0'
+          title='Insert Bullet Point'
+        >
+          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+            <path d='M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z' />
+          </svg>
+        </Button>
+
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          onClick={clearFormatting}
+          className='h-8 w-8 p-0'
+          title='Clear Formatting'
+        >
+          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+            <path d='M4 3a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h12a1 1 0 100-2H4z' />
+          </svg>
+        </Button>
+
+        <div className='flex-1'></div>
+
+        {/* Character count */}
+        <div
+          className={`text-xs px-2 py-1 rounded ${
+            isOverLimit
+              ? 'text-red-600 bg-red-50'
+              : currentLength > maxLength * 0.8
+                ? 'text-yellow-600 bg-yellow-50'
+                : 'text-gray-500'
+          }`}
+        >
+          {currentLength}/{maxLength}
+        </div>
+      </div>
+
+      {/* Editor */}
+      <div className='p-4 min-h-[120px]'>
+        <EditorContent editor={editor} />
+      </div>
+
+      {/* Error message */}
+      {isOverLimit && (
+        <div className='px-4 pb-2'>
+          <p className='text-xs text-red-600'>
+            Character limit exceeded. Please shorten your text.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default RichTextEditor;
