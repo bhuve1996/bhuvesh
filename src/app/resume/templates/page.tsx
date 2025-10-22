@@ -4,11 +4,16 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 import { ResumeTemplateRenderer } from '@/components/resume/templates/ResumeTemplateRenderer';
+import { TemplateCustomizer } from '@/components/resume/templates/TemplateCustomizer';
 import { TemplatePreview } from '@/components/resume/templates/TemplatePreview';
+import { ValidationModal } from '@/components/resume/ValidationModal';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { useResumeNavigation } from '@/contexts/ResumeNavigationContext';
 import { cloudStorage } from '@/lib/resume/cloudStorage';
 import { exportResume } from '@/lib/resume/exportUtils';
+import { validateResumeData, ValidationResult } from '@/lib/resume/validation';
+import { useResumeActions, useResumeStore } from '@/store/resumeStore';
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
 // Modern template data with beautiful designs
@@ -412,33 +417,51 @@ const modernTemplates: ResumeTemplate[] = [
 ];
 
 export default function TemplateGalleryPage() {
-  const [selectedTemplate, setSelectedTemplate] =
+  const [selectedTemplate] =
+    useState<ResumeTemplate | null>(null);
+  const [customizedTemplate, setCustomizedTemplate] =
     useState<ResumeTemplate | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedStyle, setSelectedStyle] = useState<string>('all');
   const [isExporting, setIsExporting] = useState(false);
-  const [userResumeData, setUserResumeData] = useState<ResumeData | null>(null);
-  const [useUserData, setUseUserData] = useState<boolean>(false);
-  const [showDataChoice, setShowDataChoice] = useState<boolean>(false);
-  const [hasResumeBuilderData, setHasResumeBuilderData] = useState(false);
+  const [showFloatingMenu, setShowFloatingMenu] = useState(false);
+  const [showValidationModal, setShowValidationModal] = useState(false);
+  const [validationResult, setValidationResult] =
+    useState<ValidationResult | null>(null);
+  const [pendingExportFormat, setPendingExportFormat] = useState<
+    'pdf' | 'docx' | 'txt' | null
+  >(null);
 
-  // Check for resume builder data
+  // Use global state
+  const userResumeData = useResumeStore(state => state.resumeData);
+  const { setUseUserData, setShowDataChoice, setSelectedTemplate, setResumeData } =
+    useResumeActions();
+  const { navigateToResumeBuilder, navigateToAtsChecker } =
+    useResumeNavigation();
+
+  const useUserData = useResumeStore(state => state.useUserData);
+  const showDataChoice = useResumeStore(state => state.showDataChoice);
+  const hasResumeBuilderData = !!userResumeData;
+
+  // Close floating menu when clicking outside
   useEffect(() => {
-    const resumeBuilderData = localStorage.getItem('resumeBuilderData');
-    if (resumeBuilderData) {
-      try {
-        const parsedData = JSON.parse(resumeBuilderData);
-        setUserResumeData(parsedData);
-        setHasResumeBuilderData(true);
-        setUseUserData(true);
-        // Clear the data after using it
-        localStorage.removeItem('resumeBuilderData');
-      } catch {
-        // Error parsing resume builder data
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.floating-menu-container')) {
+        setShowFloatingMenu(false);
       }
+    };
+
+    if (showFloatingMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, []);
+    return undefined;
+  }, [showFloatingMenu]);
+
+  // Data is now managed by global state
 
   // Fetch user's existing resume data
   useEffect(() => {
@@ -456,7 +479,7 @@ export default function TemplateGalleryPage() {
             source.source === 'ats-checker' ||
             source.source === 'resume-builder'
           ) {
-            setUserResumeData(resumeData);
+            setResumeData(resumeData);
           }
         }
 
@@ -469,7 +492,7 @@ export default function TemplateGalleryPage() {
               latestResume.id
             );
             if (resumeData) {
-              setUserResumeData(resumeData);
+              setResumeData(resumeData);
             }
           }
         }
@@ -628,6 +651,7 @@ export default function TemplateGalleryPage() {
 
   const handleTemplateSelect = (template: ResumeTemplate) => {
     setSelectedTemplate(template);
+    setCustomizedTemplate(template); // Initialize customized template
 
     // If user has existing data, show choice dialog
     if (userResumeData) {
@@ -637,26 +661,55 @@ export default function TemplateGalleryPage() {
     }
   };
 
+  const handleTemplateCustomize = (template: ResumeTemplate) => {
+    setCustomizedTemplate(template);
+  };
+
   const handleUseTemplate = () => {
     if (selectedTemplate) {
-      // Navigate to resume builder with selected template
-      window.location.href = `/resume/builder?template=${selectedTemplate.id}`;
+      // Store selected template in global state and navigate to resume builder
+      setSelectedTemplate(selectedTemplate);
+      navigateToResumeBuilder();
     }
   };
 
   const handleExport = async (format: 'pdf' | 'docx' | 'txt') => {
     if (!selectedTemplate) return;
 
+    const dataToUse =
+      useUserData && userResumeData ? userResumeData : sampleResumeData;
+
+    // Validate resume data before exporting
+    const validation = validateResumeData(dataToUse);
+    setValidationResult(validation);
+    setPendingExportFormat(format);
+    setShowValidationModal(true);
+  };
+
+  const handleValidationProceed = async () => {
+    if (!selectedTemplate || !pendingExportFormat) return;
+
     try {
       setIsExporting(true);
       const dataToUse =
         useUserData && userResumeData ? userResumeData : sampleResumeData;
-      await exportResume(format, selectedTemplate, dataToUse);
+      // Use customized template if available, otherwise use selected template
+      const templateToUse = customizedTemplate || selectedTemplate;
+      await exportResume(pendingExportFormat, templateToUse, dataToUse);
     } catch {
       alert('Export failed. Please try again.');
     } finally {
       setIsExporting(false);
+      setShowValidationModal(false);
+      setPendingExportFormat(null);
+      setValidationResult(null);
     }
+  };
+
+  const handleValidationCancel = () => {
+    setShowValidationModal(false);
+    setPendingExportFormat(null);
+    setValidationResult(null);
   };
 
   const handleDataChoice = (useUserDataChoice: boolean) => {
@@ -802,149 +855,54 @@ export default function TemplateGalleryPage() {
       </div>
 
       <div className='max-w-7xl mx-auto px-6 py-8'>
-        {/* Top Bar - Template Info and Export Options */}
-        {selectedTemplate && (
-          <div className='bg-white rounded-xl shadow-lg border border-slate-200 p-6 mb-8'>
-            <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6'>
-              {/* Template Info */}
-              <div className='flex-1'>
-                <h3 className='text-2xl font-bold text-slate-900 mb-2'>
-                  {selectedTemplate.name}
-                </h3>
-                <p className='text-slate-600 mb-4'>
-                  {selectedTemplate.description}
-                </p>
-                <div className='flex flex-wrap gap-4 text-sm'>
-                  <div className='flex items-center gap-2'>
-                    <span className='text-slate-600'>Category:</span>
-                    <span className='font-medium text-slate-900'>
-                      {getCategoryLabel(selectedTemplate.category)}
-                    </span>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <span className='text-slate-600'>Experience:</span>
-                    <span className='font-medium text-slate-900'>
-                      {selectedTemplate.experienceLevel}
-                    </span>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <span className='text-slate-600'>Style:</span>
-                    <span className='font-medium text-slate-900'>
-                      {getStyleLabel(selectedTemplate.style)}
-                    </span>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <span className='text-slate-600'>Data:</span>
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        useUserData && userResumeData
-                          ? 'bg-purple-100 text-purple-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {useUserData && userResumeData
-                        ? 'Your Data'
-                        : 'Sample Data'}
-                    </span>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <span className='text-slate-600'>ATS Score:</span>
-                    <span className='font-bold text-green-600'>
-                      {selectedTemplate.atsScore}/100
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Export Options and Use Template Button */}
-              <div className='flex flex-col sm:flex-row gap-3'>
-                {userResumeData && (
-                  <Button
-                    onClick={() => setShowDataChoice(true)}
-                    variant='outline'
-                    className='text-sm'
-                  >
-                    {useUserData ? 'Switch to Sample' : 'Use My Data'}
-                  </Button>
-                )}
-                <Button
-                  onClick={handleUseTemplate}
-                  className='bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200'
+        {/* Navigation Bar */}
+        <div className='mb-8'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-4'>
+              <button
+                onClick={() => navigateToAtsChecker()}
+                className='flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors'
+              >
+                <svg
+                  className='w-4 h-4'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
                 >
-                  Use This Template
-                </Button>
-                <div className='flex gap-2'>
-                  <Button
-                    onClick={() => handleExport('pdf')}
-                    disabled={isExporting}
-                    variant='outline'
-                    size='sm'
-                    className='flex items-center gap-2'
-                  >
-                    <svg
-                      className='w-4 h-4'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                      />
-                    </svg>
-                    PDF
-                  </Button>
-                  <Button
-                    onClick={() => handleExport('docx')}
-                    disabled={isExporting}
-                    variant='outline'
-                    size='sm'
-                    className='flex items-center gap-2'
-                  >
-                    <svg
-                      className='w-4 h-4'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                      />
-                    </svg>
-                    DOCX
-                  </Button>
-                  <Button
-                    onClick={() => handleExport('txt')}
-                    disabled={isExporting}
-                    variant='outline'
-                    size='sm'
-                    className='flex items-center gap-2'
-                  >
-                    <svg
-                      className='w-4 h-4'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                      />
-                    </svg>
-                    TXT
-                  </Button>
-                </div>
-              </div>
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M15 19l-7-7 7-7'
+                  />
+                </svg>
+                ATS Checker
+              </button>
+              <button
+                onClick={() => navigateToResumeBuilder()}
+                className='flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors'
+              >
+                <svg
+                  className='w-4 h-4'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
+                  />
+                </svg>
+                Resume Builder
+              </button>
+            </div>
+            <div className='text-sm text-slate-500'>
+              {hasResumeBuilderData ? 'Your data loaded' : 'Using sample data'}
             </div>
           </div>
-        )}
+        </div>
 
         <div className='grid grid-cols-1 lg:grid-cols-4 gap-8'>
           {/* Left Sidebar - Template Gallery */}
@@ -1123,25 +1081,34 @@ export default function TemplateGalleryPage() {
             )}
           </div>
 
-          {/* Right Sidebar - Live Resume Preview Only */}
+          {/* Main Content Area - Template Customizer + Preview */}
           <div className='lg:col-span-3'>
             {selectedTemplate ? (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className='bg-white rounded-xl shadow-lg border border-slate-200 p-6'
-              >
-                <h4 className='font-semibold text-slate-900 mb-4'>
-                  Live Preview
-                </h4>
-                <div className='border border-slate-200 rounded-lg overflow-hidden overflow-y-auto'>
-                  <ResumeTemplateRenderer
-                    template={selectedTemplate}
-                    data={getPreviewData()}
-                    className='scale-90 origin-top-left'
-                  />
-                </div>
-              </motion.div>
+              <div className='space-y-6'>
+                {/* Template Customizer at Top */}
+                <TemplateCustomizer
+                  template={customizedTemplate || selectedTemplate}
+                  onTemplateChange={handleTemplateCustomize}
+                />
+
+                {/* Live Preview */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className='bg-white rounded-xl shadow-lg border border-slate-200 p-6'
+                >
+                  <h4 className='font-semibold text-slate-900 mb-4'>
+                    Live Preview
+                  </h4>
+                  <div className='border border-slate-200 rounded-lg overflow-hidden overflow-y-auto'>
+                    <ResumeTemplateRenderer
+                      template={customizedTemplate || selectedTemplate}
+                      data={getPreviewData()}
+                      className='scale-70 origin-top-left hover:scale-90 transition-transform duration-300'
+                    />
+                  </div>
+                </motion.div>
+              </div>
             ) : (
               <div className='bg-white rounded-xl shadow-lg border border-slate-200 p-6 text-center'>
                 <div className='w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center'>
@@ -1176,6 +1143,212 @@ export default function TemplateGalleryPage() {
           </div>
         </div>
       </div>
+
+      {/* Floating Action Button */}
+      {selectedTemplate && (
+        <div className='fixed bottom-6 right-6 z-50 floating-menu-container'>
+          {/* Main FAB */}
+          <motion.button
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setShowFloatingMenu(!showFloatingMenu)}
+            className='w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center'
+          >
+            <svg
+              className={`w-6 h-6 transition-transform duration-300 ${
+                showFloatingMenu ? 'rotate-45' : ''
+              }`}
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M12 6v6m0 0v6m0-6h6m-6 0H6'
+              />
+            </svg>
+          </motion.button>
+
+          {/* Floating Menu */}
+          <AnimatePresence>
+            {showFloatingMenu && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+                className='absolute bottom-16 right-0 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 min-w-[200px]'
+              >
+                {/* Template Info */}
+                <div className='mb-4 pb-4 border-b border-slate-200'>
+                  <h3 className='font-bold text-slate-900 text-sm'>
+                    {selectedTemplate.name}
+                  </h3>
+                  <div className='flex items-center gap-2 mt-1'>
+                    <span className='text-xs text-slate-500'>ATS Score:</span>
+                    <span className='text-xs font-bold text-green-600'>
+                      {selectedTemplate.atsScore}/100
+                    </span>
+                  </div>
+                  <div className='flex items-center gap-2 mt-1'>
+                    <span className='text-xs text-slate-500'>Data:</span>
+                    <span
+                      className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                        useUserData && userResumeData
+                          ? 'bg-purple-100 text-purple-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {useUserData && userResumeData
+                        ? 'Your Data'
+                        : 'Sample Data'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className='space-y-2'>
+                  {/* Use Template */}
+                  <button
+                    onClick={handleUseTemplate}
+                    className='w-full text-left px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors'
+                  >
+                    <div className='flex items-center gap-2'>
+                      <svg
+                        className='w-4 h-4'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+                        />
+                      </svg>
+                      Use This Template
+                    </div>
+                  </button>
+
+                  {/* Switch Data */}
+                  {userResumeData && (
+                    <button
+                      onClick={() => setShowDataChoice(true)}
+                      className='w-full text-left px-3 py-2 text-sm font-medium text-purple-600 hover:bg-purple-50 rounded-lg transition-colors'
+                    >
+                      <div className='flex items-center gap-2'>
+                        <svg
+                          className='w-4 h-4'
+                          fill='none'
+                          stroke='currentColor'
+                          viewBox='0 0 24 24'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth={2}
+                            d='M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4'
+                          />
+                        </svg>
+                        {useUserData ? 'Switch to Sample' : 'Use My Data'}
+                      </div>
+                    </button>
+                  )}
+
+                  {/* Export Options */}
+                  <div className='pt-2 border-t border-slate-200'>
+                    <div className='text-xs font-medium text-slate-500 mb-2 px-3'>
+                      Export as:
+                    </div>
+                    <button
+                      onClick={() => handleExport('pdf')}
+                      disabled={isExporting}
+                      className='w-full text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors disabled:opacity-50'
+                    >
+                      <div className='flex items-center gap-2'>
+                        <svg
+                          className='w-4 h-4'
+                          fill='none'
+                          stroke='currentColor'
+                          viewBox='0 0 24 24'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth={2}
+                            d='M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+                          />
+                        </svg>
+                        PDF
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleExport('docx')}
+                      disabled={isExporting}
+                      className='w-full text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors disabled:opacity-50'
+                    >
+                      <div className='flex items-center gap-2'>
+                        <svg
+                          className='w-4 h-4'
+                          fill='none'
+                          stroke='currentColor'
+                          viewBox='0 0 24 24'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth={2}
+                            d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+                          />
+                        </svg>
+                        DOCX
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleExport('txt')}
+                      disabled={isExporting}
+                      className='w-full text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors disabled:opacity-50'
+                    >
+                      <div className='flex items-center gap-2'>
+                        <svg
+                          className='w-4 h-4'
+                          fill='none'
+                          stroke='currentColor'
+                          viewBox='0 0 24 24'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth={2}
+                            d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+                          />
+                        </svg>
+                        TXT
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* Validation Modal */}
+      {validationResult && pendingExportFormat && (
+        <ValidationModal
+          isOpen={showValidationModal}
+          onClose={handleValidationCancel}
+          onProceed={handleValidationProceed}
+          validationResult={validationResult}
+          actionType='export'
+        />
+      )}
     </div>
   );
 }

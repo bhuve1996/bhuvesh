@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { ReactNode } from 'react';
 
 import { ChevronIcon } from '../ChevronIcon';
@@ -65,8 +66,15 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   const colors = colorClasses[color];
 
   return (
-    <div className={`p-6 border-l-4 ${colors.border}`}>
-      <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className={`p-6 border-l-4 ${colors.border}`}
+    >
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
         className='flex items-center justify-between cursor-pointer mb-6'
         onClick={onToggle}
       >
@@ -85,13 +93,30 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
             {count} {countLabel}
           </span>
         </div>
-        <ChevronIcon
-          direction={isExpanded ? 'down' : 'right'}
-          className={`w-6 h-6 ${colors.text}`}
-        />
-      </div>
-      {isExpanded && <div className='space-y-4'>{children}</div>}
-    </div>
+        <motion.div
+          animate={{ rotate: isExpanded ? 90 : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <ChevronIcon
+            direction={isExpanded ? 'down' : 'right'}
+            className={`w-6 h-6 ${colors.text}`}
+          />
+        </motion.div>
+      </motion.div>
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className='space-y-4 overflow-hidden'
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

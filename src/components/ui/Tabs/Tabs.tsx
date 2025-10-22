@@ -19,24 +19,28 @@ export const Tabs: React.FC<TabsProps> = ({
     switch (variant) {
       case 'pills':
         return {
-          container: 'bg-gray-800/50 p-1 rounded-lg',
-          tab: 'px-4 py-2 rounded-md font-medium transition-all duration-300',
+          container: 'bg-slate-100 dark:bg-slate-800/50 p-1 rounded-lg',
+          tab: 'px-3 py-1.5 text-sm rounded-md font-medium transition-all duration-300',
           activeTab: 'bg-cyan-500 text-white shadow-lg',
-          inactiveTab: 'text-gray-400 hover:text-white hover:bg-gray-700/50',
+          inactiveTab:
+            'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700/50',
         };
       case 'underline':
         return {
-          container: 'border-b border-gray-700',
-          tab: 'px-6 py-3 font-medium transition-all duration-300 relative',
-          activeTab: 'text-cyan-400',
-          inactiveTab: 'text-gray-400 hover:text-white',
+          container: 'border-b border-slate-200 dark:border-slate-700',
+          tab: 'px-4 py-2 text-sm font-medium transition-all duration-300 relative',
+          activeTab: 'text-cyan-500 dark:text-cyan-400',
+          inactiveTab:
+            'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white',
         };
       default:
         return {
-          container: 'bg-gray-800/30 p-1 rounded-lg border border-gray-700',
-          tab: 'px-4 py-2 rounded-md font-medium transition-all duration-300',
+          container:
+            'bg-slate-100 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200 dark:border-slate-700',
+          tab: 'px-3 py-1.5 text-sm rounded-md font-medium transition-all duration-300',
           activeTab: 'bg-cyan-500 text-white shadow-lg',
-          inactiveTab: 'text-gray-400 hover:text-white hover:bg-gray-700/50',
+          inactiveTab:
+            'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700/50',
         };
     }
   };
@@ -46,7 +50,7 @@ export const Tabs: React.FC<TabsProps> = ({
   return (
     <div className={`w-full ${className}`}>
       {/* Tab Headers */}
-      <div className={`flex flex-wrap gap-1 ${variantClasses.container}`}>
+      <div className={`flex gap-1 ${variantClasses.container}`}>
         {items.map(item => (
           <motion.button
             key={item.id}
@@ -56,21 +60,28 @@ export const Tabs: React.FC<TabsProps> = ({
                 ? variantClasses.activeTab
                 : variantClasses.inactiveTab
             }`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{
+              scale: 1.05,
+              y: -2,
+              transition: { duration: 0.2 },
+            }}
+            whileTap={{
+              scale: 0.95,
+              transition: { duration: 0.1 },
+            }}
           >
-            <div className='flex items-center gap-2'>
-              {item.icon && <span className='text-lg'>{item.icon}</span>}
+            <div className='flex items-center gap-1.5'>
+              {item.icon && <span className='text-sm'>{item.icon}</span>}
               <span>{item.label}</span>
               {item.badge && (
-                <span className='px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs'>
+                <span className='px-1.5 py-0.5 bg-cyan-500/20 text-cyan-400 rounded-full text-xs'>
                   {item.badge}
                 </span>
               )}
             </div>
             {variant === 'underline' && activeTab === item.id && (
               <motion.div
-                className='absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400'
+                className='absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-500 dark:bg-cyan-400'
                 layoutId='activeTab'
                 initial={false}
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}

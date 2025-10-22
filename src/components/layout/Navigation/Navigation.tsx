@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -41,7 +42,10 @@ export const Navigation: React.FC<NavigationProps> = ({
   };
 
   return (
-    <nav
+    <motion.nav
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
       className='fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border'
       role='navigation'
       aria-label='Main navigation'
@@ -49,28 +53,45 @@ export const Navigation: React.FC<NavigationProps> = ({
       <div className={`${COMMON_CLASSES.container} py-4`}>
         <div className='flex justify-between items-center'>
           {/* Logo */}
-          <Link
-            href='/'
-            className='group hover:opacity-90 transition-all duration-300'
-            aria-label='Go to homepage'
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className='relative'>
-              <Image
-                src='/logo.png'
-                alt='Bhuvesh Logo'
-                width={128}
-                height={50}
-                className='w-32 h-[50px] rounded-lg object-cover group-hover:scale-105 transition-transform duration-300'
-                priority
-              />
-              <div className='absolute inset-0 bg-primary-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
-            </div>
-          </Link>
+            <Link
+              href='/'
+              className='group hover:opacity-90 transition-all duration-300'
+              aria-label='Go to homepage'
+            >
+              <div className='relative'>
+                <Image
+                  src='/logo.png'
+                  alt='Bhuvesh Logo'
+                  width={128}
+                  height={50}
+                  className='w-32 h-[50px] rounded-lg object-cover group-hover:scale-105 transition-transform duration-300'
+                  priority
+                />
+                <div className='absolute inset-0 bg-primary-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+              </div>
+            </Link>
+          </motion.div>
 
           {/* Desktop Navigation */}
-          <div className='hidden md:flex items-center space-x-1' role='menubar'>
-            {navItems.map(item => (
-              <React.Fragment key={item.label}>
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className='hidden md:flex items-center space-x-1'
+            role='menubar'
+          >
+            {navItems.map((item, index) => (
+              <motion.div
+                key={item.label}
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+              >
                 {item.href.includes('#') ? (
                   <Link
                     href={item.href}
@@ -101,17 +122,27 @@ export const Navigation: React.FC<NavigationProps> = ({
                     <div className='absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                   </Link>
                 )}
-              </React.Fragment>
+              </motion.div>
             ))}
 
             {/* Theme Toggle */}
-            <div className='ml-4'>
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.8 }}
+              className='ml-4'
+            >
               <ThemeToggle size='sm' />
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Mobile Menu Button */}
-          <button
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.5 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             className='md:hidden relative p-2 text-foreground hover:text-primary-400 hover:bg-muted/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label='Toggle mobile menu'
@@ -130,58 +161,76 @@ export const Navigation: React.FC<NavigationProps> = ({
                 className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45' : 'translate-y-1'}`}
               ></span>
             </div>
-          </button>
+          </motion.button>
         </div>
 
         {/* Mobile Navigation */}
-        <div
-          id='mobile-menu'
-          className={`md:hidden overflow-hidden transition-all duration-300 ${isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-          role='menu'
-          aria-hidden={!isMobileMenuOpen}
-        >
-          <div className='pt-4 pb-4 border-t border-border'>
-            <div className='flex flex-col space-y-2'>
-              {navItems.map(item => (
-                <React.Fragment key={item.label}>
-                  {item.href.includes('#') ? (
-                    <Link
-                      href={item.href}
-                      onClick={() => handleNavClick(item)}
-                      className={`px-4 py-3 rounded-lg text-left transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
-                        isActive(item)
-                          ? 'text-primary-400 bg-primary-500/10 border border-primary-500/20'
-                          : 'text-foreground hover:text-primary-400 hover:bg-muted/50'
-                      }`}
-                      role='menuitem'
-                      aria-current={isActive(item) ? 'page' : undefined}
-                      tabIndex={0}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              id='mobile-menu'
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className='md:hidden overflow-hidden'
+              role='menu'
+              aria-hidden={!isMobileMenuOpen}
+            >
+              <div className='pt-4 pb-4 border-t border-border'>
+                <div className='flex flex-col space-y-2'>
+                  {navItems.map((item, index) => (
+                    <motion.div
+                      key={item.label}
+                      initial={{ x: -50, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
                     >
-                      {item.label}
-                    </Link>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      className='px-4 py-3 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      role='menuitem'
-                      tabIndex={0}
-                    >
-                      {item.label}
-                    </Link>
-                  )}
-                </React.Fragment>
-              ))}
+                      {item.href.includes('#') ? (
+                        <Link
+                          href={item.href}
+                          onClick={() => handleNavClick(item)}
+                          className={`px-4 py-3 rounded-lg text-left transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+                            isActive(item)
+                              ? 'text-primary-400 bg-primary-500/10 border border-primary-500/20'
+                              : 'text-foreground hover:text-primary-400 hover:bg-muted/50'
+                          }`}
+                          role='menuitem'
+                          aria-current={isActive(item) ? 'page' : undefined}
+                          tabIndex={0}
+                        >
+                          {item.label}
+                        </Link>
+                      ) : (
+                        <Link
+                          href={item.href}
+                          className='px-4 py-3 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          role='menuitem'
+                          tabIndex={0}
+                        >
+                          {item.label}
+                        </Link>
+                      )}
+                    </motion.div>
+                  ))}
 
-              {/* Mobile Theme Toggle */}
-              <div className='px-4 py-3 flex justify-center'>
-                <ThemeToggle size='md' />
+                  {/* Mobile Theme Toggle */}
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.3, delay: 0.5 }}
+                    className='px-4 py-3 flex justify-center'
+                  >
+                    <ThemeToggle size='md' />
+                  </motion.div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

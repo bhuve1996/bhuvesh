@@ -9,17 +9,15 @@ import { FormField } from '@/components/ui/FormField';
 import { ItemCard } from '@/components/ui/ItemCard';
 import { ResumeInput } from '@/components/ui/ResumeInput';
 import { RichTextInput } from '@/components/ui/RichTextInput';
-import { loadTemplate } from '@/lib/resume/templateLoader';
-import { ResumeData, ResumeTemplate } from '@/types/resume';
+import { validateResumeData, ValidationResult } from '@/lib/resume/validation';
+import { ResumeData } from '@/types/resume';
 
 import { AIAssistant } from '../AIAssistant';
 import { ATSIntegration } from '../ATSIntegration';
-import { DataSelectionModal } from '../DataSelectionModal';
 import { DOCXExporter } from '../DOCXExporter';
-import { DragDropSections } from '../DragDropSections';
 import { PDFExporter } from '../PDFExporter';
 import { RichTextEditor } from '../RichTextEditor';
-import { TemplateGallery } from '../TemplateGallery';
+import { ValidationModal } from '../ValidationModal';
 
 interface ResumeBuilderProps {
   initialData?: Partial<ResumeData> | undefined;
@@ -33,23 +31,28 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
   onExport,
 }) => {
   const [currentStep, setCurrentStep] = useState<
-    'template' | 'builder' | 'preview' | 'sections'
-  >('template');
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<ResumeTemplate | null>(null);
+    'builder' | 'preview' | 'sections'
+  >('builder');
   const [currentTab, setCurrentTab] = useState<'content' | 'sections' | 'ats'>(
     'content'
   );
-  const [showDataSelectionModal, setShowDataSelectionModal] = useState(false);
-  const [pendingTemplate, setPendingTemplate] = useState<ResumeTemplate | null>(
-    null
-  );
+  const [showValidationModal, setShowValidationModal] = useState(false);
+  const [validationResult, setValidationResult] =
+    useState<ValidationResult | null>(null);
+  const [pendingAction, setPendingAction] = useState<{
+    type: 'save' | 'export';
+    format?: 'pdf' | 'docx' | 'txt';
+  } | null>(null);
   const [expandedSections, setExpandedSections] = useState<{
     [key: string]: boolean;
   }>({
-    experience: true,
-    education: true,
-    projects: true,
+    personal: true, // Only first section expanded by default
+    summary: false,
+    experience: false,
+    education: false,
+    skills: false,
+    projects: false,
+    achievements: false,
   });
   const [resumeData, setResumeData] = useState<ResumeData>({
     personal: {
@@ -75,9 +78,9 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
     achievements: [],
   });
 
-  // Initialize with ATS data (only if no template is selected yet)
+  // Initialize with ATS data
   useEffect(() => {
-    if (initialData && !selectedTemplate) {
+    if (initialData) {
       setResumeData(_prev => {
         // Use ONLY parsed data - no sample data at all
         return {
@@ -105,82 +108,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
         };
       });
     }
-  }, [initialData, selectedTemplate]);
-
-  const handleTemplateSelect = async (template: ResumeTemplate) => {
-    try {
-      // Load the full template data
-      const fullTemplate = await loadTemplate(template.id);
-      if (fullTemplate) {
-        // If we have ATS data, show the selection modal
-        if (initialData && Object.keys(initialData).length > 0) {
-          setPendingTemplate(fullTemplate);
-          setShowDataSelectionModal(true);
-        } else {
-          // No ATS data, proceed directly with template sample data
-          applyTemplateData(fullTemplate, false);
-        }
-      }
-    } catch {
-      // Error loading template
-    }
-  };
-
-  const applyTemplateData = (
-    template: ResumeTemplate,
-    useParsedData: boolean
-  ) => {
-    setSelectedTemplate(template);
-    setShowDataSelectionModal(false);
-    setPendingTemplate(null);
-
-    setResumeData(prev => {
-      if (useParsedData && initialData) {
-        // Use ONLY parsed data - no sample data at all
-        return {
-          personal: {
-            fullName: initialData.personal?.fullName || '',
-            email: initialData.personal?.email || '',
-            phone: initialData.personal?.phone || '',
-            location: initialData.personal?.location || '',
-            linkedin: initialData.personal?.linkedin || '',
-            github: initialData.personal?.github || '',
-            portfolio: initialData.personal?.portfolio || '',
-          },
-          summary: initialData.summary || '',
-          experience: initialData.experience || [],
-          education: initialData.education || [],
-          skills: {
-            technical: initialData.skills?.technical || [],
-            business: initialData.skills?.business || [],
-            soft: initialData.skills?.soft || [],
-            languages: initialData.skills?.languages || [],
-            certifications: initialData.skills?.certifications || [],
-          },
-          projects: initialData.projects || [],
-          achievements: initialData.achievements || [],
-        };
-      } else {
-        // Use template sample data as actual content
-        let mergedData = { ...prev };
-
-        if (template.sampleData) {
-          mergedData = {
-            ...mergedData,
-            ...template.sampleData,
-            personal: {
-              ...mergedData.personal,
-              ...template.sampleData?.personal,
-            },
-          };
-        }
-
-        return mergedData;
-      }
-    });
-
-    setCurrentStep('builder');
-  };
+  }, [initialData]);
 
   const handleDataUpdate = (section: keyof ResumeData, data: unknown) => {
     setResumeData(prev => ({
@@ -201,31 +129,52 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
   };
 
   const handleSave = () => {
-    if (onSave) {
-      onSave(resumeData);
-    }
-    // Also save to localStorage (client-side only)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('resume-builder-data', JSON.stringify(resumeData));
-    }
+    // Validate resume data before saving
+    const validation = validateResumeData(resumeData);
+    setValidationResult(validation);
+    setPendingAction({ type: 'save' });
+    setShowValidationModal(true);
   };
 
   const handleExport = (format: 'pdf' | 'docx' | 'txt') => {
-    if (onExport) {
-      onExport(resumeData, format);
+    // Validate resume data before exporting
+    const validation = validateResumeData(resumeData);
+    setValidationResult(validation);
+    setPendingAction({ type: 'export', format });
+    setShowValidationModal(true);
+  };
+
+  const handleValidationProceed = () => {
+    if (!pendingAction) return;
+
+    if (pendingAction.type === 'save') {
+      if (onSave) {
+        onSave(resumeData);
+      }
+      // Also save to localStorage (client-side only)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('resume-builder-data', JSON.stringify(resumeData));
+      }
+    } else if (pendingAction.type === 'export' && pendingAction.format) {
+      if (onExport) {
+        onExport(resumeData, pendingAction.format);
+      }
     }
+
+    // Close modal and reset state
+    setShowValidationModal(false);
+    setPendingAction(null);
+    setValidationResult(null);
+  };
+
+  const handleValidationCancel = () => {
+    setShowValidationModal(false);
+    setPendingAction(null);
+    setValidationResult(null);
   };
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case 'template':
-        return (
-          <TemplateGallery
-            onTemplateSelect={handleTemplateSelect}
-            selectedTemplateId={selectedTemplate?.id}
-          />
-        );
-
       case 'builder':
         return (
           <div className='max-w-7xl mx-auto p-6'>
@@ -236,16 +185,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     Build Your Resume
                   </h2>
                   <p className='text-muted-foreground'>
-                    Using template: {selectedTemplate?.name}
+                    Build your professional resume
                   </p>
                 </div>
                 <div className='flex space-x-2'>
-                  <Button
-                    variant='outline'
-                    onClick={() => setCurrentStep('template')}
-                  >
-                    Change Template
-                  </Button>
                   <Button
                     variant='outline'
                     onClick={() => setCurrentStep('preview')}
@@ -300,150 +243,173 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 {/* Builder Form */}
                 <div className='lg:col-span-2 space-y-8'>
                   {/* Personal Information */}
-                  <Card className='p-6 border-l-4 border-l-primary-500'>
-                    <div className='flex items-center space-x-3 mb-6'>
-                      <div className='w-10 h-10 bg-primary-500/10 rounded-lg flex items-center justify-center'>
-                        <span className='text-2xl'>👤</span>
+                  <Card>
+                    <CollapsibleSection
+                      title='Personal Information'
+                      icon='👤'
+                      color='primary'
+                      count={
+                        Object.values(resumeData.personal).filter(
+                          value => value && value.trim() !== ''
+                        ).length
+                      }
+                      countLabel='fields'
+                      isExpanded={expandedSections.personal || false}
+                      onToggle={() => toggleSection('personal')}
+                    >
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                        <div>
+                          <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                            Full Name *
+                          </label>
+                          <input
+                            type='text'
+                            value={resumeData.personal.fullName}
+                            onChange={e =>
+                              handleDataUpdate('personal', {
+                                ...resumeData.personal,
+                                fullName: e.target.value,
+                              })
+                            }
+                            className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                            placeholder='John Smith'
+                          />
+                        </div>
+                        <div>
+                          <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                            Email *
+                          </label>
+                          <input
+                            type='email'
+                            value={resumeData.personal.email}
+                            onChange={e =>
+                              handleDataUpdate('personal', {
+                                ...resumeData.personal,
+                                email: e.target.value,
+                              })
+                            }
+                            className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                            placeholder='john.smith@email.com'
+                          />
+                        </div>
+                        <div>
+                          <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                            Phone
+                          </label>
+                          <input
+                            type='tel'
+                            value={resumeData.personal.phone}
+                            onChange={e =>
+                              handleDataUpdate('personal', {
+                                ...resumeData.personal,
+                                phone: e.target.value,
+                              })
+                            }
+                            className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                            placeholder='(555) 123-4567'
+                          />
+                        </div>
+                        <div>
+                          <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                            Location
+                          </label>
+                          <input
+                            type='text'
+                            value={resumeData.personal.location}
+                            onChange={e =>
+                              handleDataUpdate('personal', {
+                                ...resumeData.personal,
+                                location: e.target.value,
+                              })
+                            }
+                            className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                            placeholder='San Francisco, CA'
+                          />
+                        </div>
+                        <div>
+                          <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                            LinkedIn
+                          </label>
+                          <input
+                            type='url'
+                            value={resumeData.personal.linkedin || ''}
+                            onChange={e =>
+                              handleDataUpdate('personal', {
+                                ...resumeData.personal,
+                                linkedin: e.target.value,
+                              })
+                            }
+                            className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                            placeholder='linkedin.com/in/johnsmith'
+                          />
+                        </div>
+                        <div>
+                          <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                            GitHub
+                          </label>
+                          <input
+                            type='url'
+                            value={resumeData.personal.github || ''}
+                            onChange={e =>
+                              handleDataUpdate('personal', {
+                                ...resumeData.personal,
+                                github: e.target.value,
+                              })
+                            }
+                            className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                            placeholder='github.com/johnsmith'
+                          />
+                        </div>
                       </div>
-                      <h3 className='text-xl font-bold text-foreground uppercase tracking-wide'>
-                        Personal Information
-                      </h3>
-                    </div>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
-                          Full Name *
-                        </label>
-                        <input
-                          type='text'
-                          value={resumeData.personal.fullName}
-                          onChange={e =>
-                            handleDataUpdate('personal', {
-                              ...resumeData.personal,
-                              fullName: e.target.value,
-                            })
-                          }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
-                          placeholder='John Smith'
+                      <div className='mt-4'>
+                        <AIAssistant
+                          onSuggestion={suggestion => {
+                            // AI can suggest improvements for personal information
+                            console.log(
+                              'AI suggestion for personal info:',
+                              suggestion
+                            );
+                          }}
+                          context={`Personal information for ${resumeData.personal.fullName || 'resume'}`}
+                          type='personal'
                         />
                       </div>
-                      <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
-                          Email *
-                        </label>
-                        <input
-                          type='email'
-                          value={resumeData.personal.email}
-                          onChange={e =>
-                            handleDataUpdate('personal', {
-                              ...resumeData.personal,
-                              email: e.target.value,
-                            })
-                          }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
-                          placeholder='john.smith@email.com'
-                        />
-                      </div>
-                      <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
-                          Phone
-                        </label>
-                        <input
-                          type='tel'
-                          value={resumeData.personal.phone}
-                          onChange={e =>
-                            handleDataUpdate('personal', {
-                              ...resumeData.personal,
-                              phone: e.target.value,
-                            })
-                          }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
-                          placeholder='(555) 123-4567'
-                        />
-                      </div>
-                      <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
-                          Location
-                        </label>
-                        <input
-                          type='text'
-                          value={resumeData.personal.location}
-                          onChange={e =>
-                            handleDataUpdate('personal', {
-                              ...resumeData.personal,
-                              location: e.target.value,
-                            })
-                          }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
-                          placeholder='San Francisco, CA'
-                        />
-                      </div>
-                      <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
-                          LinkedIn
-                        </label>
-                        <input
-                          type='url'
-                          value={resumeData.personal.linkedin || ''}
-                          onChange={e =>
-                            handleDataUpdate('personal', {
-                              ...resumeData.personal,
-                              linkedin: e.target.value,
-                            })
-                          }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
-                          placeholder='linkedin.com/in/johnsmith'
-                        />
-                      </div>
-                      <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
-                          GitHub
-                        </label>
-                        <input
-                          type='url'
-                          value={resumeData.personal.github || ''}
-                          onChange={e =>
-                            handleDataUpdate('personal', {
-                              ...resumeData.personal,
-                              github: e.target.value,
-                            })
-                          }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
-                          placeholder='github.com/johnsmith'
-                        />
-                      </div>
-                    </div>
+                    </CollapsibleSection>
                   </Card>
 
                   {/* Professional Summary */}
-                  <Card className='p-6 border-l-4 border-l-blue-500'>
-                    <div className='flex items-center space-x-3 mb-6'>
-                      <div className='w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center'>
-                        <span className='text-2xl'>📝</span>
-                      </div>
-                      <h3 className='text-xl font-bold text-foreground uppercase tracking-wide'>
-                        Professional Summary
-                      </h3>
-                    </div>
-                    <RichTextEditor
-                      content={resumeData.summary || ''}
-                      onChange={content => handleDataUpdate('summary', content)}
-                      placeholder='Write a brief summary of your professional background and key strengths...'
-                      maxLength={500}
-                    />
-                    <div className='mt-4'>
-                      <AIAssistant
-                        onSuggestion={suggestion =>
-                          handleDataUpdate('summary', suggestion)
+                  <Card>
+                    <CollapsibleSection
+                      title='Professional Summary'
+                      icon='📝'
+                      color='blue'
+                      count={resumeData.summary ? 1 : 0}
+                      countLabel='summary'
+                      isExpanded={expandedSections.summary || false}
+                      onToggle={() => toggleSection('summary')}
+                    >
+                      <RichTextEditor
+                        content={resumeData.summary || ''}
+                        onChange={content =>
+                          handleDataUpdate('summary', content)
                         }
-                        context={
-                          resumeData.personal.fullName
-                            ? `Professional summary for ${resumeData.personal.fullName}`
-                            : ''
-                        }
-                        type='summary'
+                        placeholder='Write a brief summary of your professional background and key strengths...'
+                        maxLength={500}
                       />
-                    </div>
+                      <div className='mt-4'>
+                        <AIAssistant
+                          onSuggestion={suggestion =>
+                            handleDataUpdate('summary', suggestion)
+                          }
+                          context={
+                            resumeData.personal.fullName
+                              ? `Professional summary for ${resumeData.personal.fullName}`
+                              : ''
+                          }
+                          type='summary'
+                        />
+                      </div>
+                    </CollapsibleSection>
                   </Card>
 
                   {/* Work Experience */}
@@ -720,6 +686,19 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       >
                         ➕ Add Education
                       </Button>
+                      <div className='mt-4'>
+                        <AIAssistant
+                          onSuggestion={suggestion => {
+                            // AI can suggest education improvements
+                            console.log(
+                              'AI suggestion for education:',
+                              suggestion
+                            );
+                          }}
+                          context={`Education section for ${resumeData.personal.fullName || 'resume'}`}
+                          type='education'
+                        />
+                      </div>
                     </CollapsibleSection>
                   </Card>
 
@@ -860,8 +839,8 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         resumeData.skills.soft.length
                       }
                       countLabel='skills'
-                      isExpanded={true}
-                      onToggle={() => {}}
+                      isExpanded={expandedSections.skills || false}
+                      onToggle={() => toggleSection('skills')}
                     >
                       <FormField
                         label='Technical Skills'
@@ -900,6 +879,19 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           placeholder='Leadership, Communication, Problem Solving...'
                         />
                       </FormField>
+                      <div className='mt-4'>
+                        <AIAssistant
+                          onSuggestion={suggestion => {
+                            // AI can suggest skills improvements
+                            console.log(
+                              'AI suggestion for skills:',
+                              suggestion
+                            );
+                          }}
+                          context={`Skills section for ${resumeData.personal.fullName || 'resume'}`}
+                          type='skills'
+                        />
+                      </div>
                     </CollapsibleSection>
                   </Card>
 
@@ -959,58 +951,103 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         + Add Certification
                       </Button>
                     </div>
+                    <div className='mt-4'>
+                      <AIAssistant
+                        onSuggestion={suggestion => {
+                          // AI can suggest certifications improvements
+                          console.log(
+                            'AI suggestion for certifications:',
+                            suggestion
+                          );
+                        }}
+                        context={`Certifications section for ${resumeData.personal.fullName || 'resume'}`}
+                        type='certifications'
+                      />
+                    </div>
                   </Card>
 
                   {/* Achievements */}
-                  <Card className='p-6'>
-                    <h3 className='text-lg font-semibold mb-4'>Achievements</h3>
-                    <div className='space-y-4'>
-                      {resumeData.achievements?.map((achievement, index) => (
-                        <div
-                          key={index}
-                          className='flex items-center space-x-2'
-                        >
-                          <input
-                            type='text'
-                            value={achievement}
-                            onChange={e => {
-                              const newAchievements = [
-                                ...(resumeData.achievements || []),
-                              ];
-                              newAchievements[index] = e.target.value;
-                              handleDataUpdate('achievements', newAchievements);
-                            }}
-                            className='flex-1 px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
-                            placeholder='Led team of 5 developers to deliver project 2 weeks early'
-                          />
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={() => {
-                              const newAchievements = (
-                                resumeData.achievements || []
-                              ).filter((_, i) => i !== index);
-                              handleDataUpdate('achievements', newAchievements);
-                            }}
-                            className='text-red-600 hover:bg-red-50'
+                  <Card>
+                    <CollapsibleSection
+                      title='Achievements'
+                      icon='🏆'
+                      color='purple'
+                      count={resumeData.achievements?.length || 0}
+                      countLabel={
+                        resumeData.achievements?.length === 1
+                          ? 'achievement'
+                          : 'achievements'
+                      }
+                      isExpanded={expandedSections.achievements || false}
+                      onToggle={() => toggleSection('achievements')}
+                    >
+                      <div className='space-y-4'>
+                        {resumeData.achievements?.map((achievement, index) => (
+                          <div
+                            key={index}
+                            className='flex items-center space-x-2'
                           >
-                            Remove
-                          </Button>
-                        </div>
-                      ))}
-                      <Button
-                        variant='outline'
-                        onClick={() => {
-                          handleDataUpdate('achievements', [
-                            ...(resumeData.achievements || []),
-                            '',
-                          ]);
-                        }}
-                        className='w-full'
-                      >
-                        + Add Achievement
-                      </Button>
-                    </div>
+                            <input
+                              type='text'
+                              value={achievement}
+                              onChange={e => {
+                                const newAchievements = [
+                                  ...(resumeData.achievements || []),
+                                ];
+                                newAchievements[index] = e.target.value;
+                                handleDataUpdate(
+                                  'achievements',
+                                  newAchievements
+                                );
+                              }}
+                              className='flex-1 px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                              placeholder='Led team of 5 developers to deliver project 2 weeks early'
+                            />
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              onClick={() => {
+                                const newAchievements = (
+                                  resumeData.achievements || []
+                                ).filter((_, i) => i !== index);
+                                handleDataUpdate(
+                                  'achievements',
+                                  newAchievements
+                                );
+                              }}
+                              className='text-red-600 hover:bg-red-50'
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        ))}
+                        <Button
+                          variant='outline'
+                          onClick={() => {
+                            handleDataUpdate('achievements', [
+                              ...(resumeData.achievements || []),
+                              '',
+                            ]);
+                          }}
+                          className='w-full'
+                        >
+                          + Add Achievement
+                        </Button>
+                      </div>
+                      <div className='mt-4'>
+                        <AIAssistant
+                          onSuggestion={suggestion => {
+                            // AI can suggest achievements improvements
+                            console.log(
+                              'AI suggestion for achievements:',
+                              suggestion
+                            );
+                          }}
+                          context={`Achievements section for ${resumeData.personal.fullName || 'resume'}`}
+                          type='achievements'
+                        />
+                      </div>
+                    </CollapsibleSection>
                   </Card>
                 </div>
 
@@ -1098,14 +1135,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       <div className='grid grid-cols-3 gap-2'>
                         <PDFExporter
                           resumeData={resumeData}
-                          template={selectedTemplate}
+                          template={null}
                           onExport={() => {
                             /* PDF exported */
                           }}
                         />
                         <DOCXExporter
                           resumeData={resumeData}
-                          template={selectedTemplate}
+                          template={null}
                           onExport={() => {
                             /* DOCX exported */
                           }}
@@ -1125,36 +1162,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
             ) : currentTab === 'sections' ? (
               /* Sections Tab */
               <div className='max-w-4xl mx-auto'>
-                <DragDropSections
-                  sections={selectedTemplate?.layout.sections || []}
-                  onSectionsChange={sections => {
-                    if (selectedTemplate) {
-                      setSelectedTemplate({
-                        ...selectedTemplate,
-                        layout: {
-                          ...selectedTemplate.layout,
-                          sections,
-                        },
-                      });
-                    }
-                  }}
-                  onAddSection={() => {}}
-                  onRemoveSection={sectionId => {
-                    if (selectedTemplate) {
-                      const updatedSections =
-                        selectedTemplate.layout.sections.filter(
-                          s => s.type !== sectionId
-                        );
-                      setSelectedTemplate({
-                        ...selectedTemplate,
-                        layout: {
-                          ...selectedTemplate.layout,
-                          sections: updatedSections,
-                        },
-                      });
-                    }
-                  }}
-                />
+                <div className='text-center py-12'>
+                  <h3 className='text-lg font-medium text-muted-foreground'>
+                    Template sections are managed in the Templates page
+                  </h3>
+                  <p className='text-sm text-muted-foreground mt-2'>
+                    Go to the Templates page to customize template layouts
+                  </p>
+                </div>
               </div>
             ) : (
               /* ATS Analysis Tab */
@@ -1296,14 +1311,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 <div className='flex gap-2'>
                   <PDFExporter
                     resumeData={resumeData}
-                    template={selectedTemplate}
+                    template={null}
                     onExport={() => {
                       /* PDF exported */
                     }}
                   />
                   <DOCXExporter
                     resumeData={resumeData}
-                    template={selectedTemplate}
+                    template={null}
                     onExport={() => {
                       /* DOCX exported */
                     }}
@@ -1329,14 +1344,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
         <div className='max-w-7xl mx-auto px-6 py-4 mt-8'>
           <div className='flex items-center justify-center space-x-8'>
             <div
-              className={`flex items-center space-x-2 ${currentStep === 'template' ? 'text-cyan-600' : currentStep === 'builder' || currentStep === 'preview' ? 'text-green-600' : 'text-gray-400'}`}
+              className={`flex items-center space-x-2 ${currentStep === 'builder' || currentStep === 'preview' ? 'text-green-600' : 'text-gray-400'}`}
             >
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'template' ? 'bg-cyan-600 text-white' : currentStep === 'builder' || currentStep === 'preview' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'}`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'builder' || currentStep === 'preview' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'}`}
               >
                 1
               </div>
-              <span className='font-medium'>Choose Template</span>
+              <span className='font-medium'>Build Resume</span>
             </div>
             <div
               className={`flex items-center space-x-2 ${currentStep === 'builder' ? 'text-cyan-600' : currentStep === 'preview' ? 'text-green-600' : 'text-gray-400'}`}
@@ -1365,19 +1380,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
       {/* Main Content */}
       {renderStepContent()}
 
-      {/* Data Selection Modal */}
-      {pendingTemplate && (
-        <DataSelectionModal
-          isOpen={showDataSelectionModal}
-          onClose={() => {
-            setShowDataSelectionModal(false);
-            setPendingTemplate(null);
-          }}
-          onSelectSampleData={() => applyTemplateData(pendingTemplate, false)}
-          onSelectParsedData={() => applyTemplateData(pendingTemplate, true)}
-          templateSampleData={pendingTemplate.sampleData}
-          parsedData={initialData}
-          templateName={pendingTemplate.name}
+      {/* Validation Modal */}
+      {validationResult && pendingAction && (
+        <ValidationModal
+          isOpen={showValidationModal}
+          onClose={handleValidationCancel}
+          onProceed={handleValidationProceed}
+          validationResult={validationResult}
+          actionType={pendingAction.type}
         />
       )}
     </div>

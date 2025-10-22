@@ -8,7 +8,16 @@ import { Card } from '@/components/ui/Card';
 interface AIAssistantProps {
   onSuggestion: (suggestion: string) => void;
   context?: string;
-  type?: 'summary' | 'experience' | 'project' | 'achievement';
+  type?:
+    | 'summary'
+    | 'experience'
+    | 'project'
+    | 'achievement'
+    | 'personal'
+    | 'education'
+    | 'skills'
+    | 'certifications'
+    | 'achievements';
 }
 
 export const AIAssistant: React.FC<AIAssistantProps> = ({
@@ -48,7 +57,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
       ],
     };
 
-    setSuggestions(mockSuggestions[type] || []);
+    setSuggestions(mockSuggestions[type as keyof typeof mockSuggestions] || []);
     setIsGenerating(false);
   };
 

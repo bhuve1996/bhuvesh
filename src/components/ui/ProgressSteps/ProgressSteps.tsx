@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import type { ProgressStepsProps, ProgressStep } from '@/types';
+import type { ProgressStep, ProgressStepsProps } from '@/types';
 
 export const ProgressSteps: React.FC<ProgressStepsProps> = ({
   steps,
@@ -155,7 +155,7 @@ export const ProgressSteps: React.FC<ProgressStepsProps> = ({
 
       {/* Current Step Details */}
       {steps[currentStep] && (
-        <div className='mt-8 p-6 bg-gray-800/50 rounded-xl border border-gray-700 backdrop-blur-sm'>
+        <div className='mt-8 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 backdrop-blur-sm'>
           <div className='flex items-center space-x-3'>
             <div className='w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center'>
               <span className='text-white text-sm font-bold'>
@@ -166,7 +166,7 @@ export const ProgressSteps: React.FC<ProgressStepsProps> = ({
               <h4 className='text-white font-semibold'>
                 {steps[currentStep].title}
               </h4>
-              <p className='text-gray-300 text-sm'>
+              <p className='text-gray-500 text-sm'>
                 {steps[currentStep].description}
               </p>
             </div>

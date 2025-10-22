@@ -35,10 +35,10 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
   const projectedScore = Math.min((currentScore || 0) + completedImpact, 100);
 
   const priorityColors = {
-    critical: 'border-red-500 bg-red-500/10',
-    high: 'border-orange-500 bg-orange-500/10',
-    medium: 'border-yellow-500 bg-yellow-500/10',
-    low: 'border-blue-500 bg-blue-500/10',
+    critical: 'border-red-600 bg-red-50 dark:bg-red-500/10',
+    high: 'border-orange-600 bg-orange-50 dark:bg-orange-500/10',
+    medium: 'border-amber-600 bg-amber-50 dark:bg-yellow-500/10',
+    low: 'border-blue-600 bg-blue-50 dark:bg-blue-500/10',
   };
 
   const priorityIcons = {
@@ -62,12 +62,17 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
   };
 
   const categoryColors = {
-    ats: 'from-red-500/20 to-pink-500/20 border-red-500/30',
-    keyword: 'from-blue-500/20 to-cyan-500/20 border-blue-500/30',
-    formatting: 'from-green-500/20 to-emerald-500/20 border-green-500/30',
-    content: 'from-purple-500/20 to-violet-500/20 border-purple-500/30',
-    structure: 'from-orange-500/20 to-amber-500/20 border-orange-500/30',
-    other: 'from-gray-500/20 to-slate-500/20 border-gray-500/30',
+    ats: 'from-red-100 to-pink-100 dark:from-red-500/20 dark:to-pink-500/20 border-red-300 dark:border-red-500/30',
+    keyword:
+      'from-blue-100 to-cyan-100 dark:from-blue-500/20 dark:to-cyan-500/20 border-blue-300 dark:border-blue-500/30',
+    formatting:
+      'from-green-100 to-emerald-100 dark:from-green-500/20 dark:to-emerald-500/20 border-green-300 dark:border-green-500/30',
+    content:
+      'from-purple-100 to-violet-100 dark:from-purple-500/20 dark:to-violet-500/20 border-purple-300 dark:border-purple-500/30',
+    structure:
+      'from-orange-100 to-amber-100 dark:from-orange-500/20 dark:to-amber-500/20 border-orange-300 dark:border-orange-500/30',
+    other:
+      'from-slate-100 to-gray-100 dark:from-gray-500/20 dark:to-slate-500/20 border-slate-300 dark:border-gray-500/30',
   };
 
   const categoryLabels = {
@@ -82,25 +87,27 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
   return (
     <div className='space-y-8'>
       {/* Header with Score Projection */}
-      <div className='bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-400/30 rounded-xl p-6'>
+      <div className='bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-500/10 dark:to-blue-500/10 border border-cyan-300 dark:border-cyan-400/30 rounded-xl p-6'>
         <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
           <div>
-            <h2 className='text-2xl font-bold text-white mb-2'>
+            <h2 className='text-2xl font-bold text-slate-900 dark:text-white mb-2'>
               📈 Improvement Plan
             </h2>
-            <p className='text-gray-300'>
+            <p className='text-slate-600 dark:text-gray-300'>
               Complete these{' '}
               {summary?.total_improvements || improvements.length} improvements
               to boost your ATS score
             </p>
           </div>
           <div className='text-right'>
-            <div className='text-3xl md:text-4xl font-bold text-cyan-400'>
+            <div className='text-3xl md:text-4xl font-bold text-cyan-600 dark:text-cyan-400'>
               {currentScore}
-              <span className='text-gray-400 mx-2'>→</span>
-              <span className='text-green-400'>{projectedScore}</span>
+              <span className='text-slate-500 dark:text-gray-400 mx-2'>→</span>
+              <span className='text-green-600 dark:text-green-400'>
+                {projectedScore}
+              </span>
             </div>
-            <div className='text-sm text-gray-400 mt-1'>
+            <div className='text-sm text-slate-500 dark:text-gray-400 mt-1'>
               Current → Potential Score
             </div>
           </div>
@@ -108,16 +115,16 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
 
         {/* Progress Bar */}
         <div className='mt-6'>
-          <div className='flex justify-between text-sm text-gray-300 mb-2'>
+          <div className='flex justify-between text-sm text-slate-600 dark:text-gray-300 mb-2'>
             <span>
               Progress: {completed.size} /{' '}
               {summary?.total_improvements || improvements.length}
             </span>
             <span>+{completedImpact} points so far</span>
           </div>
-          <div className='w-full bg-gray-700 rounded-full h-3'>
+          <div className='w-full bg-slate-200 dark:bg-gray-700 rounded-full h-3'>
             <div
-              className='bg-gradient-to-r from-cyan-400 to-blue-500 h-3 rounded-full transition-all duration-500'
+              className='bg-gradient-to-r from-cyan-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 h-3 rounded-full transition-all duration-500'
               style={{
                 width: `${(completed.size / (summary?.total_improvements || improvements.length)) * 100}%`,
               }}
@@ -128,11 +135,11 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
 
       {/* Quick Wins Section */}
       {quick_wins && quick_wins.length > 0 && (
-        <div className='bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6'>
-          <h3 className='text-xl font-bold text-yellow-400 mb-4'>
+        <div className='bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-300 dark:border-yellow-500/30 rounded-xl p-6'>
+          <h3 className='text-xl font-bold text-yellow-700 dark:text-yellow-400 mb-4'>
             ⚡ Quick Wins - Start Here!
           </h3>
-          <p className='text-gray-300 mb-4'>
+          <p className='text-slate-600 dark:text-gray-300 mb-4'>
             These {quick_wins.length} improvements will give you the biggest
             score boost with the least effort:
           </p>
@@ -140,26 +147,28 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
             {quick_wins.map(item => (
               <div
                 key={item.id}
-                className='flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-800/50 rounded-lg p-4 gap-3'
+                className='flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 gap-3'
               >
                 <div className='flex items-start gap-3 flex-1'>
                   <span className='text-2xl flex-shrink-0'>
                     {categoryIcons[item.category]}
                   </span>
                   <div className='flex-1 min-w-0'>
-                    <div className='font-semibold text-white break-words'>
+                    <div className='font-semibold text-slate-900 dark:text-white break-words'>
                       {item.title}
                     </div>
-                    <div className='text-sm text-gray-400 break-words'>
+                    <div className='text-sm text-slate-600 dark:text-gray-400 break-words'>
                       {item.description}
                     </div>
                   </div>
                 </div>
                 <div className='text-right flex-shrink-0'>
-                  <div className='text-2xl font-bold text-green-400'>
+                  <div className='text-2xl font-bold text-green-600 dark:text-green-400'>
                     +{item.score_impact || item.impact || 0}
                   </div>
-                  <div className='text-xs text-gray-400'>points</div>
+                  <div className='text-xs text-slate-500 dark:text-gray-400'>
+                    points
+                  </div>
                 </div>
               </div>
             ))}
@@ -177,11 +186,11 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
           >
             <div className='flex items-center gap-2 mb-2'>
               <span className='text-2xl'>{priorityIcons[priority]}</span>
-              <span className='font-semibold text-white capitalize'>
+              <span className='font-semibold text-slate-900 dark:text-white capitalize'>
                 {priority}
               </span>
             </div>
-            <div className='text-3xl font-bold text-white'>
+            <div className='text-3xl font-bold text-slate-900 dark:text-white'>
               {improvements.filter(i => i.priority === priority).length}
             </div>
           </div>
@@ -189,8 +198,8 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
       </div>
 
       {/* Category Breakdown */}
-      <div className='bg-gray-800/30 rounded-xl p-6 border border-gray-700'>
-        <h3 className='text-xl font-bold text-white mb-4'>
+      <div className='bg-slate-50 dark:bg-slate-800/30 rounded-xl p-6 border border-slate-200 dark:border-slate-700'>
+        <h3 className='text-xl font-bold text-slate-900 dark:text-white mb-4'>
           📊 Improvement Categories
         </h3>
         <div className='grid grid-cols-3 md:grid-cols-4 gap-4'>
@@ -214,14 +223,14 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
                   <span className='text-xl'>
                     {categoryIcons[category as keyof typeof categoryIcons]}
                   </span>
-                  <span className='font-semibold text-white text-sm'>
+                  <span className='font-semibold text-slate-900 dark:text-white text-sm'>
                     {label}
                   </span>
                 </div>
-                <div className='text-2xl font-bold text-white'>
+                <div className='text-2xl font-bold text-slate-900 dark:text-white'>
                   {categoryImprovements.length}
                 </div>
-                <div className='text-xs text-gray-300'>
+                <div className='text-xs text-slate-600 dark:text-gray-300'>
                   +{totalImpact} points potential
                 </div>
               </div>
@@ -232,7 +241,9 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
 
       {/* Improvements List */}
       <div className='space-y-4'>
-        <h3 className='text-xl font-bold text-white'>All Improvements</h3>
+        <h3 className='text-xl font-bold text-slate-900 dark:text-white'>
+          All Improvements
+        </h3>
         {improvements.map(item => {
           const isExpanded = expandedId === item.id;
           const isCompleted = completed.has(item.id);
@@ -322,12 +333,12 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
                   <span className='text-xl flex-shrink-0'>
                     {categoryIcons[item.category]}
                   </span>
-                  <span className='text-lg font-semibold text-white break-words'>
+                  <span className='text-lg font-semibold text-slate-900 dark:text-white break-words'>
                     {item.title}
                   </span>
                   <div className='flex gap-2 flex-shrink-0'>
                     <span
-                      className={`text-xs px-2 py-1 rounded bg-white/10 text-white border border-white/20`}
+                      className={`text-xs px-2 py-1 rounded bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-white border border-slate-300 dark:border-white/20`}
                     >
                       {categoryLabel}
                     </span>
@@ -340,15 +351,17 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
                     </span>
                   </div>
                 </div>
-                <p className='text-gray-300 text-sm break-words'>
+                <p className='text-slate-600 dark:text-gray-300 text-sm break-words'>
                   {item.description}
                 </p>
               </div>
               <div className='text-right flex-shrink-0'>
-                <div className='text-2xl font-bold text-green-400'>
+                <div className='text-2xl font-bold text-green-600 dark:text-green-400'>
                   +{item.score_impact || item.impact || 0}
                 </div>
-                <div className='text-xs text-gray-400'>points</div>
+                <div className='text-xs text-slate-500 dark:text-gray-400'>
+                  points
+                </div>
               </div>
             </div>
           </div>
@@ -359,9 +372,9 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
             aria-label={isExpanded ? 'Collapse' : 'Expand'}
           >
             {isExpanded ? (
-              <Icons.ChevronUp className='w-5 h-5 text-cyan-400' />
+              <Icons.ChevronUp className='w-5 h-5 text-cyan-600 dark:text-cyan-400' />
             ) : (
-              <Icons.ChevronDown className='w-5 h-5 text-gray-400' />
+              <Icons.ChevronDown className='w-5 h-5 text-slate-500 dark:text-gray-400' />
             )}
           </button>
         </div>
@@ -369,23 +382,23 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className='border-t border-white/10 p-4 space-y-4 bg-black/20'>
+        <div className='border-t border-slate-200 dark:border-white/10 p-4 space-y-4 bg-slate-50 dark:bg-black/20'>
           {/* Before/After Examples */}
           {item.before && item.after && (
             <div className='grid md:grid-cols-3 gap-4'>
-              <div className='bg-red-500/10 border border-red-500/30 rounded-lg p-4'>
-                <div className='text-sm font-semibold text-red-400 mb-2'>
+              <div className='bg-red-50 dark:bg-red-500/10 border border-red-300 dark:border-red-500/30 rounded-lg p-4'>
+                <div className='text-sm font-semibold text-red-600 dark:text-red-400 mb-2'>
                   ❌ Before
                 </div>
-                <div className='text-gray-300 text-sm italic break-words'>
+                <div className='text-slate-600 dark:text-gray-300 text-sm italic break-words'>
                   &quot;{item.before}&quot;
                 </div>
               </div>
-              <div className='bg-green-500/10 border border-green-500/30 rounded-lg p-4'>
-                <div className='text-sm font-semibold text-green-400 mb-2'>
+              <div className='bg-green-50 dark:bg-green-500/10 border border-green-300 dark:border-green-500/30 rounded-lg p-4'>
+                <div className='text-sm font-semibold text-green-600 dark:text-green-400 mb-2'>
                   ✅ After
                 </div>
-                <div className='text-gray-300 text-sm italic break-words'>
+                <div className='text-slate-600 dark:text-gray-300 text-sm italic break-words'>
                   &quot;{item.after}&quot;
                 </div>
               </div>
@@ -394,10 +407,10 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
 
           {/* Action Steps */}
           <div>
-            <div className='text-sm font-semibold text-cyan-400 mb-2'>
+            <div className='text-sm font-semibold text-cyan-600 dark:text-cyan-400 mb-2'>
               📋 Action Steps:
             </div>
-            <ol className='list-decimal list-inside space-y-2 text-gray-300 text-sm'>
+            <ol className='list-decimal list-inside space-y-2 text-slate-600 dark:text-gray-300 text-sm'>
               {item.action_steps?.map((step, idx) => (
                 <li key={idx} className='break-words'>
                   {step}
@@ -409,14 +422,14 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
           {/* Keywords (if applicable) */}
           {item.keywords && item.keywords.length > 0 && (
             <div>
-              <div className='text-sm font-semibold text-cyan-400 mb-2'>
+              <div className='text-sm font-semibold text-cyan-600 dark:text-cyan-400 mb-2'>
                 🔑 Keywords to Add:
               </div>
               <div className='flex flex-wrap gap-2'>
                 {item.keywords.map((kw, idx) => (
                   <span
                     key={idx}
-                    className='px-3 py-1 bg-cyan-500/20 border border-cyan-500/50 rounded-full text-cyan-300 text-sm break-all'
+                    className='px-3 py-1 bg-cyan-100 dark:bg-cyan-500/20 border border-cyan-300 dark:border-cyan-500/50 rounded-full text-cyan-700 dark:text-cyan-300 text-sm break-all'
                   >
                     {kw}
                   </span>
@@ -428,14 +441,14 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
           {/* Suggested Verbs (if applicable) */}
           {item.suggested_verbs && item.suggested_verbs.length > 0 && (
             <div>
-              <div className='text-sm font-semibold text-cyan-400 mb-2'>
+              <div className='text-sm font-semibold text-cyan-600 dark:text-cyan-400 mb-2'>
                 💪 Suggested Action Verbs:
               </div>
               <div className='flex flex-wrap gap-2'>
                 {item.suggested_verbs.map((verb, idx) => (
                   <span
                     key={idx}
-                    className='px-3 py-1 bg-blue-500/20 border border-blue-500/50 rounded-full text-blue-300 text-sm'
+                    className='px-3 py-1 bg-blue-100 dark:bg-blue-500/20 border border-blue-300 dark:border-blue-500/50 rounded-full text-blue-700 dark:text-blue-300 text-sm'
                   >
                     {verb}
                   </span>

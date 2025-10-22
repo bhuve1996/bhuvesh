@@ -2149,8 +2149,22 @@ class ATSAnalyzer:
             "projects",
         ]
 
-        found_required = sum(1 for section in required_sections if section in text)
-        found_optional = sum(1 for section in optional_sections if section in text)
+        # Better section detection - look for section headers, not just keywords in text
+        lines = text.split('\n')
+        section_headers_found = set()
+        
+        for line in lines:
+            line_clean = line.strip().lower()
+            # Check if line looks like a section header (short, capitalized, or all caps)
+            if (len(line_clean) < 50 and 
+                (line_clean.isupper() or line_clean.istitle() or 
+                 any(section in line_clean for section in required_sections + optional_sections))):
+                for section in required_sections + optional_sections:
+                    if section in line_clean:
+                        section_headers_found.add(section)
+        
+        found_required = sum(1 for section in required_sections if section in section_headers_found)
+        found_optional = sum(1 for section in optional_sections if section in section_headers_found)
 
         section_score = (found_required / len(required_sections)) * 40
         score += section_score
@@ -2193,23 +2207,31 @@ class ATSAnalyzer:
                 )
 
         # 3. Contact information completeness (20 points)
-        essential_contact = ["email", "phone"]
-        additional_contact = ["linkedin", "github", "portfolio", "website"]
+        # Check for actual contact information, not just keywords
+        email_found = bool(re.search(r"[\w\.-]+@[\w\.-]+\.\w+", text))
+        phone_found = bool(re.search(r"([\+\d][\d\s\-\(\)]{8,})", text))
+        linkedin_found = bool(re.search(r"linkedin\.com", text, re.IGNORECASE))
+        github_found = bool(re.search(r"github\.com", text, re.IGNORECASE))
+        portfolio_found = bool(re.search(r"(https?://)?(?:www\.)?([\w\-]+\.(?:com|dev|io|net|org|in))", text))
+        
+        essential_found = sum([email_found, phone_found])
+        additional_found = sum([linkedin_found, github_found, portfolio_found])
 
-        essential_found = sum(1 for contact in essential_contact if contact in text)
-        additional_found = sum(1 for contact in additional_contact if contact in text)
-
-        contact_score = (essential_found / len(essential_contact)) * 15
+        contact_score = (essential_found / 2) * 15  # 2 essential items: email and phone
         score += contact_score
 
         # Bonus for additional contact info
         if additional_found > 0:
             score += min(additional_found * 2, 5)
 
-        if essential_found < len(essential_contact):
-            missing_essential = [c for c in essential_contact if c not in text]
+        if essential_found < 2:
+            missing_items = []
+            if not email_found:
+                missing_items.append("email")
+            if not phone_found:
+                missing_items.append("phone")
             issues.append(
-                f"Missing essential contact info: {', '.join(missing_essential)}"
+                f"Missing essential contact info: {', '.join(missing_items)}"
             )
             recommendations.append(
                 "Include email and phone number at the top of your resume."
@@ -2219,9 +2241,12 @@ class ATSAnalyzer:
         lines = text.split("\n")
         section_order_score = 0
 
+        # Define essential contact patterns for header check
+        essential_contact = ["@", "email", "phone", "tel", "call", "contact"]
+        
         # Check if contact info appears early (first 10 lines)
         contact_in_header = any(
-            contact in " ".join(lines[:10]) for contact in essential_contact
+            contact in " ".join(lines[:10]).lower() for contact in essential_contact
         )
         if contact_in_header:
             section_order_score += 8
@@ -2264,7 +2289,7 @@ class ATSAnalyzer:
             "optional_sections_found": found_optional,
             "word_count": word_count,
             "word_count_optimal": optimal_range[0] <= word_count <= optimal_range[1],
-            "contact_completeness": f"{essential_found}/{len(essential_contact)} essential, {additional_found} additional",
+            "contact_completeness": f"{essential_found}/2 essential, {additional_found} additional",
             "has_professional_summary": has_summary,
             "section_headers_count": len(section_headers),
             "issues": issues,
@@ -2680,6 +2705,7 @@ class ATSAnalyzer:
         Checks: bullets, spacing, consistency, structure, etc.
         """
         analysis = {
+            "images_count": 0,  # Add image detection
             "bullet_points": {
                 "detected": False,
                 "count": 0,
@@ -2740,6 +2766,20 @@ class ATSAnalyzer:
                 analysis["ats_compatibility"]["warnings"].append(
                     f"Using {len(bullet_counts)} different bullet types. Stick to 1-2 for consistency."
                 )
+
+        # Detect images (for text-based resumes, this will be 0)
+        # In a real implementation, this would check for embedded images in PDFs/DOCs
+        # For now, we'll assume text-based resumes have no images
+        image_patterns = [
+            r"\[image\]", r"\[img\]", r"\[photo\]", r"\[picture\]",
+            r"<img", r"<image", r"\.jpg", r"\.jpeg", r"\.png", r"\.gif"
+        ]
+        images_found = 0
+        for pattern in image_patterns:
+            matches = re.findall(pattern, text, re.IGNORECASE)
+            images_found += len(matches)
+        
+        analysis["images_count"] = images_found
 
         # Check spacing
         empty_line_count = sum(1 for line in lines if not line.strip())

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
+import { atsApi } from '@/api/endpoints/ats';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { CloudResume, cloudStorage } from '@/lib/resume/cloudStorage';
@@ -21,6 +22,7 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
   const [importData, setImportData] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     loadResumes();
@@ -76,6 +78,61 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
     }
   };
 
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    const allowedTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword',
+    ];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please upload a PDF or DOCX file.');
+      return;
+    }
+
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size must be less than 10MB.');
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      // Use the existing ATS API to upload and parse the file
+      const result = await atsApi.uploadFile(file);
+
+      // Create a new resume from the uploaded file data
+      const resumeName = file.name.replace(/\.[^/.]+$/, ''); // Remove file extension
+      const newResumeId = cloudStorage.saveResume(
+        resumeName,
+        result as any, // Backend returns { success: true, data: {...}, message: "..." }
+        'unknown'
+      );
+
+      loadResumes();
+      alert('Resume uploaded and processed successfully!');
+
+      // Auto-select the newly created resume
+      const newResume = cloudStorage.getResume(newResumeId);
+      if (newResume) {
+        onResumeSelect(newResume);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Failed to upload and process resume. Please try again.');
+    } finally {
+      setIsUploading(false);
+      // Reset the file input
+      event.target.value = '';
+    }
+  };
+
   const filteredResumes = resumes.filter(
     resume =>
       resume.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -115,6 +172,36 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
           Create New Resume
         </Button>
 
+        <div className='relative'>
+          <input
+            type='file'
+            accept='.pdf,.docx,.doc'
+            onChange={handleFileUpload}
+            className='absolute inset-0 w-full h-full opacity-0 cursor-pointer'
+            disabled={isUploading}
+          />
+          <Button
+            variant='outline'
+            className={`${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isUploading}
+          >
+            <svg
+              className='w-4 h-4 mr-2'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10'
+              />
+            </svg>
+            {isUploading ? 'Uploading...' : 'Upload Resume File'}
+          </Button>
+        </div>
+
         <Button variant='outline' onClick={() => setShowImportModal(true)}>
           <svg
             className='w-4 h-4 mr-2'
@@ -129,7 +216,7 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
               d='M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10'
             />
           </svg>
-          Import Resume
+          Import JSON
         </Button>
       </div>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface ThemeToggleProps {
   className?: string;
@@ -58,8 +59,10 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   };
 
   return (
-    <button
+    <motion.button
       onClick={toggleTheme}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
       className={`
         ${sizeClasses[size]}
         relative rounded-lg
@@ -121,7 +124,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
 
       {/* Hover effect */}
       <div className='absolute inset-0 rounded-lg bg-gradient-to-r from-primary-500/20 to-secondary-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
-    </button>
+    </motion.button>
   );
 };
 

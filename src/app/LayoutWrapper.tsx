@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 
 import { Footer, Navigation } from '@/components/layout';
 import { Toast } from '@/components/ui';
+import { ResumeNavigationProvider } from '@/contexts/ResumeNavigationContext';
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -22,7 +23,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <>
+    <ResumeNavigationProvider>
       {/* Skip link for keyboard navigation */}
       <a href='#main-content' className='skip-link' tabIndex={1}>
         Skip to main content
@@ -33,6 +34,6 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       </main>
       <Footer />
       <Toast />
-    </>
+    </ResumeNavigationProvider>
   );
 }

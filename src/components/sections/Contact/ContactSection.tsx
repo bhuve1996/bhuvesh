@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React from 'react';
 
 import { Button } from '@/components/ui/Button';
@@ -11,17 +12,35 @@ export const ContactSection: React.FC = () => {
       id='contact'
       className='min-h-screen flex items-center justify-center px-6 pt-24 pb-20 relative overflow-hidden'
     >
-      <div className='max-w-4xl mx-auto relative z-10'>
-        <div className='text-center mb-16'>
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className='max-w-4xl mx-auto relative z-10'
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+          className='text-center mb-16'
+        >
           <h2 className='text-4xl md:text-5xl font-bold mb-6 text-cyan-400'>
             Get In Touch
           </h2>
           <p className='text-xl text-gray-300 max-w-3xl mx-auto'>
             Let&apos;s work together to bring your ideas to life
           </p>
-        </div>
+        </motion.div>
 
-        <div className='grid lg:grid-cols-2 gap-12'>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          viewport={{ once: true }}
+          className='grid lg:grid-cols-2 gap-12'
+        >
           {/* Contact Form */}
           <Card>
             <h3 className='text-2xl font-bold text-white mb-6'>
@@ -124,8 +143,8 @@ export const ContactSection: React.FC = () => {
               </div>
             </Card>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </Section>
   );
 };

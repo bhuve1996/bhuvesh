@@ -7,18 +7,22 @@ import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
 import { FileUpload } from '@/components/resume/FileUpload';
 import { ResultsDisplay } from '@/components/resume/ResultsDisplay';
 import { Section } from '@/components/ui/Section';
+// import { useResumeNavigation } from '@/contexts/ResumeNavigationContext';
 import { useAnalysisProgress } from '@/hooks/useAnalysisProgress';
-import type { AnalysisResult, ATSAnalysisBackendResponse } from '@/types';
+import { useResumeActions, useResumeStore } from '@/store/resumeStore';
+import type { ATSAnalysisBackendResponse, AnalysisResult } from '@/types';
 
 // Note: Metadata is defined in layout.tsx
 
 export default function ATSCheckerPage() {
   const [file, setFile] = useState<File | null>(null);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
-    null
-  );
-  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'upload' | 'results'>('upload');
+
+  // Use global state
+  const analysisResult = useResumeStore(state => state.analysisResult);
+  const error = useResumeStore(state => state.error);
+  const { setAnalysisResult, setError, clearAnalysisData } =
+    useResumeActions();
 
   // Progress tracking
   const {
@@ -32,7 +36,7 @@ export default function ATSCheckerPage() {
 
   const handleFileUpload = (uploadedFile: File) => {
     setFile(uploadedFile);
-    setAnalysisResult(null);
+    setAnalysisResult(null as any);
     setError(null);
     toast.success(`File "${uploadedFile.name}" uploaded successfully!`);
   };
@@ -93,9 +97,11 @@ export default function ATSCheckerPage() {
 
   const handleNewUpload = () => {
     setFile(null);
-    setAnalysisResult(null);
+    setAnalysisResult(null as any);
     setError(null);
     setActiveTab('upload');
+    // Clear analysis data from global state
+    clearAnalysisData();
     // Progress state will be reset when a new analysis starts
     toast.success('Ready for new analysis!');
   };
@@ -287,17 +293,39 @@ export default function ATSCheckerPage() {
             <h1 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent'>
               ATS Resume Checker
             </h1>
-            <p className='text-xl text-muted-foreground max-w-2xl mx-auto'>
+            <p className='text-xl text-muted-foreground max-w-2xl mx-auto mb-6'>
               Get your resume analyzed for ATS compatibility across all job
               profiles. Receive detailed feedback and optimization suggestions.
             </p>
+
+            {/* Start New Analysis Button - Show when there's already an analysis result */}
+            {analysisResult && (
+              <div className='mb-8'>
+                <button
+                  onClick={handleNewUpload}
+                  className='px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-background'
+                  aria-label='Start new analysis'
+                >
+                  🆕 Start New Analysis
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Results Tab - Only show when we have results */}
-          {/* Hidden the Analysis Results button as requested */}
-          {false && analysisResult && (
+          {/* Tab Navigation - Show when we have results */}
+          {analysisResult && (
             <div className='mb-8'>
               <div className='flex space-x-1 bg-muted/50 p-1 rounded-lg w-fit mx-auto'>
+                <button
+                  onClick={() => setActiveTab('upload')}
+                  className={`px-6 py-3 rounded-md font-medium transition-all ${
+                    activeTab === 'upload'
+                      ? 'bg-primary-500 text-primary-foreground shadow-lg'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  }`}
+                >
+                  📄 Upload New Resume
+                </button>
                 <button
                   onClick={() => setActiveTab('results')}
                   className={`px-6 py-3 rounded-md font-medium transition-all ${
@@ -313,7 +341,7 @@ export default function ATSCheckerPage() {
           )}
 
           {/* Upload Content - Show when no results or when upload tab is active */}
-          {!analysisResult && (
+          {(!analysisResult || activeTab === 'upload') && (
             <div className='space-y-8'>
               {/* File Upload Section */}
               {!file && (

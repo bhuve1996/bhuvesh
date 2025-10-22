@@ -117,7 +117,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html lang='en' className='light'>
       <head>
         {/* Additional meta tags for better sharing */}
         <meta name='viewport' content='width=device-width, initial-scale=1' />
@@ -174,24 +174,7 @@ export default function RootLayout({
         <link rel='apple-touch-icon' href='/logo.png' />
         <link rel='manifest' href='/manifest.json' />
 
-        {/* Theme initialization script */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  const storedTheme = localStorage.getItem('bhuvesh-theme');
-                  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                  const theme = storedTheme || 'light'; // Default to light theme
-                  document.documentElement.classList.remove('light', 'dark');
-                  document.documentElement.classList.add(theme);
-                } catch (e) {
-                  document.documentElement.classList.add('light');
-                }
-              })();
-            `,
-          }}
-        />
+        {/* Theme initialization script - removed to prevent hydration mismatch */}
       </head>
       <body
         className={`${poppins.variable} font-sans antialiased`}

@@ -4,14 +4,12 @@ import { useEffect, useState } from 'react';
 
 import { ResumeBuilder } from '@/components/resume/ResumeBuilder';
 import { ResumeManager } from '@/components/resume/ResumeManager';
+import { ValidationStatus } from '@/components/resume/ValidationStatus/ValidationStatus';
 import { SectionSeparator } from '@/components/ui';
+import { useResumeNavigation } from '@/contexts/ResumeNavigationContext';
 import { CloudResume, cloudStorage } from '@/lib/resume/cloudStorage';
+import { useResumeStore } from '@/store/resumeStore';
 import { ResumeData } from '@/types/resume';
-
-interface ATSDataSource {
-  originalJobType?: string;
-  atsScore?: number;
-}
 
 export default function ResumeBuilderPage() {
   const [currentView, setCurrentView] = useState<'manager' | 'builder'>(
@@ -21,55 +19,30 @@ export default function ResumeBuilderPage() {
   const [currentResumeId, setCurrentResumeId] = useState<string | undefined>(
     undefined
   );
-  const [atsCheckerData, setAtsCheckerData] = useState<{
-    data: Partial<ResumeData>;
-    source: ATSDataSource;
-  } | null>(null);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
 
-  // Load data from ATS checker on component mount
+  // Use global state
+  const resumeData = useResumeStore(state => state.resumeData);
+  const analysisResult = useResumeStore(state => state.analysisResult);
+  const { navigateToTemplates, navigateToAtsChecker } = useResumeNavigation();
+
+  // Load data from global state on component mount
   useEffect(() => {
     const loadExistingData = () => {
       try {
-        const savedData = localStorage.getItem('resume-builder-data');
-        const sourceData = localStorage.getItem('resume-builder-source');
-
-        // Loading saved data from localStorage
-
-        if (savedData && sourceData) {
-          const resumeData = JSON.parse(savedData);
-          const source = JSON.parse(sourceData);
-
-          // Only load ATS data if it's specifically from the ATS checker
-          if (source.source === 'ats-checker') {
-            // Loading ATS checker data
-
-            setAtsCheckerData({ data: resumeData, source });
-            setShowWelcomeMessage(true);
-
-            // Auto-switch to builder view when data is loaded from ATS checker
-            setCurrentView('builder');
-
-            // Clear the localStorage data after loading
-            localStorage.removeItem('resume-builder-data');
-            localStorage.removeItem('resume-builder-source');
-          } else {
-            // Data found but not from ATS checker, ignoring
-            // Clear any stale data
-            localStorage.removeItem('resume-builder-data');
-            localStorage.removeItem('resume-builder-source');
-          }
+        // Check if we have data from global state
+        if (resumeData && analysisResult) {
+          setShowWelcomeMessage(true);
+          // Auto-switch to builder view when data is loaded from ATS checker
+          setCurrentView('builder');
         }
       } catch {
-        // Error loading saved resume data
-        // Clear any corrupted data
-        localStorage.removeItem('resume-builder-data');
-        localStorage.removeItem('resume-builder-source');
+        // Error loading resume data - silently handle
       }
     };
 
     loadExistingData();
-  }, []);
+  }, [resumeData, analysisResult]);
 
   const handleSave = (data: ResumeData, resumeName?: string) => {
     try {
@@ -97,13 +70,8 @@ export default function ResumeBuilderPage() {
   };
 
   const handleResumeSelect = (resume: CloudResume) => {
-    // Clear any ATS checker data when selecting an existing resume
-    setAtsCheckerData(null);
+    // Clear welcome message when selecting an existing resume
     setShowWelcomeMessage(false);
-
-    // Clear any stale localStorage data
-    localStorage.removeItem('resume-builder-data');
-    localStorage.removeItem('resume-builder-source');
 
     setCurrentResume(resume);
     setCurrentResumeId(resume.id);
@@ -111,13 +79,8 @@ export default function ResumeBuilderPage() {
   };
 
   const handleNewResume = () => {
-    // Clear any ATS checker data when creating a new resume
-    setAtsCheckerData(null);
+    // Clear welcome message when creating a new resume
     setShowWelcomeMessage(false);
-
-    // Clear any stale localStorage data
-    localStorage.removeItem('resume-builder-data');
-    localStorage.removeItem('resume-builder-source');
 
     setCurrentResume(null);
     setCurrentResumeId(undefined);
@@ -130,14 +93,14 @@ export default function ResumeBuilderPage() {
 
   // Get initial data for the resume builder
   const getInitialData = (): Partial<ResumeData> | undefined => {
-    // Priority: current resume data > ATS checker data (as fallback only)
+    // Priority: current resume data > global state data (as fallback only)
     if (currentResume) {
       const latestData = cloudStorage.getLatestResumeData(currentResume.id);
       return latestData || undefined;
     }
-    // Only use ATS data if no existing resume is selected
-    if (atsCheckerData) {
-      return atsCheckerData.data;
+    // Only use global state data if no existing resume is selected
+    if (resumeData) {
+      return resumeData;
     }
     return undefined;
   };
@@ -183,10 +146,18 @@ export default function ResumeBuilderPage() {
                     </div>
                   )}
                 </div>
-                <div className='text-sm text-muted-foreground'>
-                  {currentResume
-                    ? `Last saved: ${new Date(currentResume.updatedAt).toLocaleString()}`
-                    : 'New resume'}
+                <div className='flex items-center space-x-4'>
+                  <div className='text-sm text-muted-foreground'>
+                    {currentResume
+                      ? `Last saved: ${new Date(currentResume.updatedAt).toLocaleString()}`
+                      : 'New resume'}
+                  </div>
+                  {getInitialData() && (
+                    <ValidationStatus
+                      resumeData={getInitialData() as ResumeData}
+                      className='text-xs'
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -195,7 +166,7 @@ export default function ResumeBuilderPage() {
           <SectionSeparator variant='gradient' color='muted' spacing='md' />
 
           {/* Welcome Message for ATS Checker Data */}
-          {showWelcomeMessage && atsCheckerData && (
+          {showWelcomeMessage && resumeData && analysisResult && (
             <div className='bg-gradient-to-r from-cyan-500 to-blue-500 text-white p-4 mx-6 mt-4 rounded-lg shadow-lg'>
               <div className='flex items-center justify-between'>
                 <div className='flex items-center space-x-3'>
@@ -220,21 +191,21 @@ export default function ResumeBuilderPage() {
                     </h3>
                     <p className='text-sm opacity-90'>
                       Your resume data from the ATS checker has been loaded.
-                      {atsCheckerData.source.originalJobType && (
+                      {analysisResult.jobType && (
                         <>
                           {' '}
                           Detected job type:{' '}
                           <span className='font-medium'>
-                            {atsCheckerData.source.originalJobType}
+                            {analysisResult.jobType}
                           </span>
                         </>
                       )}
-                      {atsCheckerData.source.atsScore && (
+                      {analysisResult.atsScore && (
                         <>
                           {' '}
                           • Previous ATS Score:{' '}
                           <span className='font-medium'>
-                            {atsCheckerData.source.atsScore}/100
+                            {analysisResult.atsScore}/100
                           </span>
                         </>
                       )}
@@ -244,8 +215,6 @@ export default function ResumeBuilderPage() {
                 <button
                   onClick={() => {
                     setShowWelcomeMessage(false);
-                    // Optionally clear ATS data when user dismisses the message
-                    // setAtsCheckerData(null);
                   }}
                   className='text-white/80 hover:text-white transition-colors'
                 >
@@ -262,6 +231,22 @@ export default function ResumeBuilderPage() {
                       d='M6 18L18 6M6 6l12 12'
                     />
                   </svg>
+                </button>
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className='flex gap-3 mt-4'>
+                <button
+                  onClick={() => navigateToAtsChecker()}
+                  className='px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors text-sm font-medium'
+                >
+                  ← Back to ATS Checker
+                </button>
+                <button
+                  onClick={() => navigateToTemplates()}
+                  className='px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors text-sm font-medium'
+                >
+                  View Templates →
                 </button>
               </div>
             </div>

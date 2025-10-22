@@ -112,7 +112,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           className={`h-8 w-8 p-0 ${editor.isActive('bold') ? 'bg-gray-200' : ''}`}
           title='Bold'
         >
-          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+          <svg className='w-6 h-6' fill='currentColor' viewBox='0 0 20 20'>
             <path d='M5 4a1 1 0 011-1h5.5a3.5 3.5 0 013.5 3.5v.5a3 3 0 01-1.5 2.6A3.5 3.5 0 0115 13.5V14a3.5 3.5 0 01-3.5 3.5H6a1 1 0 01-1-1V4zm2 1v4h4.5a1.5 1.5 0 001.5-1.5V6.5A1.5 1.5 0 0011.5 5H7zm0 6v4h5.5a1.5 1.5 0 001.5-1.5v-.5a1.5 1.5 0 00-1.5-1.5H7z' />
           </svg>
         </Button>
@@ -125,7 +125,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           className={`h-8 w-8 p-0 ${editor.isActive('italic') ? 'bg-gray-200' : ''}`}
           title='Italic'
         >
-          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+          <svg className='w-6 h-6' fill='currentColor' viewBox='0 0 20 20'>
             <path d='M8 3a1 1 0 000 2h1.5l-3 10H5a1 1 0 100 2h6a1 1 0 100-2h-1.5l3-10H14a1 1 0 100-2H8z' />
           </svg>
         </Button>
@@ -140,7 +140,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           className={`h-8 w-8 p-0 ${editor.isActive('bulletList') ? 'bg-gray-200' : ''}`}
           title='Bullet List'
         >
-          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+          <svg className='w-6 h-6' fill='currentColor' viewBox='0 0 20 20'>
             <path d='M3 4a1 1 0 100-2 1 1 0 000 2zm0 4a1 1 0 100-2 1 1 0 000 2zm0 4a1 1 0 100-2 1 1 0 000 2zm0 4a1 1 0 100-2 1 1 0 000 2zM11 4a1 1 0 10-2 0v12a1 1 0 102 0V4z' />
           </svg>
         </Button>
@@ -153,7 +153,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           className={`h-8 w-8 p-0 ${editor.isActive('orderedList') ? 'bg-gray-200' : ''}`}
           title='Numbered List'
         >
-          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+          <svg className='w-6 h-6' fill='currentColor' viewBox='0 0 20 20'>
             <path d='M2 3a1 1 0 011-1h2a1 1 0 110 2H4v1h1a1 1 0 110 2H3a1 1 0 01-1-1V3zm0 4a1 1 0 011-1h2a1 1 0 110 2H4v1h1a1 1 0 110 2H3a1 1 0 01-1-1V7zm0 4a1 1 0 011-1h2a1 1 0 110 2H4v1h1a1 1 0 110 2H3a1 1 0 01-1-1v-2zm0 4a1 1 0 011-1h2a1 1 0 110 2H4v1h1a1 1 0 110 2H3a1 1 0 01-1-1v-2z' />
           </svg>
         </Button>
@@ -168,7 +168,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           className='h-8 w-8 p-0'
           title='Insert Bullet Point'
         >
-          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+          <svg className='w-6 h-6' fill='currentColor' viewBox='0 0 20 20'>
             <path d='M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z' />
           </svg>
         </Button>
@@ -181,7 +181,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           className='h-8 w-8 p-0'
           title='Clear Formatting'
         >
-          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+          <svg className='w-6 h-6' fill='currentColor' viewBox='0 0 20 20'>
             <path d='M4 3a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h12a1 1 0 100-2H4z' />
           </svg>
         </Button>

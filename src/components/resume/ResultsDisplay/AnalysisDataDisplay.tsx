@@ -142,8 +142,8 @@ export const AnalysisDataDisplay: React.FC<AnalysisDataDisplayProps> = ({
             </div>
           </Card>
 
-          {/* ATS Recommendations */}
-          <Card className='p-6'>
+          {/* ATS Recommendations - Hidden as they are static tips */}
+          {/* <Card className='p-6'>
             <h3 className='text-xl font-bold mb-4 text-green-400'>
               ✅ ATS Optimization Tips
             </h3>
@@ -157,50 +157,83 @@ export const AnalysisDataDisplay: React.FC<AnalysisDataDisplayProps> = ({
                 )
               )}
             </ul>
-          </Card>
+          </Card> */}
         </div>
       )}
 
-      {/* Format Analysis Details */}
+      {/* Combined Structure & Contact Analysis */}
       {result.format_analysis && (
         <Card className='p-6'>
           <h3 className='text-xl font-bold mb-4 text-blue-400'>
-            📋 Resume Structure Analysis
+            📋 Resume Structure & Contact Analysis
           </h3>
-          <div className='grid md:grid-cols-3 gap-4 mb-4'>
-            <div className='text-center'>
+
+          {/* Key Metrics Grid */}
+          <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-6'>
+            <div className='text-center p-3 bg-blue-500/10 rounded-lg'>
               <p className='text-2xl font-bold text-blue-400'>
-                {result.format_analysis.sections_found || 0}
+                {result.format_analysis.sections_found || 0}/3
               </p>
-              <p className='text-sm text-gray-400'>Required Sections</p>
+              <p className='text-xs text-slate-500 dark:text-slate-400'>
+                Required Sections
+              </p>
             </div>
-            <div className='text-center'>
+            <div className='text-center p-3 bg-green-500/10 rounded-lg'>
               <p className='text-2xl font-bold text-green-400'>
                 {result.format_analysis.optional_sections_found || 0}
               </p>
-              <p className='text-sm text-gray-400'>Optional Sections</p>
-            </div>
-            <div className='text-center'>
-              <p className='text-2xl font-bold text-cyan-400'>
-                {result.format_analysis.section_headers_count || 0}
+              <p className='text-xs text-slate-500 dark:text-slate-400'>
+                Optional Sections
               </p>
-              <p className='text-sm text-gray-400'>Section Headers</p>
+            </div>
+            <div className='text-center p-3 bg-cyan-500/10 rounded-lg'>
+              <p className='text-2xl font-bold text-cyan-400'>
+                {result.format_analysis.contact_completeness?.split('/')[0] ||
+                  '0'}
+                /2
+              </p>
+              <p className='text-xs text-slate-500 dark:text-slate-400'>
+                Contact Info
+              </p>
+            </div>
+            <div className='text-center p-3 bg-purple-500/10 rounded-lg'>
+              <p className='text-2xl font-bold text-purple-400'>
+                {result.format_analysis.has_professional_summary ? '✅' : '❌'}
+              </p>
+              <p className='text-xs text-slate-500 dark:text-slate-400'>
+                Summary
+              </p>
             </div>
           </div>
 
-          <div className='space-y-2'>
-            <p className='text-gray-300'>
-              <span className='text-blue-400 font-semibold'>Contact Info:</span>{' '}
-              {result.format_analysis.contact_completeness || 'N/A'}
-            </p>
-            <p className='text-gray-300'>
-              <span className='text-blue-400 font-semibold'>
-                Professional Summary:
-              </span>{' '}
-              {result.format_analysis.has_professional_summary
-                ? '✅ Present'
-                : '❌ Missing'}
-            </p>
+          {/* Detailed Breakdown */}
+          <div className='space-y-3 text-sm'>
+            <div className='flex justify-between items-center p-2 bg-slate-50 dark:bg-slate-800/30 rounded'>
+              <span className='text-slate-700 dark:text-slate-300'>
+                Contact Information
+              </span>
+              <span className='text-slate-600 dark:text-slate-400'>
+                {result.format_analysis.contact_completeness || 'N/A'}
+              </span>
+            </div>
+            <div className='flex justify-between items-center p-2 bg-slate-50 dark:bg-slate-800/30 rounded'>
+              <span className='text-slate-700 dark:text-slate-300'>
+                Professional Summary
+              </span>
+              <span className='text-slate-600 dark:text-slate-400'>
+                {result.format_analysis.has_professional_summary
+                  ? 'Present'
+                  : 'Missing'}
+              </span>
+            </div>
+            <div className='flex justify-between items-center p-2 bg-slate-50 dark:bg-slate-800/30 rounded'>
+              <span className='text-slate-700 dark:text-slate-300'>
+                Section Headers
+              </span>
+              <span className='text-slate-600 dark:text-slate-400'>
+                {result.format_analysis.section_headers_count || 0} detected
+              </span>
+            </div>
           </div>
         </Card>
       )}
@@ -225,38 +258,73 @@ export const AnalysisDataDisplay: React.FC<AnalysisDataDisplayProps> = ({
       {/* Resume Statistics */}
       <Card className='p-6'>
         <h3 className='text-xl font-bold mb-4 text-blue-400'>
-          📊 Resume Statistics
+          📊 Resume Statistics & Keywords
         </h3>
-        <div className='grid grid-cols-3 md:grid-cols-5 gap-4'>
-          <div className='text-center'>
-            <p className='text-sm text-gray-400 mb-1'>Word Count</p>
-            <p className='text-lg font-semibold text-blue-400'>
+
+        {/* Content Metrics */}
+        <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-6'>
+          <div className='text-center p-3 bg-blue-500/10 rounded-lg'>
+            <p className='text-2xl font-bold text-blue-400'>
               {result.wordCount}
             </p>
+            <p className='text-xs text-slate-500 dark:text-slate-400'>Words</p>
           </div>
-          <div className='text-center'>
-            <p className='text-sm text-gray-400 mb-1'>Character Count</p>
-            <p className='text-lg font-semibold text-green-400'>
+          <div className='text-center p-3 bg-green-500/10 rounded-lg'>
+            <p className='text-2xl font-bold text-green-400'>
               {result.characterCount}
             </p>
+            <p className='text-xs text-slate-500 dark:text-slate-400'>
+              Characters
+            </p>
           </div>
-          <div className='text-center'>
-            <p className='text-sm text-gray-400 mb-1'>Keyword Matches</p>
-            <p className='text-lg font-semibold text-cyan-400'>
+          <div className='text-center p-3 bg-cyan-500/10 rounded-lg'>
+            <p className='text-2xl font-bold text-cyan-400'>
               {result.keywordMatches.length}
             </p>
+            <p className='text-xs text-slate-500 dark:text-slate-400'>
+              Keywords Found
+            </p>
           </div>
-          <div className='text-center'>
-            <p className='text-sm text-gray-400 mb-1'>Missing Keywords</p>
-            <p className='text-lg font-semibold text-red-400'>
+          <div className='text-center p-3 bg-red-500/10 rounded-lg'>
+            <p className='text-2xl font-bold text-red-400'>
               {result.missingKeywords.length}
             </p>
+            <p className='text-xs text-slate-500 dark:text-slate-400'>
+              Missing
+            </p>
+          </div>
+        </div>
+
+        {/* Keyword Analysis */}
+        <div className='space-y-3'>
+          <div className='flex justify-between items-center p-2 bg-slate-50 dark:bg-slate-800/30 rounded'>
+            <span className='text-slate-700 dark:text-slate-300'>
+              Keyword Match Rate
+            </span>
+            <span className='text-slate-600 dark:text-slate-400'>
+              {result.keywordMatches.length > 0 ||
+              result.missingKeywords.length > 0
+                ? `${Math.round((result.keywordMatches.length / (result.keywordMatches.length + result.missingKeywords.length)) * 100)}%`
+                : 'N/A'}
+            </span>
+          </div>
+          <div className='flex justify-between items-center p-2 bg-slate-50 dark:bg-slate-800/30 rounded'>
+            <span className='text-slate-700 dark:text-slate-300'>
+              Content Length
+            </span>
+            <span className='text-slate-600 dark:text-slate-400'>
+              {result.wordCount < 300
+                ? 'Too Short'
+                : result.wordCount > 800
+                  ? 'Too Long'
+                  : 'Optimal'}
+            </span>
           </div>
         </div>
       </Card>
 
-      {/* Suggestions */}
-      <Card className='p-6'>
+      {/* Suggestions - Hidden as they are static tips */}
+      {/* <Card className='p-6'>
         <h3 className='text-xl font-bold mb-4 text-cyan-400'>
           💡 Optimization Suggestions
         </h3>
@@ -264,11 +332,11 @@ export const AnalysisDataDisplay: React.FC<AnalysisDataDisplayProps> = ({
           {result.suggestions.map((suggestion, index) => (
             <li key={index} className='flex items-start space-x-3'>
               <span className='text-cyan-400 mt-1'>→</span>
-              <span className='text-gray-300'>{suggestion}</span>
+              <span className='text-slate-500'>{suggestion}</span>
             </li>
           ))}
         </ul>
-      </Card>
+      </Card> */}
     </div>
   );
 };
