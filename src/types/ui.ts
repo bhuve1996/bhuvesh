@@ -1,7 +1,7 @@
 // UI Component Types
 export interface ButtonProps {
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'default';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   loading?: boolean;
@@ -11,6 +11,7 @@ export interface ButtonProps {
   onClick?: (() => void) | undefined;
   className?: string;
   type?: 'button' | 'submit' | 'reset';
+  title?: string; // Add missing title property
 }
 
 export interface CardProps {
@@ -114,6 +115,7 @@ export interface ProgressProps {
 // Enhanced Card Props with animation support
 export interface EnhancedCardProps extends CardProps {
   delay?: number;
+  onClick?: () => void; // Add missing onClick property
 }
 
 // Animated Score Component Types

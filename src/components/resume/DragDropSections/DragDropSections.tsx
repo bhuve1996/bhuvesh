@@ -1,8 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { SectionConfig } from '@/types/resume';
 import {
   DndContext,
   DragEndEvent,
@@ -21,6 +18,10 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
+
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { SectionConfig } from '@/types/resume';
 
 interface DragDropSectionsProps {
   sections: SectionConfig[];
@@ -159,7 +160,7 @@ const SortableSection: React.FC<SortableSectionProps> = ({
 export const DragDropSections: React.FC<DragDropSectionsProps> = ({
   sections,
   onSectionsChange,
-  onAddSection,
+  onAddSection: _onAddSection,
   onRemoveSection,
 }) => {
   const sensors = useSensors(

@@ -79,6 +79,7 @@ export default function Home() {
       <ContactSection />
 
       <Footer />
+      {/* Test comment for pre-commit build check */}
     </div>
   );
 }

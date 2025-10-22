@@ -71,6 +71,7 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
           weaknesses: result.data.weaknesses || [],
           wordCount: result.data.word_count || 0,
           characterCount: result.data.word_count * 5 || 0, // Rough estimate
+          keywordDensity: result.data.keyword_density || {},
           extraction_details: result.data.extraction_details,
           ats_compatibility: result.data.ats_compatibility,
           format_analysis: result.data.format_analysis,

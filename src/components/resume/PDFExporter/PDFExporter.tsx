@@ -1,7 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
-import { ResumeData, ResumeTemplate } from '@/types/resume';
 import {
   Document,
   Page,
@@ -11,6 +9,9 @@ import {
   pdf,
 } from '@react-pdf/renderer';
 import React, { useState } from 'react';
+
+import { Button } from '@/components/ui/Button';
+import { ResumeData, ResumeTemplate } from '@/types/resume';
 
 interface PDFExporterProps {
   resumeData: ResumeData;
@@ -115,8 +116,8 @@ const styles = StyleSheet.create({
 const PDFDocument: React.FC<{
   resumeData: ResumeData;
   template: ResumeTemplate | null;
-}> = ({ resumeData, template }) => {
-  const templateStyles = template?.layout || {};
+}> = ({ resumeData, template: _template }) => {
+  // const _templateStyles = template?.layout || {};
 
   return (
     <Document>
@@ -280,8 +281,8 @@ export const PDFExporter: React.FC<PDFExporterProps> = ({
       if (onExport) {
         onExport();
       }
-    } catch (error) {
-      console.error('Error generating PDF:', error);
+    } catch {
+      // Error generating PDF
       alert('Error generating PDF. Please try again.');
     } finally {
       setIsExporting(false);

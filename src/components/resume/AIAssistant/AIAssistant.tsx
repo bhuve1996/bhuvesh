@@ -1,8 +1,9 @@
 'use client';
 
+import React, { useState } from 'react';
+
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import React, { useState } from 'react';
 
 interface AIAssistantProps {
   onSuggestion: (suggestion: string) => void;
@@ -108,7 +109,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
 
       <p className='text-sm text-gray-600 mb-4'>
         Get AI-powered suggestions to improve your {type} content. Click
-        "Generate Ideas" to see personalized recommendations.
+        &quot;Generate Ideas&quot; to see personalized recommendations.
       </p>
 
       {suggestions.length > 0 && (

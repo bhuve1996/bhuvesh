@@ -5,7 +5,6 @@
 import {
   FileUploadResponse,
   AnalysisResult,
-  ResumeDocument,
   ResumeAnalysisResponse,
   ImprovementPlanResponse,
   SupportedFormatsResponse,
@@ -136,7 +135,7 @@ class ATSApiClient {
 
   async getImprovementPlan(
     analysisResult: AnalysisResult,
-    extractedData: ResumeDocument,
+    extractedData: Record<string, unknown>,
     jobDescription?: string
   ): Promise<ImprovementPlanResponse> {
     return this.request<ImprovementPlanResponse>(
@@ -194,7 +193,7 @@ export const extractResumeExperience = (file: File) =>
 
 export const getResumeImprovementPlan = (
   analysisResult: AnalysisResult,
-  extractedData: ResumeDocument,
+  extractedData: Record<string, unknown>,
   jobDescription?: string
 ) => atsApi.getImprovementPlan(analysisResult, extractedData, jobDescription);
 

@@ -6,7 +6,14 @@ import React, { useCallback, useState } from 'react';
 
 import { ImprovementPlan } from '@/components/resume/ImprovementPlan';
 import { AnimatedScore, Card, DataVisualization, Tabs } from '@/components/ui';
-import type { AnalysisResult, ImprovementItem } from '@/types';
+import type {
+  ATSEducation,
+  ATSWorkExperience,
+  AnalysisResult,
+  ImprovementItem,
+  StructuredEducation,
+  StructuredWorkExperience,
+} from '@/types';
 
 import { AnalysisDataDisplay } from './AnalysisDataDisplay';
 import { TabbedParsedDataDisplay } from './TabbedParsedDataDisplay';
@@ -35,18 +42,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
 
     const extracted = result.extraction_details;
 
-    // Debug logging
-    console.log('🔍 ATS Extraction Debug:');
-    console.log('Full extraction_details:', extracted);
-    console.log('Categorized resume:', extracted.categorized_resume);
-    console.log('Structured experience:', result.structured_experience);
-    console.log('Contact info:', extracted.categorized_resume?.contact_info);
-    console.log(
-      'Work experience:',
-      extracted.categorized_resume?.work_experience
-    );
-    console.log('Education:', extracted.categorized_resume?.education);
-    console.log('Skills:', extracted.categorized_resume?.skills);
+    // Debug logging removed for production
 
     // Use structured_experience if available, otherwise fall back to categorized_resume
     const structuredData = result.structured_experience;
@@ -88,124 +84,74 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           (typeof categorizedData?.contact_info?.github === 'object'
             ? categorizedData?.contact_info?.github?.url || ''
             : categorizedData?.contact_info?.github || ''),
-        portfolio:
-          structuredData?.contact_info?.portfolio ||
-          (typeof categorizedData?.contact_info?.portfolio === 'object'
-            ? categorizedData?.contact_info?.portfolio?.url || ''
-            : categorizedData?.contact_info?.portfolio || ''),
-        website:
-          structuredData?.contact_info?.website ||
-          categorizedData?.contact_info?.website ||
-          '',
+        portfolio: categorizedData?.contact_info?.portfolio || '',
       },
       summary:
         structuredData?.summary || categorizedData?.summary_profile || '',
       experience:
-        structuredData?.work_experience?.map((exp: any, index: number) => ({
-          id: `job-${index}`,
-          position: exp.positions?.[0]?.title || '',
-          company: exp.company || '',
-          location: exp.location || '',
-          startDate: exp.start_date || '',
-          endDate: exp.end_date || '',
-          current: exp.current || false,
-          description:
-            exp.positions?.[0]?.description ||
-            exp.responsibilities?.join('\n') ||
-            '',
-          achievements: exp.achievements || [],
-        })) ||
-        categorizedData?.work_experience?.map((exp: any, index: number) => ({
-          id: exp.item_id || `job-${index}`,
-          position: exp.positions?.[0]?.title || exp.title || '',
-          company: exp.company || '',
-          location: exp.location || '',
-          startDate: exp.start_date || '',
-          endDate: exp.end_date || '',
-          current: exp.current || false,
-          description: exp.positions?.[0]?.description || exp.description || '',
-          achievements:
-            exp.positions?.[0]?.achievements || exp.achievements || [],
-        })) ||
+        structuredData?.work_experience?.map(
+          (exp: StructuredWorkExperience, index: number) => ({
+            id: `job-${index}`,
+            position: exp.positions?.[0]?.title || '',
+            company: exp.company || '',
+            location: '',
+            startDate: exp.positions?.[0]?.start_date || '',
+            endDate: exp.positions?.[0]?.end_date || '',
+            current: exp.current || false,
+            description: exp.responsibilities?.join('\n') || '',
+            achievements: exp.achievements || [],
+          })
+        ) ||
+        categorizedData?.work_experience?.map(
+          (exp: ATSWorkExperience, index: number) => ({
+            id: `job-${index}`,
+            position: exp.role || '',
+            company: exp.company || '',
+            location: exp.location || '',
+            startDate: exp.start_date || '',
+            endDate: exp.end_date || '',
+            current: false,
+            description: '',
+            achievements: [],
+          })
+        ) ||
         [],
       education:
-        structuredData?.education?.map((edu: any, index: number) => ({
+        structuredData?.education?.map(
+          (edu: StructuredEducation, index: number) => ({
+            id: `edu-${index}`,
+            degree: edu.degree || '',
+            institution: edu.institution || '',
+            field: '',
+            location: edu.location || '',
+            startDate: '',
+            endDate: edu.graduation_year || '',
+            current: false,
+            gpa: edu.gpa || '',
+            honors: [],
+          })
+        ) ||
+        categorizedData?.education?.map((edu: ATSEducation, index: number) => ({
           id: `edu-${index}`,
-          degree: edu.degree_full || edu.degree || '',
-          institution:
-            edu.institution?.name || edu.school || edu.institution || '',
-          field: edu.major || edu.field || '',
-          location: edu.institution?.location || edu.location || '',
-          startDate: edu.duration?.start_date || edu.start_date || '',
-          endDate: edu.duration?.end_date || edu.end_date || '',
-          current: edu.duration?.current || edu.current || false,
-          gpa: edu.gpa?.value || edu.gpa || '',
-          honors: edu.grade?.honors || edu.honors || [],
-        })) ||
-        categorizedData?.education?.map((edu: any, index: number) => ({
-          id: edu.item_id || `edu-${index}`,
-          degree: edu.degree_full || edu.degree || '',
-          institution:
-            edu.institution?.name || edu.school || edu.institution || '',
-          field: edu.major || edu.field || '',
-          location: edu.institution?.location || edu.location || '',
-          startDate: edu.duration?.start_date || edu.start_date || '',
-          endDate: edu.duration?.end_date || edu.end_date || '',
-          current: edu.duration?.current || edu.current || false,
-          gpa: edu.gpa?.value || edu.gpa || '',
-          honors: edu.grade?.honors || edu.honors || [],
+          degree: edu.degree_full || '',
+          institution: edu.institution?.name || '',
+          field: edu.major || '',
+          location: edu.institution?.location || '',
+          startDate: edu.duration?.start_year || '',
+          endDate: edu.duration?.end_year || '',
+          current: false,
+          gpa: edu.grade?.value || '',
+          honors: [],
         })) ||
         [],
       skills: {
-        technical:
-          structuredData?.skills?.technical ||
-          categorizedData?.skills?.technical ||
-          extracted.skills_found?.technical ||
-          [],
-        business:
-          structuredData?.skills?.business ||
-          categorizedData?.skills?.business ||
-          extracted.skills_found?.business ||
-          [],
-        soft:
-          structuredData?.skills?.soft ||
-          categorizedData?.skills?.soft ||
-          extracted.skills_found?.soft ||
-          [],
-        languages:
-          structuredData?.skills?.languages ||
-          categorizedData?.languages ||
-          extracted.skills_found?.languages ||
-          [],
-        certifications:
-          structuredData?.skills?.certifications ||
-          categorizedData?.certifications ||
-          categorizedData?.skills?.certifications ||
-          extracted.skills_found?.certifications ||
-          [],
+        technical: [],
+        business: [],
+        soft: [],
+        languages: [],
+        certifications: [],
       },
-      projects:
-        structuredData?.projects?.map((project: any, index: number) => ({
-          id: project.item_id || `project-${index}`,
-          name: project.name || project.title || '',
-          description: project.description || '',
-          technologies: project.technologies || project.tech_stack || [],
-          url: project.url || project.link || '',
-          github: project.github || project.repository || '',
-          startDate: project.start_date || '',
-          endDate: project.end_date || '',
-        })) ||
-        categorizedData?.projects?.map((project: any, index: number) => ({
-          id: project.item_id || `project-${index}`,
-          name: project.name || project.title || '',
-          description: project.description || '',
-          technologies: project.technologies || project.tech_stack || [],
-          url: project.url || project.link || '',
-          github: project.github || project.repository || '',
-          startDate: project.start_date || '',
-          endDate: project.end_date || '',
-        })) ||
-        [],
+      projects: [],
       achievements:
         structuredData?.work_experience?.flatMap(
           exp => exp.achievements || []
@@ -214,15 +160,13 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         [],
     };
 
-    console.log('✅ Converted Resume Data:', resumeData);
+    // Resume data converted successfully
     return resumeData;
-  }, [result.extraction_details]);
+  }, [result.extraction_details, result.structured_experience]);
 
   const handleEditInBuilder = useCallback(() => {
     const resumeData = convertToResumeData();
-    console.log('Converting to resume data:', resumeData);
-    console.log('Original result:', result);
-    console.log('Extraction details:', result.extraction_details);
+    // Converting to resume data
 
     if (resumeData) {
       try {
@@ -241,18 +185,17 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         );
 
         // Show success message (optional - could be a toast notification)
-        console.log('Resume data saved successfully, navigating to builder...');
-        console.log('Saved data:', JSON.stringify(resumeData, null, 2));
+        // Resume data saved successfully, navigating to builder
 
         // Navigate to the resume builder
         router.push('/resume/builder');
-      } catch (error) {
-        console.error('Error saving resume data:', error);
+      } catch {
+        // Error saving resume data
         // Still navigate even if localStorage fails
         router.push('/resume/builder');
       }
     } else {
-      console.warn('No resume data to save, navigating to builder anyway...');
+      // No resume data to save, navigating to builder anyway
       router.push('/resume/builder');
     }
   }, [convertToResumeData, router, result.jobType, result.ats_score]);

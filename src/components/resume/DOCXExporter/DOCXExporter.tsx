@@ -1,7 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
-import { ResumeData, ResumeTemplate } from '@/types/resume';
 import {
   AlignmentType,
   Document,
@@ -13,6 +11,9 @@ import {
 import { saveAs } from 'file-saver';
 import React, { useState } from 'react';
 
+import { Button } from '@/components/ui/Button';
+import { ResumeData, ResumeTemplate } from '@/types/resume';
+
 interface DOCXExporterProps {
   resumeData: ResumeData;
   template: ResumeTemplate | null;
@@ -21,13 +22,13 @@ interface DOCXExporterProps {
 
 export const DOCXExporter: React.FC<DOCXExporterProps> = ({
   resumeData,
-  template,
+  template: _template,
   onExport,
 }) => {
   const [isExporting, setIsExporting] = useState(false);
 
   const createDocument = (): Document => {
-    const children: (Paragraph | any)[] = [];
+    const children: Paragraph[] = [];
 
     // Header
     children.push(
@@ -61,7 +62,7 @@ export const DOCXExporter: React.FC<DOCXExporterProps> = ({
         children: contactInfo.map(
           info =>
             new TextRun({
-              text: info + ' | ',
+              text: `${info} | `,
               size: 20,
               color: '6b7280',
             })
@@ -379,7 +380,7 @@ export const DOCXExporter: React.FC<DOCXExporterProps> = ({
 
       const doc = createDocument();
       const buffer = await Packer.toBuffer(doc);
-      const blob = new Blob([buffer], {
+      const blob = new Blob([new Uint8Array(buffer)], {
         type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       });
 
@@ -389,8 +390,8 @@ export const DOCXExporter: React.FC<DOCXExporterProps> = ({
       if (onExport) {
         onExport();
       }
-    } catch (error) {
-      console.error('Error generating DOCX:', error);
+    } catch {
+      // Error generating DOCX
       alert('Error generating DOCX. Please try again.');
     } finally {
       setIsExporting(false);

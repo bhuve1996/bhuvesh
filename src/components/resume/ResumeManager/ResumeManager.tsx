@@ -1,14 +1,15 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
+
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { CloudResume, cloudStorage } from '@/lib/resume/cloudStorage';
-import React, { useEffect, useState } from 'react';
 
 interface ResumeManagerProps {
   onResumeSelect: (resume: CloudResume) => void;
   onNewResume: () => void;
-  currentResumeId?: string;
+  currentResumeId?: string | undefined;
 }
 
 export const ResumeManager: React.FC<ResumeManagerProps> = ({
@@ -58,20 +59,20 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch {
       alert('Failed to export resume');
     }
   };
 
   const handleImportResume = () => {
     try {
-      const resumeId = cloudStorage.importResume(importData);
+      cloudStorage.importResume(importData);
       setImportData('');
       setShowImportModal(false);
       loadResumes();
       alert('Resume imported successfully!');
     } catch (error) {
-      alert('Failed to import resume: ' + (error as Error).message);
+      alert(`Failed to import resume: ${(error as Error).message}`);
     }
   };
 

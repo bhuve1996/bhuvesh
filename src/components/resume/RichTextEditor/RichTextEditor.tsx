@@ -1,10 +1,11 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
 import Placeholder from '@tiptap/extension-placeholder';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import React from 'react';
+
+import { Button } from '@/components/ui/Button';
 
 interface RichTextEditorProps {
   content: string;

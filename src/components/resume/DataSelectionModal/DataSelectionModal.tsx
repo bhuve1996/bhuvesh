@@ -1,17 +1,18 @@
 'use client';
 
+import React from 'react';
+
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ResumeData } from '@/types/resume';
-import React from 'react';
 
 interface DataSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectSampleData: () => void;
   onSelectParsedData: () => void;
-  templateSampleData?: Partial<ResumeData>;
-  parsedData?: Partial<ResumeData>;
+  templateSampleData?: Partial<ResumeData> | undefined;
+  parsedData?: Partial<ResumeData> | undefined;
   templateName: string;
 }
 
@@ -144,8 +145,8 @@ export const DataSelectionModal: React.FC<DataSelectionModalProps> = ({
                 Choose Your Data Source
               </h2>
               <p className='text-sm text-gray-600 mt-1'>
-                Select which data to use for your "{templateName}" resume
-                template
+                Select which data to use for your &quot;{templateName}&quot;
+                resume template
               </p>
             </div>
             <button

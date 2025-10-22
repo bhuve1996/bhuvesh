@@ -1,5 +1,7 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
+
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import {
@@ -9,11 +11,10 @@ import {
   loadAllTemplates,
 } from '@/lib/resume/templateLoader';
 import { ResumeTemplate, TemplateFilter } from '@/types/resume';
-import React, { useEffect, useState } from 'react';
 
 interface TemplateGalleryProps {
   onTemplateSelect: (template: ResumeTemplate) => void;
-  selectedTemplateId?: string;
+  selectedTemplateId?: string | undefined;
 }
 
 export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
@@ -41,8 +42,8 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
         const loadedTemplates = await loadAllTemplates();
         setTemplates(loadedTemplates);
         setFilteredTemplates(loadedTemplates);
-      } catch (error) {
-        console.error('Error loading templates:', error);
+      } catch {
+        // Error loading templates
       } finally {
         setLoading(false);
       }
@@ -96,7 +97,10 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
     setFilteredTemplates(filtered);
   }, [templates, searchQuery, filters]);
 
-  const handleFilterChange = (filterType: keyof TemplateFilter, value: any) => {
+  const handleFilterChange = (
+    filterType: keyof TemplateFilter,
+    value: unknown
+  ) => {
     setFilters(prev => ({
       ...prev,
       [filterType]: value,

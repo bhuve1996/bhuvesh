@@ -14,17 +14,20 @@ export interface WorkExperience {
   id: string;
   company: string;
   position: string;
+  title?: string; // Add missing title property
   location: string;
   startDate: string;
   endDate?: string;
   current: boolean;
   description: string;
   achievements: string[];
+  period?: string; // Add missing period property
 }
 
 export interface Education {
   id: string;
   institution: string;
+  school?: string; // Add missing school property
   degree: string;
   field: string;
   location: string;
@@ -33,6 +36,7 @@ export interface Education {
   current: boolean;
   gpa?: string;
   honors?: string[];
+  period?: string; // Add missing period property
 }
 
 export interface Project {
@@ -42,8 +46,19 @@ export interface Project {
   technologies: string[];
   url?: string;
   github?: string;
+  link?: string; // Add missing link property
   startDate: string;
   endDate?: string;
+}
+
+export interface Certification {
+  id: string;
+  name: string;
+  issuer: string;
+  date: string;
+  expiry?: string;
+  credentialId?: string;
+  url?: string;
 }
 
 export interface Skills {
@@ -62,12 +77,23 @@ export interface ResumeData {
   skills: Skills;
   projects: Project[];
   achievements?: string[];
+  certifications?: Certification[];
 }
+
+// Import ATS types for proper typing
+import type {
+  ExtractionDetails,
+  ATSCompatibility,
+  FormatAnalysis,
+  DetailedScores,
+  StructuredExperience,
+} from './ats';
 
 // ATS Analysis Result Types
 export interface AnalysisResult {
   jobType: string;
   atsScore: number;
+  ats_score?: number; // Backend compatibility
   keywordMatches: string[];
   missingKeywords: string[];
   suggestions: string[];
@@ -76,14 +102,16 @@ export interface AnalysisResult {
   keywordDensity: Record<string, number>;
   wordCount: number;
   characterCount: number;
-  extraction_details?: any; // From backend extraction_details
-  ats_compatibility?: any; // From backend ats_compatibility
-  format_analysis?: any; // From backend format_analysis
-  detailed_scores?: any; // From backend detailed_scores
+  extraction_details?: ExtractionDetails;
+  ats_compatibility?: ATSCompatibility;
+  format_analysis?: FormatAnalysis;
+  detailed_scores?: DetailedScores;
   semantic_similarity?: number;
   match_category?: string;
   ats_friendly?: boolean;
   formatting_issues?: string[];
+  structured_experience?: StructuredExperience;
+  job_description?: string;
 }
 
 // Template Types

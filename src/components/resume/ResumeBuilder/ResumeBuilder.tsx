@@ -1,21 +1,23 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
+
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { loadTemplate } from '@/lib/resume/templateLoader';
 import { ResumeData, ResumeTemplate } from '@/types/resume';
-import React, { useEffect, useState } from 'react';
+
 import { AIAssistant } from '../AIAssistant';
 import { ATSIntegration } from '../ATSIntegration';
-import { DOCXExporter } from '../DOCXExporter';
 import { DataSelectionModal } from '../DataSelectionModal';
+import { DOCXExporter } from '../DOCXExporter';
 import { DragDropSections } from '../DragDropSections';
 import { PDFExporter } from '../PDFExporter';
 import { RichTextEditor } from '../RichTextEditor';
 import { TemplateGallery } from '../TemplateGallery';
 
 interface ResumeBuilderProps {
-  initialData?: Partial<ResumeData>;
+  initialData?: Partial<ResumeData> | undefined;
   onSave?: (data: ResumeData) => void;
   onExport?: (data: ResumeData, format: 'pdf' | 'docx' | 'txt') => void;
 }
@@ -65,7 +67,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
   // Initialize with ATS data (only if no template is selected yet)
   useEffect(() => {
     if (initialData && !selectedTemplate) {
-      setResumeData(prev => {
+      setResumeData(_prev => {
         // Use ONLY parsed data - no sample data at all
         return {
           personal: {
@@ -109,8 +111,8 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
           applyTemplateData(fullTemplate, false);
         }
       }
-    } catch (error) {
-      console.error('Error loading template:', error);
+    } catch {
+      // Error loading template
     }
   };
 
@@ -171,7 +173,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
     setCurrentStep('builder');
   };
 
-  const handleDataUpdate = (section: keyof ResumeData, data: any) => {
+  const handleDataUpdate = (section: keyof ResumeData, data: unknown) => {
     setResumeData(prev => ({
       ...prev,
       [section]: data,
@@ -966,12 +968,17 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         >
                           <input
                             type='text'
-                            value={cert}
+                            value={typeof cert === 'string' ? cert : cert.name}
                             onChange={e => {
                               const newCerts = [
                                 ...(resumeData.certifications || []),
                               ];
-                              newCerts[index] = e.target.value;
+                              newCerts[index] = {
+                                id: `cert-${index}`,
+                                name: e.target.value,
+                                issuer: '',
+                                date: '',
+                              };
                               handleDataUpdate('certifications', newCerts);
                             }}
                             className='flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent'
@@ -1145,12 +1152,16 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         <PDFExporter
                           resumeData={resumeData}
                           template={selectedTemplate}
-                          onExport={() => console.log('PDF exported')}
+                          onExport={() => {
+                            /* PDF exported */
+                          }}
                         />
                         <DOCXExporter
                           resumeData={resumeData}
                           template={selectedTemplate}
-                          onExport={() => console.log('DOCX exported')}
+                          onExport={() => {
+                            /* DOCX exported */
+                          }}
                         />
                         <Button
                           variant='outline'
@@ -1203,8 +1214,8 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
               <div className='max-w-4xl mx-auto'>
                 <ATSIntegration
                   resumeData={resumeData}
-                  onAnalysisComplete={result => {
-                    console.log('ATS Analysis completed:', result);
+                  onAnalysisComplete={_result => {
+                    // ATS Analysis completed
                   }}
                 />
               </div>
@@ -1321,12 +1332,16 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                   <PDFExporter
                     resumeData={resumeData}
                     template={selectedTemplate}
-                    onExport={() => console.log('PDF exported')}
+                    onExport={() => {
+                      /* PDF exported */
+                    }}
                   />
                   <DOCXExporter
                     resumeData={resumeData}
                     template={selectedTemplate}
-                    onExport={() => console.log('DOCX exported')}
+                    onExport={() => {
+                      /* DOCX exported */
+                    }}
                   />
                   <Button variant='outline' onClick={() => handleExport('txt')}>
                     Export as TXT

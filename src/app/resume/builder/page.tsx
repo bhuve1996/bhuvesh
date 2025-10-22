@@ -1,20 +1,28 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { ResumeBuilder } from '@/components/resume/ResumeBuilder';
 import { ResumeManager } from '@/components/resume/ResumeManager';
 import { CloudResume, cloudStorage } from '@/lib/resume/cloudStorage';
 import { ResumeData } from '@/types/resume';
-import { useEffect, useState } from 'react';
+
+interface ATSDataSource {
+  originalJobType?: string;
+  atsScore?: number;
+}
 
 export default function ResumeBuilderPage() {
   const [currentView, setCurrentView] = useState<'manager' | 'builder'>(
     'manager'
   );
   const [currentResume, setCurrentResume] = useState<CloudResume | null>(null);
-  const [currentResumeId, setCurrentResumeId] = useState<string | null>(null);
+  const [currentResumeId, setCurrentResumeId] = useState<string | undefined>(
+    undefined
+  );
   const [atsCheckerData, setAtsCheckerData] = useState<{
     data: Partial<ResumeData>;
-    source: any;
+    source: ATSDataSource;
   } | null>(null);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
 
@@ -25,9 +33,7 @@ export default function ResumeBuilderPage() {
         const savedData = localStorage.getItem('resume-builder-data');
         const sourceData = localStorage.getItem('resume-builder-source');
 
-        console.log('Loading saved data from localStorage:');
-        console.log('Saved data:', savedData);
-        console.log('Source data:', sourceData);
+        // Loading saved data from localStorage
 
         if (savedData && sourceData) {
           const resumeData = JSON.parse(savedData);
@@ -35,8 +41,7 @@ export default function ResumeBuilderPage() {
 
           // Only load ATS data if it's specifically from the ATS checker
           if (source.source === 'ats-checker') {
-            console.log('Loading ATS checker data:', resumeData);
-            console.log('Source:', source);
+            // Loading ATS checker data
 
             setAtsCheckerData({ data: resumeData, source });
             setShowWelcomeMessage(true);
@@ -48,16 +53,14 @@ export default function ResumeBuilderPage() {
             localStorage.removeItem('resume-builder-data');
             localStorage.removeItem('resume-builder-source');
           } else {
-            console.log('Data found but not from ATS checker, ignoring');
+            // Data found but not from ATS checker, ignoring
             // Clear any stale data
             localStorage.removeItem('resume-builder-data');
             localStorage.removeItem('resume-builder-source');
           }
-        } else {
-          console.log('No saved data found in localStorage');
         }
-      } catch (error) {
-        console.error('Error loading saved resume data:', error);
+      } catch {
+        // Error loading saved resume data
         // Clear any corrupted data
         localStorage.removeItem('resume-builder-data');
         localStorage.removeItem('resume-builder-source');
@@ -80,14 +83,14 @@ export default function ResumeBuilderPage() {
         setCurrentResumeId(newResumeId);
       }
       alert('Resume saved successfully!');
-    } catch (error) {
-      console.error('Error saving resume:', error);
+    } catch {
+      // Error saving resume
       alert('Failed to save resume');
     }
   };
 
-  const handleExport = (data: ResumeData, format: 'pdf' | 'docx' | 'txt') => {
-    console.log(`Exporting resume as ${format}:`, data);
+  const handleExport = (_data: ResumeData, format: 'pdf' | 'docx' | 'txt') => {
+    // Exporting resume
     // Here you would implement the actual export functionality
     alert(`Exporting resume as ${format.toUpperCase()}...`);
   };
@@ -116,7 +119,7 @@ export default function ResumeBuilderPage() {
     localStorage.removeItem('resume-builder-source');
 
     setCurrentResume(null);
-    setCurrentResumeId(null);
+    setCurrentResumeId(undefined);
     setCurrentView('builder');
   };
 
@@ -181,8 +184,7 @@ export default function ResumeBuilderPage() {
                 </div>
                 <div className='text-sm text-gray-500'>
                   {currentResume
-                    ? 'Last saved: ' +
-                      new Date(currentResume.updatedAt).toLocaleString()
+                    ? `Last saved: ${new Date(currentResume.updatedAt).toLocaleString()}`
                     : 'New resume'}
                 </div>
               </div>
