@@ -167,6 +167,9 @@ export interface ExtractionDetails {
   total_matched_keywords?: number;
   total_missing_keywords?: number;
   categorized_resume?: CategorizedResume;
+  languages?: string[];
+  certifications?: string[];
+  hobbies_interests?: string[];
 }
 
 export interface ATSCompatibility {

@@ -252,6 +252,16 @@ export const Icons = {
       />
     </SVG>
   ),
+
+  // Layout icon
+  Layout: (props: SVGProps) => (
+    <SVG {...props} viewBox='0 0 24 24' stroke='currentColor' fill='none'>
+      <rect x='3' y='3' width='18' height='18' rx='2' ry='2' strokeWidth='2' />
+      <line x1='9' y1='9' x2='21' y2='9' strokeWidth='2' />
+      <line x1='9' y1='15' x2='21' y2='15' strokeWidth='2' />
+      <line x1='3' y1='9' x2='3' y2='21' strokeWidth='2' />
+    </SVG>
+  ),
 };
 
 export default SVG;

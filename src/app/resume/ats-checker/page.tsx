@@ -281,7 +281,7 @@ export default function ATSCheckerPage() {
   return (
     <div className='min-h-screen bg-background text-foreground'>
       <Section id='ats-checker' className='py-20'>
-        <div className='max-w-6xl mx-auto px-6 mt-8'>
+        <div className='max-w-6xl mx-auto px-6 pt-24'>
           {/* Header */}
           <div className='text-center mb-12'>
             <h1 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent'>

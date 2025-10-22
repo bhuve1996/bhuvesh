@@ -69,6 +69,9 @@ export interface SectionProps {
   children: React.ReactNode;
   className?: string;
   background?: 'transparent' | 'gradient' | 'dark';
+  showSeparator?: boolean;
+  separatorVariant?: 'line' | 'gradient' | 'dots' | 'shadow';
+  separatorColor?: 'primary' | 'secondary' | 'accent' | 'neutral' | 'muted';
 }
 
 export interface ToastOptions {
@@ -84,7 +87,8 @@ export interface ToastOptions {
 
 export type ToastType = 'success' | 'error' | 'loading' | 'info';
 
-export interface InputProps {
+export interface InputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url';
   placeholder?: string;
   value?: string;

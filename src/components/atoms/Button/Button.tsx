@@ -20,16 +20,22 @@ export const Button: React.FC<ButtonProps> = ({
     'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantClasses = {
-    primary: 'bg-cyan-500 hover:bg-cyan-600 text-white focus:ring-cyan-500',
-    secondary: 'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500',
+    primary:
+      'bg-cyan-500 hover:bg-cyan-600 text-white focus:ring-cyan-500 focus:ring-2 focus:ring-offset-2',
+    secondary:
+      'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500 focus:ring-2 focus:ring-offset-2',
     outline:
-      'border-2 border-cyan-500 text-cyan-500 hover:bg-cyan-500 hover:text-white focus:ring-cyan-500',
-    ghost: 'text-cyan-500 hover:bg-cyan-50 focus:ring-cyan-500',
-    destructive: 'bg-red-500 hover:bg-red-600 text-white focus:ring-red-500',
-    success: 'bg-green-500 hover:bg-green-600 text-white focus:ring-green-500',
+      'border-2 border-cyan-500 text-cyan-600 hover:bg-cyan-500 hover:text-white focus:ring-cyan-500 focus:ring-2 focus:ring-offset-2 dark:text-cyan-400',
+    ghost:
+      'text-cyan-600 hover:bg-cyan-50 hover:text-cyan-700 focus:ring-cyan-500 focus:ring-2 focus:ring-offset-2 dark:text-cyan-400 dark:hover:bg-cyan-500/10',
+    destructive:
+      'bg-red-500 hover:bg-red-600 text-white focus:ring-red-500 focus:ring-2 focus:ring-offset-2',
+    success:
+      'bg-green-500 hover:bg-green-600 text-white focus:ring-green-500 focus:ring-2 focus:ring-offset-2',
     warning:
-      'bg-yellow-500 hover:bg-yellow-600 text-white focus:ring-yellow-500',
-    default: 'bg-gray-500 hover:bg-gray-600 text-white focus:ring-gray-500',
+      'bg-yellow-500 hover:bg-yellow-600 text-white focus:ring-yellow-500 focus:ring-2 focus:ring-offset-2',
+    default:
+      'bg-gray-500 hover:bg-gray-600 text-white focus:ring-gray-500 focus:ring-2 focus:ring-offset-2',
   };
 
   const sizeClasses = {
@@ -92,6 +98,9 @@ export const Button: React.FC<ButtonProps> = ({
       className={classes}
       disabled={disabled || loading}
       onClick={handleClick}
+      aria-disabled={disabled || loading}
+      aria-busy={loading}
+      tabIndex={0}
       {...props}
     >
       {renderContent()}

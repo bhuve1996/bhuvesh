@@ -36,6 +36,18 @@ export const pageCards = [
     delay: 400,
   },
   {
+    title: 'Resume Templates',
+    description:
+      'Browse beautiful, professional resume templates and export in multiple formats.',
+    href: '/resume/templates',
+    gifSrc: 'https://media.giphy.com/media/3o7aTskHEUdgCQAXde/giphy.gif',
+    gifAlt: 'Template gallery animation',
+    iconName: 'Layout',
+    gradientFrom: 'from-violet-500',
+    gradientTo: 'to-purple-600',
+    delay: 450,
+  },
+  {
     title: 'ATS Checker',
     description:
       "Check your resume's ATS compatibility and get detailed analysis reports.",

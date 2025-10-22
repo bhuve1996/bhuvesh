@@ -4,10 +4,8 @@ import { useState } from 'react';
 
 import { AnimatedSection } from '@/components/common';
 import { PageLayout } from '@/components/layout';
-import { AnimatedGif } from '@/components/ui/AnimatedGif';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { sectionGifs } from '@/lib/gifs';
 
 export default function Services() {
   const [selectedService, setSelectedService] = useState('web-development');
@@ -244,30 +242,9 @@ export default function Services() {
       description='Comprehensive web development and technology solutions to bring your ideas to life.'
       activeSection='services'
     >
-      {/* Animated GIFs */}
-      {sectionGifs.services.map(gif => (
-        <AnimatedGif
-          key={gif.id}
-          src={gif.src}
-          alt={gif.alt}
-          position={gif.position}
-          width={gif.width}
-          height={gif.height}
-          opacity={gif.opacity}
-          animation={gif.animation}
-          speed={gif.speed}
-          zIndex={5}
-          showSeparator={gif.showSeparator}
-          separatorType={gif.separatorType}
-        />
-      ))}
-
       {/* Services Grid */}
       <section className='px-6 pb-16'>
         <div className='max-w-7xl mx-auto'>
-          <h2 className='section-title text-center animate-slide-up'>
-            What I Offer
-          </h2>
           <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
             {services.map((service, index) => (
               <AnimatedSection

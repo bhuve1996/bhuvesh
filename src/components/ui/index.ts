@@ -11,6 +11,7 @@ export { OrbitingElements } from './OrbitingElements';
 export { ProgressSteps } from './ProgressSteps';
 export { Icons, SVG } from './SVG';
 export { Section } from './Section';
+export { SectionSeparator } from './SectionSeparator/SectionSeparator';
 export { Tabs } from './Tabs';
 export { ThemeToggle } from './ThemeToggle';
 export { Toast } from './Toast';

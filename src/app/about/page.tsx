@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Footer, Navigation } from '@/components/layout';
 import { AboutSection } from '@/components/sections';
 import { StructuredData } from '@/components/SEO/StructuredData';
-import { Loading } from '@/components/ui';
+import { Loading, SectionSeparator } from '@/components/ui';
 
 export default function About() {
   const [activeSection, setActiveSection] = useState('about');
@@ -79,6 +79,8 @@ export default function About() {
           onGetStarted={handleGetStarted}
           onViewProjects={handleViewProjects}
         />
+
+        <SectionSeparator variant='gradient' color='muted' spacing='lg' />
 
         <Footer />
       </div>

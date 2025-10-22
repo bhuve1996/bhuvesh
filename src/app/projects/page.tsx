@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Footer, Navigation } from '@/components/layout';
 import { ProjectsSection } from '@/components/sections';
 import { StructuredData } from '@/components/SEO/StructuredData';
-import { Loading } from '@/components/ui';
+import { Loading, SectionSeparator } from '@/components/ui';
 
 export default function Projects() {
   const [activeSection, setActiveSection] = useState('projects');
@@ -67,6 +67,8 @@ export default function Projects() {
         />
 
         <ProjectsSection />
+
+        <SectionSeparator variant='gradient' color='muted' spacing='lg' />
 
         <Footer />
       </div>

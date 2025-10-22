@@ -20,11 +20,11 @@ export const Input: React.FC<InputProps> = ({
 
   const variantClasses = error
     ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-    : 'border-gray-300 focus:ring-cyan-500 focus:border-cyan-500';
+    : 'border-border focus:ring-primary-500 focus:border-primary-500';
 
   const disabledClasses = disabled
-    ? 'bg-gray-100 cursor-not-allowed opacity-50'
-    : 'bg-white';
+    ? 'bg-muted cursor-not-allowed opacity-50'
+    : 'bg-background';
 
   const classes =
     `${baseClasses} ${variantClasses} ${disabledClasses} ${className}`.trim();
@@ -32,9 +32,13 @@ export const Input: React.FC<InputProps> = ({
   return (
     <div className='space-y-1'>
       {label && (
-        <label className='block text-sm font-medium text-gray-700'>
+        <label className='block text-sm font-medium text-foreground'>
           {label}
-          {required && <span className='text-red-500 ml-1'>*</span>}
+          {required && (
+            <span className='text-red-500 ml-1' aria-label='required'>
+              *
+            </span>
+          )}
         </label>
       )}
 
@@ -46,13 +50,34 @@ export const Input: React.FC<InputProps> = ({
         disabled={disabled}
         required={required}
         className={classes}
+        aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={
+          error
+            ? `${props.id || 'input'}-error`
+            : helperText
+              ? `${props.id || 'input'}-helper`
+              : undefined
+        }
         {...props}
       />
 
-      {error && <p className='text-sm text-red-600'>{error}</p>}
+      {error && (
+        <p
+          id={`${props.id || 'input'}-error`}
+          className='text-sm text-red-600'
+          role='alert'
+        >
+          {error}
+        </p>
+      )}
 
       {helperText && !error && (
-        <p className='text-sm text-gray-500'>{helperText}</p>
+        <p
+          id={`${props.id || 'input'}-helper`}
+          className='text-sm text-muted-foreground'
+        >
+          {helperText}
+        </p>
       )}
     </div>
   );

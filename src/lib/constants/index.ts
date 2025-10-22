@@ -10,7 +10,7 @@ export const SITE_CONFIG = {
     github: 'https://github.com/bhuvesh-singla',
     linkedin: 'https://linkedin.com/in/bhuvesh-singla',
     twitter: 'https://twitter.com/bhuvesh_singla',
-    email: 'mailto:contact@bhuvesh.com',
+    email: 'mailto:bhuve1996@gmail.com',
   },
 } as const;
 
@@ -19,6 +19,7 @@ export const NAV_ITEMS = [
   { label: 'About', href: '/about', type: 'route' },
   { label: 'Projects', href: '/projects', type: 'route' },
   { label: 'Resume Builder', href: '/resume/builder', type: 'route' },
+  { label: 'Templates', href: '/resume/templates', type: 'route' },
   { label: 'ATS Checker', href: '/resume/ats-checker', type: 'route' },
   { label: 'Blog', href: '/blog', type: 'route' },
   { label: 'Contact', href: '/contact', type: 'route' },

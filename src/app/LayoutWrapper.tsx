@@ -23,8 +23,14 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      {/* Skip link for keyboard navigation */}
+      <a href='#main-content' className='skip-link' tabIndex={1}>
+        Skip to main content
+      </a>
       <Navigation />
-      <main className='min-h-screen'>{children}</main>
+      <main id='main-content' className='min-h-screen pt-24' tabIndex={-1}>
+        {children}
+      </main>
       <Footer />
       <Toast />
     </>

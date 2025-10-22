@@ -1,14 +1,13 @@
 import React from 'react';
 
 import { AnimatedSection, SectionHeader, TechStack } from '@/components/common';
-import { AnimatedGif } from '@/components/ui/AnimatedGif';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Section } from '@/components/ui/Section';
+import { SectionSeparator } from '@/components/ui/SectionSeparator';
 import { VisualSeparator } from '@/components/ui/VisualSeparator';
 import { COMMON_CLASSES } from '@/lib/constants';
 import { skillsList } from '@/lib/data';
-import { sectionGifs } from '@/lib/gifs';
 
 interface AboutSectionProps {
   onGetStarted?: () => void;
@@ -29,24 +28,6 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
         <div className='absolute top-1/3 right-1/4 w-72 h-72 bg-secondary-500/5 rounded-full blur-3xl animate-pulse-slow'></div>
         <div className='absolute bottom-1/3 left-1/4 w-64 h-64 bg-primary-500/5 rounded-full blur-3xl animate-pulse-slow delay-1000'></div>
       </div>
-
-      {/* Animated GIFs */}
-      {sectionGifs.about.map(gif => (
-        <AnimatedGif
-          key={gif.id}
-          src={gif.src}
-          alt={gif.alt}
-          position={gif.position}
-          width={gif.width}
-          height={gif.height}
-          opacity={gif.opacity}
-          animation={gif.animation}
-          speed={gif.speed}
-          zIndex={5}
-          showSeparator={gif.showSeparator}
-          separatorType={gif.separatorType}
-        />
-      ))}
 
       {/* Visual Separator */}
       <VisualSeparator
@@ -143,10 +124,12 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
           </div>
         </div>
 
+        <SectionSeparator variant='gradient' color='muted' spacing='xl' />
+
         <SectionHeader
           title='About Me'
           subtitle='Passionate developer with expertise in modern web technologies and innovative solutions'
-          badge='💻 About Me'
+          badge='💻 Developer'
         />
 
         <div className='grid lg:grid-cols-2 gap-16 items-center'>
@@ -225,6 +208,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
             </div>
           </div>
         </div>
+
+        <SectionSeparator variant='gradient' color='muted' spacing='xl' />
 
         {/* Stats Section */}
         <div className='mt-20 grid grid-cols-1 md:grid-cols-4 gap-8 animate-slide-up delay-600'>

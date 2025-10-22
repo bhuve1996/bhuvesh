@@ -164,19 +164,19 @@ export const ParsedDataDisplay: React.FC<ParsedDataDisplayProps> = ({
                       <span className='text-indigo-400 font-medium'>
                         Institution:
                       </span>{' '}
-                      {String(edu.institution)}
+                      {String(edu.institution) || 'Not specified'}
                     </p>
                     <p className='text-gray-300 mb-1'>
                       <span className='text-indigo-400 font-medium'>
                         Location:
                       </span>{' '}
-                      {edu.location}
+                      {edu.location || 'Not specified'}
                     </p>
                     <p className='text-gray-300 mb-1'>
                       <span className='text-indigo-400 font-medium'>
                         Graduation:
                       </span>{' '}
-                      {edu.graduation_year}
+                      {edu.graduation_year || 'Not specified'}
                     </p>
                     {edu.gpa && (
                       <p className='text-gray-300 mb-1'>

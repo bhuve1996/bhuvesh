@@ -78,6 +78,7 @@ export interface ResumeData {
   projects: Project[];
   achievements?: string[];
   certifications?: Certification[];
+  hobbies?: string[];
 }
 
 // Import ATS types for proper typing

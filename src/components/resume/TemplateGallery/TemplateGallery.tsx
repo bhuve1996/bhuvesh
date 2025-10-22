@@ -153,7 +153,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
     return (
       <div className='flex items-center justify-center py-12'>
         <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400'></div>
-        <span className='ml-2 text-gray-600'>Loading templates...</span>
+        <span className='ml-2 text-muted-foreground'>Loading templates...</span>
       </div>
     );
   }
@@ -162,10 +162,10 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
     <div className='max-w-7xl mx-auto p-6'>
       {/* Header */}
       <div className='mb-8'>
-        <h2 className='text-3xl font-bold text-gray-900 mb-2'>
+        <h2 className='text-3xl font-bold text-foreground mb-2'>
           Choose a Template
         </h2>
-        <p className='text-gray-600'>
+        <p className='text-muted-foreground'>
           Select a professional template that matches your industry and
           experience level.
         </p>
@@ -180,10 +180,10 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
             placeholder='Search templates...'
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className='w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent'
+            className='w-full px-4 py-2 pl-10 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
           />
           <svg
-            className='absolute left-3 top-2.5 h-5 w-5 text-gray-400'
+            className='absolute left-3 top-2.5 h-5 w-5 text-muted-foreground'
             fill='none'
             stroke='currentColor'
             viewBox='0 0 24 24'
@@ -201,7 +201,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
         <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
           {/* Category Filter */}
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-2'>
+            <label className='block text-sm font-medium text-foreground mb-2'>
               Category
             </label>
             <select
@@ -214,7 +214,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
                 );
                 handleFilterChange('category', values);
               }}
-              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent'
+              className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
             >
               {getTemplateCategories().map(category => (
                 <option key={category} value={category}>
@@ -226,7 +226,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
 
           {/* Experience Level Filter */}
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-2'>
+            <label className='block text-sm font-medium text-foreground mb-2'>
               Experience
             </label>
             <select
@@ -239,7 +239,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
                 );
                 handleFilterChange('experienceLevel', values);
               }}
-              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent'
+              className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
             >
               {getExperienceLevels().map(level => (
                 <option key={level} value={level}>
@@ -251,7 +251,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
 
           {/* Style Filter */}
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-2'>
+            <label className='block text-sm font-medium text-foreground mb-2'>
               Style
             </label>
             <select
@@ -264,7 +264,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
                 );
                 handleFilterChange('style', values);
               }}
-              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent'
+              className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
             >
               {getTemplateStyles().map(style => (
                 <option key={style} value={style}>
@@ -276,7 +276,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
 
           {/* ATS Score Filter */}
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-2'>
+            <label className='block text-sm font-medium text-foreground mb-2'>
               ATS Score
             </label>
             <div className='flex items-center space-x-2'>
@@ -293,7 +293,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
                 }
                 className='flex-1'
               />
-              <span className='text-sm text-gray-600'>
+              <span className='text-sm text-muted-foreground'>
                 {filters.atsScore.min}+
               </span>
             </div>
@@ -306,7 +306,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
             variant='outline'
             size='sm'
             onClick={clearFilters}
-            className='text-gray-600 hover:text-gray-800'
+            className='text-muted-foreground hover:text-foreground'
           >
             Clear Filters
           </Button>
@@ -315,7 +315,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
 
       {/* Results Count */}
       <div className='mb-6'>
-        <p className='text-gray-600'>
+        <p className='text-muted-foreground'>
           Showing {filteredTemplates.length} of {templates.length} templates
         </p>
       </div>
@@ -334,50 +334,52 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
           >
             <div className='p-6'>
               {/* Template Preview */}
-              <div className='aspect-[3/4] bg-gray-100 rounded-lg mb-4 flex items-center justify-center'>
+              <div className='aspect-[3/4] bg-muted rounded-lg mb-4 flex items-center justify-center'>
                 <div className='text-center'>
                   <div className='w-16 h-16 mx-auto mb-2 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center'>
                     <span className='text-white font-bold text-lg'>
                       {template.name.charAt(0)}
                     </span>
                   </div>
-                  <p className='text-sm text-gray-500'>Preview</p>
+                  <p className='text-sm text-muted-foreground'>Preview</p>
                 </div>
               </div>
 
               {/* Template Info */}
               <div className='space-y-2'>
-                <h3 className='font-semibold text-lg text-gray-900'>
+                <h3 className='font-semibold text-lg text-foreground'>
                   {template.name}
                 </h3>
-                <p className='text-sm text-gray-600 line-clamp-2'>
+                <p className='text-sm text-muted-foreground line-clamp-2'>
                   {template.description}
                 </p>
 
                 {/* Tags */}
                 <div className='flex flex-wrap gap-1 mt-3'>
-                  <span className='px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full'>
+                  <span className='px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full'>
                     {getCategoryLabel(template.category)}
                   </span>
-                  <span className='px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full'>
+                  <span className='px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full'>
                     {getExperienceLabel(template.experienceLevel)}
                   </span>
-                  <span className='px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full'>
+                  <span className='px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full'>
                     {getStyleLabel(template.style)}
                   </span>
                 </div>
 
                 {/* ATS Score */}
                 <div className='flex items-center justify-between mt-3'>
-                  <span className='text-sm text-gray-600'>ATS Score</span>
+                  <span className='text-sm text-muted-foreground'>
+                    ATS Score
+                  </span>
                   <div className='flex items-center space-x-2'>
-                    <div className='w-16 h-2 bg-gray-200 rounded-full overflow-hidden'>
+                    <div className='w-16 h-2 bg-muted rounded-full overflow-hidden'>
                       <div
                         className='h-full bg-gradient-to-r from-red-400 to-green-400'
                         style={{ width: `${template.atsScore}%` }}
                       />
                     </div>
-                    <span className='text-sm font-medium text-gray-900'>
+                    <span className='text-sm font-medium text-foreground'>
                       {template.atsScore}
                     </span>
                   </div>
@@ -403,9 +405,9 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
       {/* No Results */}
       {filteredTemplates.length === 0 && (
         <div className='text-center py-12'>
-          <div className='w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center'>
+          <div className='w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center'>
             <svg
-              className='w-8 h-8 text-gray-400'
+              className='w-8 h-8 text-muted-foreground'
               fill='none'
               stroke='currentColor'
               viewBox='0 0 24 24'
@@ -418,10 +420,10 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
               />
             </svg>
           </div>
-          <h3 className='text-lg font-medium text-gray-900 mb-2'>
+          <h3 className='text-lg font-medium text-foreground mb-2'>
             No templates found
           </h3>
-          <p className='text-gray-600 mb-4'>
+          <p className='text-muted-foreground mb-4'>
             Try adjusting your search or filters to find more templates.
           </p>
           <Button onClick={clearFilters} variant='outline'>

@@ -122,9 +122,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             id: `edu-${index}`,
             degree: edu.degree || '',
             institution: edu.institution || '',
-            field: '',
+            field: '', // This could be extracted from degree if needed
             location: edu.location || '',
-            startDate: '',
+            startDate: '', // Could be estimated from graduation year
             endDate: edu.graduation_year || '',
             current: false,
             gpa: edu.gpa || '',
@@ -135,7 +135,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           id: `edu-${index}`,
           degree: edu.degree_full || '',
           institution: edu.institution?.name || '',
-          field: edu.major || '',
+          field: edu.major || edu.specialization || '',
           location: edu.institution?.location || '',
           startDate: edu.duration?.start_year || '',
           endDate: edu.duration?.end_year || '',
@@ -145,11 +145,26 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         })) ||
         [],
       skills: {
-        technical: [],
-        business: [],
-        soft: [],
-        languages: [],
-        certifications: [],
+        technical: [
+          ...(extracted.skills_found?.technical_programming || []),
+          ...(extracted.skills_found?.technical_tools || []),
+          ...(extracted.skills_found?.tools_software || []),
+        ],
+        business: [
+          ...(extracted.skills_found?.business_management || []),
+          ...(extracted.skills_found?.financial_accounting || []),
+          ...(extracted.skills_found?.sales_marketing || []),
+          ...(extracted.skills_found?.customer_service || []),
+        ],
+        soft: [...(extracted.skills_found?.soft_skills || [])],
+        languages: [
+          ...(extracted.skills_found?.languages_spoken || []),
+          ...(extracted.languages || []),
+        ],
+        certifications: [
+          ...(extracted.skills_found?.certifications || []),
+          ...(extracted.certifications || []),
+        ],
       },
       projects: [],
       achievements:
@@ -158,6 +173,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         ) ||
         categorizedData?.achievements ||
         [],
+      hobbies: extracted.hobbies_interests || [],
     };
 
     // Resume data converted successfully

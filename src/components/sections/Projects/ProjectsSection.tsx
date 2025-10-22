@@ -1,13 +1,11 @@
 import React from 'react';
 
 import { AnimatedSection } from '@/components/common';
-import { AnimatedGif } from '@/components/ui/AnimatedGif';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Section } from '@/components/ui/Section';
 import { VisualSeparator } from '@/components/ui/VisualSeparator';
 import { projects } from '@/lib/data';
-import { sectionGifs } from '@/lib/gifs';
 
 export const ProjectsSection: React.FC = () => {
   return (
@@ -20,24 +18,6 @@ export const ProjectsSection: React.FC = () => {
         <div className='absolute top-1/4 left-1/3 w-80 h-80 bg-accent-500/5 rounded-full blur-3xl animate-pulse-slow'></div>
         <div className='absolute bottom-1/4 right-1/3 w-72 h-72 bg-primary-500/5 rounded-full blur-3xl animate-pulse-slow delay-1000'></div>
       </div>
-
-      {/* Animated GIFs */}
-      {sectionGifs.projects.map(gif => (
-        <AnimatedGif
-          key={gif.id}
-          src={gif.src}
-          alt={gif.alt}
-          position={gif.position}
-          width={gif.width}
-          height={gif.height}
-          opacity={gif.opacity}
-          animation={gif.animation}
-          speed={gif.speed}
-          zIndex={5}
-          showSeparator={gif.showSeparator}
-          separatorType={gif.separatorType}
-        />
-      ))}
 
       {/* Visual Separator */}
       <VisualSeparator
@@ -55,8 +35,7 @@ export const ProjectsSection: React.FC = () => {
               🚀 My Projects
             </span>
           </div>
-          <h2 className='section-title animate-slide-up'>Featured Projects</h2>
-          <p className='section-subtitle animate-slide-up delay-200'>
+          <p className='section-subtitle animate-slide-up delay-200 mt-4'>
             Here are some of my recent projects showcasing modern web
             development and innovative solutions
           </p>

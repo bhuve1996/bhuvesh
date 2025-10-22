@@ -42,7 +42,9 @@ class ATSAnalyzer:
 
         # Always initialize these attributes first
         self.model = None
+        self.content_model = None
         self.use_embeddings = False
+        self.use_content_generation = False
 
         # Enhanced scoring weights based on industry standards
         self.weights = {
@@ -77,19 +79,36 @@ class ATSAnalyzer:
             print(
                 "⚠️  WARNING: sentence-transformers not available. Using keyword-only matching."
             )
-            return
+        else:
+            try:
+                self.model = SentenceTransformer(
+                    "all-MiniLM-L6-v2"
+                )  # Lightweight, fast model
+                self.use_embeddings = True
+                print("✅ ATS Analyzer: AI embeddings model loaded successfully")
+            except Exception as e:
+                print(
+                    f"⚠️  WARNING: Failed to load AI embeddings model: {e}. Using keyword-only matching."
+                )
+                # Don't raise exception, just use keyword-only mode
 
+        # Try to load content generation model if available
         try:
-            self.model = SentenceTransformer(
-                "all-MiniLM-L6-v2"
-            )  # Lightweight, fast model
-            self.use_embeddings = True
-            print("✅ ATS Analyzer: AI embeddings model loaded successfully")
+            import google.generativeai as genai
+            import os
+            
+            api_key = os.getenv("GEMINI_API_KEY")
+            if api_key:
+                genai.configure(api_key=api_key)
+                self.content_model = genai.GenerativeModel("gemini-2.0-flash")
+                self.use_content_generation = True
+                print("✅ ATS Analyzer: AI content generation model loaded successfully")
+            else:
+                print("⚠️  WARNING: GEMINI_API_KEY not set. AI content generation disabled.")
+        except ImportError:
+            print("⚠️  WARNING: google-generativeai not available. AI content generation disabled.")
         except Exception as e:
-            print(
-                f"⚠️  WARNING: Failed to load AI embeddings model: {e}. Using keyword-only matching."
-            )
-            # Don't raise exception, just use keyword-only mode
+            print(f"⚠️  WARNING: Failed to load AI content generation model: {e}. Using fallback methods.")
 
     def extract_structured_experience(self, resume_text: str) -> dict[str, Any]:
         """
@@ -1732,7 +1751,11 @@ class ATSAnalyzer:
             return: ["python", "react", "aws"]
             """
 
-            response = self.model.generate_content(prompt)
+            if self.use_content_generation and self.content_model:
+                response = self.content_model.generate_content(prompt)
+            else:
+                print("⚠️  AI keyword classification failed: Content generation model not available, using fallback")
+                return set(keywords)  # Return all keywords as technical if AI is not available
 
             if response and response.text:
                 # Parse the JSON response
@@ -1993,7 +2016,11 @@ class ATSAnalyzer:
             ["python", "react", "aws", "docker", "postgresql", "rest", "git", "jenkins", "agile"]
             """
 
-            response = self.model.generate_content(prompt)
+            if self.use_content_generation and self.content_model:
+                response = self.content_model.generate_content(prompt)
+            else:
+                print("⚠️  AI resume keyword extraction failed: Content generation model not available, using fallback")
+                return self._extract_keywords(resume_text)
 
             if response and response.text:
                 import json
@@ -2916,11 +2943,19 @@ class ATSAnalyzer:
                 break
 
         # Extract detailed location
-        # Pattern 1: City, State/Country
-        location_match = re.search(
-            r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)",
-            text,
-        )
+        # Pattern 1: City, State/Country (more specific patterns)
+        location_patterns = [
+            r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),\s*(CA|NY|TX|FL|IL|PA|OH|GA|NC|MI|NJ|VA|WA|AZ|MA|TN|IN|MO|MD|WI|CO|MN|SC|AL|LA|KY|OR|OK|CT|UT|IA|NV|AR|MS|KS|NM|NE|WV|ID|HI|NH|ME|RI|MT|DE|SD|ND|AK|VT|WY|DC)",
+            r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),\s*(California|New York|Texas|Florida|Illinois|Pennsylvania|Ohio|Georgia|North Carolina|Michigan|New Jersey|Virginia|Washington|Arizona|Massachusetts|Tennessee|Indiana|Missouri|Maryland|Wisconsin|Colorado|Minnesota|South Carolina|Alabama|Louisiana|Kentucky|Oregon|Oklahoma|Connecticut|Utah|Iowa|Nevada|Arkansas|Mississippi|Kansas|New Mexico|Nebraska|West Virginia|Idaho|Hawaii|New Hampshire|Maine|Rhode Island|Montana|Delaware|South Dakota|North Dakota|Alaska|Vermont|Wyoming)",
+            r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),\s*(USA|United States|US|America)",
+            r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),\s*(India|Canada|UK|United Kingdom|Australia|Germany|France|Japan|China|Brazil|Mexico|Spain|Italy|Netherlands|Sweden|Norway|Denmark|Finland|Switzerland|Austria|Belgium|Poland|Czech Republic|Portugal|Greece|Turkey|Russia|South Korea|Singapore|Hong Kong|Taiwan|Thailand|Malaysia|Indonesia|Philippines|Vietnam|New Zealand|South Africa|Argentina|Chile|Colombia|Peru|Venezuela|Ecuador|Uruguay|Paraguay|Bolivia|Guyana|Suriname|French Guiana)",
+        ]
+        
+        location_match = None
+        for pattern in location_patterns:
+            location_match = re.search(pattern, text)
+            if location_match:
+                break
         if location_match:
             contact["location"]["full"] = location_match.group(0)
             contact["location"]["city"] = location_match.group(1)
@@ -2996,7 +3031,11 @@ class ATSAnalyzer:
                     r"(bachelor|master|phd|doctorate|b\.?e\.?|b\.?tech|m\.?e\.?|m\.?tech|b\.?s\.?|m\.?s\.?|b\.?a\.?|m\.?a\.?|mba|diploma)",
                     line_lower,
                 )
-                if degree_match and not current_edu.get("degree"):
+                if degree_match:
+                    # If we already have a current education entry, save it first
+                    if current_edu and current_edu.get("degree_full"):
+                        education_list.append(current_edu)
+                        current_edu = {}
                     # Parse degree details
                     degree_full = line_stripped
                     degree_type = ""
@@ -3072,7 +3111,11 @@ class ATSAnalyzer:
                     or "institute" in line_lower
                     or "school" in line_lower
                 ):
-                    current_edu["institution"]["name"] = line_stripped
+                    # Clean up institution name (remove "Institution:" prefix)
+                    institution_name = line_stripped
+                    if institution_name.startswith("Institution:"):
+                        institution_name = institution_name.replace("Institution:", "").strip()
+                    current_edu["institution"]["name"] = institution_name
 
                     # Determine institution type
                     if "university" in line_lower:
@@ -3084,30 +3127,73 @@ class ATSAnalyzer:
                     elif "school" in line_lower:
                         current_edu["institution"]["type"] = "School"
 
-                # Extract year with detailed parsing
-                year_match = re.search(r"(19|20)(\d{2})\s*[-–]\s*(19|20)(\d{2})", line)
-                if current_edu and year_match:
-                    start_year = year_match.group(1) + year_match.group(2)
-                    end_year = year_match.group(3) + year_match.group(4)
-
-                    current_edu["duration"]["start_year"] = start_year
-                    current_edu["duration"]["end_year"] = end_year
-                    current_edu["duration"]["total_years"] = int(end_year) - int(
-                        start_year
+                # Extract location (City, State/Country patterns)
+                if current_edu and not current_edu["institution"]["location"]:
+                    # Look for location patterns: "City, State" or "City, Country"
+                    location_match = re.search(
+                        r"([A-Za-z\s]+),\s*([A-Za-z\s]+)(?:\s*[-–]\s*([A-Za-z\s]+))?",
+                        line_stripped
                     )
+                    if location_match and not any(keyword in line_lower for keyword in ["university", "college", "institute", "school", "bachelor", "master", "phd", "degree"]):
+                        location_parts = [part.strip() for part in location_match.groups() if part]
+                        if len(location_parts) >= 2:
+                            current_edu["institution"]["location"] = ", ".join(location_parts)
+
+                # Extract year with detailed parsing
+                if current_edu:
+                    # First try to match year ranges (2017-2021)
+                    year_range_match = re.search(r"(19|20)(\d{2})\s*[-–]\s*(19|20)(\d{2})", line)
+                    if year_range_match:
+                        start_year = year_range_match.group(1) + year_range_match.group(2)
+                        end_year = year_range_match.group(3) + year_range_match.group(4)
+
+                        current_edu["duration"]["start_year"] = start_year
+                        current_edu["duration"]["end_year"] = end_year
+                        current_edu["duration"]["total_years"] = int(end_year) - int(start_year)
+                    else:
+                        # Try to match single graduation year (2017)
+                        single_year_match = re.search(r"\b(19|20)(\d{2})\b", line)
+                        if single_year_match and not current_edu["duration"]["end_year"]:
+                            graduation_year = single_year_match.group(1) + single_year_match.group(2)
+                            current_edu["duration"]["end_year"] = graduation_year
+                            # Estimate start year (typically 4 years for bachelor's, 2 for master's)
+                            if current_edu.get("degree_type") == "Bachelor":
+                                estimated_start = str(int(graduation_year) - 4)
+                                current_edu["duration"]["start_year"] = estimated_start
+                                current_edu["duration"]["total_years"] = 4
+                            elif current_edu.get("degree_type") == "Master":
+                                estimated_start = str(int(graduation_year) - 2)
+                                current_edu["duration"]["start_year"] = estimated_start
+                                current_edu["duration"]["total_years"] = 2
 
                 # Extract grade with detailed parsing
                 if current_edu:
-                    # CGPA pattern
-                    cgpa_match = re.search(
-                        r"(\d+\.?\d*)\s*(?:out of|/)?\s*(\d+\.?\d*)?\s*(cgpa|gpa)",
+                    # First try CGPA with scale (CGPA: 3.8/4.0)
+                    cgpa_with_scale_match = re.search(
+                        r"(?:cgpa|gpa)\s*:?\s*(\d+\.?\d*)\s*(?:out of|/|\s+)\s*(\d+\.?\d*)",
                         line_lower,
                     )
-                    if cgpa_match:
-                        current_edu["grade"]["value"] = cgpa_match.group(1)
-                        current_edu["grade"]["type"] = cgpa_match.group(3).upper()
-                        if cgpa_match.group(2):
-                            current_edu["grade"]["scale"] = cgpa_match.group(2)
+                    if cgpa_with_scale_match:
+                        current_edu["grade"]["value"] = cgpa_with_scale_match.group(1)
+                        current_edu["grade"]["type"] = "CGPA"
+                        current_edu["grade"]["scale"] = cgpa_with_scale_match.group(2)
+                    else:
+                        # Simple GPA pattern (GPA: 8.2) - no scale specified
+                        simple_gpa_match = re.search(
+                            r"gpa\s*:?\s*(\d+\.?\d*)(?!\s*(?:out of|/|\s+\d))",
+                            line_lower,
+                        )
+                        if simple_gpa_match:
+                            gpa_value = float(simple_gpa_match.group(1))
+                            current_edu["grade"]["value"] = simple_gpa_match.group(1)
+                            current_edu["grade"]["type"] = "GPA"
+                            # Determine scale based on value
+                            if gpa_value <= 4.0:
+                                current_edu["grade"]["scale"] = "4.0"
+                            elif gpa_value <= 10.0:
+                                current_edu["grade"]["scale"] = "10.0"
+                            else:
+                                current_edu["grade"]["scale"] = "10.0"  # Default
 
                     # Percentage pattern
                     percentage_match = re.search(
@@ -3148,6 +3234,7 @@ class ATSAnalyzer:
         in_experience = False
         current_job = None
         current_project = None
+        pending_title = None
 
         for i, line in enumerate(lines):
             line_stripped = line.strip()
@@ -3177,21 +3264,37 @@ class ATSAnalyzer:
                 break
 
             if in_experience and line_stripped:
+                # First, detect job role/title (before company detection)
+                if (not current_job and  # No current job yet
+                    re.search(
+                        r"(engineer|developer|manager|analyst|designer|architect|consultant|specialist|lead|senior|junior|software|frontend|backend)",
+                        line_lower,
+                    ) and
+                    not re.search(
+                        r"(developed|built|implemented|created|designed|integrated|engineered|architected)",
+                        line_lower,
+                    )):
+                    pending_title = line_stripped
+                    continue
+                
                 # Detect company name (usually has location pattern or is followed by date)
                 # Look ahead to see if next few lines have date pattern
                 has_date_nearby = False
                 for j in range(i, min(i + 3, len(lines))):
+                    # Support multiple date formats: MM/YYYY, YYYY, YYYY-MM
                     if re.search(
-                        r"\d{2}/\d{4}\s*[-–]\s*(\d{2}/\d{4}|present)", lines[j].lower()
+                        r"(\d{2}/\d{4}|\d{4})\s*[-–]\s*(\d{2}/\d{4}|\d{4}|present)", lines[j].lower()
                     ):
                         has_date_nearby = True
                         break
 
-                if has_date_nearby and (
-                    re.search(r",\s*[A-Z][a-z]+", line)
-                    or line.isupper()
-                    or len(line_stripped) < 60
-                ):
+                # More specific company detection - avoid dates and locations
+                if (has_date_nearby and 
+                    not re.search(r"\d{4}", line) and  # Not a date line
+                    not re.search(r"^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*,\s*([A-Z]{2}|[A-Z][a-z]+)$", line) and  # Not a location line
+                    (re.search(r",\s*[A-Z][a-z]+", line) or  # Has location pattern (but not state abbreviations)
+                     (line.isupper() and len(line_stripped) < 60) or  # All caps short line
+                     (not re.search(r"[•\-\*]", line) and len(line_stripped) < 60 and not re.search(r",\s*[A-Z]{2}$", line)))):  # Not a bullet point and not state abbreviation
                     # Save previous job
                     if current_project and current_job:
                         current_job["projects"].append(current_project)
@@ -3208,13 +3311,14 @@ class ATSAnalyzer:
                     current_job = {
                         "company": line_stripped,
                         "location": location,
-                        "role": "",
+                        "role": pending_title or "",  # Use pending title if available
                         "duration": "",
                         "start_date": "",
                         "end_date": "",
                         "total_duration_months": 0,
                         "projects": [],
                     }
+                    pending_title = None  # Clear pending title
                     continue
 
                 # Detect job role/title
@@ -3359,7 +3463,7 @@ class ATSAnalyzer:
 
             if (
                 re.search(
-                    r"\b(certification|certificate|licensed|credential)\b", line_lower
+                    r"\b(certification|certificate|licensed|credential)s?\b", line_lower
                 )
                 and len(line.strip()) < 40
             ):
@@ -3446,6 +3550,85 @@ class ATSAnalyzer:
             r"percentile",
         ]
 
+        lines = text.split("\n")
+        for line in lines:
+            line_lower = line.lower()
+            for pattern in achievement_patterns:
+                if re.search(pattern, line_lower):
+                    achievements.append(line.strip())
+                    break
+
+        return achievements
+
+    def _extract_summary(self, text: str) -> str:
+        """Extract summary/profile section"""
+        lines = text.split("\n")
+        summary = ""
+
+        in_summary = False
+        for i, line in enumerate(lines):
+            line_lower = line.lower()
+
+            if (
+                re.search(r"\b(summary|profile|objective|about)\b", line_lower)
+                and len(line.strip()) < 30
+            ):
+                in_summary = True
+                continue
+
+            if in_summary:
+                if (
+                    re.search(r"\b(experience|education|skills|work)\b", line_lower)
+                    and len(line.strip()) < 30
+                ):
+                    break
+                if line.strip():
+                    summary += line.strip() + " "
+
+        return summary.strip()
+
+
+    def _extract_hobbies(self, text: str) -> list[str]:
+        """Extract hobbies and interests"""
+        hobbies = []
+        lines = text.split("\n")
+
+        for i, line in enumerate(lines):
+            line_lower = line.lower()
+
+            if (
+                re.search(r"\b(hobbies|interests|activities)\b", line_lower)
+                and len(line.strip()) < 30
+            ):
+                # Look for hobbies in the next few lines
+                for j in range(i + 1, min(i + 10, len(lines))):
+                    hobby_line = lines[j].strip()
+                    if not hobby_line:
+                        continue
+                    if re.search(r"\b(education|skills|experience|certification)\b", hobby_line.lower()):
+                        break
+                    if hobby_line.startswith("•") or hobby_line.startswith("-"):
+                        hobbies.append(hobby_line)
+                    elif len(hobby_line) < 50 and not re.search(r"\d{4}", hobby_line):
+                        hobbies.append(hobby_line)
+
+        return hobbies
+
+    def _extract_achievements(self, text: str) -> list[str]:
+        """Extract achievements and awards"""
+        achievements = []
+
+        # Look for achievement indicators
+        achievement_patterns = [
+            r"top\s+\d+\s*%",
+            r"ranked\s+\d+",
+            r"award",
+            r"achievement",
+            r"recognition",
+            r"winner",
+        ]
+        
+        # Search for achievements in the text
         lines = text.split("\n")
         for line in lines:
             line_lower = line.lower()
@@ -3607,118 +3790,6 @@ class ATSAnalyzer:
             "payroll",
             "accounts payable",
             "accounts receivable",
-            "quickbooks",
-            "sap",
-            "oracle financials",
-            "financial analysis",
-            "budgeting",
-            "forecasting",
-            "cpa",
-            "cfa",
-            "excel",
-            "tally",
-            "gaap",
-            "ifrs",
-            "financial modeling",
-            "valuation",
-        ]
-        for skill in finance:
-            if re.search(r"\b" + skill + r"\b", text_lower):
-                skills["financial_accounting"].append(skill.title())
-
-        # === CREATIVE & DESIGN ===
-        creative = [
-            "adobe photoshop",
-            "illustrator",
-            "indesign",
-            "after effects",
-            "premiere pro",
-            "figma",
-            "sketch",
-            "canva",
-            "graphic design",
-            "ui/ux",
-            "web design",
-            "logo design",
-            "branding",
-            "typography",
-            "video editing",
-            "motion graphics",
-            "3d modeling",
-            "blender",
-            "maya",
-            "autocad",
-            "coreldraw",
-            "final cut pro",
-        ]
-        for skill in creative:
-            if re.search(r"\b" + skill.replace("/", "\\/") + r"\b", text_lower):
-                skills["creative_design"].append(skill.title())
-
-        # === MEDICAL & HEALTHCARE ===
-        medical = [
-            "patient care",
-            "diagnosis",
-            "treatment planning",
-            "surgery",
-            "emergency care",
-            "icu",
-            "cardiology",
-            "pediatrics",
-            "oncology",
-            "radiology",
-            "nursing",
-            "phlebotomy",
-            "ehr",
-            "epic",
-            "cerner",
-            "medical coding",
-            "icd-10",
-            "cpt",
-            "hipaa",
-            "clinical research",
-            "pharmacology",
-            "anatomy",
-            "physiology",
-        ]
-        for skill in medical:
-            if re.search(r"\b" + skill + r"\b", text_lower):
-                skills["medical_clinical"].append(skill.title())
-
-        # === EDUCATION & TRAINING ===
-        education = [
-            "teaching",
-            "curriculum development",
-            "lesson planning",
-            "classroom management",
-            "student assessment",
-            "tutoring",
-            "training",
-            "instructional design",
-            "e-learning",
-            "lms",
-            "moodle",
-            "blackboard",
-            "zoom",
-            "google classroom",
-            "child development",
-            "special education",
-            "tesol",
-            "tefl",
-        ]
-        for skill in education:
-            if re.search(r"\b" + skill + r"\b", text_lower):
-                skills["teaching_training"].append(skill.title())
-
-        # === SALES & MARKETING ===
-        sales_marketing = [
-            "sales",
-            "business development",
-            "lead generation",
-            "cold calling",
-            "crm",
-            "salesforce",
-            "hubspot",
             "digital marketing",
             "seo",
             "sem",
@@ -3733,9 +3804,9 @@ class ATSAnalyzer:
             "market research",
             "copywriting",
         ]
-        for skill in sales_marketing:
+        for skill in finance:
             if re.search(r"\b" + skill + r"\b", text_lower):
-                skills["sales_marketing"].append(skill.title())
+                skills["financial_accounting"].append(skill.title())
 
         # === CUSTOMER SERVICE ===
         customer_service = [

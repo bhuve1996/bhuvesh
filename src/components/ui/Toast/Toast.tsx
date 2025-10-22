@@ -6,6 +6,9 @@ export const Toast: React.FC = () => {
   return (
     <Toaster
       position='top-right'
+      containerStyle={{
+        top: '80px', // Position below the fixed header
+      }}
       toastOptions={{
         duration: 5000,
         style: {

@@ -51,7 +51,7 @@ export const DataVisualization: React.FC<DataVisualizationProps> = ({
         initial='hidden'
         animate='visible'
       >
-        <h3 className='text-xl font-bold mb-6 text-white'>{title}</h3>
+        <h3 className='text-xl font-bold mb-6 text-foreground'>{title}</h3>
         <div className='grid grid-cols-3 gap-4'>
           {data.map((item, index) => (
             <motion.div
@@ -98,12 +98,12 @@ export const DataVisualization: React.FC<DataVisualizationProps> = ({
                   </defs>
                 </svg>
                 <div className='absolute inset-0 flex flex-col items-center justify-center'>
-                  <span className='text-lg font-bold text-white'>
+                  <span className='text-lg font-bold text-foreground'>
                     {item.value}%
                   </span>
                 </div>
               </div>
-              <p className='text-center text-sm text-gray-300 mt-2'>
+              <p className='text-center text-sm text-muted-foreground mt-2'>
                 {item.label}
               </p>
             </motion.div>
@@ -121,7 +121,7 @@ export const DataVisualization: React.FC<DataVisualizationProps> = ({
         initial='hidden'
         animate='visible'
       >
-        <h3 className='text-xl font-bold mb-6 text-white'>{title}</h3>
+        <h3 className='text-xl font-bold mb-6 text-foreground'>{title}</h3>
         <div className='relative w-48 h-48 mx-auto'>
           <svg
             className='w-full h-full transform -rotate-90'
@@ -167,10 +167,10 @@ export const DataVisualization: React.FC<DataVisualizationProps> = ({
             ))}
           </svg>
           <div className='absolute inset-0 flex flex-col items-center justify-center'>
-            <span className='text-2xl font-bold text-white'>
+            <span className='text-2xl font-bold text-foreground'>
               {data.reduce((sum, item) => sum + item.value, 0)}
             </span>
-            <span className='text-sm text-gray-400'>Total</span>
+            <span className='text-sm text-muted-foreground'>Total</span>
           </div>
         </div>
         <div className='mt-6 space-y-2'>
@@ -184,9 +184,9 @@ export const DataVisualization: React.FC<DataVisualizationProps> = ({
                 <div
                   className={`w-3 h-3 rounded-full bg-gradient-to-r ${getColor(index)}`}
                 />
-                <span className='text-gray-300'>{item.label}</span>
+                <span className='text-muted-foreground'>{item.label}</span>
               </div>
-              <span className='text-white font-medium'>{item.value}</span>
+              <span className='text-foreground font-medium'>{item.value}</span>
             </motion.div>
           ))}
         </div>
@@ -202,7 +202,7 @@ export const DataVisualization: React.FC<DataVisualizationProps> = ({
       initial='hidden'
       animate='visible'
     >
-      <h3 className='text-xl font-bold mb-6 text-white'>{title}</h3>
+      <h3 className='text-xl font-bold mb-6 text-foreground'>{title}</h3>
       <div className='space-y-4'>
         {data.map((item, index) => (
           <motion.div
@@ -213,11 +213,13 @@ export const DataVisualization: React.FC<DataVisualizationProps> = ({
             <div className='flex justify-between items-center'>
               <div className='flex items-center space-x-2'>
                 {item.icon && <span className='text-lg'>{item.icon}</span>}
-                <span className='text-gray-300 font-medium'>{item.label}</span>
+                <span className='text-muted-foreground font-medium'>
+                  {item.label}
+                </span>
               </div>
-              <span className='text-white font-bold'>{item.value}</span>
+              <span className='text-foreground font-bold'>{item.value}</span>
             </div>
-            <div className='w-full bg-gray-700/30 rounded-full h-3 overflow-hidden'>
+            <div className='w-full bg-muted/30 rounded-full h-3 overflow-hidden'>
               <motion.div
                 className={`h-full bg-gradient-to-r ${getColor(index, item.color)} rounded-full relative`}
                 initial={{ width: 0 }}

@@ -41,7 +41,11 @@ export const Navigation: React.FC<NavigationProps> = ({
   };
 
   return (
-    <nav className='fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border'>
+    <nav
+      className='fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border'
+      role='navigation'
+      aria-label='Main navigation'
+    >
       <div className={`${COMMON_CLASSES.container} py-4`}>
         <div className='flex justify-between items-center'>
           {/* Logo */}
@@ -64,18 +68,21 @@ export const Navigation: React.FC<NavigationProps> = ({
           </Link>
 
           {/* Desktop Navigation */}
-          <div className='hidden md:flex items-center space-x-1'>
+          <div className='hidden md:flex items-center space-x-1' role='menubar'>
             {navItems.map(item => (
               <React.Fragment key={item.label}>
                 {item.href.includes('#') ? (
                   <Link
                     href={item.href}
                     onClick={() => handleNavClick(item)}
-                    className={`relative px-4 py-2 rounded-lg transition-all duration-300 group ${
+                    className={`relative px-4 py-2 rounded-lg transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
                       isActive(item)
                         ? 'text-primary-400 bg-primary-500/10'
                         : 'text-foreground hover:text-primary-400 hover:bg-muted/50'
                     }`}
+                    role='menuitem'
+                    aria-current={isActive(item) ? 'page' : undefined}
+                    tabIndex={0}
                   >
                     <span className='relative z-10'>{item.label}</span>
                     {isActive(item) && (
@@ -86,7 +93,9 @@ export const Navigation: React.FC<NavigationProps> = ({
                 ) : (
                   <Link
                     href={item.href}
-                    className='relative px-4 py-2 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 group'
+                    className='relative px-4 py-2 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
+                    role='menuitem'
+                    tabIndex={0}
                   >
                     <span className='relative z-10'>{item.label}</span>
                     <div className='absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
@@ -103,9 +112,12 @@ export const Navigation: React.FC<NavigationProps> = ({
 
           {/* Mobile Menu Button */}
           <button
-            className='md:hidden relative p-2 text-foreground hover:text-primary-400 hover:bg-muted/50 rounded-lg transition-all duration-300'
+            className='md:hidden relative p-2 text-foreground hover:text-primary-400 hover:bg-muted/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label='Toggle mobile menu'
+            aria-expanded={isMobileMenuOpen}
+            aria-controls='mobile-menu'
+            tabIndex={0}
           >
             <div className='relative w-6 h-6'>
               <span
@@ -123,7 +135,10 @@ export const Navigation: React.FC<NavigationProps> = ({
 
         {/* Mobile Navigation */}
         <div
+          id='mobile-menu'
           className={`md:hidden overflow-hidden transition-all duration-300 ${isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+          role='menu'
+          aria-hidden={!isMobileMenuOpen}
         >
           <div className='pt-4 pb-4 border-t border-border'>
             <div className='flex flex-col space-y-2'>
@@ -133,19 +148,24 @@ export const Navigation: React.FC<NavigationProps> = ({
                     <Link
                       href={item.href}
                       onClick={() => handleNavClick(item)}
-                      className={`px-4 py-3 rounded-lg text-left transition-all duration-300 ${
+                      className={`px-4 py-3 rounded-lg text-left transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
                         isActive(item)
                           ? 'text-primary-400 bg-primary-500/10 border border-primary-500/20'
                           : 'text-foreground hover:text-primary-400 hover:bg-muted/50'
                       }`}
+                      role='menuitem'
+                      aria-current={isActive(item) ? 'page' : undefined}
+                      tabIndex={0}
                     >
                       {item.label}
                     </Link>
                   ) : (
                     <Link
                       href={item.href}
-                      className='px-4 py-3 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300'
+                      className='px-4 py-3 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
                       onClick={() => setIsMobileMenuOpen(false)}
+                      role='menuitem'
+                      tabIndex={0}
                     >
                       {item.label}
                     </Link>

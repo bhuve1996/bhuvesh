@@ -18,21 +18,21 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantClasses = {
     primary:
-      'bg-primary-500 hover:bg-primary-600 text-primary-950 shadow-lg hover:shadow-primary-500/25 focus:ring-primary-500',
+      'bg-primary-500 hover:bg-primary-600 text-primary-950 shadow-lg hover:shadow-primary-500/25 focus:ring-primary-500 focus:ring-2 focus:ring-offset-2',
     secondary:
-      'bg-secondary-500 hover:bg-secondary-600 text-secondary-950 shadow-lg hover:shadow-secondary-500/25 focus:ring-secondary-500',
+      'bg-secondary-500 hover:bg-secondary-600 text-secondary-950 shadow-lg hover:shadow-secondary-500/25 focus:ring-secondary-500 focus:ring-2 focus:ring-offset-2',
     outline:
-      'border-2 border-primary-500 text-primary-400 hover:bg-primary-500 hover:text-primary-950 focus:ring-primary-500',
+      'border-2 border-primary-500 text-primary-600 hover:bg-primary-500 hover:text-primary-950 focus:ring-primary-500 focus:ring-2 focus:ring-offset-2 dark:text-primary-400 dark:hover:text-primary-950',
     ghost:
-      'text-primary-400 hover:bg-primary-500/10 hover:text-primary-300 focus:ring-primary-500',
+      'text-primary-600 hover:bg-primary-500/10 hover:text-primary-700 focus:ring-primary-500 focus:ring-2 focus:ring-offset-2 dark:text-primary-400 dark:hover:text-primary-300',
     destructive:
-      'bg-error-500 hover:bg-error-600 text-error-50 shadow-lg hover:shadow-error-500/25 focus:ring-error-500',
+      'bg-error-500 hover:bg-error-600 text-error-50 shadow-lg hover:shadow-error-500/25 focus:ring-error-500 focus:ring-2 focus:ring-offset-2',
     success:
-      'bg-success-500 hover:bg-success-600 text-success-950 shadow-lg hover:shadow-success-500/25 focus:ring-success-500',
+      'bg-success-500 hover:bg-success-600 text-success-950 shadow-lg hover:shadow-success-500/25 focus:ring-success-500 focus:ring-2 focus:ring-offset-2',
     warning:
-      'bg-warning-500 hover:bg-warning-600 text-warning-950 shadow-lg hover:shadow-warning-500/25 focus:ring-warning-500',
+      'bg-warning-500 hover:bg-warning-600 text-warning-950 shadow-lg hover:shadow-warning-500/25 focus:ring-warning-500 focus:ring-2 focus:ring-offset-2',
     default:
-      'bg-neutral-600 hover:bg-neutral-700 text-neutral-100 shadow-lg hover:shadow-neutral-500/25 focus:ring-neutral-500',
+      'bg-neutral-600 hover:bg-neutral-700 text-neutral-100 shadow-lg hover:shadow-neutral-500/25 focus:ring-neutral-500 focus:ring-2 focus:ring-offset-2',
   };
 
   const sizeClasses = {
@@ -50,6 +50,9 @@ export const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
       disabled={disabled || loading}
       className={classes}
+      aria-disabled={disabled || loading}
+      aria-busy={loading}
+      tabIndex={0}
       {...props}
     >
       {loading && (

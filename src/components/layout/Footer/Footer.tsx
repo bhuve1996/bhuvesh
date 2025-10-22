@@ -12,17 +12,17 @@ export const Footer: React.FC = () => {
   const socialLinks = [
     {
       name: 'GitHub',
-      href: 'https://github.com/bhuvesh',
+      href: 'https://github.com/bhuvesh-singla',
       icon: Icons.GitHub,
     },
     {
       name: 'LinkedIn',
-      href: 'https://linkedin.com/in/bhuvesh',
+      href: 'https://linkedin.com/in/bhuvesh-singla',
       icon: Icons.LinkedIn,
     },
     {
       name: 'Twitter',
-      href: 'https://twitter.com/bhuvesh',
+      href: 'https://twitter.com/bhuvesh_singla',
       icon: Icons.Twitter,
     },
   ];
@@ -63,9 +63,9 @@ export const Footer: React.FC = () => {
                 className='w-32 h-[50px] rounded-lg object-cover'
               />
             </Link>
-            <p className='text-gray-400 text-sm leading-relaxed mb-6'>
-              Senior Frontend Developer with 7+ years of experience building
-              modern web applications with React, Next.js, and cutting-edge
+            <p className='text-muted-foreground text-sm leading-relaxed mb-6'>
+              Full-Stack Developer with 7+ years of experience building modern
+              web applications with React, Next.js, TypeScript, and cutting-edge
               technologies.
             </p>
             {/* Social Links */}
@@ -78,7 +78,7 @@ export const Footer: React.FC = () => {
                     href={social.href}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-gray-400 hover:text-cyan-400 transition-colors duration-300 p-2 rounded-lg hover:bg-cyan-400/10'
+                    className='text-muted-foreground hover:text-cyan-400 transition-colors duration-300 p-2 rounded-lg hover:bg-cyan-400/10 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black'
                     aria-label={`Visit ${social.name} profile`}
                   >
                     <IconComponent className='w-5 h-5' />
@@ -98,7 +98,7 @@ export const Footer: React.FC = () => {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className='text-gray-400 hover:text-cyan-400 transition-colors duration-300 text-sm'
+                    className='text-muted-foreground hover:text-cyan-400 transition-colors duration-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black'
                   >
                     {link.label}
                   </Link>
@@ -115,7 +115,7 @@ export const Footer: React.FC = () => {
                 <li key={service.label}>
                   <Link
                     href={service.href}
-                    className='text-gray-400 hover:text-cyan-400 transition-colors duration-300 text-sm'
+                    className='text-muted-foreground hover:text-cyan-400 transition-colors duration-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black'
                   >
                     {service.label}
                   </Link>
@@ -133,19 +133,19 @@ export const Footer: React.FC = () => {
               <div className='flex items-center space-x-3'>
                 <Icons.Email className='w-4 h-4 text-cyan-400 flex-shrink-0' />
                 <a
-                  href='mailto:hello@bhuvesh.com'
-                  className='text-gray-400 hover:text-cyan-400 transition-colors duration-300 text-sm'
+                  href='mailto:bhuve1996@gmail.com'
+                  className='text-muted-foreground hover:text-cyan-400 transition-colors duration-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black'
                 >
-                  hello@bhuvesh.com
+                  bhuve1996@gmail.com
                 </a>
               </div>
               <div className='flex items-center space-x-3'>
                 <Icons.Location className='w-4 h-4 text-cyan-400 flex-shrink-0' />
-                <span className='text-gray-400 text-sm'>San Francisco, CA</span>
+                <span className='text-muted-foreground text-sm'>India</span>
               </div>
               <div className='flex items-center space-x-3'>
                 <Icons.Globe className='w-4 h-4 text-cyan-400 flex-shrink-0' />
-                <span className='text-gray-400 text-sm'>
+                <span className='text-muted-foreground text-sm'>
                   Available for remote work
                 </span>
               </div>
@@ -154,27 +154,27 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className='border-t border-gray-800 pt-8'>
+        <div className='border-t border-border pt-8'>
           <div className='flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0'>
-            <div className='text-gray-400 text-sm'>
+            <div className='text-muted-foreground text-sm'>
               © {currentYear} Bhuvesh Singla. All rights reserved.
             </div>
             <div className='flex items-center space-x-6 text-sm'>
               <Link
                 href='/privacy'
-                className='text-gray-400 hover:text-cyan-400 transition-colors duration-300'
+                className='text-muted-foreground hover:text-cyan-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black'
               >
                 Privacy Policy
               </Link>
               <Link
                 href='/terms'
-                className='text-gray-400 hover:text-cyan-400 transition-colors duration-300'
+                className='text-muted-foreground hover:text-cyan-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black'
               >
                 Terms of Service
               </Link>
               <Link
                 href='/sitemap'
-                className='text-gray-400 hover:text-cyan-400 transition-colors duration-300'
+                className='text-muted-foreground hover:text-cyan-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black'
               >
                 Sitemap
               </Link>
