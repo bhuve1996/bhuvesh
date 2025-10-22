@@ -417,7 +417,8 @@ const modernTemplates: ResumeTemplate[] = [
 ];
 
 export default function TemplateGalleryPage() {
-  const [selectedTemplate] = useState<ResumeTemplate | null>(null);
+  // Use global state for selectedTemplate
+  const selectedTemplate = useResumeStore(state => state.selectedTemplate);
   const [customizedTemplate, setCustomizedTemplate] =
     useState<ResumeTemplate | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
