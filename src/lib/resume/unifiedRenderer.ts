@@ -252,15 +252,16 @@ export const renderToPDF = async (
   const jsDoc = doc as any; // Cast for jsPDF operations
   const pageWidth = jsDoc.internal.pageSize.getWidth();
   const pageHeight = jsDoc.internal.pageSize.getHeight();
-  const margin = convertSpacing(config.spacing.margins || '0.75in');
+  const margin = convertSpacing(config.spacing.margins || '0.5in'); // Reduced margins
   const contentWidth = pageWidth - margin * 2;
-  let yPosition = margin + 10; // Start with some top margin
+  let yPosition = margin + 5; // Reduced top margin
 
   // Helper function to check if we need a new page
-  const checkPageBreak = (requiredSpace: number = 20) => {
-    if (yPosition + requiredSpace > pageHeight - margin) {
+  const checkPageBreak = (requiredSpace: number = 15) => {
+    if (yPosition + requiredSpace > pageHeight - margin - 10) {
+      // More aggressive page breaking
       jsDoc.addPage();
-      yPosition = margin;
+      yPosition = margin + 5;
       return true;
     }
     return false;
@@ -283,8 +284,8 @@ export const renderToPDF = async (
     jsDoc.setTextColor(r, g, b);
 
     const lines = jsDoc.splitTextToSize(text, contentWidth);
-    const lineHeight = fontSize * 1.4; // Better line height for readability
-    const requiredSpace = lines.length * lineHeight + 6; // More space between lines
+    const lineHeight = fontSize * 1.1; // Compact line height
+    const requiredSpace = lines.length * lineHeight + 2; // Minimal space between lines
 
     // Check if we need a new page
     checkPageBreak(requiredSpace);
@@ -296,12 +297,12 @@ export const renderToPDF = async (
 
   // Helper function to add section header
   const addSectionHeader = (title: string) => {
-    yPosition += 16; // More space before section headers
-    checkPageBreak(25);
+    yPosition += 6; // Further reduced space before section headers
+    checkPageBreak(12);
 
     addText(
       title,
-      convertFontSize(config.fonts.size.subheading),
+      convertFontSize(config.fonts.size.subheading) - 1, // Slightly smaller headers
       true,
       config.colors.primary,
       'left',
@@ -311,31 +312,31 @@ export const renderToPDF = async (
     // Add underline with accent color
     const [r, g, b] = convertColor(config.colors.accent);
     jsDoc.setDrawColor(r, g, b);
-    jsDoc.setLineWidth(2);
-    jsDoc.line(margin, yPosition - 8, pageWidth - margin, yPosition - 8);
-    yPosition += 12; // More space after section headers
+    jsDoc.setLineWidth(1);
+    jsDoc.line(margin, yPosition - 3, pageWidth - margin, yPosition - 3);
+    yPosition += 4; // Reduced space after section headers
   };
 
   // Helper function to add a subtle separator line
   const addSeparator = () => {
-    yPosition += 6; // More space before separators
+    yPosition += 3; // Minimal space before separators
     const [r, g, b] = convertColor(config.colors.secondary);
     jsDoc.setDrawColor(r, g, b);
-    jsDoc.setLineWidth(0.5);
+    jsDoc.setLineWidth(0.3);
     jsDoc.line(margin + 20, yPosition, pageWidth - margin - 20, yPosition);
-    yPosition += 6; // More space after separators
+    yPosition += 3; // Minimal space after separators
   };
 
   // Header
   addText(
     content.header.name,
-    convertFontSize(config.fonts.size.heading) + 2, // Slightly larger for name
+    convertFontSize(config.fonts.size.heading), // Standard size for name
     true,
     config.colors.primary,
     'center',
     config.fonts.heading
   );
-  yPosition += 8; // Space between name and contact
+  yPosition += 3; // Minimal space between name and contact
 
   addText(
     content.header.contact.join(' • '),
@@ -345,7 +346,7 @@ export const renderToPDF = async (
     'center',
     config.fonts.body
   );
-  yPosition += 20; // More space after header
+  yPosition += 8; // Reduced space after header
 
   // Summary
   if (content.sections.summary) {
@@ -358,7 +359,7 @@ export const renderToPDF = async (
       'left',
       config.fonts.body
     );
-    yPosition += 5;
+    yPosition += 2; // Minimal space after summary
   }
 
   // Experience
@@ -414,7 +415,7 @@ export const renderToPDF = async (
     if (index < content.sections.experience.length - 1) {
       addSeparator();
     } else {
-      yPosition += 12; // More space after last experience
+      yPosition += 4; // Minimal space after last experience
     }
   });
 
@@ -458,7 +459,7 @@ export const renderToPDF = async (
     if (index < content.sections.education.length - 1) {
       addSeparator();
     } else {
-      yPosition += 12; // More space after last education
+      yPosition += 4; // Minimal space after last education
     }
   });
 
@@ -525,7 +526,7 @@ export const renderToPDF = async (
     );
   }
 
-  yPosition += 12; // Space after skills
+  yPosition += 4; // Minimal space after skills
 
   // Projects
   if (content.sections.projects && content.sections.projects.length > 0) {
@@ -580,7 +581,7 @@ export const renderToPDF = async (
       ) {
         addSeparator();
       } else {
-        yPosition += 12; // More space after last project
+        yPosition += 4; // Minimal space after last project
       }
     });
   }
@@ -601,7 +602,7 @@ export const renderToPDF = async (
         config.fonts.body
       );
     });
-    yPosition += 12; // Space after achievements
+    yPosition += 4; // Minimal space after achievements
   }
 
   // Save the PDF
