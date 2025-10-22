@@ -417,8 +417,7 @@ const modernTemplates: ResumeTemplate[] = [
 ];
 
 export default function TemplateGalleryPage() {
-  const [selectedTemplate] =
-    useState<ResumeTemplate | null>(null);
+  const [selectedTemplate] = useState<ResumeTemplate | null>(null);
   const [customizedTemplate, setCustomizedTemplate] =
     useState<ResumeTemplate | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -435,8 +434,12 @@ export default function TemplateGalleryPage() {
 
   // Use global state
   const userResumeData = useResumeStore(state => state.resumeData);
-  const { setUseUserData, setShowDataChoice, setSelectedTemplate, setResumeData } =
-    useResumeActions();
+  const {
+    setUseUserData,
+    setShowDataChoice,
+    setSelectedTemplate,
+    setResumeData,
+  } = useResumeActions();
   const { navigateToResumeBuilder, navigateToAtsChecker } =
     useResumeNavigation();
 
@@ -459,7 +462,7 @@ export default function TemplateGalleryPage() {
         document.removeEventListener('mousedown', handleClickOutside);
     }
     return undefined;
-  }, [showFloatingMenu]);
+  }, [showFloatingMenu, setResumeData]);
 
   // Data is now managed by global state
 

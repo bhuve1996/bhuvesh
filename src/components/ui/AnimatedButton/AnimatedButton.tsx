@@ -5,7 +5,13 @@ import React from 'react';
 
 interface AnimatedButtonProps {
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'success';
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'outline'
+    | 'ghost'
+    | 'destructive'
+    | 'success';
   size?: 'sm' | 'md' | 'lg';
   onClick?: () => void;
   className?: string;
@@ -38,12 +44,17 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   }));
 
   const variantClasses = {
-    primary: 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg',
-    secondary: 'bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white shadow-lg',
-    outline: 'border-2 border-cyan-500 text-cyan-600 hover:bg-cyan-500 hover:text-white',
+    primary:
+      'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg',
+    secondary:
+      'bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white shadow-lg',
+    outline:
+      'border-2 border-cyan-500 text-cyan-600 hover:bg-cyan-500 hover:text-white',
     ghost: 'text-cyan-600 hover:bg-cyan-500/10 hover:text-cyan-700',
-    destructive: 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg',
-    success: 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg',
+    destructive:
+      'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg',
+    success:
+      'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg',
   };
 
   const sizeClasses = {
@@ -136,9 +147,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 
       {/* Loading spinner */}
       {loading && (
-        <animated.div
-          className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2'
-        />
+        <animated.div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2' />
       )}
 
       {/* Button content */}

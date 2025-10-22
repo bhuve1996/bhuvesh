@@ -363,12 +363,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       </div>
                       <div className='mt-4'>
                         <AIAssistant
-                          onSuggestion={suggestion => {
+                          onSuggestion={_suggestion => {
                             // AI can suggest improvements for personal information
-                            console.log(
-                              'AI suggestion for personal info:',
-                              suggestion
-                            );
+                            // console.log(
+                            //   'AI suggestion for personal info:',
+                            //   suggestion
+                            // );
                           }}
                           context={`Personal information for ${resumeData.personal.fullName || 'resume'}`}
                           type='personal'
@@ -688,12 +688,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       </Button>
                       <div className='mt-4'>
                         <AIAssistant
-                          onSuggestion={suggestion => {
+                          onSuggestion={_suggestion => {
                             // AI can suggest education improvements
-                            console.log(
-                              'AI suggestion for education:',
-                              suggestion
-                            );
+                            // console.log(
+                            //   'AI suggestion for education:',
+                            //   suggestion
+                            // );
                           }}
                           context={`Education section for ${resumeData.personal.fullName || 'resume'}`}
                           type='education'
@@ -881,12 +881,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       </FormField>
                       <div className='mt-4'>
                         <AIAssistant
-                          onSuggestion={suggestion => {
+                          onSuggestion={_suggestion => {
                             // AI can suggest skills improvements
-                            console.log(
-                              'AI suggestion for skills:',
-                              suggestion
-                            );
+                            // console.log(
+                            //   'AI suggestion for skills:',
+                            //   suggestion
+                            // );
                           }}
                           context={`Skills section for ${resumeData.personal.fullName || 'resume'}`}
                           type='skills'
@@ -953,12 +953,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     </div>
                     <div className='mt-4'>
                       <AIAssistant
-                        onSuggestion={suggestion => {
+                        onSuggestion={_suggestion => {
                           // AI can suggest certifications improvements
-                          console.log(
-                            'AI suggestion for certifications:',
-                            suggestion
-                          );
+                          // console.log(
+                          //   'AI suggestion for certifications:',
+                          //   suggestion
+                          // );
                         }}
                         context={`Certifications section for ${resumeData.personal.fullName || 'resume'}`}
                         type='certifications'
@@ -1036,12 +1036,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       </div>
                       <div className='mt-4'>
                         <AIAssistant
-                          onSuggestion={suggestion => {
+                          onSuggestion={_suggestion => {
                             // AI can suggest achievements improvements
-                            console.log(
-                              'AI suggestion for achievements:',
-                              suggestion
-                            );
+                            // console.log(
+                            //   'AI suggestion for achievements:',
+                            //   suggestion
+                            // );
                           }}
                           context={`Achievements section for ${resumeData.personal.fullName || 'resume'}`}
                           type='achievements'

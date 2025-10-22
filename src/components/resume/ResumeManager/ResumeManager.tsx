@@ -111,7 +111,7 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
       const resumeName = file.name.replace(/\.[^/.]+$/, ''); // Remove file extension
       const newResumeId = cloudStorage.saveResume(
         resumeName,
-        result as any, // Backend returns { success: true, data: {...}, message: "..." }
+        result as unknown as any, // Backend returns { success: true, data: {...}, message: "..." }
         'unknown'
       );
 
@@ -124,7 +124,7 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
         onResumeSelect(newResume);
       }
     } catch (error) {
-      console.error('Upload error:', error);
+      // console.error('Upload error:', error);
       alert('Failed to upload and process resume. Please try again.');
     } finally {
       setIsUploading(false);

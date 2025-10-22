@@ -21,8 +21,7 @@ export default function ATSCheckerPage() {
   // Use global state
   const analysisResult = useResumeStore(state => state.analysisResult);
   const error = useResumeStore(state => state.error);
-  const { setAnalysisResult, setError, clearAnalysisData } =
-    useResumeActions();
+  const { setAnalysisResult, setError, clearAnalysisData } = useResumeActions();
 
   // Progress tracking
   const {
@@ -36,7 +35,7 @@ export default function ATSCheckerPage() {
 
   const handleFileUpload = (uploadedFile: File) => {
     setFile(uploadedFile);
-    setAnalysisResult(null as any);
+    setAnalysisResult(null as unknown as AnalysisResult);
     setError(null);
     toast.success(`File "${uploadedFile.name}" uploaded successfully!`);
   };
@@ -97,7 +96,7 @@ export default function ATSCheckerPage() {
 
   const handleNewUpload = () => {
     setFile(null);
-    setAnalysisResult(null as any);
+    setAnalysisResult(null as unknown as AnalysisResult);
     setError(null);
     setActiveTab('upload');
     // Clear analysis data from global state

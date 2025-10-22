@@ -64,7 +64,8 @@ export const mapFontForExport = (webFont: string): string => {
   };
 
   // Extract font family name (remove quotes, weights, etc.)
-  const cleanFont = webFont?.replace(/['"]/g, '').split(',')[0]?.trim() || 'helvetica';
+  const cleanFont =
+    webFont?.replace(/['"]/g, '').split(',')[0]?.trim() || 'helvetica';
   return fontMap[cleanFont] || 'helvetica';
 };
 
@@ -212,7 +213,7 @@ export const convertToUnifiedContent = (data: ResumeData): UnifiedContent => {
         ...(project.url && { url: project.url }),
         duration: `${project.startDate} - ${project.endDate || 'Present'}`,
       })),
-      achievements: data.achievements,
+      ...(data.achievements && { achievements: data.achievements }),
     },
   };
 };
@@ -251,7 +252,7 @@ export const renderToPDF = async (
   ) => {
     doc.setFontSize(fontSize);
     doc.setFont(mapFontForExport(fontFamily), isBold ? 'bold' : 'normal');
-    
+
     // Set text color properly for jsPDF
     const colorArray = convertColor(color);
     if (Array.isArray(colorArray)) {
@@ -372,7 +373,7 @@ export const renderToPDF = async (
       'left',
       config.fonts.body
     );
-    
+
     // Add achievements with proper indentation
     if (exp.achievements && exp.achievements.length > 0) {
       exp.achievements.forEach(achievement => {
@@ -507,7 +508,10 @@ export const renderToPDF = async (
       }
 
       // Add separator between project entries (except for the last one)
-      if (content.sections.projects && index < content.sections.projects.length - 1) {
+      if (
+        content.sections.projects &&
+        index < content.sections.projects.length - 1
+      ) {
         addSeparator();
       } else {
         yPosition += 8; // More space after last project
@@ -544,8 +548,15 @@ export const renderToDOCX = async (
   content: UnifiedContent,
   filename: string = 'resume.docx'
 ) => {
-  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } =
-    await import('docx');
+  const {
+    Document,
+    Packer,
+    Paragraph,
+    TextRun,
+    HeadingLevel,
+    AlignmentType,
+    BorderStyle,
+  } = await import('docx');
 
   // Helper function to convert colors for DOCX
   const convertColorForDOCX = (color: string): string => {

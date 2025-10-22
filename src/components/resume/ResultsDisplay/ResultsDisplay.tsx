@@ -59,7 +59,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         // Navigate to resume builder
         navigateToResumeBuilder();
       } catch (error) {
-        console.error('Error storing resume data:', error);
+        // console.error('Error storing resume data:', error);
         // Still navigate even if storage fails
         navigateToResumeBuilder();
       }

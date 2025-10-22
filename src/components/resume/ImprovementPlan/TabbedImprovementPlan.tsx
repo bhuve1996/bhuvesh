@@ -82,7 +82,14 @@ export const TabbedImprovementPlan: React.FC<ImprovementPlanProps> = ({
       content: (
         <ImprovementPlan
           improvements={improvements}
-          summary={summary || { total_improvements: 0, high_priority: 0, estimated_impact: 0, estimated_time: '0 min' }}
+          summary={
+            summary || {
+              total_improvements: 0,
+              high_priority: 0,
+              estimated_impact: 0,
+              estimated_time: '0 min',
+            }
+          }
           quick_wins={quick_wins || []}
           currentScore={currentScore || 0}
         />
