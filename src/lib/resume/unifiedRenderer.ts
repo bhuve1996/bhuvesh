@@ -222,11 +222,14 @@ export const convertToUnifiedContent = (data: ResumeData): UnifiedContent => {
 export const renderToPDF = async (
   config: RenderConfig,
   content: UnifiedContent,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   doc: any, // jsPDF document
   filename: string = 'resume.pdf'
 ) => {
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const jsDoc = doc as any; // Cast for jsPDF operations
+  const pageWidth = jsDoc.internal.pageSize.getWidth();
+  const pageHeight = jsDoc.internal.pageSize.getHeight();
   const margin = convertSpacing(config.spacing.margins || '0.75in');
   const contentWidth = pageWidth - margin * 2;
   let yPosition = margin;
@@ -234,7 +237,7 @@ export const renderToPDF = async (
   // Helper function to check if we need a new page
   const checkPageBreak = (requiredSpace: number = 20) => {
     if (yPosition + requiredSpace > pageHeight - margin) {
-      doc.addPage();
+      jsDoc.addPage();
       yPosition = margin;
       return true;
     }
@@ -250,18 +253,18 @@ export const renderToPDF = async (
     alignment: 'left' | 'center' | 'right' = 'left',
     fontFamily: string = 'helvetica'
   ) => {
-    doc.setFontSize(fontSize);
-    doc.setFont(mapFontForExport(fontFamily), isBold ? 'bold' : 'normal');
+    jsDoc.setFontSize(fontSize);
+    jsDoc.setFont(mapFontForExport(fontFamily), isBold ? 'bold' : 'normal');
 
     // Set text color properly for jsPDF
     const colorArray = convertColor(color);
     if (Array.isArray(colorArray)) {
-      doc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
+      jsDoc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
     } else {
-      doc.setTextColor(colorArray);
+      jsDoc.setTextColor(colorArray);
     }
 
-    const lines = doc.splitTextToSize(text, contentWidth);
+    const lines = jsDoc.splitTextToSize(text, contentWidth);
     const lineHeight = fontSize * 1.2; // Better line height
     const requiredSpace = lines.length * lineHeight + 4;
 
@@ -269,7 +272,7 @@ export const renderToPDF = async (
     checkPageBreak(requiredSpace);
 
     const xPosition = alignment === 'center' ? pageWidth / 2 : margin;
-    doc.text(lines, xPosition, yPosition, { align: alignment });
+    jsDoc.text(lines, xPosition, yPosition, { align: alignment });
     yPosition += requiredSpace;
   };
 
@@ -290,12 +293,12 @@ export const renderToPDF = async (
     // Add underline with accent color
     const accentColor = convertColor(config.colors.accent);
     if (Array.isArray(accentColor)) {
-      doc.setDrawColor(accentColor[0], accentColor[1], accentColor[2]);
+      jsDoc.setDrawColor(accentColor[0], accentColor[1], accentColor[2]);
     } else {
-      doc.setDrawColor(accentColor);
+      jsDoc.setDrawColor(accentColor);
     }
-    doc.setLineWidth(1.5);
-    doc.line(margin, yPosition - 5, pageWidth - margin, yPosition - 5);
+    jsDoc.setLineWidth(1.5);
+    jsDoc.line(margin, yPosition - 5, pageWidth - margin, yPosition - 5);
     yPosition += 8; // More space after section headers
   };
 
@@ -304,12 +307,16 @@ export const renderToPDF = async (
     yPosition += 6; // More space before separators
     const secondaryColor = convertColor(config.colors.secondary);
     if (Array.isArray(secondaryColor)) {
-      doc.setDrawColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+      jsDoc.setDrawColor(
+        secondaryColor[0],
+        secondaryColor[1],
+        secondaryColor[2]
+      );
     } else {
-      doc.setDrawColor(secondaryColor);
+      jsDoc.setDrawColor(secondaryColor);
     }
-    doc.setLineWidth(0.5);
-    doc.line(margin + 20, yPosition, pageWidth - margin - 20, yPosition);
+    jsDoc.setLineWidth(0.5);
+    jsDoc.line(margin + 20, yPosition, pageWidth - margin - 20, yPosition);
     yPosition += 6; // More space after separators
   };
 
@@ -539,7 +546,7 @@ export const renderToPDF = async (
   }
 
   // Save the PDF
-  doc.save(filename);
+  jsDoc.save(filename);
 };
 
 // DOCX rendering with unified styling

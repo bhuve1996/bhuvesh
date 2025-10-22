@@ -6,6 +6,7 @@ import { atsApi } from '@/api/endpoints/ats';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { CloudResume, cloudStorage } from '@/lib/resume/cloudStorage';
+import { ResumeData } from '@/types/resume';
 
 interface ResumeManagerProps {
   onResumeSelect: (resume: CloudResume) => void;
@@ -105,13 +106,39 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
 
     try {
       // Use the existing ATS API to upload and parse the file
-      const result = await atsApi.uploadFile(file);
+      await atsApi.uploadFile(file);
 
       // Create a new resume from the uploaded file data
       const resumeName = file.name.replace(/\.[^/.]+$/, ''); // Remove file extension
+
+      // Create a basic ResumeData structure from the backend response
+      const resumeData: ResumeData = {
+        personal: {
+          fullName: resumeName,
+          email: '',
+          phone: '',
+          location: '',
+          linkedin: '',
+          github: '',
+          portfolio: '',
+        },
+        summary: '',
+        experience: [],
+        education: [],
+        skills: {
+          technical: [],
+          business: [],
+          soft: [],
+          languages: [],
+          certifications: [],
+        },
+        projects: [],
+        achievements: [],
+      };
+
       const newResumeId = cloudStorage.saveResume(
         resumeName,
-        result as unknown as any, // Backend returns { success: true, data: {...}, message: "..." }
+        resumeData,
         'unknown'
       );
 
@@ -123,7 +150,7 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
       if (newResume) {
         onResumeSelect(newResume);
       }
-    } catch (error) {
+    } catch {
       // console.error('Upload error:', error);
       alert('Failed to upload and process resume. Please try again.');
     } finally {

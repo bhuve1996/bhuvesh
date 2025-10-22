@@ -505,7 +505,7 @@ export default function TemplateGalleryPage() {
     };
 
     fetchUserData();
-  }, []);
+  }, [setResumeData]);
 
   // Sample resume data for preview
   const sampleResumeData: ResumeData = {

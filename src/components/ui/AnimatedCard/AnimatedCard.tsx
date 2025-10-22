@@ -1,8 +1,8 @@
 'use client';
 
-import { useInView } from 'react-intersection-observer';
 import { animated, useSpring } from '@react-spring/web';
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 interface AnimatedCardProps {
   children: React.ReactNode;
@@ -28,7 +28,7 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
     triggerOnce: true,
   });
 
-  const getInitialTransform = () => {
+  const getInitialTransform = useCallback(() => {
     switch (direction) {
       case 'up':
         return { opacity: 0, y: 50, scale: 0.9 };
@@ -45,9 +45,9 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
       default:
         return { opacity: 0, y: 50, scale: 0.9 };
     }
-  };
+  }, [direction]);
 
-  const getFinalTransform = () => {
+  const getFinalTransform = useCallback(() => {
     switch (direction) {
       case 'up':
       case 'down':
@@ -61,17 +61,17 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
       default:
         return { opacity: 1, x: 0, y: 0, scale: 1 };
     }
-  };
+  }, [direction]);
 
   const [springs, api] = useSpring(() => ({
     from: getInitialTransform(),
     to: inView ? getFinalTransform() : getInitialTransform(),
-    config: { 
-      tension: 300, 
+    config: {
+      tension: 300,
       friction: 30,
-      duration: duration 
+      duration,
     },
-    delay: delay,
+    delay,
   }));
 
   const [hoverSprings, hoverApi] = useSpring(() => ({
@@ -84,7 +84,7 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
     api.start({
       to: inView ? getFinalTransform() : getInitialTransform(),
     });
-  }, [inView, api]);
+  }, [inView, api, getFinalTransform, getInitialTransform]);
 
   const handleMouseEnter = () => {
     if (hover) {
@@ -112,7 +112,7 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
       scale: 0.95,
       y: 2,
     });
-    
+
     setTimeout(() => {
       hoverApi.start({
         scale: 1.05,
@@ -136,13 +136,13 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
       onClick={handleClick}
     >
       {/* Animated background gradient */}
-      <animated.div 
+      <animated.div
         className='absolute inset-0 bg-gradient-to-br from-cyan-400/5 via-transparent to-blue-500/5'
         style={{
           opacity: hoverSprings.scale.to(s => (s - 1) * 2),
         }}
       />
-      
+
       {/* Content */}
       <div className='relative z-10'>{children}</div>
     </animated.div>

@@ -1,7 +1,8 @@
 'use client';
 
-import { ColorScheme, FontConfig, ResumeTemplate } from '@/types/resume';
 import React, { useState } from 'react';
+
+import { ColorScheme, FontConfig, ResumeTemplate } from '@/types/resume';
 
 interface TemplateCustomizerProps {
   template: ResumeTemplate;
@@ -218,7 +219,9 @@ export const TemplateCustomizer: React.FC<TemplateCustomizerProps> = ({
             ].map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() =>
+                  setActiveTab(tab.id as 'colors' | 'fonts' | 'sections')
+                }
                 className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
                   activeTab === tab.id
                     ? 'bg-white text-slate-900 shadow-sm'

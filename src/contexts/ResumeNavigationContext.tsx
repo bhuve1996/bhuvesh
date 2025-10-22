@@ -1,8 +1,9 @@
 'use client';
 
-import { useNavigation } from '@/store/resumeStore';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { createContext, useContext, useEffect } from 'react';
+
+import { useNavigation } from '@/store/resumeStore';
 
 interface ResumeNavigationContextType {
   navigateToAtsChecker: () => void;
@@ -51,7 +52,14 @@ export const ResumeNavigationProvider: React.FC<
 
     const currentPathStep = pathToStep[pathname];
     if (currentPathStep && currentPathStep !== currentStep) {
-      navigateToStep(currentPathStep as any, true);
+      navigateToStep(
+        currentPathStep as
+          | 'ats-checker'
+          | 'resume-builder'
+          | 'templates'
+          | 'preview',
+        true
+      );
     }
   }, [pathname, currentStep, navigateToStep]);
 

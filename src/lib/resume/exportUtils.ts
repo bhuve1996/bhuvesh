@@ -1,4 +1,5 @@
 import { ResumeData, ResumeTemplate } from '@/types/resume';
+
 import {
   convertToUnifiedContent,
   getRenderConfig,
@@ -22,9 +23,14 @@ export const exportToPDF = async (
     const config = getRenderConfig(template);
     const content = convertToUnifiedContent(data);
 
-    await renderToPDF(config, content, doc, filename);
-  } catch (error) {
-    console.error('PDF export error:', error);
+    await renderToPDF(
+      config,
+      content,
+      doc as unknown as Record<string, unknown>,
+      filename
+    );
+  } catch {
+    // console.error('PDF export error:', error);
     throw new Error('Failed to generate PDF');
   }
 };
@@ -41,8 +47,8 @@ export const exportToDOCX = async (
     const content = convertToUnifiedContent(data);
 
     await renderToDOCX(config, content, filename);
-  } catch (error) {
-    console.error('DOCX export error:', error);
+  } catch {
+    // console.error('DOCX export error:', error);
     throw new Error('Failed to generate DOCX');
   }
 };
@@ -57,8 +63,8 @@ export const exportToTXT = (
     // Use unified rendering system
     const content = convertToUnifiedContent(data);
     renderToTXT(content, filename);
-  } catch (error) {
-    console.error('TXT export error:', error);
+  } catch {
+    // console.error('TXT export error:', error);
     throw new Error('Failed to generate TXT');
   }
 };
