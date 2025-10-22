@@ -13,9 +13,9 @@ export const Card: React.FC<EnhancedCardProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-6 relative overflow-hidden';
+    'bg-card/5 backdrop-blur-sm border border-primary-500/20 rounded-2xl p-6 relative overflow-hidden';
   const hoverClasses = hover
-    ? 'hover:bg-white/10 transition-all duration-300'
+    ? 'hover:bg-card/10 transition-all duration-300'
     : '';
 
   const classes = `${baseClasses} ${hoverClasses} ${className}`;

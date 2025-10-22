@@ -45,7 +45,7 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
           !progress.isAnalyzing)) && (
         <Card className='p-6'>
           <div className='text-center mb-6'>
-            <h3 className='text-xl font-bold text-white mb-2'>
+            <h3 className='text-xl font-bold text-foreground mb-2'>
               {progress.error
                 ? 'Analysis Failed'
                 : progress.isAnalyzing
@@ -76,7 +76,7 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
                     : 100}
                   %
                 </div>
-                <div className='w-full bg-gray-700 rounded-full h-3'>
+                <div className='w-full bg-muted rounded-full h-3'>
                   <div
                     className={`h-3 rounded-full transition-all duration-500 ease-out ${
                       progress.isAnalyzing
@@ -116,7 +116,7 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
       {!hasStartedAnalysis && (
         <Card className='p-6'>
           <div>
-            <h3 className='text-xl font-bold mb-4 text-white'>
+            <h3 className='text-xl font-bold mb-4 text-foreground'>
               Ready to Analyze
             </h3>
             <p className='text-gray-300 mb-6'>
@@ -132,7 +132,7 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
                   type='checkbox'
                   checked={showJDInput}
                   onChange={e => setShowJDInput(e.target.checked)}
-                  className='w-4 h-4 text-cyan-500 bg-gray-800 border-gray-600 rounded focus:ring-cyan-500'
+                  className='w-4 h-4 text-primary-500 bg-card border-border rounded focus:ring-primary-500'
                 />
                 <span>
                   Compare with specific job description (recommended for best

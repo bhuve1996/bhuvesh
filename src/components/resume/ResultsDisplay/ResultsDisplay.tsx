@@ -244,22 +244,22 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
     <div className='space-y-6'>
       {/* Header */}
       <div className='text-center'>
-        <h2 className='text-3xl font-bold mb-2 text-white'>
+        <h2 className='text-3xl font-bold mb-2 text-foreground'>
           Analysis Complete
         </h2>
-        <p className='text-gray-300'>
+        <p className='text-muted-foreground'>
           Detected job type:{' '}
-          <span className='text-cyan-400 font-medium'>{result.jobType}</span>
+          <span className='text-primary-400 font-medium'>{result.jobType}</span>
         </p>
 
         {/* Resume Improvement Actions */}
         {result.extraction_details && (
           <div className='mt-8 space-y-4'>
             <div className='text-center'>
-              <h3 className='text-xl font-semibold text-white mb-2'>
+              <h3 className='text-xl font-semibold text-foreground mb-2'>
                 Ready to Improve Your Resume?
               </h3>
-              <p className='text-gray-300 mb-6'>
+              <p className='text-muted-foreground mb-6'>
                 Take action based on your ATS analysis results
               </p>
             </div>

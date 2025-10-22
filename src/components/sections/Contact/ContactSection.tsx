@@ -1,17 +1,37 @@
 import React from 'react';
 
+import { AnimatedGif } from '@/components/ui/AnimatedGif';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Section } from '@/components/ui/Section';
 import { Icons } from '@/components/ui/SVG';
+import { sectionGifs } from '@/lib/gifs';
 
 export const ContactSection: React.FC = () => {
   return (
     <Section
       id='contact'
-      className='min-h-screen flex items-center justify-center px-6 py-20'
+      className='min-h-screen flex items-center justify-center px-6 pt-24 pb-20 relative overflow-hidden'
     >
-      <div className='max-w-4xl mx-auto'>
+      {/* Animated GIFs */}
+      {sectionGifs.contact.map(gif => (
+        <AnimatedGif
+          key={gif.id}
+          src={gif.src}
+          alt={gif.alt}
+          position={gif.position}
+          width={gif.width}
+          height={gif.height}
+          opacity={gif.opacity}
+          animation={gif.animation}
+          speed={gif.speed}
+          zIndex={5}
+          showSeparator={gif.showSeparator}
+          separatorType={gif.separatorType}
+        />
+      ))}
+
+      <div className='max-w-4xl mx-auto relative z-10'>
         <div className='text-center mb-16'>
           <h2 className='text-4xl md:text-5xl font-bold mb-6 text-cyan-400'>
             Get In Touch

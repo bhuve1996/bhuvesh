@@ -3,27 +3,14 @@
 import { useEffect, useState } from 'react';
 
 import { Footer, Navigation } from '@/components/layout';
-import {
-  AboutSection,
-  ContactSection,
-  HeroSection,
-  ProjectsSection,
-} from '@/components/sections';
-import { Loading } from '@/components/ui';
+import { StructuredData } from '@/components/SEO/StructuredData';
+import { FlipCard, Loading, OrbitingElements } from '@/components/ui';
+import { pageCards } from '@/lib/pageCards';
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState('home');
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
-
-  const handleGetStarted = () => {
-    setActiveSection('about');
-    scrollToSection('about');
-  };
-
-  const handleViewProjects = () => {
-    scrollToSection('projects');
-  };
 
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
@@ -61,25 +48,63 @@ export default function Home() {
   }
 
   return (
-    <div className='min-h-screen bg-black text-white'>
-      <Navigation
-        activeSection={activeSection}
-        onSectionClick={scrollToSection}
-      />
+    <>
+      <StructuredData type='Person' />
+      <StructuredData type='WebSite' />
 
-      <HeroSection
-        onGetStarted={handleGetStarted}
-        onViewProjects={handleViewProjects}
-      />
+      <div className='min-h-screen bg-gradient-to-br from-background via-background to-background text-foreground relative overflow-hidden'>
+        {/* Orbiting Elements */}
+        <OrbitingElements />
 
-      <AboutSection />
+        {/* Global Background Effects */}
+        <div className='fixed inset-0 -z-10'>
+          <div className='absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary-500/5 via-transparent to-secondary-500/5'></div>
+          <div className='absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/3 rounded-full blur-3xl animate-pulse-slow'></div>
+          <div className='absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary-500/3 rounded-full blur-3xl animate-pulse-slow delay-1000'></div>
+          <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-accent-500/2 rounded-full blur-3xl animate-pulse-slow delay-2000'></div>
+        </div>
 
-      <ProjectsSection />
+        <Navigation
+          activeSection={activeSection}
+          onSectionClick={scrollToSection}
+        />
 
-      <ContactSection />
+        {/* Homepage Content - Flip Card Gallery */}
+        <main className='flex-1 min-h-screen pt-24 pb-20'>
+          <div className='max-w-7xl mx-auto px-6'>
+            {/* Header */}
+            <div className='text-center mb-16'>
+              <h1 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent'>
+                Welcome to My Portfolio
+              </h1>
+              <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
+                Explore my work, learn about my journey, and discover how I can
+                help bring your ideas to life.
+              </p>
+            </div>
 
-      <Footer />
-      {/* Test comment for pre-commit build check */}
-    </div>
+            {/* Flip Card Gallery */}
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto'>
+              {pageCards.map(card => (
+                <FlipCard
+                  key={card.title}
+                  title={card.title}
+                  description={card.description}
+                  href={card.href}
+                  gifSrc={card.gifSrc}
+                  gifAlt={card.gifAlt}
+                  iconName={card.iconName}
+                  gradientFrom={card.gradientFrom}
+                  gradientTo={card.gradientTo}
+                  delay={card.delay}
+                />
+              ))}
+            </div>
+          </div>
+        </main>
+
+        <Footer />
+      </div>
+    </>
   );
 }

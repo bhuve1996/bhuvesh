@@ -1,63 +1,167 @@
 import React from 'react';
 
+import { AnimatedSection } from '@/components/common';
+import { AnimatedGif } from '@/components/ui/AnimatedGif';
+import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Section } from '@/components/ui/Section';
+import { VisualSeparator } from '@/components/ui/VisualSeparator';
 import { projects } from '@/lib/data';
+import { sectionGifs } from '@/lib/gifs';
 
 export const ProjectsSection: React.FC = () => {
   return (
     <Section
       id='projects'
-      className='min-h-screen flex items-center justify-center px-6 py-20'
+      className='min-h-screen flex items-center justify-center px-6 pt-24 pb-20 relative overflow-hidden'
     >
-      <div className='max-w-6xl mx-auto'>
-        <div className='text-center mb-16'>
-          <h2 className='text-4xl md:text-5xl font-bold mb-6 text-cyan-400'>
-            My Projects
-          </h2>
-          <p className='text-xl text-gray-300 max-w-3xl mx-auto'>
-            Here are some of my recent projects and work
+      {/* Background Effects */}
+      <div className='absolute inset-0 -z-10'>
+        <div className='absolute top-1/4 left-1/3 w-80 h-80 bg-accent-500/5 rounded-full blur-3xl animate-pulse-slow'></div>
+        <div className='absolute bottom-1/4 right-1/3 w-72 h-72 bg-primary-500/5 rounded-full blur-3xl animate-pulse-slow delay-1000'></div>
+      </div>
+
+      {/* Animated GIFs */}
+      {sectionGifs.projects.map(gif => (
+        <AnimatedGif
+          key={gif.id}
+          src={gif.src}
+          alt={gif.alt}
+          position={gif.position}
+          width={gif.width}
+          height={gif.height}
+          opacity={gif.opacity}
+          animation={gif.animation}
+          speed={gif.speed}
+          zIndex={5}
+          showSeparator={gif.showSeparator}
+          separatorType={gif.separatorType}
+        />
+      ))}
+
+      {/* Visual Separator */}
+      <VisualSeparator
+        type='vertical'
+        position='center'
+        color='accent'
+        opacity={0.1}
+        animated={true}
+      />
+
+      <div className='max-w-7xl mx-auto relative z-10'>
+        <div className='text-center mb-20'>
+          <div className='mb-6 animate-fade-in'>
+            <span className='inline-block px-4 py-2 bg-accent-500/10 border border-accent-500/20 rounded-full text-accent-400 text-sm font-medium backdrop-blur-sm'>
+              🚀 My Projects
+            </span>
+          </div>
+          <h2 className='section-title animate-slide-up'>Featured Projects</h2>
+          <p className='section-subtitle animate-slide-up delay-200'>
+            Here are some of my recent projects showcasing modern web
+            development and innovative solutions
           </p>
         </div>
 
-        <div className='grid md:grid-cols-3 lg:grid-cols-4 gap-8'>
-          {projects.map(project => (
-            <Card key={project.id} className='group'>
-              <div className='flex justify-between items-start mb-4'>
-                <h3 className='text-xl font-bold text-white group-hover:text-cyan-400 transition-colors'>
-                  {project.title}
-                </h3>
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    project.status === 'Completed'
-                      ? 'bg-green-500/20 text-green-400'
-                      : 'bg-yellow-500/20 text-yellow-400'
-                  }`}
-                >
-                  {project.status}
-                </span>
-              </div>
-
-              <p className='text-gray-300 mb-4 leading-relaxed'>
-                {project.description}
-              </p>
-
-              <div className='flex flex-wrap gap-2 mb-4'>
-                {project.tech.map(tech => (
+        <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
+          {projects.map((project, index) => (
+            <AnimatedSection
+              key={project.id}
+              animation='slideUp'
+              delay={index * 100}
+            >
+              <Card className='group card-hover'>
+                {/* Project Header */}
+                <div className='flex justify-between items-start mb-6'>
+                  <div className='flex items-center'>
+                    <div className='w-10 h-10 bg-primary-500/10 rounded-lg flex items-center justify-center mr-3'>
+                      <span className='text-lg'>🚀</span>
+                    </div>
+                    <h3 className='text-xl font-bold text-foreground group-hover:text-primary-400 transition-colors duration-300'>
+                      {project.title}
+                    </h3>
+                  </div>
                   <span
-                    key={tech}
-                    className='bg-cyan-400/10 text-cyan-400 px-2 py-1 rounded text-xs'
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      project.status === 'Completed'
+                        ? 'bg-success-500/20 text-success-400 border border-success-500/30'
+                        : 'bg-warning-500/20 text-warning-400 border border-warning-500/30'
+                    }`}
                   >
-                    {tech}
+                    {project.status}
                   </span>
-                ))}
-              </div>
+                </div>
 
-              <button className='w-full bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 py-2 rounded-lg hover:bg-cyan-400/20 transition-colors'>
-                View Project
-              </button>
-            </Card>
+                {/* Project Description */}
+                <p className='text-muted-foreground mb-6 leading-relaxed'>
+                  {project.description}
+                </p>
+
+                {/* Tech Stack */}
+                <div className='mb-6'>
+                  <h4 className='text-sm font-semibold text-muted-foreground mb-3'>
+                    Tech Stack
+                  </h4>
+                  <div className='flex flex-wrap gap-2'>
+                    {project.tech.map((tech, techIndex) => (
+                      <span
+                        key={tech}
+                        className='bg-primary-500/10 border border-primary-500/20 text-primary-400 px-3 py-1 rounded-lg text-xs font-medium hover:bg-primary-500/20 transition-colors duration-300'
+                        style={{
+                          animationDelay: `${index * 100 + techIndex * 50}ms`,
+                        }}
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className='flex gap-3'>
+                  <Button
+                    variant='primary'
+                    size='sm'
+                    className='flex-1 group-hover:scale-105 transition-transform duration-300'
+                  >
+                    View Project
+                  </Button>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='group-hover:scale-105 transition-transform duration-300'
+                  >
+                    Code
+                  </Button>
+                </div>
+
+                {/* Hover Effect Overlay */}
+                <div className='absolute inset-0 bg-gradient-to-br from-primary-500/5 to-secondary-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none'></div>
+              </Card>
+            </AnimatedSection>
           ))}
+        </div>
+
+        {/* Call to Action */}
+        <div className='text-center mt-16 animate-slide-up delay-500'>
+          <div className='bg-gradient-to-r from-primary-500/10 to-secondary-500/10 border border-primary-500/20 rounded-2xl p-8 backdrop-blur-sm'>
+            <h3 className='text-2xl font-bold text-foreground mb-4'>
+              Interested in working together?
+            </h3>
+            <p className='text-muted-foreground mb-6 max-w-2xl mx-auto'>
+              I&apos;m always excited to take on new challenges and create
+              amazing digital experiences. Let&apos;s discuss your next project!
+            </p>
+            <div className='flex flex-col sm:flex-row gap-4 justify-center'>
+              <Button size='lg' className='group'>
+                <span className='group-hover:text-primary-950 transition-colors duration-200'>
+                  Start a Project
+                </span>
+              </Button>
+              <Button variant='outline' size='lg'>
+                View All Projects
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </Section>

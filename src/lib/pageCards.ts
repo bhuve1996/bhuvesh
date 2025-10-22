@@ -1,0 +1,86 @@
+export const pageCards = [
+  {
+    title: 'About Me',
+    description:
+      'Learn about my journey, skills, and passion for creating amazing digital experiences.',
+    href: '/about',
+    gifSrc: 'https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif',
+    gifAlt: 'Brain thinking animation',
+    iconName: 'User',
+    gradientFrom: 'from-blue-500',
+    gradientTo: 'to-purple-600',
+    delay: 0,
+  },
+  {
+    title: 'My Projects',
+    description:
+      'Explore my portfolio of web applications, mobile apps, and creative solutions.',
+    href: '/projects',
+    gifSrc: 'https://media.giphy.com/media/3o7btT1T9qpQZWhNlK/giphy.gif',
+    gifAlt: 'Rocket launch animation',
+    iconName: 'Code',
+    gradientFrom: 'from-green-500',
+    gradientTo: 'to-blue-600',
+    delay: 200,
+  },
+  {
+    title: 'Resume Builder',
+    description:
+      'Create professional resumes with our advanced builder tool and templates.',
+    href: '/resume/builder',
+    gifSrc: 'https://media.giphy.com/media/3o7aTskHEUdgCQAXde/giphy.gif',
+    gifAlt: 'Document building animation',
+    iconName: 'FileText',
+    gradientFrom: 'from-orange-500',
+    gradientTo: 'to-red-600',
+    delay: 400,
+  },
+  {
+    title: 'ATS Checker',
+    description:
+      "Check your resume's ATS compatibility and get detailed analysis reports.",
+    href: '/resume/ats-checker',
+    gifSrc: 'https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif',
+    gifAlt: 'Analysis animation',
+    iconName: 'Search',
+    gradientFrom: 'from-emerald-500',
+    gradientTo: 'to-teal-600',
+    delay: 500,
+  },
+  {
+    title: 'Blog & Insights',
+    description:
+      'Read my latest thoughts on web development, technology trends, and best practices.',
+    href: '/blog',
+    gifSrc: 'https://media.giphy.com/media/3o7aTskHEUdgCQAXde/giphy.gif',
+    gifAlt: 'Learning animation',
+    iconName: 'BookOpen',
+    gradientFrom: 'from-purple-500',
+    gradientTo: 'to-pink-600',
+    delay: 600,
+  },
+  {
+    title: 'Get In Touch',
+    description:
+      "Ready to work together? Let's discuss your next project and bring ideas to life.",
+    href: '/contact',
+    gifSrc: 'https://media.giphy.com/media/3o7aD2d7hy9ktXNDP2/giphy.gif',
+    gifAlt: 'Message animation',
+    iconName: 'Mail',
+    gradientFrom: 'from-cyan-500',
+    gradientTo: 'to-teal-600',
+    delay: 700,
+  },
+  {
+    title: 'Services',
+    description:
+      'Discover the range of development services I offer to help grow your business.',
+    href: '/services',
+    gifSrc: 'https://media.giphy.com/media/3o7aTskHEUdgCQAXde/giphy.gif',
+    gifAlt: 'Service animation',
+    iconName: 'Settings',
+    gradientFrom: 'from-indigo-500',
+    gradientTo: 'to-purple-600',
+    delay: 800,
+  },
+] as const;

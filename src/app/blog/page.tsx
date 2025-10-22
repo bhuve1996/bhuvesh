@@ -105,16 +105,18 @@ export default function Blog() {
   const featuredPosts = blogPosts.filter(post => post.featured);
 
   return (
-    <div className='min-h-screen bg-black text-white'>
+    <div className='min-h-screen bg-background text-foreground'>
       {/* Navigation */}
-      <nav className='fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/20'>
-        <div className='max-w-6xl mx-auto px-6 py-4'>
+      <nav className='fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b border-border'>
+        <div className='max-w-6xl mx-auto px-6 py-4 mt-8'>
           <div className='flex justify-between items-center'>
             <div className='flex items-center space-x-2'>
               <div className='w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center'>
-                <span className='text-white font-bold text-lg'>B</span>
+                <span className='text-primary-foreground font-bold text-lg'>
+                  B
+                </span>
               </div>
-              <span className='text-xl font-bold text-white'>Bhuvesh</span>
+              <span className='text-xl font-bold text-foreground'>Bhuvesh</span>
             </div>
 
             <div className='hidden md:flex items-center space-x-8'>
@@ -171,7 +173,7 @@ export default function Blog() {
             {featuredPosts.map(post => (
               <article
                 key={post.id}
-                className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-6 hover:bg-white/10 transition-colors group cursor-pointer'
+                className='bg-card/5 backdrop-blur-sm border border-border rounded-2xl p-6 hover:bg-card/10 transition-colors group cursor-pointer'
               >
                 <div className='mb-4'>
                   <span className='bg-cyan-400/20 text-cyan-400 px-3 py-1 rounded-full text-sm font-semibold'>
@@ -218,8 +220,8 @@ export default function Blog() {
           <div className='flex flex-col md:flex-row gap-8'>
             {/* Sidebar */}
             <div className='md:w-1/4'>
-              <div className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-6 sticky top-32'>
-                <h3 className='text-xl font-bold text-white mb-4'>
+              <div className='bg-card/5 backdrop-blur-sm border border-border rounded-2xl p-6 sticky top-32'>
+                <h3 className='text-xl font-bold text-foreground mb-4'>
                   Categories
                 </h3>
                 <div className='space-y-2'>

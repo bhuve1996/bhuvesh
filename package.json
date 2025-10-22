@@ -25,6 +25,7 @@
     "@tiptap/extension-placeholder": "^3.7.2",
     "@tiptap/react": "^3.7.2",
     "@tiptap/starter-kit": "^3.7.2",
+    "clsx": "^2.1.1",
     "docx": "^9.5.1",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.23.16",
@@ -36,6 +37,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hot-toast": "^2.6.0",
+    "tailwind-merge": "^3.3.1",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

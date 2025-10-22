@@ -319,7 +319,7 @@ export const ATSIntegration: React.FC<ATSIntegrationProps> = ({
           {/* Overall Score */}
           <div className='mb-6'>
             <div className='flex items-center justify-between mb-2'>
-              <span className='text-sm font-medium text-gray-700'>
+              <span className='text-sm font-medium text-muted-foreground'>
                 Overall ATS Score
               </span>
               <span
@@ -329,16 +329,16 @@ export const ATSIntegration: React.FC<ATSIntegrationProps> = ({
                 {getScoreLabel(analysisResult.ats_score)}
               </span>
             </div>
-            <div className='w-full bg-gray-200 rounded-full h-3'>
+            <div className='w-full bg-muted rounded-full h-3'>
               <div
                 className={`h-3 rounded-full ${
                   analysisResult.ats_score >= 80
-                    ? 'bg-green-500'
+                    ? 'bg-success-500'
                     : analysisResult.ats_score >= 70
-                      ? 'bg-blue-500'
+                      ? 'bg-primary-500'
                       : analysisResult.ats_score >= 60
-                        ? 'bg-yellow-500'
-                        : 'bg-red-500'
+                        ? 'bg-warning-500'
+                        : 'bg-error-500'
                 }`}
                 style={{ width: `${analysisResult.ats_score}%` }}
               ></div>

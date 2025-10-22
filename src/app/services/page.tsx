@@ -1,7 +1,13 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
+
+import { AnimatedSection } from '@/components/common';
+import { PageLayout } from '@/components/layout';
+import { AnimatedGif } from '@/components/ui/AnimatedGif';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { sectionGifs } from '@/lib/gifs';
 
 export default function Services() {
   const [selectedService, setSelectedService] = useState('web-development');
@@ -233,136 +239,99 @@ export default function Services() {
   );
 
   return (
-    <div className='min-h-screen bg-black text-white'>
-      {/* Navigation */}
-      <nav className='fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/20'>
-        <div className='max-w-6xl mx-auto px-6 py-4'>
-          <div className='flex justify-between items-center'>
-            <div className='flex items-center space-x-2'>
-              <div className='w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center'>
-                <span className='text-white font-bold text-lg'>B</span>
-              </div>
-              <span className='text-xl font-bold text-white'>Bhuvesh</span>
-            </div>
-
-            <div className='hidden md:flex items-center space-x-8'>
-              <Link
-                href='/'
-                className='text-gray-300 hover:text-white transition-colors duration-300'
-              >
-                Home
-              </Link>
-              <Link
-                href='/#about'
-                className='text-gray-300 hover:text-white transition-colors duration-300'
-              >
-                About
-              </Link>
-              <Link
-                href='/#projects'
-                className='text-gray-300 hover:text-white transition-colors duration-300'
-              >
-                Projects
-              </Link>
-              <Link
-                href='/blog'
-                className='text-gray-300 hover:text-white transition-colors duration-300'
-              >
-                Blog
-              </Link>
-              <Link
-                href='/resume'
-                className='text-gray-300 hover:text-white transition-colors duration-300'
-              >
-                Resume
-              </Link>
-              <span className='text-cyan-400'>Services</span>
-              <Link
-                href='/#contact'
-                className='text-gray-300 hover:text-white transition-colors duration-300'
-              >
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className='pt-32 pb-16 px-6'>
-        <div className='max-w-4xl mx-auto text-center'>
-          <h1 className='text-5xl md:text-6xl font-bold mb-6 text-cyan-400'>
-            My Services
-          </h1>
-          <p className='text-xl text-gray-300 mb-8 max-w-2xl mx-auto'>
-            Comprehensive web development and technology solutions to bring your
-            ideas to life.
-          </p>
-        </div>
-      </section>
+    <PageLayout
+      title='My Services'
+      description='Comprehensive web development and technology solutions to bring your ideas to life.'
+      activeSection='services'
+    >
+      {/* Animated GIFs */}
+      {sectionGifs.services.map(gif => (
+        <AnimatedGif
+          key={gif.id}
+          src={gif.src}
+          alt={gif.alt}
+          position={gif.position}
+          width={gif.width}
+          height={gif.height}
+          opacity={gif.opacity}
+          animation={gif.animation}
+          speed={gif.speed}
+          zIndex={5}
+          showSeparator={gif.showSeparator}
+          separatorType={gif.separatorType}
+        />
+      ))}
 
       {/* Services Grid */}
       <section className='px-6 pb-16'>
-        <div className='max-w-6xl mx-auto'>
-          <h2 className='text-3xl font-bold text-white mb-8 text-center'>
+        <div className='max-w-7xl mx-auto'>
+          <h2 className='section-title text-center animate-slide-up'>
             What I Offer
           </h2>
-          <div className='grid md:grid-cols-3 lg:grid-cols-4 gap-6'>
-            {services.map(service => (
-              <div
+          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {services.map((service, index) => (
+              <AnimatedSection
                 key={service.id}
-                onClick={() => setSelectedService(service.id)}
-                className={`bg-white/5 backdrop-blur-sm border rounded-2xl p-6 cursor-pointer transition-all duration-300 ${
-                  selectedService === service.id
-                    ? 'border-cyan-400 bg-white/10'
-                    : 'border-cyan-400/20 hover:border-cyan-400/40 hover:bg-white/8'
-                } ${service.popular ? 'ring-2 ring-cyan-400/30' : ''}`}
+                animation='slideUp'
+                delay={index * 100}
               >
-                {service.popular && (
-                  <div className='bg-cyan-400 text-black px-3 py-1 rounded-full text-xs font-semibold mb-4 inline-block'>
-                    Popular
-                  </div>
-                )}
-
-                <div className='text-4xl mb-4'>{service.icon}</div>
-
-                <h3 className='text-xl font-bold text-white mb-3'>
-                  {service.title}
-                </h3>
-
-                <p className='text-gray-300 mb-4 leading-relaxed'>
-                  {service.description}
-                </p>
-
-                <div className='space-y-2 mb-4'>
-                  <div className='flex justify-between text-sm'>
-                    <span className='text-gray-400'>Pricing:</span>
-                    <span className='text-cyan-400 font-semibold'>
-                      {service.pricing}
-                    </span>
-                  </div>
-                  <div className='flex justify-between text-sm'>
-                    <span className='text-gray-400'>Timeline:</span>
-                    <span className='text-white'>{service.timeline}</span>
-                  </div>
-                </div>
-
-                <div className='flex flex-wrap gap-2'>
-                  {service.technologies.slice(0, 3).map(tech => (
-                    <span
-                      key={tech}
-                      className='bg-cyan-400/10 text-cyan-400 px-2 py-1 rounded text-xs'
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                  {service.technologies.length > 3 && (
-                    <span className='text-gray-400 text-xs'>
-                      +{service.technologies.length - 3} more
-                    </span>
+                <Card
+                  onClick={() => setSelectedService(service.id)}
+                  className={`cursor-pointer transition-all duration-300 group ${
+                    selectedService === service.id
+                      ? 'border-primary-500 bg-primary-500/10'
+                      : 'border-neutral-800 hover:border-primary-500/50 hover:bg-neutral-800/50'
+                  } ${service.popular ? 'ring-2 ring-primary-500/30' : ''}`}
+                >
+                  {service.popular && (
+                    <div className='bg-primary-500 text-primary-950 px-3 py-1 rounded-full text-xs font-semibold mb-4 inline-block'>
+                      Popular
+                    </div>
                   )}
-                </div>
-              </div>
+
+                  <div className='flex items-center mb-4'>
+                    <div className='w-12 h-12 bg-primary-500/10 rounded-lg flex items-center justify-center mr-4'>
+                      <span className='text-2xl'>{service.icon}</span>
+                    </div>
+                    <h3 className='text-xl font-bold text-white group-hover:text-primary-400 transition-colors'>
+                      {service.title}
+                    </h3>
+                  </div>
+
+                  <p className='text-neutral-300 mb-6 leading-relaxed'>
+                    {service.description}
+                  </p>
+
+                  <div className='space-y-3 mb-6'>
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-neutral-400'>Pricing:</span>
+                      <span className='text-primary-400 font-semibold'>
+                        {service.pricing}
+                      </span>
+                    </div>
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-neutral-400'>Timeline:</span>
+                      <span className='text-white'>{service.timeline}</span>
+                    </div>
+                  </div>
+
+                  <div className='flex flex-wrap gap-2'>
+                    {service.technologies.slice(0, 3).map(tech => (
+                      <span
+                        key={tech}
+                        className='bg-primary-500/10 border border-primary-500/20 text-primary-400 px-3 py-1 rounded-lg text-xs font-medium'
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                    {service.technologies.length > 3 && (
+                      <span className='text-neutral-400 text-xs'>
+                        +{service.technologies.length - 3} more
+                      </span>
+                    )}
+                  </div>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
         </div>
@@ -371,23 +340,27 @@ export default function Services() {
       {/* Selected Service Details */}
       {selectedServiceData && (
         <section className='px-6 pb-16'>
-          <div className='max-w-6xl mx-auto'>
-            <div className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8'>
+          <div className='max-w-7xl mx-auto'>
+            <Card className='animate-slide-up'>
               <div className='grid lg:grid-cols-3 gap-8'>
-                <div>
+                <div className='lg:col-span-2'>
                   <div className='flex items-center space-x-4 mb-6'>
-                    <div className='text-5xl'>{selectedServiceData.icon}</div>
+                    <div className='w-16 h-16 bg-primary-500/10 rounded-lg flex items-center justify-center'>
+                      <span className='text-3xl'>
+                        {selectedServiceData.icon}
+                      </span>
+                    </div>
                     <div>
                       <h3 className='text-3xl font-bold text-white'>
                         {selectedServiceData.title}
                       </h3>
-                      <p className='text-cyan-400 text-lg'>
+                      <p className='text-primary-400 text-lg font-semibold'>
                         {selectedServiceData.pricing}
                       </p>
                     </div>
                   </div>
 
-                  <p className='text-gray-300 mb-6 leading-relaxed text-lg'>
+                  <p className='text-neutral-300 mb-6 leading-relaxed text-lg'>
                     {selectedServiceData.description}
                   </p>
 
@@ -395,11 +368,11 @@ export default function Services() {
                     <h4 className='text-xl font-semibold text-white mb-4'>
                       What&apos;s Included:
                     </h4>
-                    <ul className='space-y-2'>
+                    <ul className='space-y-3'>
                       {selectedServiceData.features.map((feature, index) => (
                         <li key={index} className='flex items-center space-x-3'>
-                          <span className='text-cyan-400'>✓</span>
-                          <span className='text-gray-300'>{feature}</span>
+                          <span className='text-primary-400 text-lg'>✓</span>
+                          <span className='text-neutral-300'>{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -413,7 +386,7 @@ export default function Services() {
                       {selectedServiceData.technologies.map(tech => (
                         <span
                           key={tech}
-                          className='bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 px-3 py-1 rounded-full text-sm'
+                          className='bg-primary-500/10 border border-primary-500/20 text-primary-400 px-3 py-1 rounded-lg text-sm font-medium'
                         >
                           {tech}
                         </span>
@@ -423,82 +396,87 @@ export default function Services() {
                 </div>
 
                 <div className='space-y-6'>
-                  <div className='bg-white/5 border border-cyan-400/20 rounded-xl p-6'>
+                  <Card className='bg-primary-500/5 border-primary-500/20'>
                     <h4 className='text-lg font-semibold text-white mb-3'>
                       Project Timeline
                     </h4>
-                    <p className='text-cyan-400 text-xl font-bold'>
+                    <p className='text-primary-400 text-xl font-bold'>
                       {selectedServiceData.timeline}
                     </p>
-                  </div>
+                  </Card>
 
-                  <div className='bg-white/5 border border-cyan-400/20 rounded-xl p-6'>
+                  <Card className='bg-secondary-500/5 border-secondary-500/20'>
                     <h4 className='text-lg font-semibold text-white mb-3'>
                       Investment
                     </h4>
-                    <p className='text-cyan-400 text-xl font-bold'>
+                    <p className='text-secondary-400 text-xl font-bold'>
                       {selectedServiceData.pricing}
                     </p>
-                  </div>
+                  </Card>
 
-                  <button className='w-full bg-cyan-400 text-black py-4 rounded-lg font-bold text-lg hover:bg-cyan-300 transition-colors'>
+                  <Button size='lg' className='w-full'>
                     Get Started
-                  </button>
+                  </Button>
 
-                  <button className='w-full border-2 border-cyan-400 text-cyan-400 py-4 rounded-lg font-bold text-lg hover:bg-cyan-400 hover:text-black transition-colors'>
+                  <Button variant='outline' size='lg' className='w-full'>
                     Schedule Consultation
-                  </button>
+                  </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
         </section>
       )}
 
       {/* Process Section */}
       <section className='px-6 pb-16'>
-        <div className='max-w-6xl mx-auto'>
-          <h2 className='text-3xl font-bold text-white mb-12 text-center'>
+        <div className='max-w-7xl mx-auto'>
+          <h2 className='section-title text-center animate-slide-up'>
             My Development Process
           </h2>
-          <div className='grid md:grid-cols-3 lg:grid-cols-4 gap-8'>
-            {process.map(step => (
-              <div
+          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {process.map((step, index) => (
+              <AnimatedSection
                 key={step.step}
-                className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-6 hover:bg-white/10 transition-colors'
+                animation='slideUp'
+                delay={index * 100}
               >
-                <div className='flex items-center space-x-4 mb-4'>
-                  <div className='w-12 h-12 bg-cyan-400 text-black rounded-full flex items-center justify-center font-bold text-lg'>
-                    {step.step}
+                <Card className='card-hover'>
+                  <div className='flex items-center space-x-4 mb-6'>
+                    <div className='w-12 h-12 bg-primary-500 text-primary-950 rounded-full flex items-center justify-center font-bold text-lg'>
+                      {step.step}
+                    </div>
+                    <div>
+                      <h3 className='text-xl font-bold text-white'>
+                        {step.title}
+                      </h3>
+                      <p className='text-primary-400 text-sm font-medium'>
+                        {step.duration}
+                      </p>
+                    </div>
                   </div>
+
+                  <p className='text-neutral-300 mb-6 leading-relaxed'>
+                    {step.description}
+                  </p>
+
                   <div>
-                    <h3 className='text-xl font-bold text-white'>
-                      {step.title}
-                    </h3>
-                    <p className='text-cyan-400 text-sm'>{step.duration}</p>
+                    <h4 className='text-sm font-semibold text-white mb-3'>
+                      Deliverables:
+                    </h4>
+                    <ul className='space-y-2'>
+                      {step.deliverables.map((deliverable, index) => (
+                        <li key={index} className='flex items-center space-x-3'>
+                          <span className='text-primary-400 text-sm'>•</span>
+                          <span className='text-neutral-400 text-sm'>
+                            {deliverable}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
-
-                <p className='text-gray-300 mb-4 leading-relaxed'>
-                  {step.description}
-                </p>
-
-                <div>
-                  <h4 className='text-sm font-semibold text-white mb-2'>
-                    Deliverables:
-                  </h4>
-                  <ul className='space-y-1'>
-                    {step.deliverables.map((deliverable, index) => (
-                      <li key={index} className='flex items-center space-x-2'>
-                        <span className='text-cyan-400 text-xs'>•</span>
-                        <span className='text-gray-400 text-sm'>
-                          {deliverable}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
         </div>
@@ -506,40 +484,47 @@ export default function Services() {
 
       {/* Testimonials */}
       <section className='px-6 pb-20'>
-        <div className='max-w-6xl mx-auto'>
-          <h2 className='text-3xl font-bold text-white mb-12 text-center'>
+        <div className='max-w-7xl mx-auto'>
+          <h2 className='section-title text-center animate-slide-up'>
             What Clients Say
           </h2>
           <div className='grid md:grid-cols-3 gap-8'>
-            {testimonials.map(testimonial => (
-              <div
+            {testimonials.map((testimonial, index) => (
+              <AnimatedSection
                 key={testimonial.id}
-                className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-6 hover:bg-white/10 transition-colors'
+                animation='slideUp'
+                delay={index * 100}
               >
-                <div className='flex items-center space-x-1 mb-4'>
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <span key={i} className='text-yellow-400'>
-                      ★
-                    </span>
-                  ))}
-                </div>
+                <Card className='card-hover'>
+                  <div className='flex items-center space-x-1 mb-4'>
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <span key={i} className='text-accent-400 text-lg'>
+                        ★
+                      </span>
+                    ))}
+                  </div>
 
-                <p className='text-gray-300 mb-6 leading-relaxed italic'>
-                  &ldquo;{testimonial.content}&rdquo;
-                </p>
-
-                <div className='border-t border-gray-700 pt-4'>
-                  <p className='text-white font-semibold'>{testimonial.name}</p>
-                  <p className='text-cyan-400 text-sm'>{testimonial.role}</p>
-                  <p className='text-gray-400 text-xs mt-1'>
-                    {testimonial.project}
+                  <p className='text-neutral-300 mb-6 leading-relaxed italic'>
+                    &ldquo;{testimonial.content}&rdquo;
                   </p>
-                </div>
-              </div>
+
+                  <div className='border-t border-neutral-700 pt-4'>
+                    <p className='text-white font-semibold'>
+                      {testimonial.name}
+                    </p>
+                    <p className='text-primary-400 text-sm'>
+                      {testimonial.role}
+                    </p>
+                    <p className='text-neutral-400 text-xs mt-1'>
+                      {testimonial.project}
+                    </p>
+                  </div>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
         </div>
       </section>
-    </div>
+    </PageLayout>
   );
 }

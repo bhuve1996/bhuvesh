@@ -187,7 +187,7 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
         />
       ) : (
         <div className='text-center py-12'>
-          <p className='text-gray-500'>No analysis results available</p>
+          <p className='text-muted-foreground'>No analysis results available</p>
         </div>
       ),
     },
@@ -197,10 +197,10 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
     <div className={`ats-checker ${className}`} {...props}>
       {/* Header */}
       <div className='text-center mb-8'>
-        <h1 className='text-4xl font-bold text-gray-900 mb-4'>
+        <h1 className='text-4xl font-bold text-foreground mb-4'>
           ATS Resume Checker
         </h1>
-        <p className='text-lg text-gray-600 max-w-2xl mx-auto'>
+        <p className='text-lg text-muted-foreground max-w-2xl mx-auto'>
           Get your resume analyzed for ATS compatibility and receive detailed
           feedback to improve your chances of landing interviews.
         </p>

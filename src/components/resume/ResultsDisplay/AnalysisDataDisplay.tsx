@@ -21,14 +21,14 @@ export const AnalysisDataDisplay: React.FC<AnalysisDataDisplayProps> = ({
           {/* Matched Keywords */}
           {result.keywordMatches.length > 0 && (
             <Card className='p-6'>
-              <h3 className='text-xl font-bold mb-4 text-green-400'>
+              <h3 className='text-xl font-bold mb-4 text-success-400'>
                 ✅ Matched Keywords ({result.keywordMatches.length})
               </h3>
               <div className='flex flex-wrap gap-2'>
                 {result.keywordMatches.map((keyword, index) => (
                   <span
                     key={index}
-                    className='px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm border border-green-500/30'
+                    className='px-3 py-1 bg-success-500/20 text-success-400 rounded-full text-sm border border-success-500/30'
                   >
                     {keyword}
                   </span>
@@ -40,14 +40,14 @@ export const AnalysisDataDisplay: React.FC<AnalysisDataDisplayProps> = ({
           {/* Missing Keywords */}
           {result.missingKeywords.length > 0 && (
             <Card className='p-6'>
-              <h3 className='text-xl font-bold mb-4 text-red-400'>
+              <h3 className='text-xl font-bold mb-4 text-error-400'>
                 ❌ Missing Keywords ({result.missingKeywords.length})
               </h3>
               <div className='flex flex-wrap gap-2'>
                 {result.missingKeywords.map((keyword, index) => (
                   <span
                     key={index}
-                    className='px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm border border-red-500/30'
+                    className='px-3 py-1 bg-error-500/20 text-error-400 rounded-full text-sm border border-error-500/30'
                   >
                     {keyword}
                   </span>

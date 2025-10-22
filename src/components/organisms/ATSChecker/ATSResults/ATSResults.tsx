@@ -17,9 +17,9 @@ export const ATSResults: React.FC<ATSResultsProps> = ({
   onNewUpload,
 }) => {
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 80) return 'text-success-400';
+    if (score >= 60) return 'text-warning-400';
+    return 'text-error-400';
   };
 
   const getScoreGrade = (score: number) => {
@@ -42,10 +42,10 @@ export const ATSResults: React.FC<ATSResultsProps> = ({
           >
             {result.atsScore}
           </div>
-          <div className='text-xl text-gray-600 mb-4'>
+          <div className='text-xl text-muted-foreground mb-4'>
             Grade: {getScoreGrade(result.atsScore)}
           </div>
-          <p className='text-gray-500'>Job Type: {result.jobType}</p>
+          <p className='text-muted-foreground'>Job Type: {result.jobType}</p>
         </div>
       </Card>
 

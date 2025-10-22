@@ -279,15 +279,15 @@ export default function ATSCheckerPage() {
   };
 
   return (
-    <div className='min-h-screen bg-black text-white'>
+    <div className='min-h-screen bg-background text-foreground'>
       <Section id='ats-checker' className='py-20'>
-        <div className='max-w-6xl mx-auto px-6'>
+        <div className='max-w-6xl mx-auto px-6 mt-8'>
           {/* Header */}
           <div className='text-center mb-12'>
             <h1 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent'>
               ATS Resume Checker
             </h1>
-            <p className='text-xl text-gray-300 max-w-2xl mx-auto'>
+            <p className='text-xl text-muted-foreground max-w-2xl mx-auto'>
               Get your resume analyzed for ATS compatibility across all job
               profiles. Receive detailed feedback and optimization suggestions.
             </p>
@@ -297,13 +297,13 @@ export default function ATSCheckerPage() {
           {/* Hidden the Analysis Results button as requested */}
           {false && analysisResult && (
             <div className='mb-8'>
-              <div className='flex space-x-1 bg-gray-800/50 p-1 rounded-lg w-fit mx-auto'>
+              <div className='flex space-x-1 bg-muted/50 p-1 rounded-lg w-fit mx-auto'>
                 <button
                   onClick={() => setActiveTab('results')}
                   className={`px-6 py-3 rounded-md font-medium transition-all ${
                     activeTab === 'results'
-                      ? 'bg-cyan-500 text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                      ? 'bg-primary-500 text-primary-foreground shadow-lg'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }`}
                 >
                   📊 Analysis Results

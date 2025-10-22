@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { AnimatedGif } from '@/components/ui/AnimatedGif';
+import { sectionGifs } from '@/lib/gifs';
+
 export default function Resume() {
   const [activeTab, setActiveTab] = useState('experience');
 
@@ -219,16 +222,35 @@ export default function Resume() {
   };
 
   return (
-    <div className='min-h-screen bg-black text-white'>
+    <div className='min-h-screen bg-background text-foreground relative overflow-hidden'>
+      {/* Animated GIFs */}
+      {sectionGifs.resume.map(gif => (
+        <AnimatedGif
+          key={gif.id}
+          src={gif.src}
+          alt={gif.alt}
+          position={gif.position}
+          width={gif.width}
+          height={gif.height}
+          opacity={gif.opacity}
+          animation={gif.animation}
+          speed={gif.speed}
+          zIndex={5}
+          showSeparator={gif.showSeparator}
+          separatorType={gif.separatorType}
+        />
+      ))}
       {/* Navigation */}
-      <nav className='fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/20'>
-        <div className='max-w-6xl mx-auto px-6 py-4'>
+      <nav className='fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b border-border'>
+        <div className='max-w-6xl mx-auto px-6 py-4 mt-8'>
           <div className='flex justify-between items-center'>
             <div className='flex items-center space-x-2'>
               <div className='w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center'>
-                <span className='text-white font-bold text-lg'>B</span>
+                <span className='text-primary-foreground font-bold text-lg'>
+                  B
+                </span>
               </div>
-              <span className='text-xl font-bold text-white'>Bhuvesh</span>
+              <span className='text-xl font-bold text-foreground'>Bhuvesh</span>
             </div>
 
             <div className='hidden md:flex items-center space-x-8'>
@@ -302,7 +324,7 @@ export default function Resume() {
       <section className='px-6 pb-8'>
         <div className='max-w-6xl mx-auto'>
           <div className='flex justify-center'>
-            <div className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-2'>
+            <div className='bg-card/5 backdrop-blur-sm border border-border rounded-2xl p-2'>
               {[
                 { id: 'experience', label: 'Experience' },
                 { id: 'education', label: 'Education' },
@@ -338,7 +360,7 @@ export default function Resume() {
               {experience.map(job => (
                 <div
                   key={job.id}
-                  className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8 hover:bg-white/10 transition-colors'
+                  className='bg-card/5 backdrop-blur-sm border border-border rounded-2xl p-8 hover:bg-card/10 transition-colors'
                 >
                   <div className='flex flex-col md:flex-row md:justify-between md:items-start mb-4'>
                     <div>
@@ -401,7 +423,7 @@ export default function Resume() {
               {education.map(edu => (
                 <div
                   key={edu.id}
-                  className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8 hover:bg-white/10 transition-colors'
+                  className='bg-card/5 backdrop-blur-sm border border-border rounded-2xl p-8 hover:bg-card/10 transition-colors'
                 >
                   <div className='flex flex-col md:flex-row md:justify-between md:items-start mb-4'>
                     <div>
@@ -447,7 +469,7 @@ export default function Resume() {
                 {Object.entries(skills).map(([category, skillList]) => (
                   <div
                     key={category}
-                    className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8 hover:bg-white/10 transition-colors'
+                    className='bg-card/5 backdrop-blur-sm border border-border rounded-2xl p-8 hover:bg-card/10 transition-colors'
                   >
                     <h3 className='text-xl font-bold text-white mb-6'>
                       {category}
