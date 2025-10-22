@@ -33,7 +33,14 @@ export interface SelectOption {
 export interface FormField {
   name: string;
   label: string;
-  type: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea' | 'file';
+  type:
+    | 'text'
+    | 'email'
+    | 'password'
+    | 'number'
+    | 'select'
+    | 'textarea'
+    | 'file';
   required?: boolean;
   placeholder?: string;
   options?: SelectOption[];

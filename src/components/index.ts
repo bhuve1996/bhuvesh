@@ -28,7 +28,7 @@ export {
   SVG,
   Section,
   Tabs,
-  Toast
+  Toast,
 } from './ui';
 
 // Types are available from @/types directly

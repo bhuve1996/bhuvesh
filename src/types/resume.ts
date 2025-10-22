@@ -82,10 +82,10 @@ export interface ResumeData {
 
 // Import ATS types for proper typing
 import type {
-  ExtractionDetails,
   ATSCompatibility,
-  FormatAnalysis,
   DetailedScores,
+  ExtractionDetails,
+  FormatAnalysis,
   StructuredExperience,
 } from './ats';
 

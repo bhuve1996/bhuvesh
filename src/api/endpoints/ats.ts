@@ -3,10 +3,10 @@
 // ============================================================================
 
 import {
-  FileUploadResponse,
   AnalysisResult,
-  ResumeAnalysisResponse,
+  FileUploadResponse,
   ImprovementPlanResponse,
+  ResumeAnalysisResponse,
   SupportedFormatsResponse,
 } from '@/types';
 
