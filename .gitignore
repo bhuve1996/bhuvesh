@@ -52,7 +52,9 @@ dist/
 downloads/
 eggs/
 .eggs/
+# Python lib directories (but not src/lib for TypeScript)
 lib/
+!src/lib/
 lib64/
 parts/
 sdist/
