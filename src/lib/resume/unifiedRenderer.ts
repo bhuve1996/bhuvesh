@@ -89,16 +89,32 @@ export const convertFontSize = (cssSize: string): number => {
 };
 
 // Color conversion utilities
-export const convertColor = (color: string): string => {
-  // Convert hex colors to RGB for jsPDF
+export const convertColor = (color: string): [number, number, number] => {
+  // Convert hex colors to RGB array for jsPDF
   if (color.startsWith('#')) {
     const hex = color.replace('#', '');
     const r = parseInt(hex.substr(0, 2), 16);
     const g = parseInt(hex.substr(2, 2), 16);
     const b = parseInt(hex.substr(4, 2), 16);
-    return `rgb(${r}, ${g}, ${b})`;
+    return [r, g, b];
   }
-  return color;
+
+  // Handle named colors
+  const colorMap: { [key: string]: [number, number, number] } = {
+    black: [0, 0, 0],
+    white: [255, 255, 255],
+    red: [255, 0, 0],
+    green: [0, 128, 0],
+    blue: [0, 0, 255],
+    gray: [128, 128, 128],
+    grey: [128, 128, 128],
+    darkgray: [64, 64, 64],
+    darkgrey: [64, 64, 64],
+    lightgray: [192, 192, 192],
+    lightgrey: [192, 192, 192],
+  };
+
+  return colorMap[color.toLowerCase()] || [0, 0, 0]; // Default to black
 };
 
 // Spacing conversion utilities
@@ -159,6 +175,9 @@ export interface UnifiedContent {
     skills: {
       technical: string[];
       business: string[];
+      soft: string[];
+      languages: string[];
+      certifications: string[];
     };
     projects?: Array<{
       name: string;
@@ -205,6 +224,9 @@ export const convertToUnifiedContent = (data: ResumeData): UnifiedContent => {
       skills: {
         technical: data.skills.technical,
         business: data.skills.business,
+        soft: data.skills.soft,
+        languages: data.skills.languages,
+        certifications: data.skills.certifications,
       },
       projects: data.projects?.map(project => ({
         name: project.name,
@@ -232,7 +254,7 @@ export const renderToPDF = async (
   const pageHeight = jsDoc.internal.pageSize.getHeight();
   const margin = convertSpacing(config.spacing.margins || '0.75in');
   const contentWidth = pageWidth - margin * 2;
-  let yPosition = margin;
+  let yPosition = margin + 10; // Start with some top margin
 
   // Helper function to check if we need a new page
   const checkPageBreak = (requiredSpace: number = 20) => {
@@ -257,16 +279,12 @@ export const renderToPDF = async (
     jsDoc.setFont(mapFontForExport(fontFamily), isBold ? 'bold' : 'normal');
 
     // Set text color properly for jsPDF
-    const colorArray = convertColor(color);
-    if (Array.isArray(colorArray)) {
-      jsDoc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
-    } else {
-      jsDoc.setTextColor(colorArray);
-    }
+    const [r, g, b] = convertColor(color);
+    jsDoc.setTextColor(r, g, b);
 
     const lines = jsDoc.splitTextToSize(text, contentWidth);
-    const lineHeight = fontSize * 1.2; // Better line height
-    const requiredSpace = lines.length * lineHeight + 4;
+    const lineHeight = fontSize * 1.4; // Better line height for readability
+    const requiredSpace = lines.length * lineHeight + 6; // More space between lines
 
     // Check if we need a new page
     checkPageBreak(requiredSpace);
@@ -278,8 +296,8 @@ export const renderToPDF = async (
 
   // Helper function to add section header
   const addSectionHeader = (title: string) => {
-    yPosition += 12; // More space before section headers
-    checkPageBreak(20);
+    yPosition += 16; // More space before section headers
+    checkPageBreak(25);
 
     addText(
       title,
@@ -291,30 +309,18 @@ export const renderToPDF = async (
     );
 
     // Add underline with accent color
-    const accentColor = convertColor(config.colors.accent);
-    if (Array.isArray(accentColor)) {
-      jsDoc.setDrawColor(accentColor[0], accentColor[1], accentColor[2]);
-    } else {
-      jsDoc.setDrawColor(accentColor);
-    }
-    jsDoc.setLineWidth(1.5);
-    jsDoc.line(margin, yPosition - 5, pageWidth - margin, yPosition - 5);
-    yPosition += 8; // More space after section headers
+    const [r, g, b] = convertColor(config.colors.accent);
+    jsDoc.setDrawColor(r, g, b);
+    jsDoc.setLineWidth(2);
+    jsDoc.line(margin, yPosition - 8, pageWidth - margin, yPosition - 8);
+    yPosition += 12; // More space after section headers
   };
 
   // Helper function to add a subtle separator line
   const addSeparator = () => {
     yPosition += 6; // More space before separators
-    const secondaryColor = convertColor(config.colors.secondary);
-    if (Array.isArray(secondaryColor)) {
-      jsDoc.setDrawColor(
-        secondaryColor[0],
-        secondaryColor[1],
-        secondaryColor[2]
-      );
-    } else {
-      jsDoc.setDrawColor(secondaryColor);
-    }
+    const [r, g, b] = convertColor(config.colors.secondary);
+    jsDoc.setDrawColor(r, g, b);
     jsDoc.setLineWidth(0.5);
     jsDoc.line(margin + 20, yPosition, pageWidth - margin - 20, yPosition);
     yPosition += 6; // More space after separators
@@ -323,12 +329,14 @@ export const renderToPDF = async (
   // Header
   addText(
     content.header.name,
-    convertFontSize(config.fonts.size.heading),
+    convertFontSize(config.fonts.size.heading) + 2, // Slightly larger for name
     true,
     config.colors.primary,
     'center',
     config.fonts.heading
   );
+  yPosition += 8; // Space between name and contact
+
   addText(
     content.header.contact.join(' • '),
     convertFontSize(config.fonts.size.small),
@@ -337,7 +345,7 @@ export const renderToPDF = async (
     'center',
     config.fonts.body
   );
-  yPosition += 15; // More space after header
+  yPosition += 20; // More space after header
 
   // Summary
   if (content.sections.summary) {
@@ -356,14 +364,17 @@ export const renderToPDF = async (
   // Experience
   addSectionHeader('Professional Experience');
   content.sections.experience.forEach((exp, index) => {
+    // Job title and company
     addText(
       `${exp.position} | ${exp.company}`,
-      convertFontSize(config.fonts.size.body),
+      convertFontSize(config.fonts.size.body) + 1,
       true,
       config.colors.text,
       'left',
       config.fonts.heading
     );
+
+    // Duration
     addText(
       exp.duration,
       convertFontSize(config.fonts.size.small),
@@ -372,14 +383,18 @@ export const renderToPDF = async (
       'left',
       config.fonts.body
     );
-    addText(
-      exp.description,
-      convertFontSize(config.fonts.size.body),
-      false,
-      config.colors.text,
-      'left',
-      config.fonts.body
-    );
+
+    // Description
+    if (exp.description) {
+      addText(
+        exp.description,
+        convertFontSize(config.fonts.size.body),
+        false,
+        config.colors.text,
+        'left',
+        config.fonts.body
+      );
+    }
 
     // Add achievements with proper indentation
     if (exp.achievements && exp.achievements.length > 0) {
@@ -399,21 +414,24 @@ export const renderToPDF = async (
     if (index < content.sections.experience.length - 1) {
       addSeparator();
     } else {
-      yPosition += 8; // More space after last experience
+      yPosition += 12; // More space after last experience
     }
   });
 
   // Education
   addSectionHeader('Education');
   content.sections.education.forEach((edu, index) => {
+    // Degree
     addText(
       edu.degree,
-      convertFontSize(config.fonts.size.body),
+      convertFontSize(config.fonts.size.body) + 1,
       true,
       config.colors.text,
       'left',
       config.fonts.heading
     );
+
+    // Institution
     addText(
       edu.institution,
       convertFontSize(config.fonts.size.body),
@@ -422,35 +440,32 @@ export const renderToPDF = async (
       'left',
       config.fonts.body
     );
+
+    // Duration and GPA on same line if GPA exists
+    const durationText = edu.gpa
+      ? `${edu.duration} | GPA: ${edu.gpa}`
+      : edu.duration;
     addText(
-      edu.duration,
+      durationText,
       convertFontSize(config.fonts.size.small),
       false,
       config.colors.secondary,
       'left',
       config.fonts.body
     );
-    if (edu.gpa) {
-      addText(
-        `GPA: ${edu.gpa}`,
-        convertFontSize(config.fonts.size.small),
-        false,
-        config.colors.secondary,
-        'left',
-        config.fonts.body
-      );
-    }
 
     // Add separator between education entries (except for the last one)
     if (index < content.sections.education.length - 1) {
       addSeparator();
     } else {
-      yPosition += 8; // More space after last education
+      yPosition += 12; // More space after last education
     }
   });
 
   // Skills
   addSectionHeader('Skills');
+
+  // Technical Skills
   if (content.sections.skills.technical.length > 0) {
     addText(
       `Technical: ${content.sections.skills.technical.join(', ')}`,
@@ -461,6 +476,8 @@ export const renderToPDF = async (
       config.fonts.body
     );
   }
+
+  // Business Skills
   if (content.sections.skills.business.length > 0) {
     addText(
       `Business: ${content.sections.skills.business.join(', ')}`,
@@ -471,44 +488,86 @@ export const renderToPDF = async (
       config.fonts.body
     );
   }
-  yPosition += 8; // Space after skills
+
+  // Soft Skills
+  if (content.sections.skills.soft.length > 0) {
+    addText(
+      `Soft Skills: ${content.sections.skills.soft.join(', ')}`,
+      convertFontSize(config.fonts.size.body),
+      false,
+      config.colors.text,
+      'left',
+      config.fonts.body
+    );
+  }
+
+  // Languages
+  if (content.sections.skills.languages.length > 0) {
+    addText(
+      `Languages: ${content.sections.skills.languages.join(', ')}`,
+      convertFontSize(config.fonts.size.body),
+      false,
+      config.colors.text,
+      'left',
+      config.fonts.body
+    );
+  }
+
+  // Certifications
+  if (content.sections.skills.certifications.length > 0) {
+    addText(
+      `Certifications: ${content.sections.skills.certifications.join(', ')}`,
+      convertFontSize(config.fonts.size.body),
+      false,
+      config.colors.text,
+      'left',
+      config.fonts.body
+    );
+  }
+
+  yPosition += 12; // Space after skills
 
   // Projects
   if (content.sections.projects && content.sections.projects.length > 0) {
     addSectionHeader('Projects');
     content.sections.projects.forEach((project, index) => {
+      // Project name
       addText(
         project.name,
-        convertFontSize(config.fonts.size.body),
+        convertFontSize(config.fonts.size.body) + 1,
         true,
         config.colors.text,
         'left',
         config.fonts.heading
       );
-      addText(
-        project.description,
-        convertFontSize(config.fonts.size.body),
-        false,
-        config.colors.text,
-        'left',
-        config.fonts.body
-      );
-      if (project.technologies && project.technologies.length > 0) {
+
+      // Project description
+      if (project.description) {
         addText(
-          `Technologies: ${project.technologies.join(', ')}`,
-          convertFontSize(config.fonts.size.small),
+          project.description,
+          convertFontSize(config.fonts.size.body),
           false,
-          config.colors.secondary,
+          config.colors.text,
           'left',
           config.fonts.body
         );
       }
+
+      // Technologies and URL on same line if both exist
+      const techAndUrl = [];
+      if (project.technologies && project.technologies.length > 0) {
+        techAndUrl.push(`Technologies: ${project.technologies.join(', ')}`);
+      }
       if (project.url) {
+        techAndUrl.push(`URL: ${project.url}`);
+      }
+
+      if (techAndUrl.length > 0) {
         addText(
-          `URL: ${project.url}`,
+          techAndUrl.join(' | '),
           convertFontSize(config.fonts.size.small),
           false,
-          config.colors.accent,
+          config.colors.secondary,
           'left',
           config.fonts.body
         );
@@ -521,7 +580,7 @@ export const renderToPDF = async (
       ) {
         addSeparator();
       } else {
-        yPosition += 8; // More space after last project
+        yPosition += 12; // More space after last project
       }
     });
   }
@@ -542,7 +601,7 @@ export const renderToPDF = async (
         config.fonts.body
       );
     });
-    yPosition += 8; // Space after achievements
+    yPosition += 12; // Space after achievements
   }
 
   // Save the PDF
@@ -570,7 +629,21 @@ export const renderToDOCX = async (
     if (color.startsWith('#')) {
       return color.replace('#', '');
     }
-    return color;
+    // Handle named colors
+    const colorMap: { [key: string]: string } = {
+      black: '000000',
+      white: 'FFFFFF',
+      red: 'FF0000',
+      green: '008000',
+      blue: '0000FF',
+      gray: '808080',
+      grey: '808080',
+      darkgray: '404040',
+      darkgrey: '404040',
+      lightgray: 'C0C0C0',
+      lightgrey: 'C0C0C0',
+    };
+    return colorMap[color.toLowerCase()] || '000000';
   };
 
   const doc = new Document({
@@ -650,7 +723,7 @@ export const renderToDOCX = async (
                 text: 'Professional Experience',
                 bold: true,
                 size: convertFontSize(config.fonts.size.subheading) * 2,
-                color: convertColor(config.colors.primary),
+                color: convertColorForDOCX(config.colors.primary),
                 font: mapFontForExport(config.fonts.heading),
               }),
             ],
@@ -675,7 +748,7 @@ export const renderToDOCX = async (
                 new TextRun({
                   text: exp.duration,
                   size: convertFontSize(config.fonts.size.small) * 2,
-                  color: convertColor(config.colors.secondary),
+                  color: convertColorForDOCX(config.colors.secondary),
                   font: mapFontForExport(config.fonts.body),
                 }),
               ],
@@ -713,7 +786,7 @@ export const renderToDOCX = async (
                 text: 'Education',
                 bold: true,
                 size: convertFontSize(config.fonts.size.subheading) * 2,
-                color: convertColor(config.colors.primary),
+                color: convertColorForDOCX(config.colors.primary),
                 font: mapFontForExport(config.fonts.heading),
               }),
             ],
@@ -748,7 +821,7 @@ export const renderToDOCX = async (
                 new TextRun({
                   text: edu.duration,
                   size: convertFontSize(config.fonts.size.small) * 2,
-                  color: convertColor(config.colors.secondary),
+                  color: convertColorForDOCX(config.colors.secondary),
                   font: mapFontForExport(config.fonts.body),
                 }),
               ],
@@ -761,7 +834,7 @@ export const renderToDOCX = async (
                       new TextRun({
                         text: `GPA: ${edu.gpa}`,
                         size: convertFontSize(config.fonts.size.small) * 2,
-                        color: convertColor(config.colors.secondary),
+                        color: convertColorForDOCX(config.colors.secondary),
                         font: mapFontForExport(config.fonts.body),
                       }),
                     ],
@@ -778,7 +851,7 @@ export const renderToDOCX = async (
                 text: 'Skills',
                 bold: true,
                 size: convertFontSize(config.fonts.size.subheading) * 2,
-                color: convertColor(config.colors.primary),
+                color: convertColorForDOCX(config.colors.primary),
                 font: mapFontForExport(config.fonts.heading),
               }),
             ],
@@ -825,7 +898,7 @@ export const renderToDOCX = async (
                       text: 'Projects',
                       bold: true,
                       size: convertFontSize(config.fonts.size.subheading) * 2,
-                      color: convertColor(config.colors.primary),
+                      color: convertColorForDOCX(config.colors.primary),
                       font: mapFontForExport(config.fonts.heading),
                     }),
                   ],
@@ -862,7 +935,9 @@ export const renderToDOCX = async (
                               text: `Technologies: ${project.technologies.join(', ')}`,
                               size:
                                 convertFontSize(config.fonts.size.small) * 2,
-                              color: convertColor(config.colors.secondary),
+                              color: convertColorForDOCX(
+                                config.colors.secondary
+                              ),
                               font: mapFontForExport(config.fonts.body),
                             }),
                           ],
@@ -884,7 +959,7 @@ export const renderToDOCX = async (
                       text: 'Achievements',
                       bold: true,
                       size: convertFontSize(config.fonts.size.subheading) * 2,
-                      color: convertColor(config.colors.primary),
+                      color: convertColorForDOCX(config.colors.primary),
                       font: mapFontForExport(config.fonts.heading),
                     }),
                   ],
