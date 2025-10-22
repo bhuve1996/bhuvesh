@@ -421,6 +421,24 @@ export default function TemplateGalleryPage() {
   const [userResumeData, setUserResumeData] = useState<ResumeData | null>(null);
   const [useUserData, setUseUserData] = useState<boolean>(false);
   const [showDataChoice, setShowDataChoice] = useState<boolean>(false);
+  const [hasResumeBuilderData, setHasResumeBuilderData] = useState(false);
+
+  // Check for resume builder data
+  useEffect(() => {
+    const resumeBuilderData = localStorage.getItem('resumeBuilderData');
+    if (resumeBuilderData) {
+      try {
+        const parsedData = JSON.parse(resumeBuilderData);
+        setUserResumeData(parsedData);
+        setHasResumeBuilderData(true);
+        setUseUserData(true);
+        // Clear the data after using it
+        localStorage.removeItem('resumeBuilderData');
+      } catch {
+        // Error parsing resume builder data
+      }
+    }
+  }, []);
 
   // Fetch user's existing resume data
   useEffect(() => {
@@ -729,14 +747,35 @@ export default function TemplateGalleryPage() {
       <div className='bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-24 z-10'>
         <div className='max-w-7xl mx-auto px-6 py-6'>
           <div className='flex items-center justify-between'>
-            <div>
-              <h1 className='text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent'>
-                Resume Templates
-              </h1>
-              <p className='text-slate-600 mt-1'>
-                Choose from our collection of modern, professional resume
-                templates
-              </p>
+            <div className='flex items-center space-x-4'>
+              {hasResumeBuilderData && (
+                <Button
+                  variant='outline'
+                  onClick={() => {
+                    // Save current data back to localStorage and go back to builder
+                    if (userResumeData) {
+                      localStorage.setItem(
+                        'resumeBuilderData',
+                        JSON.stringify(userResumeData)
+                      );
+                    }
+                    window.location.href = '/resume/builder';
+                  }}
+                  className='flex items-center space-x-2'
+                >
+                  <span>←</span>
+                  <span>Back to Builder</span>
+                </Button>
+              )}
+              <div>
+                <h1 className='text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent'>
+                  Resume Templates
+                </h1>
+                <p className='text-slate-600 mt-1'>
+                  Choose from our collection of modern, professional resume
+                  templates
+                </p>
+              </div>
             </div>
             <Button
               onClick={() => window.history.back()}

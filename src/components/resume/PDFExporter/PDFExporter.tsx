@@ -191,12 +191,14 @@ const PDFDocument: React.FC<{
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Skills</Text>
             <View style={styles.skillsContainer}>
-              {resumeData.skills.technical.map((skill, index) => (
-                <Text key={index} style={styles.skillTag}>
-                  {skill}
-                </Text>
-              ))}
-              {resumeData.skills.soft.map((skill, index) => (
+              {resumeData.skills.technical.map(
+                (skill: string, index: number) => (
+                  <Text key={index} style={styles.skillTag}>
+                    {skill}
+                  </Text>
+                )
+              )}
+              {resumeData.skills.soft.map((skill: string, index: number) => (
                 <Text key={index} style={styles.skillTag}>
                   {skill}
                 </Text>

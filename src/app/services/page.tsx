@@ -243,7 +243,7 @@ export default function Services() {
       activeSection='services'
     >
       {/* Services Grid */}
-      <section className='px-6 pb-16'>
+      <section className='px-6 pb-16' aria-labelledby='services-title'>
         <div className='max-w-7xl mx-auto'>
           <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
             {services.map((service, index) => (
@@ -259,9 +259,23 @@ export default function Services() {
                       ? 'border-primary-500 bg-primary-500/10'
                       : 'border-neutral-800 hover:border-primary-500/50 hover:bg-neutral-800/50'
                   } ${service.popular ? 'ring-2 ring-primary-500/30' : ''}`}
+                  role='button'
+                  tabIndex={0}
+                  aria-pressed={selectedService === service.id}
+                  aria-label={`Select ${service.title} service`}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedService(service.id);
+                    }
+                  }}
                 >
                   {service.popular && (
-                    <div className='bg-primary-500 text-primary-950 px-3 py-1 rounded-full text-xs font-semibold mb-4 inline-block'>
+                    <div
+                      className='bg-primary-500 text-primary-950 px-3 py-1 rounded-full text-xs font-semibold mb-4 inline-block'
+                      role='status'
+                      aria-label='Popular service'
+                    >
                       Popular
                     </div>
                   )}
@@ -270,25 +284,27 @@ export default function Services() {
                     <div className='w-12 h-12 bg-primary-500/10 rounded-lg flex items-center justify-center mr-4'>
                       <span className='text-2xl'>{service.icon}</span>
                     </div>
-                    <h3 className='text-xl font-bold text-white group-hover:text-primary-400 transition-colors'>
+                    <h3 className='text-xl font-bold text-foreground group-hover:text-primary-400 transition-colors'>
                       {service.title}
                     </h3>
                   </div>
 
-                  <p className='text-neutral-300 mb-6 leading-relaxed'>
+                  <p className='text-muted-foreground mb-6 leading-relaxed'>
                     {service.description}
                   </p>
 
                   <div className='space-y-3 mb-6'>
                     <div className='flex justify-between text-sm'>
-                      <span className='text-neutral-400'>Pricing:</span>
+                      <span className='text-muted-foreground'>Pricing:</span>
                       <span className='text-primary-400 font-semibold'>
                         {service.pricing}
                       </span>
                     </div>
                     <div className='flex justify-between text-sm'>
-                      <span className='text-neutral-400'>Timeline:</span>
-                      <span className='text-white'>{service.timeline}</span>
+                      <span className='text-muted-foreground'>Timeline:</span>
+                      <span className='text-foreground'>
+                        {service.timeline}
+                      </span>
                     </div>
                   </div>
 
@@ -302,7 +318,7 @@ export default function Services() {
                       </span>
                     ))}
                     {service.technologies.length > 3 && (
-                      <span className='text-neutral-400 text-xs'>
+                      <span className='text-muted-foreground text-xs'>
                         +{service.technologies.length - 3} more
                       </span>
                     )}
@@ -316,7 +332,10 @@ export default function Services() {
 
       {/* Selected Service Details */}
       {selectedServiceData && (
-        <section className='px-6 pb-16'>
+        <section
+          className='px-6 pb-16'
+          aria-labelledby='selected-service-title'
+        >
           <div className='max-w-7xl mx-auto'>
             <Card className='animate-slide-up'>
               <div className='grid lg:grid-cols-3 gap-8'>
@@ -328,7 +347,10 @@ export default function Services() {
                       </span>
                     </div>
                     <div>
-                      <h3 className='text-3xl font-bold text-white'>
+                      <h3
+                        id='selected-service-title'
+                        className='text-3xl font-bold text-foreground'
+                      >
                         {selectedServiceData.title}
                       </h3>
                       <p className='text-primary-400 text-lg font-semibold'>
@@ -342,21 +364,23 @@ export default function Services() {
                   </p>
 
                   <div className='mb-6'>
-                    <h4 className='text-xl font-semibold text-white mb-4'>
+                    <h4 className='text-xl font-semibold text-foreground mb-4'>
                       What&apos;s Included:
                     </h4>
                     <ul className='space-y-3'>
                       {selectedServiceData.features.map((feature, index) => (
                         <li key={index} className='flex items-center space-x-3'>
                           <span className='text-primary-400 text-lg'>✓</span>
-                          <span className='text-neutral-300'>{feature}</span>
+                          <span className='text-muted-foreground'>
+                            {feature}
+                          </span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
                   <div className='mb-6'>
-                    <h4 className='text-xl font-semibold text-white mb-4'>
+                    <h4 className='text-xl font-semibold text-foreground mb-4'>
                       Technologies Used:
                     </h4>
                     <div className='flex flex-wrap gap-2'>
@@ -374,7 +398,7 @@ export default function Services() {
 
                 <div className='space-y-6'>
                   <Card className='bg-primary-500/5 border-primary-500/20'>
-                    <h4 className='text-lg font-semibold text-white mb-3'>
+                    <h4 className='text-lg font-semibold text-foreground mb-3'>
                       Project Timeline
                     </h4>
                     <p className='text-primary-400 text-xl font-bold'>
@@ -383,7 +407,7 @@ export default function Services() {
                   </Card>
 
                   <Card className='bg-secondary-500/5 border-secondary-500/20'>
-                    <h4 className='text-lg font-semibold text-white mb-3'>
+                    <h4 className='text-lg font-semibold text-foreground mb-3'>
                       Investment
                     </h4>
                     <p className='text-secondary-400 text-xl font-bold'>
@@ -391,11 +415,20 @@ export default function Services() {
                     </p>
                   </Card>
 
-                  <Button size='lg' className='w-full'>
+                  <Button
+                    size='lg'
+                    className='w-full'
+                    aria-label='Get started with this service'
+                  >
                     Get Started
                   </Button>
 
-                  <Button variant='outline' size='lg' className='w-full'>
+                  <Button
+                    variant='outline'
+                    size='lg'
+                    className='w-full'
+                    aria-label='Schedule a consultation for this service'
+                  >
                     Schedule Consultation
                   </Button>
                 </div>
@@ -406,9 +439,12 @@ export default function Services() {
       )}
 
       {/* Process Section */}
-      <section className='px-6 pb-16'>
+      <section className='px-6 pb-16' aria-labelledby='process-title'>
         <div className='max-w-7xl mx-auto'>
-          <h2 className='section-title text-center animate-slide-up'>
+          <h2
+            id='process-title'
+            className='section-title text-center animate-slide-up'
+          >
             My Development Process
           </h2>
           <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
@@ -424,7 +460,7 @@ export default function Services() {
                       {step.step}
                     </div>
                     <div>
-                      <h3 className='text-xl font-bold text-white'>
+                      <h3 className='text-xl font-bold text-foreground'>
                         {step.title}
                       </h3>
                       <p className='text-primary-400 text-sm font-medium'>
@@ -433,19 +469,19 @@ export default function Services() {
                     </div>
                   </div>
 
-                  <p className='text-neutral-300 mb-6 leading-relaxed'>
+                  <p className='text-muted-foreground mb-6 leading-relaxed'>
                     {step.description}
                   </p>
 
                   <div>
-                    <h4 className='text-sm font-semibold text-white mb-3'>
+                    <h4 className='text-sm font-semibold text-foreground mb-3'>
                       Deliverables:
                     </h4>
                     <ul className='space-y-2'>
                       {step.deliverables.map((deliverable, index) => (
                         <li key={index} className='flex items-center space-x-3'>
                           <span className='text-primary-400 text-sm'>•</span>
-                          <span className='text-neutral-400 text-sm'>
+                          <span className='text-muted-foreground text-sm'>
                             {deliverable}
                           </span>
                         </li>
@@ -460,9 +496,12 @@ export default function Services() {
       </section>
 
       {/* Testimonials */}
-      <section className='px-6 pb-20'>
+      <section className='px-6 pb-20' aria-labelledby='testimonials-title'>
         <div className='max-w-7xl mx-auto'>
-          <h2 className='section-title text-center animate-slide-up'>
+          <h2
+            id='testimonials-title'
+            className='section-title text-center animate-slide-up'
+          >
             What Clients Say
           </h2>
           <div className='grid md:grid-cols-3 gap-8'>
@@ -472,7 +511,11 @@ export default function Services() {
                 animation='slideUp'
                 delay={index * 100}
               >
-                <Card className='card-hover'>
+                <Card
+                  className='card-hover'
+                  role='article'
+                  aria-labelledby={`testimonial-${testimonial.id}-name`}
+                >
                   <div className='flex items-center space-x-1 mb-4'>
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <span key={i} className='text-accent-400 text-lg'>
@@ -481,18 +524,21 @@ export default function Services() {
                     ))}
                   </div>
 
-                  <p className='text-neutral-300 mb-6 leading-relaxed italic'>
+                  <p className='text-muted-foreground mb-6 leading-relaxed italic'>
                     &ldquo;{testimonial.content}&rdquo;
                   </p>
 
                   <div className='border-t border-neutral-700 pt-4'>
-                    <p className='text-white font-semibold'>
+                    <p
+                      id={`testimonial-${testimonial.id}-name`}
+                      className='text-foreground font-semibold'
+                    >
                       {testimonial.name}
                     </p>
                     <p className='text-primary-400 text-sm'>
                       {testimonial.role}
                     </p>
-                    <p className='text-neutral-400 text-xs mt-1'>
+                    <p className='text-muted-foreground text-xs mt-1'>
                       {testimonial.project}
                     </p>
                   </div>

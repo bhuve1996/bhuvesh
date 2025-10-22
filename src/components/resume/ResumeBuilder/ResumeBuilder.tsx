@@ -4,6 +4,11 @@ import React, { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
+import { FormField } from '@/components/ui/FormField';
+import { ItemCard } from '@/components/ui/ItemCard';
+import { ResumeInput } from '@/components/ui/ResumeInput';
+import { RichTextInput } from '@/components/ui/RichTextInput';
 import { loadTemplate } from '@/lib/resume/templateLoader';
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
@@ -39,6 +44,13 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
   const [pendingTemplate, setPendingTemplate] = useState<ResumeTemplate | null>(
     null
   );
+  const [expandedSections, setExpandedSections] = useState<{
+    [key: string]: boolean;
+  }>({
+    experience: true,
+    education: true,
+    projects: true,
+  });
   const [resumeData, setResumeData] = useState<ResumeData>({
     personal: {
       fullName: '',
@@ -48,7 +60,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
       linkedin: '',
       github: '',
       portfolio: '',
-      website: '',
     },
     summary: '',
     experience: [],
@@ -78,7 +89,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
             linkedin: initialData.personal?.linkedin || '',
             github: initialData.personal?.github || '',
             portfolio: initialData.personal?.portfolio || '',
-            website: initialData.personal?.website || '',
           },
           summary: initialData.summary || '',
           experience: initialData.experience || [],
@@ -136,7 +146,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
             linkedin: initialData.personal?.linkedin || '',
             github: initialData.personal?.github || '',
             portfolio: initialData.personal?.portfolio || '',
-            website: initialData.personal?.website || '',
           },
           summary: initialData.summary || '',
           experience: initialData.experience || [],
@@ -178,6 +187,17 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
       ...prev,
       [section]: data,
     }));
+  };
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
+  const capitalizeFirstLetter = (str: string) => {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
 
   const handleSave = () => {
@@ -278,15 +298,20 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
             {currentTab === 'content' ? (
               <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
                 {/* Builder Form */}
-                <div className='lg:col-span-2 space-y-6'>
+                <div className='lg:col-span-2 space-y-8'>
                   {/* Personal Information */}
-                  <Card className='p-6'>
-                    <h3 className='text-lg font-semibold mb-4'>
-                      Personal Information
-                    </h3>
+                  <Card className='p-6 border-l-4 border-l-primary-500'>
+                    <div className='flex items-center space-x-3 mb-6'>
+                      <div className='w-10 h-10 bg-primary-500/10 rounded-lg flex items-center justify-center'>
+                        <span className='text-2xl'>👤</span>
+                      </div>
+                      <h3 className='text-xl font-bold text-foreground uppercase tracking-wide'>
+                        Personal Information
+                      </h3>
+                    </div>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                       <div>
-                        <label className='block text-sm font-medium text-foreground mb-1'>
+                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
                           Full Name *
                         </label>
                         <input
@@ -298,12 +323,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               fullName: e.target.value,
                             })
                           }
-                          className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
+                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
                           placeholder='John Smith'
                         />
                       </div>
                       <div>
-                        <label className='block text-sm font-medium text-foreground mb-1'>
+                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
                           Email *
                         </label>
                         <input
@@ -315,12 +340,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               email: e.target.value,
                             })
                           }
-                          className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
+                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
                           placeholder='john.smith@email.com'
                         />
                       </div>
                       <div>
-                        <label className='block text-sm font-medium text-foreground mb-1'>
+                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
                           Phone
                         </label>
                         <input
@@ -332,12 +357,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               phone: e.target.value,
                             })
                           }
-                          className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
+                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
                           placeholder='(555) 123-4567'
                         />
                       </div>
                       <div>
-                        <label className='block text-sm font-medium text-foreground mb-1'>
+                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
                           Location
                         </label>
                         <input
@@ -349,12 +374,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               location: e.target.value,
                             })
                           }
-                          className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
+                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
                           placeholder='San Francisco, CA'
                         />
                       </div>
                       <div>
-                        <label className='block text-sm font-medium text-foreground mb-1'>
+                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
                           LinkedIn
                         </label>
                         <input
@@ -366,12 +391,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               linkedin: e.target.value,
                             })
                           }
-                          className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
+                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
                           placeholder='linkedin.com/in/johnsmith'
                         />
                       </div>
                       <div>
-                        <label className='block text-sm font-medium text-foreground mb-1'>
+                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
                           GitHub
                         </label>
                         <input
@@ -383,7 +408,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               github: e.target.value,
                             })
                           }
-                          className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
+                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
                           placeholder='github.com/johnsmith'
                         />
                       </div>
@@ -391,10 +416,15 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                   </Card>
 
                   {/* Professional Summary */}
-                  <Card className='p-6'>
-                    <h3 className='text-lg font-semibold mb-4'>
-                      Professional Summary
-                    </h3>
+                  <Card className='p-6 border-l-4 border-l-blue-500'>
+                    <div className='flex items-center space-x-3 mb-6'>
+                      <div className='w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center'>
+                        <span className='text-2xl'>📝</span>
+                      </div>
+                      <h3 className='text-xl font-bold text-foreground uppercase tracking-wide'>
+                        Professional Summary
+                      </h3>
+                    </div>
                     <RichTextEditor
                       content={resumeData.summary || ''}
                       onChange={content => handleDataUpdate('summary', content)}
@@ -417,107 +447,103 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                   </Card>
 
                   {/* Work Experience */}
-                  <Card className='p-6'>
-                    <h3 className='text-lg font-semibold mb-4'>
-                      Work Experience
-                    </h3>
-                    <div className='space-y-4'>
+                  <Card>
+                    <CollapsibleSection
+                      title='Work Experience'
+                      icon='💼'
+                      color='green'
+                      count={resumeData.experience.length}
+                      countLabel={
+                        resumeData.experience.length === 1 ? 'job' : 'jobs'
+                      }
+                      isExpanded={expandedSections.experience || false}
+                      onToggle={() => toggleSection('experience')}
+                    >
                       {resumeData.experience.map((job, index) => (
-                        <div
+                        <ItemCard
                           key={job.id}
-                          className='border border-border rounded-lg p-4'
+                          onRemove={() => {
+                            const newExperience = resumeData.experience.filter(
+                              (_, i) => i !== index
+                            );
+                            handleDataUpdate('experience', newExperience);
+                          }}
+                          removeLabel='Remove Job'
                         >
                           <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
-                            <div>
-                              <label className='block text-sm font-medium text-foreground mb-1'>
-                                Job Title *
-                              </label>
-                              <input
-                                type='text'
-                                value={job.title}
-                                onChange={e => {
+                            <FormField label='Job Title' required>
+                              <ResumeInput
+                                value={job.position}
+                                onChange={value => {
                                   const newExperience = [
                                     ...resumeData.experience,
                                   ];
                                   newExperience[index] = {
                                     ...job,
-                                    title: e.target.value,
+                                    position: value,
                                   };
                                   handleDataUpdate('experience', newExperience);
                                 }}
-                                className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                                 placeholder='Software Engineer'
                               />
-                            </div>
-                            <div>
-                              <label className='block text-sm font-medium text-foreground mb-1'>
-                                Company *
-                              </label>
-                              <input
-                                type='text'
+                            </FormField>
+                            <FormField label='Company' required>
+                              <ResumeInput
                                 value={job.company}
-                                onChange={e => {
+                                onChange={value => {
                                   const newExperience = [
                                     ...resumeData.experience,
                                   ];
                                   newExperience[index] = {
                                     ...job,
-                                    company: e.target.value,
+                                    company: value,
                                   };
                                   handleDataUpdate('experience', newExperience);
                                 }}
-                                className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                                 placeholder='Google Inc.'
                               />
-                            </div>
-                            <div>
-                              <label className='block text-sm font-medium text-foreground mb-1'>
-                                Location
-                              </label>
-                              <input
-                                type='text'
+                            </FormField>
+                            <FormField label='Location'>
+                              <ResumeInput
                                 value={job.location}
-                                onChange={e => {
+                                onChange={value => {
                                   const newExperience = [
                                     ...resumeData.experience,
                                   ];
                                   newExperience[index] = {
                                     ...job,
-                                    location: e.target.value,
+                                    location: value,
                                   };
                                   handleDataUpdate('experience', newExperience);
                                 }}
-                                className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                                 placeholder='San Francisco, CA'
                               />
-                            </div>
-                            <div>
-                              <label className='block text-sm font-medium text-foreground mb-1'>
-                                Period *
-                              </label>
-                              <input
-                                type='text'
-                                value={job.period}
-                                onChange={e => {
+                            </FormField>
+                            <FormField label='Period' required>
+                              <ResumeInput
+                                value={`${job.startDate} - ${job.endDate || 'Present'}`}
+                                onChange={value => {
                                   const newExperience = [
                                     ...resumeData.experience,
                                   ];
+                                  const [startDate, endDate] =
+                                    value.split(' - ');
                                   newExperience[index] = {
                                     ...job,
-                                    period: e.target.value,
+                                    startDate: startDate || '',
+                                    endDate:
+                                      endDate === 'Present'
+                                        ? ''
+                                        : endDate || '',
                                   };
                                   handleDataUpdate('experience', newExperience);
                                 }}
-                                className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                                 placeholder='Jan 2020 - Present'
                               />
-                            </div>
+                            </FormField>
                           </div>
-                          <div className='mb-4'>
-                            <label className='block text-sm font-medium text-foreground mb-1'>
-                              Job Description
-                            </label>
-                            <RichTextEditor
+                          <FormField label='Job Description'>
+                            <RichTextInput
                               content={job.description}
                               onChange={content => {
                                 const newExperience = [
@@ -531,41 +557,11 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               }}
                               placeholder='Describe your role and key responsibilities...'
                               maxLength={1000}
+                              context={`${job.position} at ${job.company}`}
+                              type='experience'
                             />
-                            <div className='mt-2'>
-                              <AIAssistant
-                                onSuggestion={suggestion => {
-                                  const newExperience = [
-                                    ...resumeData.experience,
-                                  ];
-                                  newExperience[index] = {
-                                    ...job,
-                                    description: suggestion,
-                                  };
-                                  handleDataUpdate('experience', newExperience);
-                                }}
-                                context={`${job.title} at ${job.company}`}
-                                type='experience'
-                              />
-                            </div>
-                          </div>
-                          <div className='flex justify-end'>
-                            <Button
-                              variant='outline'
-                              size='sm'
-                              onClick={() => {
-                                const newExperience =
-                                  resumeData.experience.filter(
-                                    (_, i) => i !== index
-                                  );
-                                handleDataUpdate('experience', newExperience);
-                              }}
-                              className='text-red-600 hover:bg-red-50'
-                            >
-                              Remove Job
-                            </Button>
-                          </div>
-                        </div>
+                          </FormField>
+                        </ItemCard>
                       ))}
                       <Button
                         variant='outline'
@@ -587,144 +583,121 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         }}
                         className='w-full'
                       >
-                        + Add Work Experience
+                        ➕ Add Work Experience
                       </Button>
-                    </div>
+                    </CollapsibleSection>
                   </Card>
 
                   {/* Education */}
-                  <Card className='p-6'>
-                    <h3 className='text-lg font-semibold mb-4'>Education</h3>
-                    <div className='space-y-4'>
+                  <Card>
+                    <CollapsibleSection
+                      title='Education'
+                      icon='🎓'
+                      color='purple'
+                      count={resumeData.education.length}
+                      countLabel={
+                        resumeData.education.length === 1 ? 'degree' : 'degrees'
+                      }
+                      isExpanded={expandedSections.education || false}
+                      onToggle={() => toggleSection('education')}
+                    >
                       {resumeData.education.map((edu, index) => (
-                        <div
+                        <ItemCard
                           key={edu.id}
-                          className='border border-border rounded-lg p-4'
+                          onRemove={() => {
+                            const newEducation = resumeData.education.filter(
+                              (_, i) => i !== index
+                            );
+                            handleDataUpdate('education', newEducation);
+                          }}
+                          removeLabel='Remove Education'
                         >
                           <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
-                            <div>
-                              <label className='block text-sm font-medium text-foreground mb-1'>
-                                Degree *
-                              </label>
-                              <input
-                                type='text'
+                            <FormField label='Degree' required>
+                              <ResumeInput
                                 value={edu.degree}
-                                onChange={e => {
+                                onChange={value => {
                                   const newEducation = [
                                     ...resumeData.education,
                                   ];
                                   newEducation[index] = {
                                     ...edu,
-                                    degree: e.target.value,
+                                    degree: value,
                                   };
                                   handleDataUpdate('education', newEducation);
                                 }}
-                                className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                                 placeholder='Bachelor of Science in Computer Science'
                               />
-                            </div>
-                            <div>
-                              <label className='block text-sm font-medium text-foreground mb-1'>
-                                School *
-                              </label>
-                              <input
-                                type='text'
-                                value={edu.school}
-                                onChange={e => {
+                            </FormField>
+                            <FormField label='School' required>
+                              <ResumeInput
+                                value={edu.institution}
+                                onChange={value => {
                                   const newEducation = [
                                     ...resumeData.education,
                                   ];
                                   newEducation[index] = {
                                     ...edu,
-                                    school: e.target.value,
+                                    institution: value,
                                   };
                                   handleDataUpdate('education', newEducation);
                                 }}
-                                className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                                 placeholder='Stanford University'
                               />
-                            </div>
-                            <div>
-                              <label className='block text-sm font-medium text-foreground mb-1'>
-                                Location
-                              </label>
-                              <input
-                                type='text'
+                            </FormField>
+                            <FormField label='Location'>
+                              <ResumeInput
                                 value={edu.location}
-                                onChange={e => {
+                                onChange={value => {
                                   const newEducation = [
                                     ...resumeData.education,
                                   ];
                                   newEducation[index] = {
                                     ...edu,
-                                    location: e.target.value,
+                                    location: value,
                                   };
                                   handleDataUpdate('education', newEducation);
                                 }}
-                                className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                                 placeholder='Stanford, CA'
                               />
-                            </div>
-                            <div>
-                              <label className='block text-sm font-medium text-foreground mb-1'>
-                                Period *
-                              </label>
-                              <input
-                                type='text'
-                                value={edu.period}
-                                onChange={e => {
+                            </FormField>
+                            <FormField label='Period' required>
+                              <ResumeInput
+                                value={`${edu.startDate} - ${edu.endDate || 'Present'}`}
+                                onChange={value => {
                                   const newEducation = [
                                     ...resumeData.education,
                                   ];
+                                  const [startDate, endDate] =
+                                    value.split(' - ');
                                   newEducation[index] = {
                                     ...edu,
-                                    period: e.target.value,
+                                    startDate: startDate || '',
+                                    endDate:
+                                      endDate === 'Present'
+                                        ? ''
+                                        : endDate || '',
                                   };
                                   handleDataUpdate('education', newEducation);
                                 }}
-                                className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                                 placeholder='2016 - 2020'
                               />
-                            </div>
-                            <div>
-                              <label className='block text-sm font-medium text-foreground mb-1'>
-                                GPA (Optional)
-                              </label>
-                              <input
-                                type='text'
+                            </FormField>
+                            <FormField label='GPA (Optional)'>
+                              <ResumeInput
                                 value={edu.gpa || ''}
-                                onChange={e => {
+                                onChange={value => {
                                   const newEducation = [
                                     ...resumeData.education,
                                   ];
-                                  newEducation[index] = {
-                                    ...edu,
-                                    gpa: e.target.value,
-                                  };
+                                  newEducation[index] = { ...edu, gpa: value };
                                   handleDataUpdate('education', newEducation);
                                 }}
-                                className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                                 placeholder='3.8/4.0'
                               />
-                            </div>
+                            </FormField>
                           </div>
-                          <div className='flex justify-end'>
-                            <Button
-                              variant='outline'
-                              size='sm'
-                              onClick={() => {
-                                const newEducation =
-                                  resumeData.education.filter(
-                                    (_, i) => i !== index
-                                  );
-                                handleDataUpdate('education', newEducation);
-                              }}
-                              className='text-red-600 hover:bg-red-50'
-                            >
-                              Remove Education
-                            </Button>
-                          </div>
-                        </div>
+                        </ItemCard>
                       ))}
                       <Button
                         variant='outline'
@@ -745,69 +718,74 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         }}
                         className='w-full'
                       >
-                        + Add Education
+                        ➕ Add Education
                       </Button>
-                    </div>
+                    </CollapsibleSection>
                   </Card>
 
                   {/* Projects */}
-                  <Card className='p-6'>
-                    <h3 className='text-lg font-semibold mb-4'>Projects</h3>
-                    <div className='space-y-4'>
+                  <Card>
+                    <CollapsibleSection
+                      title='Projects'
+                      icon='🚀'
+                      color='orange'
+                      count={resumeData.projects?.length || 0}
+                      countLabel={
+                        resumeData.projects?.length === 1
+                          ? 'project'
+                          : 'projects'
+                      }
+                      isExpanded={expandedSections.projects || false}
+                      onToggle={() => toggleSection('projects')}
+                    >
                       {resumeData.projects?.map((project, index) => (
-                        <div
+                        <ItemCard
                           key={project.id}
-                          className='border border-border rounded-lg p-4'
+                          onRemove={() => {
+                            const newProjects = (
+                              resumeData.projects || []
+                            ).filter((_, i) => i !== index);
+                            handleDataUpdate('projects', newProjects);
+                          }}
+                          removeLabel='Remove Project'
                         >
                           <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
-                            <div>
-                              <label className='block text-sm font-medium text-foreground mb-1'>
-                                Project Name *
-                              </label>
-                              <input
-                                type='text'
+                            <FormField label='Project Name' required>
+                              <ResumeInput
                                 value={project.name}
-                                onChange={e => {
+                                onChange={value => {
                                   const newProjects = [
                                     ...(resumeData.projects || []),
                                   ];
                                   newProjects[index] = {
                                     ...project,
-                                    name: e.target.value,
+                                    name: value,
                                   };
                                   handleDataUpdate('projects', newProjects);
                                 }}
-                                className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                                 placeholder='E-commerce Platform'
                               />
-                            </div>
-                            <div>
-                              <label className='block text-sm font-medium text-foreground mb-1'>
-                                Project Link (Optional)
-                              </label>
-                              <input
+                            </FormField>
+                            <FormField label='Project Link (Optional)'>
+                              <ResumeInput
                                 type='url'
-                                value={project.link || ''}
-                                onChange={e => {
+                                value={project.url || ''}
+                                onChange={value => {
                                   const newProjects = [
                                     ...(resumeData.projects || []),
                                   ];
                                   newProjects[index] = {
                                     ...project,
-                                    link: e.target.value,
+                                    url: value,
                                   };
                                   handleDataUpdate('projects', newProjects);
                                 }}
-                                className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                                 placeholder='https://github.com/username/project'
                               />
-                            </div>
+                            </FormField>
                           </div>
-                          <div className='mb-4'>
-                            <label className='block text-sm font-medium text-foreground mb-1'>
-                              Project Description
-                            </label>
-                            <RichTextEditor
+                          <FormField label='Project Description'>
+                            <RichTextInput
                               content={project.description}
                               onChange={content => {
                                 const newProjects = [
@@ -821,67 +799,33 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               }}
                               placeholder='Describe your project, technologies used, and your role...'
                               maxLength={800}
+                              context={`${project.name} project`}
+                              type='project'
                             />
-                            <div className='mt-2'>
-                              <AIAssistant
-                                onSuggestion={suggestion => {
-                                  const newProjects = [
-                                    ...(resumeData.projects || []),
-                                  ];
-                                  newProjects[index] = {
-                                    ...project,
-                                    description: suggestion,
-                                  };
-                                  handleDataUpdate('projects', newProjects);
-                                }}
-                                context={`${project.name} project`}
-                                type='project'
-                              />
-                            </div>
-                          </div>
-                          <div className='mb-4'>
-                            <label className='block text-sm font-medium text-foreground mb-1'>
-                              Technologies Used
-                            </label>
-                            <input
-                              type='text'
+                          </FormField>
+                          <FormField
+                            label='Technologies Used'
+                            helperText='Separate technologies with commas'
+                          >
+                            <ResumeInput
                               value={project.technologies.join(', ')}
-                              onChange={e => {
+                              onChange={value => {
                                 const newProjects = [
                                   ...(resumeData.projects || []),
                                 ];
                                 newProjects[index] = {
                                   ...project,
-                                  technologies: e.target.value
+                                  technologies: value
                                     .split(',')
                                     .map(s => s.trim())
                                     .filter(s => s),
                                 };
                                 handleDataUpdate('projects', newProjects);
                               }}
-                              className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                               placeholder='React, Node.js, MongoDB, AWS...'
                             />
-                            <p className='text-xs text-gray-500 mt-1'>
-                              Separate technologies with commas
-                            </p>
-                          </div>
-                          <div className='flex justify-end'>
-                            <Button
-                              variant='outline'
-                              size='sm'
-                              onClick={() => {
-                                const newProjects = (
-                                  resumeData.projects || []
-                                ).filter((_, i) => i !== index);
-                                handleDataUpdate('projects', newProjects);
-                              }}
-                              className='text-red-600 hover:bg-red-50'
-                            >
-                              Remove Project
-                            </Button>
-                          </div>
-                        </div>
+                          </FormField>
+                        </ItemCard>
                       ))}
                       <Button
                         variant='outline'
@@ -900,59 +844,63 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         }}
                         className='w-full'
                       >
-                        + Add Project
+                        ➕ Add Project
                       </Button>
-                    </div>
+                    </CollapsibleSection>
                   </Card>
 
                   {/* Skills */}
-                  <Card className='p-6'>
-                    <h3 className='text-lg font-semibold mb-4'>Skills</h3>
-                    <div className='space-y-4'>
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
-                          Technical Skills
-                        </label>
-                        <input
-                          type='text'
+                  <Card>
+                    <CollapsibleSection
+                      title='Skills'
+                      icon='⚡'
+                      color='cyan'
+                      count={
+                        resumeData.skills.technical.length +
+                        resumeData.skills.soft.length
+                      }
+                      countLabel='skills'
+                      isExpanded={true}
+                      onToggle={() => {}}
+                    >
+                      <FormField
+                        label='Technical Skills'
+                        required
+                        helperText='Separate skills with commas'
+                      >
+                        <ResumeInput
                           value={resumeData.skills.technical.join(', ')}
-                          onChange={e =>
+                          onChange={value =>
                             handleDataUpdate('skills', {
                               ...resumeData.skills,
-                              technical: e.target.value
+                              technical: value
                                 .split(',')
-                                .map(s => s.trim())
+                                .map(s => capitalizeFirstLetter(s.trim()))
                                 .filter(s => s),
                             })
                           }
-                          className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                           placeholder='JavaScript, React, Node.js, Python...'
                         />
-                        <p className='text-xs text-gray-500 mt-1'>
-                          Separate skills with commas
-                        </p>
-                      </div>
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
-                          Soft Skills
-                        </label>
-                        <input
-                          type='text'
+                      </FormField>
+                      <FormField
+                        label='Soft Skills'
+                        helperText='Separate skills with commas'
+                      >
+                        <ResumeInput
                           value={resumeData.skills.soft.join(', ')}
-                          onChange={e =>
+                          onChange={value =>
                             handleDataUpdate('skills', {
                               ...resumeData.skills,
-                              soft: e.target.value
+                              soft: value
                                 .split(',')
-                                .map(s => s.trim())
+                                .map(s => capitalizeFirstLetter(s.trim()))
                                 .filter(s => s),
                             })
                           }
-                          className='w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-background text-foreground'
                           placeholder='Leadership, Communication, Problem Solving...'
                         />
-                      </div>
-                    </div>
+                      </FormField>
+                    </CollapsibleSection>
                   </Card>
 
                   {/* Certifications */}
@@ -974,14 +922,13 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                                 ...(resumeData.certifications || []),
                               ];
                               newCerts[index] = {
-                                id: `cert-${index}`,
                                 name: e.target.value,
                                 issuer: '',
                                 date: '',
                               };
                               handleDataUpdate('certifications', newCerts);
                             }}
-                            className='flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent'
+                            className='flex-1 px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
                             placeholder='AWS Certified Solutions Architect'
                           />
                           <Button
@@ -1033,7 +980,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               newAchievements[index] = e.target.value;
                               handleDataUpdate('achievements', newAchievements);
                             }}
-                            className='flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent'
+                            className='flex-1 px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
                             placeholder='Led team of 5 developers to deliver project 2 weeks early'
                           />
                           <Button
@@ -1301,6 +1248,24 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 )}
               </div>
             </Card>
+
+            {/* Preview with Templates */}
+            <div className='mt-8 text-center'>
+              <Button
+                onClick={() => {
+                  // Save current data to localStorage and navigate to templates
+                  localStorage.setItem(
+                    'resumeBuilderData',
+                    JSON.stringify(resumeData)
+                  );
+                  window.location.href = '/resume/templates';
+                }}
+                className='bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-3 text-lg font-semibold mb-6'
+              >
+                <span className='mr-2'>👁️</span>
+                Preview with Templates
+              </Button>
+            </div>
 
             {/* Export Options */}
             <div className='mt-8 text-center'>

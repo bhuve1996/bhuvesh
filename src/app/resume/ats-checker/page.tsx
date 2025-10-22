@@ -343,7 +343,8 @@ export default function ATSCheckerPage() {
               <div className='text-center'>
                 <button
                   onClick={handleNewUpload}
-                  className='px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg'
+                  className='px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background'
+                  aria-label='Analyze another resume'
                 >
                   📄 Analyze Another Resume
                 </button>

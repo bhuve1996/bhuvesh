@@ -52,7 +52,7 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
                   ? 'Analyzing Your Resume'
                   : 'Analysis Complete!'}
             </h3>
-            <p className='text-gray-400 mb-4'>
+            <p className='text-muted-foreground mb-4'>
               {progress.error
                 ? 'There was an error processing your resume. Please try again.'
                 : progress.isAnalyzing
@@ -119,7 +119,7 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
             <h3 className='text-xl font-bold mb-4 text-foreground'>
               Ready to Analyze
             </h3>
-            <p className='text-gray-300 mb-6'>
+            <p className='text-muted-foreground mb-6'>
               Your resume{' '}
               <span className='text-cyan-400 font-medium'>{file.name}</span> is
               ready for analysis.
@@ -127,7 +127,7 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
 
             {/* Job Description Toggle */}
             <div className='mb-6'>
-              <label className='flex items-center space-x-2 text-gray-300 cursor-pointer'>
+              <label className='flex items-center space-x-2 text-foreground cursor-pointer'>
                 <input
                   type='checkbox'
                   checked={showJDInput}
@@ -144,9 +144,9 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
             {/* Job Description Input */}
             {showJDInput && (
               <div className='mb-6'>
-                <label className='block text-sm font-medium text-gray-300 mb-2'>
+                <label className='block text-sm font-medium text-foreground mb-2'>
                   Job Description
-                  <span className='text-xs text-gray-500 ml-2'>
+                  <span className='text-xs text-muted-foreground ml-2'>
                     (paste the full job posting)
                   </span>
                 </label>
@@ -165,9 +165,9 @@ Requirements:
 - Experience with React, Node.js, and modern web frameworks
 - Knowledge of SQL databases
 - Experience with AWS, Docker, Kubernetes'
-                  className='w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none'
+                  className='w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none'
                 />
-                <p className='text-xs text-gray-500 mt-1'>
+                <p className='text-xs text-muted-foreground mt-1'>
                   {jobDescription.length} characters (minimum 50 recommended)
                 </p>
               </div>
@@ -209,7 +209,7 @@ Requirements:
                       }}
                     ></div>
                   </div>
-                  <p className='text-sm text-gray-400 mt-2'>
+                  <p className='text-sm text-muted-foreground mt-2'>
                     {progress.steps[progress.currentStep]?.description ||
                       'Processing...'}
                   </p>

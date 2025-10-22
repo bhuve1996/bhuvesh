@@ -1762,15 +1762,30 @@ class ATSAnalyzer:
                 import json
 
                 try:
-                    technical_list = json.loads(response.text.strip())
+                    # Try to extract JSON from the response
+                    response_text = response.text.strip()
+                    
+                    # First try direct parsing
+                    try:
+                        technical_list = json.loads(response_text)
+                    except json.JSONDecodeError:
+                        # Try to find JSON array in the response
+                        import re
+                        json_match = re.search(r'\[.*?\]', response_text, re.DOTALL)
+                        if json_match:
+                            technical_list = json.loads(json_match.group())
+                        else:
+                            raise json.JSONDecodeError("No JSON array found", response_text, 0)
+                    
                     print(
                         f"✅ AI classified {len(technical_list)} technical keywords from {len(keywords)} total keywords"
                     )
                     return set(technical_list)
-                except json.JSONDecodeError:
+                except json.JSONDecodeError as e:
                     print(
-                        "⚠️  Failed to parse AI keyword classification, using fallback"
+                        f"⚠️  Failed to parse AI keyword classification: {e}"
                     )
+                    print(f"Raw AI response: {response.text[:200]}...")
                     return self._rule_based_technical_classification(keywords)
             else:
                 return self._rule_based_technical_classification(keywords)
@@ -2026,15 +2041,30 @@ class ATSAnalyzer:
                 import json
 
                 try:
-                    ai_keywords = json.loads(response.text.strip())
+                    # Try to extract JSON from the response
+                    response_text = response.text.strip()
+                    
+                    # First try direct parsing
+                    try:
+                        ai_keywords = json.loads(response_text)
+                    except json.JSONDecodeError:
+                        # Try to find JSON array in the response
+                        import re
+                        json_match = re.search(r'\[.*?\]', response_text, re.DOTALL)
+                        if json_match:
+                            ai_keywords = json.loads(json_match.group())
+                        else:
+                            raise json.JSONDecodeError("No JSON array found", response_text, 0)
+                    
                     print(
                         f"✅ AI extracted {len(ai_keywords)} technical keywords from resume"
                     )
                     return ai_keywords
-                except json.JSONDecodeError:
+                except json.JSONDecodeError as e:
                     print(
-                        "⚠️  Failed to parse AI resume keyword extraction, using fallback"
+                        f"⚠️  Failed to parse AI resume keyword extraction: {e}"
                     )
+                    print(f"Raw AI response: {response.text[:200]}...")
                     return self._extract_keywords(resume_text)
             else:
                 return self._extract_keywords(resume_text)

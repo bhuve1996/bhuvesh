@@ -107,7 +107,11 @@ export default function Blog() {
   return (
     <div className='min-h-screen bg-background text-foreground'>
       {/* Navigation */}
-      <nav className='fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b border-border'>
+      <nav
+        className='fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b border-border'
+        role='navigation'
+        aria-label='Main navigation'
+      >
         <div className='max-w-6xl mx-auto px-6 py-4'>
           <div className='flex justify-between items-center'>
             <div className='flex items-center space-x-2'>
@@ -119,29 +123,43 @@ export default function Blog() {
               <span className='text-xl font-bold text-foreground'>Bhuvesh</span>
             </div>
 
-            <div className='hidden md:flex items-center space-x-8'>
+            <div
+              className='hidden md:flex items-center space-x-8'
+              role='menubar'
+              aria-label='Main menu'
+            >
               <Link
                 href='/'
-                className='text-gray-300 hover:text-white transition-colors duration-300'
+                className='text-muted-foreground hover:text-foreground transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
+                role='menuitem'
+                aria-label='Go to home page'
               >
                 Home
               </Link>
               <Link
                 href='/#about'
-                className='text-gray-300 hover:text-white transition-colors duration-300'
+                className='text-muted-foreground hover:text-foreground transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
+                role='menuitem'
+                aria-label='Go to about section'
               >
                 About
               </Link>
               <Link
                 href='/#projects'
-                className='text-gray-300 hover:text-white transition-colors duration-300'
+                className='text-muted-foreground hover:text-foreground transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
+                role='menuitem'
+                aria-label='Go to projects section'
               >
                 Projects
               </Link>
-              <span className='text-cyan-400'>Blog</span>
+              <span className='text-primary-400' aria-current='page'>
+                Blog
+              </span>
               <Link
                 href='/#contact'
-                className='text-gray-300 hover:text-white transition-colors duration-300'
+                className='text-muted-foreground hover:text-foreground transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
+                role='menuitem'
+                aria-label='Go to contact section'
               >
                 Contact
               </Link>
@@ -151,12 +169,15 @@ export default function Blog() {
       </nav>
 
       {/* Hero Section */}
-      <section className='pt-32 pb-16 px-6'>
+      <section className='pt-32 pb-16 px-6' aria-labelledby='blog-title'>
         <div className='max-w-4xl mx-auto text-center'>
-          <h1 className='text-5xl md:text-6xl font-bold mb-6 text-cyan-400'>
+          <h1
+            id='blog-title'
+            className='text-5xl md:text-6xl font-bold mb-6 text-primary-400'
+          >
             My Blog
           </h1>
-          <p className='text-xl text-gray-300 mb-8 max-w-2xl mx-auto'>
+          <p className='text-xl text-muted-foreground mb-8 max-w-2xl mx-auto'>
             Thoughts, tutorials, and insights about web development, technology,
             and the journey of building digital experiences.
           </p>
@@ -164,9 +185,12 @@ export default function Blog() {
       </section>
 
       {/* Featured Posts */}
-      <section className='px-6 pb-16'>
+      <section className='px-6 pb-16' aria-labelledby='featured-posts-title'>
         <div className='max-w-6xl mx-auto'>
-          <h2 className='text-3xl font-bold text-white mb-8'>
+          <h2
+            id='featured-posts-title'
+            className='text-3xl font-bold text-foreground mb-8'
+          >
             Featured Articles
           </h2>
           <div className='grid md:grid-cols-3 lg:grid-cols-4 gap-8'>
@@ -174,22 +198,27 @@ export default function Blog() {
               <article
                 key={post.id}
                 className='bg-card/5 backdrop-blur-sm border border-border rounded-2xl p-6 hover:bg-card/10 transition-colors group cursor-pointer'
+                aria-labelledby={`featured-post-${post.id}-title`}
+                role='article'
               >
                 <div className='mb-4'>
-                  <span className='bg-cyan-400/20 text-cyan-400 px-3 py-1 rounded-full text-sm font-semibold'>
+                  <span className='bg-primary-400/20 text-primary-400 px-3 py-1 rounded-full text-sm font-semibold'>
                     {post.category}
                   </span>
                 </div>
 
-                <h3 className='text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors'>
+                <h3
+                  id={`featured-post-${post.id}-title`}
+                  className='text-xl font-bold text-foreground mb-3 group-hover:text-primary-400 transition-colors'
+                >
                   {post.title}
                 </h3>
 
-                <p className='text-gray-300 mb-4 leading-relaxed'>
+                <p className='text-muted-foreground mb-4 leading-relaxed'>
                   {post.excerpt}
                 </p>
 
-                <div className='flex items-center justify-between text-sm text-gray-400 mb-4'>
+                <div className='flex items-center justify-between text-sm text-muted-foreground mb-4'>
                   <span>{post.date}</span>
                   <span>{post.readTime}</span>
                 </div>
@@ -198,14 +227,17 @@ export default function Blog() {
                   {post.tags.slice(0, 3).map(tag => (
                     <span
                       key={tag}
-                      className='bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-xs'
+                      className='bg-muted/50 text-muted-foreground px-2 py-1 rounded text-xs'
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
 
-                <button className='text-cyan-400 hover:text-cyan-300 font-semibold transition-colors'>
+                <button
+                  className='text-primary-400 hover:text-primary-300 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
+                  aria-label={`Read more about ${post.title}`}
+                >
                   Read More →
                 </button>
               </article>
@@ -215,25 +247,35 @@ export default function Blog() {
       </section>
 
       {/* All Posts */}
-      <section className='px-6 pb-20'>
+      <section className='px-6 pb-20' aria-labelledby='all-posts-title'>
         <div className='max-w-6xl mx-auto'>
           <div className='flex flex-col md:flex-row gap-8'>
             {/* Sidebar */}
             <div className='md:w-1/4'>
               <div className='bg-card/5 backdrop-blur-sm border border-border rounded-2xl p-6 sticky top-32'>
-                <h3 className='text-xl font-bold text-foreground mb-4'>
+                <h3
+                  id='categories-title'
+                  className='text-xl font-bold text-foreground mb-4'
+                >
                   Categories
                 </h3>
-                <div className='space-y-2'>
+                <div
+                  className='space-y-2'
+                  role='list'
+                  aria-labelledby='categories-title'
+                >
                   {categories.map(category => (
                     <button
                       key={category}
                       onClick={() => setSelectedCategory(category)}
-                      className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                      className={`w-full text-left px-3 py-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background ${
                         selectedCategory === category
-                          ? 'bg-cyan-400/20 text-cyan-400'
-                          : 'text-gray-300 hover:text-white hover:bg-white/5'
+                          ? 'bg-primary-400/20 text-primary-400'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/5'
                       }`}
+                      role='button'
+                      aria-pressed={selectedCategory === category}
+                      aria-label={`Filter posts by ${category} category`}
                     >
                       {category}
                     </button>
@@ -244,7 +286,10 @@ export default function Blog() {
 
             {/* Posts List */}
             <div className='md:w-3/4'>
-              <h2 className='text-3xl font-bold text-white mb-8'>
+              <h2
+                id='all-posts-title'
+                className='text-3xl font-bold text-foreground mb-8'
+              >
                 {selectedCategory === 'all' ? 'All Articles' : selectedCategory}
               </h2>
 
@@ -253,11 +298,13 @@ export default function Blog() {
                   <article
                     key={post.id}
                     className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8 hover:bg-white/10 transition-colors group cursor-pointer'
+                    aria-labelledby={`post-${post.id}-title`}
+                    role='article'
                   >
                     <div className='flex flex-col md:flex-row gap-6'>
                       <div className='md:w-2/3'>
                         <div className='flex items-center gap-4 mb-4'>
-                          <span className='bg-cyan-400/20 text-cyan-400 px-3 py-1 rounded-full text-sm font-semibold'>
+                          <span className='bg-primary-400/20 text-primary-400 px-3 py-1 rounded-full text-sm font-semibold'>
                             {post.category}
                           </span>
                           {post.featured && (
@@ -267,15 +314,18 @@ export default function Blog() {
                           )}
                         </div>
 
-                        <h3 className='text-2xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors'>
+                        <h3
+                          id={`post-${post.id}-title`}
+                          className='text-2xl font-bold text-foreground mb-3 group-hover:text-primary-400 transition-colors'
+                        >
                           {post.title}
                         </h3>
 
-                        <p className='text-gray-300 mb-4 leading-relaxed'>
+                        <p className='text-muted-foreground mb-4 leading-relaxed'>
                           {post.excerpt}
                         </p>
 
-                        <div className='flex items-center justify-between text-sm text-gray-400 mb-4'>
+                        <div className='flex items-center justify-between text-sm text-muted-foreground mb-4'>
                           <span>{post.date}</span>
                           <span>{post.readTime}</span>
                         </div>
@@ -284,14 +334,17 @@ export default function Blog() {
                           {post.tags.map(tag => (
                             <span
                               key={tag}
-                              className='bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-xs'
+                              className='bg-muted/50 text-muted-foreground px-2 py-1 rounded text-xs'
                             >
                               {tag}
                             </span>
                           ))}
                         </div>
 
-                        <button className='text-cyan-400 hover:text-cyan-300 font-semibold transition-colors'>
+                        <button
+                          className='text-primary-400 hover:text-primary-300 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
+                          aria-label={`Read full article: ${post.title}`}
+                        >
                           Read Full Article →
                         </button>
                       </div>

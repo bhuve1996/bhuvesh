@@ -1,33 +1,38 @@
-// Resume Builder Types
-export interface PersonalInfo {
-  fullName: string;
-  email: string;
-  phone: string;
-  location: string;
-  linkedin?: string;
-  github?: string;
-  portfolio?: string;
-  website?: string;
-}
+import type {
+  ATSCompatibility,
+  Certification,
+  DetailedScores,
+  ExtractionDetails,
+  FormatAnalysis,
+  StructuredExperience,
+} from './ats';
 
-export interface WorkExperience {
+// Re-export ATS types with Resume Builder naming for compatibility
+export type {
+  Certification,
+  Education,
+  ContactInfo as PersonalInfo,
+  Project,
+  SkillsFound as Skills,
+  WorkExperience,
+} from './ats';
+
+// Resume Builder specific interfaces (standalone, not extending ATS types)
+export interface ResumeBuilderWorkExperience {
   id: string;
   company: string;
   position: string;
-  title?: string; // Add missing title property
   location: string;
   startDate: string;
   endDate?: string;
   current: boolean;
   description: string;
   achievements: string[];
-  period?: string; // Add missing period property
 }
 
-export interface Education {
+export interface ResumeBuilderEducation {
   id: string;
   institution: string;
-  school?: string; // Add missing school property
   degree: string;
   field: string;
   location: string;
@@ -36,59 +41,45 @@ export interface Education {
   current: boolean;
   gpa?: string;
   honors?: string[];
-  period?: string; // Add missing period property
 }
 
-export interface Project {
+export interface ResumeBuilderProject {
   id: string;
   name: string;
   description: string;
   technologies: string[];
   url?: string;
   github?: string;
-  link?: string; // Add missing link property
   startDate: string;
   endDate?: string;
 }
 
-export interface Certification {
-  id: string;
-  name: string;
-  issuer: string;
-  date: string;
-  expiry?: string;
-  credentialId?: string;
-  url?: string;
-}
-
-export interface Skills {
-  technical: string[];
-  business: string[];
-  soft: string[];
-  languages: string[];
-  certifications: string[];
-}
-
+// Resume Builder Data Structure using ATS types
 export interface ResumeData {
-  personal: PersonalInfo;
+  personal: {
+    fullName: string;
+    email: string;
+    phone: string;
+    location: string;
+    linkedin?: string;
+    github?: string;
+    portfolio?: string;
+  };
   summary?: string;
-  experience: WorkExperience[];
-  education: Education[];
-  skills: Skills;
-  projects: Project[];
+  experience: ResumeBuilderWorkExperience[];
+  education: ResumeBuilderEducation[];
+  skills: {
+    technical: string[];
+    business: string[];
+    soft: string[];
+    languages: string[];
+    certifications: string[];
+  };
+  projects: ResumeBuilderProject[];
   achievements?: string[];
   certifications?: Certification[];
   hobbies?: string[];
 }
-
-// Import ATS types for proper typing
-import type {
-  ATSCompatibility,
-  DetailedScores,
-  ExtractionDetails,
-  FormatAnalysis,
-  StructuredExperience,
-} from './ats';
 
 // ATS Analysis Result Types
 export interface AnalysisResult {

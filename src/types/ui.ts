@@ -128,6 +128,11 @@ export interface ProgressProps {
 export interface EnhancedCardProps extends CardProps {
   delay?: number;
   onClick?: () => void; // Add missing onClick property
+  role?: string;
+  tabIndex?: number;
+  'aria-pressed'?: boolean;
+  'aria-label'?: string;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
 }
 
 // Animated Score Component Types

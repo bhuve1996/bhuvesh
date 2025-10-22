@@ -89,18 +89,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
   return (
     <Card className='p-8'>
       <div className='text-center'>
-        <h2 className='text-2xl font-bold mb-4 text-white'>
+        <h2 className='text-2xl font-bold mb-4 text-foreground'>
           Upload Your Resume
         </h2>
-        <p className='text-gray-300 mb-6'>
+        <p className='text-muted-foreground mb-6'>
           Drag and drop your resume file or click to browse
         </p>
 
         <div
           className={`border-2 border-dashed rounded-lg p-8 transition-colors ${
             isDragOver
-              ? 'border-cyan-400 bg-cyan-400/10'
-              : 'border-gray-600 hover:border-gray-500'
+              ? 'border-primary-500 bg-primary-500/10'
+              : 'border-border hover:border-primary-500'
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -124,12 +124,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
             </div>
 
             <div>
-              <p className='text-lg font-medium text-white'>
+              <p className='text-lg font-medium text-foreground'>
                 {isDragOver
                   ? 'Drop your file here'
                   : 'Choose a file or drag it here'}
               </p>
-              <p className='text-sm text-gray-400 mt-1'>
+              <p className='text-sm text-muted-foreground mt-1'>
                 Supports PDF, DOCX, DOC, and TXT files (Max 10MB)
               </p>
             </div>
@@ -143,7 +143,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
             />
             <label
               htmlFor='file-upload'
-              className='px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-lg hover:from-cyan-500 hover:to-blue-600 transition-all cursor-pointer font-medium'
+              className='px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-primary-foreground rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all cursor-pointer font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background'
             >
               Browse Files
             </label>

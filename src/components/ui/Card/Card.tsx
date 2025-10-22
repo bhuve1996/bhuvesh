@@ -10,6 +10,12 @@ export const Card: React.FC<EnhancedCardProps> = ({
   className = '',
   hover = true,
   delay = 0,
+  onClick,
+  role,
+  tabIndex,
+  'aria-pressed': ariaPressed,
+  'aria-label': ariaLabel,
+  onKeyDown,
   ...props
 }) => {
   const baseClasses =
@@ -39,6 +45,12 @@ export const Card: React.FC<EnhancedCardProps> = ({
             }
           : {}
       }
+      onClick={onClick}
+      role={role}
+      tabIndex={tabIndex}
+      aria-pressed={ariaPressed}
+      aria-label={ariaLabel}
+      onKeyDown={onKeyDown}
       {...props}
     >
       {/* Animated background gradient */}

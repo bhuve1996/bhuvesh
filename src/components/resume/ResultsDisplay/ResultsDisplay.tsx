@@ -6,14 +6,8 @@ import React, { useCallback, useState } from 'react';
 
 import { ImprovementPlan } from '@/components/resume/ImprovementPlan';
 import { AnimatedScore, Card, DataVisualization, Tabs } from '@/components/ui';
-import type {
-  ATSEducation,
-  ATSWorkExperience,
-  AnalysisResult,
-  ImprovementItem,
-  StructuredEducation,
-  StructuredWorkExperience,
-} from '@/types';
+import { mapATSToResumeData } from '@/lib/utils/atsToResumeMapper';
+import type { AnalysisResult, ImprovementItem } from '@/types';
 
 import { AnalysisDataDisplay } from './AnalysisDataDisplay';
 import { TabbedParsedDataDisplay } from './TabbedParsedDataDisplay';
@@ -38,146 +32,12 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
   const [loadingImprovements, setLoadingImprovements] = useState(false);
 
   const convertToResumeData = useCallback(() => {
+    // Use the unified mapper to convert ATS data to Resume Builder format
     if (!result.extraction_details) return null;
-
-    const extracted = result.extraction_details;
-
-    // Debug logging removed for production
-
-    // Use structured_experience if available, otherwise fall back to categorized_resume
-    const structuredData = result.structured_experience;
-    const categorizedData = extracted.categorized_resume;
-
-    // Convert extracted data to ResumeData format
-    const resumeData = {
-      personal: {
-        fullName:
-          structuredData?.contact_info?.full_name ||
-          categorizedData?.contact_info?.full_name ||
-          '',
-        email:
-          structuredData?.contact_info?.email ||
-          categorizedData?.contact_info?.email ||
-          '',
-        phone:
-          structuredData?.contact_info?.phone ||
-          (typeof categorizedData?.contact_info?.phone === 'object'
-            ? categorizedData?.contact_info?.phone?.raw ||
-              categorizedData?.contact_info?.phone?.number ||
-              ''
-            : categorizedData?.contact_info?.phone || ''),
-        location:
-          structuredData?.contact_info?.location ||
-          (typeof categorizedData?.contact_info?.location === 'object'
-            ? categorizedData?.contact_info?.location?.full ||
-              `${categorizedData?.contact_info?.location?.city || ''}, ${categorizedData?.contact_info?.location?.state || ''}, ${categorizedData?.contact_info?.location?.country || ''}`
-                .replace(/^,\s*|,\s*$/g, '')
-                .replace(/,\s*,/g, ',')
-            : categorizedData?.contact_info?.location || ''),
-        linkedin:
-          structuredData?.contact_info?.linkedin ||
-          (typeof categorizedData?.contact_info?.linkedin === 'object'
-            ? categorizedData?.contact_info?.linkedin?.url || ''
-            : categorizedData?.contact_info?.linkedin || ''),
-        github:
-          structuredData?.contact_info?.github ||
-          (typeof categorizedData?.contact_info?.github === 'object'
-            ? categorizedData?.contact_info?.github?.url || ''
-            : categorizedData?.contact_info?.github || ''),
-        portfolio: categorizedData?.contact_info?.portfolio || '',
-      },
-      summary:
-        structuredData?.summary || categorizedData?.summary_profile || '',
-      experience:
-        structuredData?.work_experience?.map(
-          (exp: StructuredWorkExperience, index: number) => ({
-            id: `job-${index}`,
-            position: exp.positions?.[0]?.title || '',
-            company: exp.company || '',
-            location: '',
-            startDate: exp.positions?.[0]?.start_date || '',
-            endDate: exp.positions?.[0]?.end_date || '',
-            current: exp.current || false,
-            description: exp.responsibilities?.join('\n') || '',
-            achievements: exp.achievements || [],
-          })
-        ) ||
-        categorizedData?.work_experience?.map(
-          (exp: ATSWorkExperience, index: number) => ({
-            id: `job-${index}`,
-            position: exp.role || '',
-            company: exp.company || '',
-            location: exp.location || '',
-            startDate: exp.start_date || '',
-            endDate: exp.end_date || '',
-            current: false,
-            description: '',
-            achievements: [],
-          })
-        ) ||
-        [],
-      education:
-        structuredData?.education?.map(
-          (edu: StructuredEducation, index: number) => ({
-            id: `edu-${index}`,
-            degree: edu.degree || '',
-            institution: edu.institution || '',
-            field: '', // This could be extracted from degree if needed
-            location: edu.location || '',
-            startDate: '', // Could be estimated from graduation year
-            endDate: edu.graduation_year || '',
-            current: false,
-            gpa: edu.gpa || '',
-            honors: [],
-          })
-        ) ||
-        categorizedData?.education?.map((edu: ATSEducation, index: number) => ({
-          id: `edu-${index}`,
-          degree: edu.degree_full || '',
-          institution: edu.institution?.name || '',
-          field: edu.major || edu.specialization || '',
-          location: edu.institution?.location || '',
-          startDate: edu.duration?.start_year || '',
-          endDate: edu.duration?.end_year || '',
-          current: false,
-          gpa: edu.grade?.value || '',
-          honors: [],
-        })) ||
-        [],
-      skills: {
-        technical: [
-          ...(extracted.skills_found?.technical_programming || []),
-          ...(extracted.skills_found?.technical_tools || []),
-          ...(extracted.skills_found?.tools_software || []),
-        ],
-        business: [
-          ...(extracted.skills_found?.business_management || []),
-          ...(extracted.skills_found?.financial_accounting || []),
-          ...(extracted.skills_found?.sales_marketing || []),
-          ...(extracted.skills_found?.customer_service || []),
-        ],
-        soft: [...(extracted.skills_found?.soft_skills || [])],
-        languages: [
-          ...(extracted.skills_found?.languages_spoken || []),
-          ...(extracted.languages || []),
-        ],
-        certifications: [
-          ...(extracted.skills_found?.certifications || []),
-          ...(extracted.certifications || []),
-        ],
-      },
-      projects: [],
-      achievements:
-        structuredData?.work_experience?.flatMap(
-          exp => exp.achievements || []
-        ) ||
-        categorizedData?.achievements ||
-        [],
-      hobbies: extracted.hobbies_interests || [],
-    };
-
-    // Resume data converted successfully
-    return resumeData;
+    return mapATSToResumeData(
+      result.extraction_details,
+      result.structured_experience
+    );
   }, [result.extraction_details, result.structured_experience]);
 
   const handleEditInBuilder = useCallback(() => {
