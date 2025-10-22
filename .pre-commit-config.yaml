@@ -19,11 +19,11 @@ repos:
         types: [file]
         additional_dependencies:
           - eslint@^8.55.0
-          - "@typescript-eslint/eslint-plugin@^6.0.0"
-          - "@typescript-eslint/parser@^6.0.0"
-          - "eslint-plugin-import@^2.29.0"
-          - "eslint-plugin-react@^7.33.0"
-          - "eslint-plugin-react-hooks@^4.6.0"
+          - '@typescript-eslint/eslint-plugin@^6.0.0'
+          - '@typescript-eslint/parser@^6.0.0'
+          - 'eslint-plugin-import@^2.29.0'
+          - 'eslint-plugin-react@^7.33.0'
+          - 'eslint-plugin-react-hooks@^4.6.0'
         args: [--fix, --max-warnings=0]
 
   # Frontend: Prettier
@@ -37,14 +37,24 @@ repos:
           - prettier@^3.1.0
 
   # Frontend: TypeScript check
-  - repo: https://github.com/pre-commit/mirrors-typescript
-    rev: v5.3.0
+  - repo: local
     hooks:
-      - id: tsc
+      - id: typescript-check
+        name: TypeScript check
+        entry: npx tsc --noEmit
+        language: system
         files: ^src/.*\.(ts|tsx)$
-        types: [file]
-        additional_dependencies:
-          - typescript@^5.3.0
+        pass_filenames: false
+
+  # Frontend: Build check
+  - repo: local
+    hooks:
+      - id: npm-build
+        name: npm build
+        entry: npm run build
+        language: system
+        files: ^(src/|package\.json|next\.config\.ts|tailwind\.config\.js|tsconfig\.json)$
+        pass_filenames: false
 
   # Backend: Black code formatter
   - repo: https://github.com/psf/black

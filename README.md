@@ -3,6 +3,7 @@
 A modern, full-stack portfolio website featuring an advanced ATS (Applicant Tracking System) resume checker powered by AI and semantic matching.
 
 <!-- Updated: Testing pre-commit hook with build check -->
+<!-- Added npm run build to pre-commit hooks -->
 
 ## ✨ Features
 
