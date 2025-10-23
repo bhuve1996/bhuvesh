@@ -32,7 +32,8 @@ export const PaginatedTemplatePreview: React.FC<
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft' && currentPage > 0) {
         setCurrentPage(prev => prev - 1);
-      } else if (e.key === 'ArrowRight' && currentPage < 10) { // Use a reasonable max
+      } else if (e.key === 'ArrowRight' && currentPage < 10) {
+        // Use a reasonable max
         setCurrentPage(prev => prev + 1);
       }
     };

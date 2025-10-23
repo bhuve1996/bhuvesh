@@ -576,17 +576,19 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                       >
                         {project.name}
                       </h3>
-                      {'link' in project && typeof project.link === 'string' && project.link && (
-                        <a
-                          href={project.link}
-                          target='_blank'
-                          rel='noopener noreferrer'
-                          className='text-xs text-blue-600 hover:underline'
-                          style={{ fontFamily: '"Roboto", sans-serif' }}
-                        >
-                          View Project →
-                        </a>
-                      )}
+                      {'link' in project &&
+                        typeof project.link === 'string' &&
+                        project.link && (
+                          <a
+                            href={project.link}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-xs text-blue-600 hover:underline'
+                            style={{ fontFamily: '"Roboto", sans-serif' }}
+                          >
+                            View Project →
+                          </a>
+                        )}
                     </div>
                     <span
                       className='text-xs'

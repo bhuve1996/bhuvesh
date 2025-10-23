@@ -29,11 +29,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
         Skip to main content
       </a>
       <Navigation />
-      <main
-        id='main-content'
-        className='min-h-screen'
-        tabIndex={-1}
-      >
+      <main id='main-content' className='min-h-screen' tabIndex={-1}>
         <div className='container mx-auto px-4 sm:px-6 lg:px-8'>{children}</div>
       </main>
       <Footer />
