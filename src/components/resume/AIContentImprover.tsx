@@ -102,7 +102,7 @@ export const AIContentImprover: React.FC<AIContentImproverProps> = ({
             key={key}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 * sections.indexOf({ key, label, icon }) }}
+            transition={{ delay: 0.1 * sections.findIndex(s => s.key === key) }}
             className='flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700'
           >
             <div className='flex items-center space-x-3'>

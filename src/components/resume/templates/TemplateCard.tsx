@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 import { Card } from '@/components/ui/Card';
-import { ResumeTemplate } from '@/types/resume';
+import { ResumeData, ResumeTemplate } from '@/types/resume';
 
 import { ImprovedPaginatedTemplatePreview } from './ImprovedPaginatedTemplatePreview';
 
@@ -103,7 +103,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
             <div className='w-full h-full flex items-center justify-center relative overflow-hidden'>
               {/* Gradient Overlay */}
               <div className='absolute inset-0 bg-gradient-to-br from-cyan-400/3 via-transparent to-blue-500/3 sm:from-cyan-400/5 sm:to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100'></div>
-              
+
               {/* Theme Color Bars */}
               <div className='absolute inset-0 flex flex-col'>
                 <div
@@ -197,7 +197,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
             <div className='aspect-[4/3] bg-white rounded-lg mb-2 overflow-hidden shadow-sm border border-slate-200'>
               <ImprovedPaginatedTemplatePreview
                 template={template}
-                data={template.sampleData}
+                data={template.sampleData as ResumeData}
                 className='w-full h-full'
                 maxHeight='200px'
               />

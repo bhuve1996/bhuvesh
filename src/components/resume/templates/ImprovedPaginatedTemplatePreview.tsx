@@ -66,17 +66,17 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
         'Ensure contact information is complete and professional',
         'Keep summary concise (2-3 sentences)',
         'Use action verbs and quantifiable achievements',
-        'Include relevant keywords from job descriptions'
+        'Include relevant keywords from job descriptions',
       ],
       content: (
         <div className='space-y-6'>
           {/* Header */}
           <div
             className='text-center p-4 border-b-2'
-            style={{ 
+            style={{
               borderColor: `${colors.accent}40`,
               borderBottomWidth: '2px',
-              borderBottomStyle: 'solid'
+              borderBottomStyle: 'solid',
             }}
           >
             <h1
@@ -86,19 +86,19 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                 fontSize: '18px',
                 color: colors.primary,
                 fontWeight: '700',
-                letterSpacing: '0.5px'
+                letterSpacing: '0.5px',
               }}
             >
               {data.personal?.fullName || 'John Doe'}
             </h1>
             <div
               className='flex flex-wrap justify-center gap-3 text-xs'
-              style={{ 
+              style={{
                 color: colors.secondary,
-                fontFamily: '"Roboto", "Helvetica", sans-serif'
+                fontFamily: '"Roboto", "Helvetica", sans-serif',
               }}
             >
-              <a 
+              <a
                 href={`mailto:${data.personal?.email || 'john.doe@email.com'}`}
                 className='hover:underline hover:text-blue-600 transition-colors px-2 py-1 rounded-md hover:bg-blue-50'
                 style={{ color: colors.secondary }}
@@ -108,7 +108,7 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
               {data.personal?.phone && (
                 <>
                   <span className='text-gray-400'>•</span>
-                  <a 
+                  <a
                     href={`tel:${data.personal.phone}`}
                     className='hover:underline hover:text-blue-600 transition-colors px-2 py-1 rounded-md hover:bg-blue-50'
                     style={{ color: colors.secondary }}
@@ -126,8 +126,12 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
               {data.personal?.linkedin && (
                 <>
                   <span className='text-gray-400'>•</span>
-                  <a 
-                    href={data.personal.linkedin.startsWith('http') ? data.personal.linkedin : `https://linkedin.com/in/${data.personal.linkedin}`}
+                  <a
+                    href={
+                      data.personal.linkedin.startsWith('http')
+                        ? data.personal.linkedin
+                        : `https://linkedin.com/in/${data.personal.linkedin}`
+                    }
                     target='_blank'
                     rel='noopener noreferrer'
                     className='hover:underline hover:text-blue-600 transition-colors px-2 py-1 rounded-md hover:bg-blue-50'
@@ -140,8 +144,12 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
               {data.personal?.github && (
                 <>
                   <span className='text-gray-400'>•</span>
-                  <a 
-                    href={data.personal.github.startsWith('http') ? data.personal.github : `https://github.com/${data.personal.github}`}
+                  <a
+                    href={
+                      data.personal.github.startsWith('http')
+                        ? data.personal.github
+                        : `https://github.com/${data.personal.github}`
+                    }
                     target='_blank'
                     rel='noopener noreferrer'
                     className='hover:underline hover:text-blue-600 transition-colors px-2 py-1 rounded-md hover:bg-blue-50'
@@ -154,8 +162,12 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
               {data.personal?.portfolio && (
                 <>
                   <span className='text-gray-400'>•</span>
-                  <a 
-                    href={data.personal.portfolio.startsWith('http') ? data.personal.portfolio : `https://${data.personal.portfolio}`}
+                  <a
+                    href={
+                      data.personal.portfolio.startsWith('http')
+                        ? data.personal.portfolio
+                        : `https://${data.personal.portfolio}`
+                    }
                     target='_blank'
                     rel='noopener noreferrer'
                     className='hover:underline hover:text-blue-600 transition-colors px-2 py-1 rounded-md hover:bg-blue-50'
@@ -180,18 +192,18 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                   borderColor: colors.accent,
                   fontWeight: '600',
                   textTransform: 'uppercase',
-                  letterSpacing: '1px'
+                  letterSpacing: '1px',
                 }}
               >
-                {template.layout.sections.find(s => s.type === 'summary')?.title ||
-                  'Professional Summary'}
+                {template.layout.sections.find(s => s.type === 'summary')
+                  ?.title || 'Professional Summary'}
               </h2>
               <p
                 className='text-sm leading-relaxed'
-                style={{ 
+                style={{
                   color: colors.text,
                   fontFamily: '"Roboto", "Helvetica", sans-serif',
-                  lineHeight: '1.6'
+                  lineHeight: '1.6',
                 }}
               >
                 {data.summary}
@@ -211,7 +223,7 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
           'Use action verbs to start each bullet point',
           'Include quantifiable achievements and metrics',
           'Focus on results and impact, not just responsibilities',
-          'Use consistent formatting and tense (past tense for previous roles)'
+          'Use consistent formatting and tense (past tense for previous roles)',
         ],
         content: (
           <div className='space-y-4'>
@@ -224,11 +236,11 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                 borderColor: colors.accent,
                 fontWeight: '600',
                 textTransform: 'uppercase',
-                letterSpacing: '1px'
+                letterSpacing: '1px',
               }}
             >
-              {template.layout.sections.find(s => s.type === 'experience')?.title ||
-                'Work Experience'}
+              {template.layout.sections.find(s => s.type === 'experience')
+                ?.title || 'Work Experience'}
             </h2>
             <div className='space-y-4'>
               {data.experience.slice(0, 2).map((exp, index) => (
@@ -241,19 +253,19 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                     <div>
                       <h3
                         className='font-semibold text-sm'
-                        style={{ 
+                        style={{
                           color: colors.text,
                           fontFamily: '"Inter", sans-serif',
-                          fontWeight: '600'
+                          fontWeight: '600',
                         }}
                       >
                         {exp.position}
                       </h3>
                       <p
                         className='font-medium text-sm'
-                        style={{ 
+                        style={{
                           color: colors.primary,
-                          fontFamily: '"Roboto", sans-serif'
+                          fontFamily: '"Roboto", sans-serif',
                         }}
                       >
                         {exp.company}
@@ -261,33 +273,41 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                     </div>
                     <span
                       className='text-xs'
-                      style={{ 
+                      style={{
                         color: colors.secondary,
-                        fontFamily: '"Roboto", sans-serif'
+                        fontFamily: '"Roboto", sans-serif',
                       }}
                     >
                       {exp.startDate} - {exp.endDate}
                     </span>
                   </div>
                   {exp.description && (
-                    <p className='text-xs mb-2' style={{ 
-                      color: colors.text,
-                      fontFamily: '"Roboto", sans-serif',
-                      lineHeight: '1.5'
-                    }}>
+                    <p
+                      className='text-xs mb-2'
+                      style={{
+                        color: colors.text,
+                        fontFamily: '"Roboto", sans-serif',
+                        lineHeight: '1.5',
+                      }}
+                    >
                       {exp.description}
                     </p>
                   )}
                   {exp.achievements && exp.achievements.length > 0 && (
                     <ul className='text-xs space-y-1'>
-                      {exp.achievements.slice(0, 2).map((achievement, achIndex) => (
-                        <li key={achIndex} style={{ 
-                          color: colors.text,
-                          fontFamily: '"Roboto", sans-serif'
-                        }}>
-                          • {achievement}
-                        </li>
-                      ))}
+                      {exp.achievements
+                        .slice(0, 2)
+                        .map((achievement, achIndex) => (
+                          <li
+                            key={achIndex}
+                            style={{
+                              color: colors.text,
+                              fontFamily: '"Roboto", sans-serif',
+                            }}
+                          >
+                            • {achievement}
+                          </li>
+                        ))}
                     </ul>
                   )}
                 </div>
@@ -307,7 +327,7 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
           'Group skills by category (Technical, Business, Soft)',
           'Include relevant keywords from job postings',
           'Be specific about proficiency levels when appropriate',
-          'Keep skills current and relevant to your target role'
+          'Keep skills current and relevant to your target role',
         ],
         content: (
           <div className='space-y-4'>
@@ -320,7 +340,7 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                 borderColor: colors.accent,
                 fontWeight: '600',
                 textTransform: 'uppercase',
-                letterSpacing: '1px'
+                letterSpacing: '1px',
               }}
             >
               {template.layout.sections.find(s => s.type === 'skills')?.title ||
@@ -331,10 +351,10 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                 <div>
                   <h3
                     className='text-sm font-medium mb-2'
-                    style={{ 
+                    style={{
                       color: colors.primary,
                       fontFamily: '"Inter", sans-serif',
-                      fontWeight: '500'
+                      fontWeight: '500',
                     }}
                   >
                     Technical Skills
@@ -348,7 +368,7 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                           backgroundColor: `${colors.accent}20`,
                           color: colors.accent,
                           fontFamily: '"Roboto", sans-serif',
-                          fontWeight: '500'
+                          fontWeight: '500',
                         }}
                       >
                         {skill}
@@ -361,10 +381,10 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                 <div>
                   <h3
                     className='text-sm font-medium mb-2'
-                    style={{ 
+                    style={{
                       color: colors.primary,
                       fontFamily: '"Inter", sans-serif',
-                      fontWeight: '500'
+                      fontWeight: '500',
                     }}
                   >
                     Business Skills
@@ -378,7 +398,7 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                           backgroundColor: `${colors.primary}20`,
                           color: colors.primary,
                           fontFamily: '"Roboto", sans-serif',
-                          fontWeight: '500'
+                          fontWeight: '500',
                         }}
                       >
                         {skill}
@@ -391,10 +411,10 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                 <div>
                   <h3
                     className='text-sm font-medium mb-2'
-                    style={{ 
+                    style={{
                       color: colors.primary,
                       fontFamily: '"Inter", sans-serif',
-                      fontWeight: '500'
+                      fontWeight: '500',
                     }}
                   >
                     Soft Skills
@@ -408,7 +428,7 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                           backgroundColor: `${colors.secondary}20`,
                           color: colors.secondary,
                           fontFamily: '"Roboto", sans-serif',
-                          fontWeight: '500'
+                          fontWeight: '500',
                         }}
                       >
                         {skill}
@@ -432,7 +452,7 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
           'Include relevant coursework or academic achievements',
           'Add GPA if it strengthens your application (3.5+)',
           'Include honors, awards, or academic distinctions',
-          'List relevant certifications or professional development'
+          'List relevant certifications or professional development',
         ],
         content: (
           <div className='space-y-4'>
@@ -445,11 +465,11 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                 borderColor: colors.accent,
                 fontWeight: '600',
                 textTransform: 'uppercase',
-                letterSpacing: '1px'
+                letterSpacing: '1px',
               }}
             >
-              {template.layout.sections.find(s => s.type === 'education')?.title ||
-                'Education'}
+              {template.layout.sections.find(s => s.type === 'education')
+                ?.title || 'Education'}
             </h2>
             <div className='space-y-4'>
               {data.education.slice(0, 2).map((edu, index) => (
@@ -462,19 +482,19 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                     <div>
                       <h3
                         className='font-semibold text-sm'
-                        style={{ 
+                        style={{
                           color: colors.text,
                           fontFamily: '"Inter", sans-serif',
-                          fontWeight: '600'
+                          fontWeight: '600',
                         }}
                       >
                         {edu.degree} {edu.field && `in ${edu.field}`}
                       </h3>
                       <p
                         className='font-medium text-sm'
-                        style={{ 
+                        style={{
                           color: colors.primary,
-                          fontFamily: '"Roboto", sans-serif'
+                          fontFamily: '"Roboto", sans-serif',
                         }}
                       >
                         {edu.institution}
@@ -482,9 +502,9 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                       {edu.gpa && (
                         <p
                           className='text-xs'
-                          style={{ 
+                          style={{
                             color: colors.secondary,
-                            fontFamily: '"Roboto", sans-serif'
+                            fontFamily: '"Roboto", sans-serif',
                           }}
                         >
                           GPA: {edu.gpa}
@@ -493,9 +513,9 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                     </div>
                     <span
                       className='text-xs'
-                      style={{ 
+                      style={{
                         color: colors.secondary,
-                        fontFamily: '"Roboto", sans-serif'
+                        fontFamily: '"Roboto", sans-serif',
                       }}
                     >
                       {edu.startDate} - {edu.endDate}
@@ -518,7 +538,7 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
           'Include project outcomes and impact',
           'Mention technologies and tools used',
           'Highlight your role and contributions',
-          'Add links to live projects or GitHub repositories'
+          'Add links to live projects or GitHub repositories',
         ],
         content: (
           <div className='space-y-4'>
@@ -531,11 +551,11 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                 borderColor: colors.accent,
                 fontWeight: '600',
                 textTransform: 'uppercase',
-                letterSpacing: '1px'
+                letterSpacing: '1px',
               }}
             >
-              {template.layout.sections.find(s => s.type === 'projects')?.title ||
-                'Projects'}
+              {template.layout.sections.find(s => s.type === 'projects')
+                ?.title || 'Projects'}
             </h2>
             <div className='space-y-4'>
               {data.projects.slice(0, 2).map((project, index) => (
@@ -548,15 +568,15 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                     <div>
                       <h3
                         className='font-semibold text-sm'
-                        style={{ 
+                        style={{
                           color: colors.text,
                           fontFamily: '"Inter", sans-serif',
-                          fontWeight: '600'
+                          fontWeight: '600',
                         }}
                       >
                         {project.name}
                       </h3>
-                      {project.link && (
+                      {'link' in project && typeof project.link === 'string' && project.link && (
                         <a
                           href={project.link}
                           target='_blank'
@@ -570,38 +590,43 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                     </div>
                     <span
                       className='text-xs'
-                      style={{ 
+                      style={{
                         color: colors.secondary,
-                        fontFamily: '"Roboto", sans-serif'
+                        fontFamily: '"Roboto", sans-serif',
                       }}
                     >
                       {project.startDate} - {project.endDate}
                     </span>
                   </div>
                   {project.description && (
-                    <p className='text-xs mb-2' style={{ 
-                      color: colors.text,
-                      fontFamily: '"Roboto", sans-serif',
-                      lineHeight: '1.5'
-                    }}>
+                    <p
+                      className='text-xs mb-2'
+                      style={{
+                        color: colors.text,
+                        fontFamily: '"Roboto", sans-serif',
+                        lineHeight: '1.5',
+                      }}
+                    >
                       {project.description}
                     </p>
                   )}
                   {project.technologies && project.technologies.length > 0 && (
                     <div className='flex flex-wrap gap-1'>
-                      {project.technologies.slice(0, 4).map((tech, techIndex) => (
-                        <span
-                          key={techIndex}
-                          className='px-2 py-1 rounded text-xs'
-                          style={{
-                            backgroundColor: `${colors.secondary}20`,
-                            color: colors.secondary,
-                            fontFamily: '"Roboto", sans-serif'
-                          }}
-                        >
-                          {tech}
-                        </span>
-                      ))}
+                      {project.technologies
+                        .slice(0, 4)
+                        .map((tech, techIndex) => (
+                          <span
+                            key={techIndex}
+                            className='px-2 py-1 rounded text-xs'
+                            style={{
+                              backgroundColor: `${colors.secondary}20`,
+                              color: colors.secondary,
+                              fontFamily: '"Roboto", sans-serif',
+                            }}
+                          >
+                            {tech}
+                          </span>
+                        ))}
                     </div>
                   )}
                 </div>
@@ -621,7 +646,7 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
           'Focus on quantifiable achievements and awards',
           'Include professional recognition and certifications',
           'Highlight leadership roles and team accomplishments',
-          'Keep achievements relevant to your target position'
+          'Keep achievements relevant to your target position',
         ],
         content: (
           <div className='space-y-4'>
@@ -634,30 +659,30 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                 borderColor: colors.accent,
                 fontWeight: '600',
                 textTransform: 'uppercase',
-                letterSpacing: '1px'
+                letterSpacing: '1px',
               }}
             >
-              {template.layout.sections.find(s => s.type === 'achievements')?.title ||
-                'Achievements'}
+              {template.layout.sections.find(s => s.type === 'achievements')
+                ?.title || 'Achievements'}
             </h2>
             <ul className='space-y-2'>
               {data.achievements.slice(0, 4).map((achievement, index) => (
-                <li 
-                  key={index} 
+                <li
+                  key={index}
                   className='flex items-start space-x-2'
                   style={{ color: colors.text }}
                 >
-                  <span 
+                  <span
                     className='text-blue-500 mt-1'
                     style={{ fontFamily: '"Inter", sans-serif' }}
                   >
                     •
                   </span>
-                  <span 
+                  <span
                     className='text-sm'
-                    style={{ 
+                    style={{
                       fontFamily: '"Roboto", sans-serif',
-                      lineHeight: '1.5'
+                      lineHeight: '1.5',
                     }}
                   >
                     {achievement}
@@ -714,7 +739,9 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
       <div
         className={`template-preview bg-white shadow-lg rounded-lg overflow-hidden ${className}`}
       >
-        <div className='p-4 text-center text-gray-500'>No content available</div>
+        <div className='p-4 text-center text-gray-500'>
+          No content available
+        </div>
       </div>
     );
   }
@@ -756,13 +783,16 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
 
             {/* Section-specific suggestions */}
             <div className='mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-4 border-blue-400'>
-              <h4 
-                className='text-sm font-semibold text-blue-800 mb-3' 
+              <h4
+                className='text-sm font-semibold text-blue-800 mb-3'
                 style={{ fontFamily: '"Inter", sans-serif', fontWeight: '600' }}
               >
                 💡 {pages[currentPage]?.title} Suggestions
               </h4>
-              <ul className='text-xs text-blue-700 space-y-2' style={{ fontFamily: '"Roboto", sans-serif' }}>
+              <ul
+                className='text-xs text-blue-700 space-y-2'
+                style={{ fontFamily: '"Roboto", sans-serif' }}
+              >
                 {pages[currentPage]?.suggestions.map((suggestion, index) => (
                   <li key={index} className='flex items-start space-x-2'>
                     <span className='text-blue-500 mt-0.5'>•</span>
@@ -787,13 +817,13 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
             Previous
           </button>
           <div className='flex items-center space-x-3'>
-            <span 
+            <span
               className='text-sm font-medium text-slate-700'
               style={{ fontFamily: '"Inter", sans-serif' }}
             >
               {`${currentPage + 1} of ${totalPages}`}
             </span>
-            <span 
+            <span
               className='text-sm text-slate-500'
               style={{ fontFamily: '"Roboto", sans-serif' }}
             >
@@ -825,13 +855,16 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
 
       {/* Overall Suggestions */}
       <div className='p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-t border-green-200'>
-        <h4 
-          className='text-sm font-semibold text-green-800 mb-2' 
+        <h4
+          className='text-sm font-semibold text-green-800 mb-2'
           style={{ fontFamily: '"Inter", sans-serif', fontWeight: '600' }}
         >
           🎯 Overall Resume Tips
         </h4>
-        <ul className='text-xs text-green-700 space-y-1' style={{ fontFamily: '"Roboto", sans-serif' }}>
+        <ul
+          className='text-xs text-green-700 space-y-1'
+          style={{ fontFamily: '"Roboto", sans-serif' }}
+        >
           <li>• Keep formatting consistent throughout all sections</li>
           <li>• Use bullet points for easy scanning by ATS systems</li>
           <li>• Include relevant keywords from job descriptions</li>
@@ -842,7 +875,7 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
       {/* Swipe Instructions */}
       {totalPages > 1 && (
         <div className='text-center p-2 bg-slate-100'>
-          <p 
+          <p
             className='text-xs text-slate-500'
             style={{ fontFamily: '"Roboto", sans-serif' }}
           >

@@ -1,5 +1,5 @@
-export { PaginatedTemplatePreview } from './PaginatedTemplatePreview';
 export { ImprovedPaginatedTemplatePreview } from './ImprovedPaginatedTemplatePreview';
+export { PaginatedTemplatePreview } from './PaginatedTemplatePreview';
 export { ResumeTemplateRenderer } from './ResumeTemplateRenderer';
 export { TemplateCard, default as TemplateCardDefault } from './TemplateCard';
 export { TemplateCarousel } from './TemplateCarousel';

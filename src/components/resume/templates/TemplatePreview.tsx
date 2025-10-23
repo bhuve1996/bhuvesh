@@ -16,6 +16,18 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   const { layout, sampleData } = template;
   const { colors, fonts } = layout;
 
+  if (!sampleData) {
+    return (
+      <div
+        className={`template-preview bg-white shadow-lg rounded-lg overflow-hidden ${className}`}
+      >
+        <div className='p-4 text-center text-gray-500'>
+          No sample data available
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`template-preview bg-white shadow-lg rounded-lg overflow-hidden ${className}`}
@@ -45,38 +57,38 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
             color: colors.primary,
           }}
         >
-          {sampleData.personal.fullName}
+          {sampleData.personal?.fullName || 'John Doe'}
         </h1>
         <div
           className='flex flex-wrap justify-center gap-2 text-xs'
           style={{ color: colors.secondary }}
         >
-          <span>{sampleData.personal.email}</span>
-          {sampleData.personal.phone && (
+          <span>{sampleData.personal?.email || 'john.doe@email.com'}</span>
+          {sampleData.personal?.phone && (
             <>
               <span>•</span>
               <span>{sampleData.personal.phone}</span>
             </>
           )}
-          {sampleData.personal.location && (
+          {sampleData.personal?.location && (
             <>
               <span>•</span>
               <span>{sampleData.personal.location}</span>
             </>
           )}
-          {sampleData.personal.linkedin && (
+          {sampleData.personal?.linkedin && (
             <>
               <span>•</span>
               <span>LinkedIn</span>
             </>
           )}
-          {sampleData.personal.github && (
+          {sampleData.personal?.github && (
             <>
               <span>•</span>
               <span>GitHub</span>
             </>
           )}
-          {sampleData.personal.portfolio && (
+          {sampleData.personal?.portfolio && (
             <>
               <span>•</span>
               <span>Portfolio</span>

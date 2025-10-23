@@ -618,8 +618,8 @@ export const PaginatedTemplatePreview: React.FC<
         onMouseMove={e => handleMove(e.clientX)}
         onMouseUp={handleEnd}
         onMouseLeave={handleEnd}
-        onTouchStart={e => handleStart(e.touches[0].clientX)}
-        onTouchMove={e => handleMove(e.touches[0].clientX)}
+        onTouchStart={e => handleStart(e.touches[0]?.clientX || 0)}
+        onTouchMove={e => handleMove(e.touches[0]?.clientX || 0)}
         onTouchEnd={handleEnd}
       >
         {/* Page Content */}
