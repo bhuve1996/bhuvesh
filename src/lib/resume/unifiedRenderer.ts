@@ -284,8 +284,8 @@ export const renderToPDF = async (
     jsDoc.setTextColor(r, g, b);
 
     const lines = jsDoc.splitTextToSize(text, contentWidth);
-    const lineHeight = fontSize * 1.2; // Better line height to match preview
-    const requiredSpace = lines.length * lineHeight + 2; // Space between lines
+    const lineHeight = fontSize * 1.0; // Compact line height
+    const requiredSpace = lines.length * lineHeight + 1; // Minimal space between lines
 
     // Check if we need a new page
     checkPageBreak(requiredSpace);
@@ -300,8 +300,8 @@ export const renderToPDF = async (
 
   // Helper function to add section header
   const addSectionHeader = (title: string) => {
-    yPosition += 12; // Reduced spacing between sections
-    checkPageBreak(15);
+    yPosition += 4; // Minimal spacing between sections
+    checkPageBreak(10);
 
     addText(
       title,
@@ -317,7 +317,7 @@ export const renderToPDF = async (
     jsDoc.setDrawColor(r, g, b);
     jsDoc.setLineWidth(2);
     jsDoc.line(margin, yPosition - 4, pageWidth - margin, yPosition - 4);
-    yPosition += 8; // Reduced spacing after headers
+    yPosition += 2; // Minimal spacing after headers
   };
   // Header
   addText(
@@ -338,7 +338,7 @@ export const renderToPDF = async (
     'center',
     config.fonts.body
   );
-  yPosition += 16; // Reduced spacing after header
+  yPosition += 6; // Minimal spacing after header
 
   // Summary
   if (content.sections.summary) {
@@ -351,7 +351,7 @@ export const renderToPDF = async (
       'left',
       config.fonts.body
     );
-    yPosition += 6; // Reduced spacing after summary
+    yPosition += 2; // Minimal spacing after summary
   }
 
   // Experience
@@ -405,9 +405,9 @@ export const renderToPDF = async (
 
     // Add separator between experience entries (except for the last one)
     if (index < content.sections.experience.length - 1) {
-      yPosition += 8; // Reduced spacing between experience entries
+      yPosition += 3; // Minimal spacing between experience entries
     } else {
-      yPosition += 12; // Reduced spacing after experience section
+      yPosition += 4; // Minimal spacing after experience section
     }
   });
 
@@ -449,9 +449,9 @@ export const renderToPDF = async (
 
     // Add separator between education entries (except for the last one)
     if (index < content.sections.education.length - 1) {
-      yPosition += 6; // Reduced spacing between education entries
+      yPosition += 2; // Minimal spacing between education entries
     } else {
-      yPosition += 12; // Reduced spacing after education section
+      yPosition += 4; // Minimal spacing after education section
     }
   });
 
@@ -518,7 +518,7 @@ export const renderToPDF = async (
     );
   }
 
-  yPosition += 12; // Reduced spacing after skills section
+  yPosition += 4; // Minimal spacing after skills section
 
   // Projects
   if (content.sections.projects && content.sections.projects.length > 0) {
@@ -571,9 +571,9 @@ export const renderToPDF = async (
         content.sections.projects &&
         index < content.sections.projects.length - 1
       ) {
-        yPosition += 8; // Reduced spacing between project entries
+        yPosition += 3; // Minimal spacing between project entries
       } else {
-        yPosition += 12; // Reduced spacing after projects section
+        yPosition += 4; // Minimal spacing after projects section
       }
     });
   }
@@ -594,7 +594,7 @@ export const renderToPDF = async (
         config.fonts.body
       );
     });
-    yPosition += 12; // Reduced spacing after achievements section
+    yPosition += 4; // Minimal spacing after achievements section
   }
 
   // Save the PDF
