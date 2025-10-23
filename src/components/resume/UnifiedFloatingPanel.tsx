@@ -376,7 +376,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
       if (result.success && result.data) {
         setAtsResult({
           atsScore: result.data.atsScore || 0,
-          issues: result.data.issues || [],
+          issues: (result.data as any).issues || [],
           suggestions: result.data.suggestions || [],
         });
         toast.success(
