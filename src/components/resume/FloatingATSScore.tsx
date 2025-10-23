@@ -77,7 +77,9 @@ export const FloatingATSScore: React.FC<FloatingATSScoreProps> = ({
         setAnalysisResult({
           score: analysis.atsScore || 0,
           breakdown: {
-            keywordMatching: Array.isArray(analysis.keywordMatches) ? analysis.keywordMatches.length : (analysis.keywordMatches || 0),
+            keywordMatching: Array.isArray(analysis.keywordMatches)
+              ? analysis.keywordMatches.length
+              : analysis.keywordMatches || 0,
             semanticMatching: 0, // Not available in current API
             formatCompliance: 0, // Not available in current API
             contentQuality: 0, // Not available in current API

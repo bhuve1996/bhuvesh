@@ -7,6 +7,11 @@ import toast from 'react-hot-toast';
 import { atsApi } from '@/api/endpoints/ats';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import {
+  exportToDOCX,
+  exportToPDFWithFallback,
+  exportToTXT,
+} from '@/lib/resume/exportUtils';
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
 interface UnifiedFloatingPanelProps {
@@ -429,51 +434,23 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
   };
 
   // Export Functionality
-  const handleExport = async (
-    format: 'pdf' | 'docx' | 'txt',
-    method: 'classic' | 'modern' | 'print' = 'classic'
-  ) => {
+  const handleExport = async (format: 'pdf' | 'docx' | 'txt') => {
     setIsExporting(true);
 
     try {
       const filename = `${resumeData.personal.fullName || 'resume'}_${format}`;
 
-      if (method === 'print') {
-        // Use print-based export
-        if (format === 'pdf') {
-          await exportToPDFViaPrint({
-            template,
-            data: resumeData,
-            filename: `${filename}.pdf`,
-          });
-        } else if (format === 'docx') {
-          await exportToDOCXViaDownload({
-            template,
-            data: resumeData,
-            filename: `${filename}.docx`,
-          });
-        }
-      } else if (method === 'modern') {
-        // Use HTML-based export
-        await exportResumeFromHTML({
+      // Use classic export with fallback
+      if (format === 'pdf') {
+        await exportToPDFWithFallback(
           template,
-          data: resumeData,
-          format: format as 'pdf' | 'docx',
-          filename: `${filename}.${format}`,
-        });
-      } else {
-        // Use classic export with fallback
-        if (format === 'pdf') {
-          await exportToPDFWithFallback(
-            template,
-            resumeData,
-            `${filename}.pdf`
-          );
-        } else if (format === 'docx') {
-          await exportToDOCX(template, resumeData, `${filename}.docx`);
-        } else if (format === 'txt') {
-          await exportToTXT(template, resumeData, `${filename}.txt`);
-        }
+          resumeData,
+          `${filename}.pdf`
+        );
+      } else if (format === 'docx') {
+        await exportToDOCX(template, resumeData, `${filename}.docx`);
+      } else if (format === 'txt') {
+        await exportToTXT(template, resumeData, `${filename}.txt`);
       }
 
       // Show success message
@@ -490,7 +467,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
         },
       });
     } catch (error) {
-      console.error(`Export error (${method}):`, error);
+      console.error(`Export error:`, error);
       // Show more specific error message using toast
       const errorMessage =
         error instanceof Error
@@ -1201,7 +1178,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
                         </h5>
                         <div className='space-y-2'>
                           <Button
-                            onClick={() => handleExport('pdf', 'classic')}
+                            onClick={() => handleExport('pdf')}
                             disabled={isExporting}
                             className='w-full justify-start'
                             variant='outline'
@@ -1231,7 +1208,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
                             )}
                           </Button>
                           <Button
-                            onClick={() => handleExport('pdf', 'print')}
+                            onClick={() => handleExport('pdf')}
                             disabled={isExporting}
                             className='w-full justify-start'
                             variant='outline'
@@ -1283,7 +1260,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
                         </h5>
                         <div className='space-y-2'>
                           <Button
-                            onClick={() => handleExport('docx', 'classic')}
+                            onClick={() => handleExport('docx')}
                             disabled={isExporting}
                             className='w-full justify-start'
                             variant='outline'
@@ -1313,7 +1290,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
                             )}
                           </Button>
                           <Button
-                            onClick={() => handleExport('docx', 'print')}
+                            onClick={() => handleExport('docx')}
                             disabled={isExporting}
                             className='w-full justify-start'
                             variant='outline'
@@ -1364,7 +1341,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
                           Text Export
                         </h5>
                         <Button
-                          onClick={() => handleExport('txt', 'classic')}
+                          onClick={() => handleExport('txt')}
                           disabled={isExporting}
                           className='w-full justify-start'
                           variant='outline'
