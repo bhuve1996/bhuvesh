@@ -300,8 +300,8 @@ export const renderToPDF = async (
 
   // Helper function to add section header
   const addSectionHeader = (title: string) => {
-    yPosition += 24; // mb-6 equivalent (24px) - matches preview
-    checkPageBreak(20);
+    yPosition += 12; // Reduced spacing between sections
+    checkPageBreak(15);
 
     addText(
       title,
@@ -317,9 +317,8 @@ export const renderToPDF = async (
     jsDoc.setDrawColor(r, g, b);
     jsDoc.setLineWidth(2);
     jsDoc.line(margin, yPosition - 4, pageWidth - margin, yPosition - 4);
-    yPosition += 16; // mb-4 equivalent (16px) - matches preview
+    yPosition += 8; // Reduced spacing after headers
   };
-
   // Header
   addText(
     content.header.name,
@@ -339,7 +338,7 @@ export const renderToPDF = async (
     'center',
     config.fonts.body
   );
-  yPosition += 32; // mb-8 equivalent (32px) - matches preview
+  yPosition += 16; // Reduced spacing after header
 
   // Summary
   if (content.sections.summary) {
@@ -352,7 +351,7 @@ export const renderToPDF = async (
       'left',
       config.fonts.body
     );
-    yPosition += 12; // mb-3 equivalent (12px) - matches preview
+    yPosition += 6; // Reduced spacing after summary
   }
 
   // Experience
@@ -406,9 +405,9 @@ export const renderToPDF = async (
 
     // Add separator between experience entries (except for the last one)
     if (index < content.sections.experience.length - 1) {
-      yPosition += 16; // space-y-4 equivalent (16px) - matches preview
+      yPosition += 8; // Reduced spacing between experience entries
     } else {
-      yPosition += 24; // mb-6 equivalent (24px) - matches preview
+      yPosition += 12; // Reduced spacing after experience section
     }
   });
 
@@ -450,9 +449,9 @@ export const renderToPDF = async (
 
     // Add separator between education entries (except for the last one)
     if (index < content.sections.education.length - 1) {
-      yPosition += 12; // space-y-3 equivalent (12px) - matches preview
+      yPosition += 6; // Reduced spacing between education entries
     } else {
-      yPosition += 24; // mb-6 equivalent (24px) - matches preview
+      yPosition += 12; // Reduced spacing after education section
     }
   });
 
@@ -519,7 +518,7 @@ export const renderToPDF = async (
     );
   }
 
-  yPosition += 24; // mb-6 equivalent (24px) - matches preview
+  yPosition += 12; // Reduced spacing after skills section
 
   // Projects
   if (content.sections.projects && content.sections.projects.length > 0) {
@@ -572,9 +571,9 @@ export const renderToPDF = async (
         content.sections.projects &&
         index < content.sections.projects.length - 1
       ) {
-        yPosition += 16; // space-y-4 equivalent (16px) - matches preview
+        yPosition += 8; // Reduced spacing between project entries
       } else {
-        yPosition += 24; // mb-6 equivalent (24px) - matches preview
+        yPosition += 12; // Reduced spacing after projects section
       }
     });
   }
@@ -595,7 +594,7 @@ export const renderToPDF = async (
         config.fonts.body
       );
     });
-    yPosition += 24; // mb-6 equivalent (24px) - matches preview
+    yPosition += 12; // Reduced spacing after achievements section
   }
 
   // Save the PDF
