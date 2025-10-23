@@ -374,7 +374,11 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
 
       const result = await atsApi.extractExperience(file);
       if (result.success && result.data) {
-        setAtsResult(result.data);
+        setAtsResult({
+          atsScore: result.data.atsScore || 0,
+          issues: result.data.issues || [],
+          suggestions: result.data.suggestions || [],
+        });
         toast.success(
           `🎯 ATS Analysis Complete! Score: ${result.data.atsScore}/100`
         );
@@ -406,9 +410,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
       await new Promise(resolve => setTimeout(resolve, 2000));
       setImprovementResult({
         section,
-        originalContent: 'Original content...',
-        improvedContent: 'AI-improved content...',
-        predictedScoreIncrease: 10,
+        improvements: [`Improved ${section.toLowerCase()} content`],
       });
       toast.success(
         `✨ ${section} improved! Expected score increase: +10 points`
@@ -505,20 +507,26 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
     property: string,
     value: string | number
   ) => {
-    const updatedTemplate = { ...template } as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> };
+    const updatedTemplate = { ...template } as ResumeTemplate & {
+      customStyles?: Record<string, Record<string, string>>;
+    };
     if (!updatedTemplate.customStyles) {
       updatedTemplate.customStyles = {};
     }
     if (!updatedTemplate.customStyles[section]) {
       updatedTemplate.customStyles[section] = {};
     }
-    updatedTemplate.customStyles[section][property] = value;
+    updatedTemplate.customStyles[section][property] = String(value);
     onTemplateChange(updatedTemplate as ResumeTemplate);
   };
 
   const getCurrentValue = (section: string, property: string): string => {
     return (
-      (template as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> }).customStyles?.[section]?.[property] ||
+      (
+        template as ResumeTemplate & {
+          customStyles?: Record<string, Record<string, string>>;
+        }
+      ).customStyles?.[section]?.[property] ||
       getDefaultValue(section, property)
     );
   };
@@ -880,7 +888,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
                       >
                         <div className='text-center p-3 bg-green-50 rounded-lg'>
                           <div className='text-lg font-bold text-green-600 mb-1'>
-                            +{improvementResult.predictedScoreIncrease} Points
+                            +10 Points
                           </div>
                           <p className='text-sm text-green-700'>
                             Expected ATS Score Increase
@@ -1138,7 +1146,11 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
 
                     <Button
                       onClick={() => {
-                        const defaultTemplate = { ...template } as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> };
+                        const defaultTemplate = {
+                          ...template,
+                        } as ResumeTemplate & {
+                          customStyles?: Record<string, Record<string, string>>;
+                        };
                         if (defaultTemplate.customStyles) {
                           delete defaultTemplate.customStyles;
                         }
