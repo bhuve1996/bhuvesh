@@ -192,52 +192,59 @@ export interface UnifiedContent {
 
 // Convert ResumeData to UnifiedContent
 export const convertToUnifiedContent = (data: ResumeData): UnifiedContent => {
-  const contact = [
-    data.personal.email,
-    data.personal.phone,
-    data.personal.location,
-  ];
+  try {
+    const contact = [
+      data.personal?.email || '',
+      data.personal?.phone || '',
+      data.personal?.location || '',
+    ].filter(Boolean);
 
-  if (data.personal.linkedin) contact.push(data.personal.linkedin);
-  if (data.personal.github) contact.push(data.personal.github);
+    if (data.personal?.linkedin) contact.push(data.personal.linkedin);
+    if (data.personal?.github) contact.push(data.personal.github);
 
-  return {
-    header: {
-      name: data.personal.fullName,
-      contact,
-    },
-    sections: {
-      ...(data.summary && { summary: data.summary }),
-      experience: data.experience.map(exp => ({
-        position: exp.position,
-        company: exp.company,
-        duration: `${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}`,
-        description: exp.description,
-        achievements: exp.achievements,
-      })),
-      education: data.education.map(edu => ({
-        degree: `${edu.degree} in ${edu.field}`,
-        institution: edu.institution,
-        duration: `${edu.startDate} - ${edu.current ? 'Present' : edu.endDate}`,
-        ...(edu.gpa && { gpa: edu.gpa }),
-      })),
-      skills: {
-        technical: data.skills.technical,
-        business: data.skills.business,
-        soft: data.skills.soft,
-        languages: data.skills.languages,
-        certifications: data.skills.certifications,
+    return {
+      header: {
+        name: data.personal?.fullName || 'Resume',
+        contact,
       },
-      projects: data.projects?.map(project => ({
-        name: project.name,
-        description: project.description,
-        technologies: project.technologies,
-        ...(project.url && { url: project.url }),
-        duration: `${project.startDate} - ${project.endDate || 'Present'}`,
-      })),
-      ...(data.achievements && { achievements: data.achievements }),
-    },
-  };
+      sections: {
+        ...(data.summary && { summary: data.summary }),
+        experience: (data.experience || []).map(exp => ({
+          position: exp.position || '',
+          company: exp.company || '',
+          duration: `${exp.startDate || ''} - ${exp.current ? 'Present' : exp.endDate || ''}`,
+          description: exp.description || '',
+          achievements: exp.achievements || [],
+        })),
+        education: (data.education || []).map(edu => ({
+          degree: edu.field
+            ? `${edu.degree || ''} in ${edu.field}`
+            : edu.degree || '',
+          institution: edu.institution || '',
+          duration: `${edu.startDate || ''} - ${edu.current ? 'Present' : edu.endDate || ''}`,
+          ...(edu.gpa && { gpa: edu.gpa }),
+        })),
+        skills: {
+          technical: data.skills?.technical || [],
+          business: data.skills?.business || [],
+          soft: data.skills?.soft || [],
+          languages: data.skills?.languages || [],
+          certifications: data.skills?.certifications || [],
+        },
+        projects: (data.projects || []).map(project => ({
+          name: project.name || '',
+          description: project.description || '',
+          technologies: project.technologies || [],
+          ...(project.url && { url: project.url }),
+          duration: `${project.startDate || ''} - ${project.endDate || 'Present'}`,
+        })),
+        ...(data.achievements && { achievements: data.achievements }),
+      },
+    };
+  } catch (error) {
+    console.error('Error converting resume data to unified content:', error);
+    throw new Error('Failed to process resume data for export');
+  }
 };
 
 // PDF rendering with unified styling
@@ -248,141 +255,230 @@ export const renderToPDF = async (
   doc: any, // jsPDF document
   filename: string = 'resume.pdf'
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const jsDoc = doc as any; // Cast for jsPDF operations
-  const pageWidth = jsDoc.internal.pageSize.getWidth();
-  const pageHeight = jsDoc.internal.pageSize.getHeight();
-  // Use template margin settings or default to minimal
-  const marginValue = config.spacing?.margins || '0.1in';
-  const margin = convertSpacing(marginValue); // Convert template margin to points
-  const contentWidth = pageWidth - margin * 2;
-  let yPosition = margin + 2; // Minimal top margin
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const jsDoc = doc as any; // Cast for jsPDF operations
 
-  // Helper function to check if we need a new page
-  const checkPageBreak = (requiredSpace: number = 10) => {
-    if (yPosition + requiredSpace > pageHeight - margin - 5) {
-      // Very aggressive page breaking
-      jsDoc.addPage();
-      yPosition = margin + 2;
-      return true;
+    // Validate jsPDF document
+    if (!jsDoc || !jsDoc.internal || !jsDoc.internal.pageSize) {
+      throw new Error('Invalid PDF document object');
     }
-    return false;
-  };
 
-  // Helper function to add text with proper styling
-  const addText = (
-    text: string,
-    fontSize: number,
-    isBold: boolean = false,
-    color: string = config.colors.text,
-    alignment: 'left' | 'center' | 'right' = 'left',
-    fontFamily: string = 'helvetica'
-  ) => {
-    jsDoc.setFontSize(fontSize);
-    jsDoc.setFont(mapFontForExport(fontFamily), isBold ? 'bold' : 'normal');
+    const pageWidth = jsDoc.internal.pageSize.getWidth();
+    const pageHeight = jsDoc.internal.pageSize.getHeight();
 
-    // Set text color properly for jsPDF
-    const [r, g, b] = convertColor(color);
-    jsDoc.setTextColor(r, g, b);
+    // Use template margin settings or default to minimal
+    const marginValue = config.spacing?.margins || '0.1in';
+    const margin = convertSpacing(marginValue); // Convert template margin to points
+    const contentWidth = pageWidth - margin * 2;
+    let yPosition = margin + 2; // Minimal top margin
 
-    const lines = jsDoc.splitTextToSize(text, contentWidth);
-    const lineHeight = fontSize * 0.9; // Very compact line height
-    const requiredSpace = lines.length * lineHeight + 0.5; // Very minimal space between lines
+    // Helper function to check if we need a new page
+    const checkPageBreak = (requiredSpace: number = 10) => {
+      if (yPosition + requiredSpace > pageHeight - margin - 5) {
+        // Very aggressive page breaking
+        jsDoc.addPage();
+        yPosition = margin + 2;
+        return true;
+      }
+      return false;
+    };
 
-    // Check if we need a new page
-    checkPageBreak(requiredSpace);
+    // Helper function to add text with proper styling
+    const addText = (
+      text: string,
+      fontSize: number,
+      isBold: boolean = false,
+      color: string = config.colors.text,
+      alignment: 'left' | 'center' | 'right' = 'left',
+      fontFamily: string = 'helvetica'
+    ) => {
+      jsDoc.setFontSize(fontSize);
+      jsDoc.setFont(mapFontForExport(fontFamily), isBold ? 'bold' : 'normal');
 
-    const xPosition = alignment === 'center' ? pageWidth / 2 : margin;
-    jsDoc.text(lines, xPosition, yPosition, {
-      align: alignment,
-      maxWidth: contentWidth,
-    });
-    yPosition += requiredSpace;
-  };
+      // Set text color properly for jsPDF
+      const [r, g, b] = convertColor(color);
+      jsDoc.setTextColor(r, g, b);
 
-  // Helper function to add section header
-  const addSectionHeader = (title: string) => {
-    yPosition += 2; // Very minimal spacing between sections
-    checkPageBreak(8);
+      const lines = jsDoc.splitTextToSize(text, contentWidth);
+      const lineHeight = fontSize * 0.9; // Very compact line height
+      const requiredSpace = lines.length * lineHeight + 0.5; // Very minimal space between lines
 
+      // Check if we need a new page
+      checkPageBreak(requiredSpace);
+
+      const xPosition = alignment === 'center' ? pageWidth / 2 : margin;
+      jsDoc.text(lines, xPosition, yPosition, {
+        align: alignment,
+        maxWidth: contentWidth,
+      });
+      yPosition += requiredSpace;
+    };
+
+    // Helper function to add section header
+    const addSectionHeader = (title: string) => {
+      yPosition += 2; // Very minimal spacing between sections
+      checkPageBreak(8);
+
+      addText(
+        title,
+        convertFontSize(config.fonts.size.subheading),
+        true,
+        config.colors.primary,
+        'left',
+        config.fonts.heading
+      );
+
+      // Add underline with accent color (border-b-2 pb-1 equivalent)
+      const [r, g, b] = convertColor(config.colors.accent);
+      jsDoc.setDrawColor(r, g, b);
+      jsDoc.setLineWidth(1);
+      jsDoc.line(margin, yPosition - 2, pageWidth - margin, yPosition - 2);
+      yPosition += 1; // Very minimal spacing after headers
+    };
+    // Header
     addText(
-      title,
-      convertFontSize(config.fonts.size.subheading),
+      content.header.name,
+      convertFontSize(config.fonts.size.heading),
       true,
       config.colors.primary,
-      'left',
+      'center',
       config.fonts.heading
     );
+    yPosition += 2; // Very minimal space between name and contact
 
-    // Add underline with accent color (border-b-2 pb-1 equivalent)
-    const [r, g, b] = convertColor(config.colors.accent);
-    jsDoc.setDrawColor(r, g, b);
-    jsDoc.setLineWidth(1);
-    jsDoc.line(margin, yPosition - 2, pageWidth - margin, yPosition - 2);
-    yPosition += 1; // Very minimal spacing after headers
-  };
-  // Header
-  addText(
-    content.header.name,
-    convertFontSize(config.fonts.size.heading),
-    true,
-    config.colors.primary,
-    'center',
-    config.fonts.heading
-  );
-  yPosition += 2; // Very minimal space between name and contact
-
-  addText(
-    content.header.contact.join(' • '),
-    convertFontSize(config.fonts.size.small),
-    false,
-    config.colors.secondary,
-    'center',
-    config.fonts.body
-  );
-  yPosition += 3; // Very minimal spacing after header
-
-  // Summary
-  if (content.sections.summary) {
-    addSectionHeader('Professional Summary');
     addText(
-      content.sections.summary,
-      convertFontSize(config.fonts.size.body),
-      false,
-      config.colors.text,
-      'left',
-      config.fonts.body
-    );
-    yPosition += 1; // Very minimal spacing after summary
-  }
-
-  // Experience
-  addSectionHeader('Professional Experience');
-  content.sections.experience.forEach((exp, index) => {
-    // Job title and company
-    addText(
-      `${exp.position} | ${exp.company}`,
-      convertFontSize(config.fonts.size.body) + 1,
-      true,
-      config.colors.text,
-      'left',
-      config.fonts.heading
-    );
-
-    // Duration
-    addText(
-      exp.duration,
+      content.header.contact.join(' • '),
       convertFontSize(config.fonts.size.small),
       false,
       config.colors.secondary,
-      'left',
+      'center',
       config.fonts.body
     );
+    yPosition += 3; // Very minimal spacing after header
 
-    // Description
-    if (exp.description) {
+    // Summary
+    if (content.sections.summary) {
+      addSectionHeader('Professional Summary');
       addText(
-        exp.description,
+        content.sections.summary,
+        convertFontSize(config.fonts.size.body),
+        false,
+        config.colors.text,
+        'left',
+        config.fonts.body
+      );
+      yPosition += 1; // Very minimal spacing after summary
+    }
+
+    // Experience
+    addSectionHeader('Professional Experience');
+    content.sections.experience.forEach((exp, index) => {
+      // Job title and company
+      addText(
+        `${exp.position} | ${exp.company}`,
+        convertFontSize(config.fonts.size.body) + 1,
+        true,
+        config.colors.text,
+        'left',
+        config.fonts.heading
+      );
+
+      // Duration
+      addText(
+        exp.duration,
+        convertFontSize(config.fonts.size.small),
+        false,
+        config.colors.secondary,
+        'left',
+        config.fonts.body
+      );
+
+      // Description
+      if (exp.description) {
+        addText(
+          exp.description,
+          convertFontSize(config.fonts.size.body),
+          false,
+          config.colors.text,
+          'left',
+          config.fonts.body
+        );
+      }
+
+      // Add achievements with proper indentation
+      if (exp.achievements && exp.achievements.length > 0) {
+        exp.achievements.forEach(achievement => {
+          addText(
+            `• ${achievement}`,
+            convertFontSize(config.fonts.size.body),
+            false,
+            config.colors.text,
+            'left',
+            config.fonts.body
+          );
+        });
+      }
+
+      // Add separator between experience entries (except for the last one)
+      if (index < content.sections.experience.length - 1) {
+        yPosition += 1; // Very minimal spacing between experience entries
+      } else {
+        yPosition += 2; // Very minimal spacing after experience section
+      }
+    });
+
+    // Education
+    addSectionHeader('Education');
+    content.sections.education.forEach((edu, index) => {
+      // Degree
+      addText(
+        edu.degree,
+        convertFontSize(config.fonts.size.body) + 1,
+        true,
+        config.colors.text,
+        'left',
+        config.fonts.heading
+      );
+
+      // Institution
+      addText(
+        edu.institution,
+        convertFontSize(config.fonts.size.body),
+        false,
+        config.colors.text,
+        'left',
+        config.fonts.body
+      );
+
+      // Duration and GPA on same line if GPA exists
+      const durationText = edu.gpa
+        ? `${edu.duration} | GPA: ${edu.gpa}`
+        : edu.duration;
+      addText(
+        durationText,
+        convertFontSize(config.fonts.size.small),
+        false,
+        config.colors.secondary,
+        'left',
+        config.fonts.body
+      );
+
+      // Add separator between education entries (except for the last one)
+      if (index < content.sections.education.length - 1) {
+        yPosition += 1; // Very minimal spacing between education entries
+      } else {
+        yPosition += 2; // Very minimal spacing after education section
+      }
+    });
+
+    // Skills
+    addSectionHeader('Skills');
+
+    // Technical Skills
+    if (content.sections.skills.technical.length > 0) {
+      addText(
+        `Technical: ${content.sections.skills.technical.join(', ')}`,
         convertFontSize(config.fonts.size.body),
         false,
         config.colors.text,
@@ -391,9 +487,121 @@ export const renderToPDF = async (
       );
     }
 
-    // Add achievements with proper indentation
-    if (exp.achievements && exp.achievements.length > 0) {
-      exp.achievements.forEach(achievement => {
+    // Business Skills
+    if (content.sections.skills.business.length > 0) {
+      addText(
+        `Business: ${content.sections.skills.business.join(', ')}`,
+        convertFontSize(config.fonts.size.body),
+        false,
+        config.colors.text,
+        'left',
+        config.fonts.body
+      );
+    }
+
+    // Soft Skills
+    if (content.sections.skills.soft.length > 0) {
+      addText(
+        `Soft Skills: ${content.sections.skills.soft.join(', ')}`,
+        convertFontSize(config.fonts.size.body),
+        false,
+        config.colors.text,
+        'left',
+        config.fonts.body
+      );
+    }
+
+    // Languages
+    if (content.sections.skills.languages.length > 0) {
+      addText(
+        `Languages: ${content.sections.skills.languages.join(', ')}`,
+        convertFontSize(config.fonts.size.body),
+        false,
+        config.colors.text,
+        'left',
+        config.fonts.body
+      );
+    }
+
+    // Certifications
+    if (content.sections.skills.certifications.length > 0) {
+      addText(
+        `Certifications: ${content.sections.skills.certifications.join(', ')}`,
+        convertFontSize(config.fonts.size.body),
+        false,
+        config.colors.text,
+        'left',
+        config.fonts.body
+      );
+    }
+
+    yPosition += 2; // Very minimal spacing after skills section
+
+    // Projects
+    if (content.sections.projects && content.sections.projects.length > 0) {
+      addSectionHeader('Projects');
+      content.sections.projects.forEach((project, index) => {
+        // Project name
+        addText(
+          project.name,
+          convertFontSize(config.fonts.size.body) + 1,
+          true,
+          config.colors.text,
+          'left',
+          config.fonts.heading
+        );
+
+        // Project description
+        if (project.description) {
+          addText(
+            project.description,
+            convertFontSize(config.fonts.size.body),
+            false,
+            config.colors.text,
+            'left',
+            config.fonts.body
+          );
+        }
+
+        // Technologies and URL on same line if both exist
+        const techAndUrl = [];
+        if (project.technologies && project.technologies.length > 0) {
+          techAndUrl.push(`Technologies: ${project.technologies.join(', ')}`);
+        }
+        if (project.url) {
+          techAndUrl.push(`URL: ${project.url}`);
+        }
+
+        if (techAndUrl.length > 0) {
+          addText(
+            techAndUrl.join(' | '),
+            convertFontSize(config.fonts.size.small),
+            false,
+            config.colors.secondary,
+            'left',
+            config.fonts.body
+          );
+        }
+
+        // Add separator between project entries (except for the last one)
+        if (
+          content.sections.projects &&
+          index < content.sections.projects.length - 1
+        ) {
+          yPosition += 1; // Very minimal spacing between project entries
+        } else {
+          yPosition += 2; // Very minimal spacing after projects section
+        }
+      });
+    }
+
+    // Achievements
+    if (
+      content.sections.achievements &&
+      content.sections.achievements.length > 0
+    ) {
+      addSectionHeader('Achievements');
+      content.sections.achievements.forEach(achievement => {
         addText(
           `• ${achievement}`,
           convertFontSize(config.fonts.size.body),
@@ -403,204 +611,17 @@ export const renderToPDF = async (
           config.fonts.body
         );
       });
+      yPosition += 2; // Very minimal spacing after achievements section
     }
 
-    // Add separator between experience entries (except for the last one)
-    if (index < content.sections.experience.length - 1) {
-      yPosition += 1; // Very minimal spacing between experience entries
-    } else {
-      yPosition += 2; // Very minimal spacing after experience section
-    }
-  });
-
-  // Education
-  addSectionHeader('Education');
-  content.sections.education.forEach((edu, index) => {
-    // Degree
-    addText(
-      edu.degree,
-      convertFontSize(config.fonts.size.body) + 1,
-      true,
-      config.colors.text,
-      'left',
-      config.fonts.heading
-    );
-
-    // Institution
-    addText(
-      edu.institution,
-      convertFontSize(config.fonts.size.body),
-      false,
-      config.colors.text,
-      'left',
-      config.fonts.body
-    );
-
-    // Duration and GPA on same line if GPA exists
-    const durationText = edu.gpa
-      ? `${edu.duration} | GPA: ${edu.gpa}`
-      : edu.duration;
-    addText(
-      durationText,
-      convertFontSize(config.fonts.size.small),
-      false,
-      config.colors.secondary,
-      'left',
-      config.fonts.body
-    );
-
-    // Add separator between education entries (except for the last one)
-    if (index < content.sections.education.length - 1) {
-      yPosition += 1; // Very minimal spacing between education entries
-    } else {
-      yPosition += 2; // Very minimal spacing after education section
-    }
-  });
-
-  // Skills
-  addSectionHeader('Skills');
-
-  // Technical Skills
-  if (content.sections.skills.technical.length > 0) {
-    addText(
-      `Technical: ${content.sections.skills.technical.join(', ')}`,
-      convertFontSize(config.fonts.size.body),
-      false,
-      config.colors.text,
-      'left',
-      config.fonts.body
+    // Save the PDF
+    jsDoc.save(filename);
+  } catch (error) {
+    console.error('Error rendering PDF:', error);
+    throw new Error(
+      `PDF rendering failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
   }
-
-  // Business Skills
-  if (content.sections.skills.business.length > 0) {
-    addText(
-      `Business: ${content.sections.skills.business.join(', ')}`,
-      convertFontSize(config.fonts.size.body),
-      false,
-      config.colors.text,
-      'left',
-      config.fonts.body
-    );
-  }
-
-  // Soft Skills
-  if (content.sections.skills.soft.length > 0) {
-    addText(
-      `Soft Skills: ${content.sections.skills.soft.join(', ')}`,
-      convertFontSize(config.fonts.size.body),
-      false,
-      config.colors.text,
-      'left',
-      config.fonts.body
-    );
-  }
-
-  // Languages
-  if (content.sections.skills.languages.length > 0) {
-    addText(
-      `Languages: ${content.sections.skills.languages.join(', ')}`,
-      convertFontSize(config.fonts.size.body),
-      false,
-      config.colors.text,
-      'left',
-      config.fonts.body
-    );
-  }
-
-  // Certifications
-  if (content.sections.skills.certifications.length > 0) {
-    addText(
-      `Certifications: ${content.sections.skills.certifications.join(', ')}`,
-      convertFontSize(config.fonts.size.body),
-      false,
-      config.colors.text,
-      'left',
-      config.fonts.body
-    );
-  }
-
-  yPosition += 2; // Very minimal spacing after skills section
-
-  // Projects
-  if (content.sections.projects && content.sections.projects.length > 0) {
-    addSectionHeader('Projects');
-    content.sections.projects.forEach((project, index) => {
-      // Project name
-      addText(
-        project.name,
-        convertFontSize(config.fonts.size.body) + 1,
-        true,
-        config.colors.text,
-        'left',
-        config.fonts.heading
-      );
-
-      // Project description
-      if (project.description) {
-        addText(
-          project.description,
-          convertFontSize(config.fonts.size.body),
-          false,
-          config.colors.text,
-          'left',
-          config.fonts.body
-        );
-      }
-
-      // Technologies and URL on same line if both exist
-      const techAndUrl = [];
-      if (project.technologies && project.technologies.length > 0) {
-        techAndUrl.push(`Technologies: ${project.technologies.join(', ')}`);
-      }
-      if (project.url) {
-        techAndUrl.push(`URL: ${project.url}`);
-      }
-
-      if (techAndUrl.length > 0) {
-        addText(
-          techAndUrl.join(' | '),
-          convertFontSize(config.fonts.size.small),
-          false,
-          config.colors.secondary,
-          'left',
-          config.fonts.body
-        );
-      }
-
-      // Add separator between project entries (except for the last one)
-      if (
-        content.sections.projects &&
-        index < content.sections.projects.length - 1
-      ) {
-        yPosition += 1; // Very minimal spacing between project entries
-      } else {
-        yPosition += 2; // Very minimal spacing after projects section
-      }
-    });
-  }
-
-  // Achievements
-  if (
-    content.sections.achievements &&
-    content.sections.achievements.length > 0
-  ) {
-    addSectionHeader('Achievements');
-    content.sections.achievements.forEach(achievement => {
-      addText(
-        `• ${achievement}`,
-        convertFontSize(config.fonts.size.body),
-        false,
-        config.colors.text,
-        'left',
-        config.fonts.body
-      );
-    });
-    yPosition += 2; // Very minimal spacing after achievements section
-  }
-
-  // Save the PDF
-  jsDoc.save(filename);
 };
 
 // DOCX rendering with unified styling

@@ -121,7 +121,7 @@ export const modernTemplates: ResumeTemplate[] = [
         text: '#0f172a', // Slate-900 - Excellent contrast on light background
         background: '#f8fafc', // Slate-50 - Light background
         sidebar: '#0f172a', // Slate-900 - Excellent contrast
-        sidebarText: '#f8fafc', // Slate-50 - Good contrast on dark sidebar
+        sidebarText: '#ffffff', // White - Excellent contrast on dark sidebar
         card: '#ffffff',
         border: '#e2e8f0',
       },

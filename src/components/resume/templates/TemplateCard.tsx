@@ -8,6 +8,22 @@ import { ResumeData, ResumeTemplate } from '@/types/resume';
 
 import { ImprovedPaginatedTemplatePreview } from './ImprovedPaginatedTemplatePreview';
 
+// Helper function to determine if a color is light or dark
+const isLightColor = (color: string): boolean => {
+  // Remove # if present
+  const hex = color.replace('#', '');
+
+  // Convert to RGB
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+
+  // Calculate luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  return luminance > 0.5;
+};
+
 interface TemplateCardProps {
   template: ResumeTemplate;
   isSelected?: boolean;
@@ -85,24 +101,52 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
       className={`group relative ${className}`}
     >
       <Card
-        className={`cursor-pointer transition-all duration-300 ${
+        className={`cursor-pointer transition-all duration-300 border-2 ${
           isSelected
-            ? 'ring-2 ring-blue-500 shadow-xl scale-105'
-            : 'hover:shadow-lg'
+            ? 'ring-2 ring-blue-500 shadow-xl scale-105 border-blue-200 bg-blue-50/30'
+            : 'border-slate-200 hover:border-slate-300 hover:shadow-lg bg-white'
         }`}
         {...(onClick && { onClick })}
       >
         <div className={currentSize.container}>
           {/* Template Preview */}
           <div
-            className={`${currentSize.preview} overflow-hidden shadow-sm border border-slate-200 relative group-hover:shadow-lg transition-all duration-300`}
+            className={`${currentSize.preview} overflow-hidden shadow-md border-2 border-slate-200 relative group-hover:shadow-xl transition-all duration-300 rounded-lg`}
             style={{
-              background: `linear-gradient(135deg, ${template.layout.colors.primary}20, ${template.layout.colors.accent}20)`,
+              background: `linear-gradient(135deg, ${template.layout.colors.primary}15, ${template.layout.colors.accent}15, ${template.layout.colors.secondary}10)`,
             }}
           >
             <div className='w-full h-full flex items-center justify-center relative overflow-hidden'>
               {/* Gradient Overlay */}
-              <div className='absolute inset-0 bg-gradient-to-br from-cyan-400/3 via-transparent to-blue-500/3 sm:from-cyan-400/5 sm:to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100'></div>
+              <div className='absolute inset-0 bg-gradient-to-br from-cyan-400/3 via-transparent to-blue-500/3 sm:from-cyan-400/5 sm:to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100'>
+                {/* Close Button */}
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    // Hide the gradient overlay by removing hover state
+                    const card = e.currentTarget.closest('.group');
+                    if (card) {
+                      card.classList.remove('group-hover:opacity-100');
+                    }
+                  }}
+                  className='absolute top-2 right-2 w-6 h-6 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-200 shadow-sm'
+                  title='Close preview'
+                >
+                  <svg
+                    className='w-3 h-3'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M6 18L18 6M6 6l12 12'
+                    />
+                  </svg>
+                </button>
+              </div>
 
               {/* Theme Color Bars */}
               <div className='absolute inset-0 flex flex-col'>
@@ -161,7 +205,12 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
           {showDetails && (
             <div className='text-center'>
               <h3
-                className={`${currentSize.name} font-bold text-slate-900 truncate`}
+                className={`${currentSize.name} font-bold truncate`}
+                style={{
+                  color: isLightColor(template.layout.colors.primary)
+                    ? '#1f2937'
+                    : '#ffffff',
+                }}
               >
                 {size === 'micro' ||
                 size === 'xxs' ||
@@ -203,16 +252,39 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
               />
             </div>
             <div className='space-y-2'>
-              <h3 className='font-bold text-sm text-slate-900'>
+              <h3
+                className='font-bold text-sm'
+                style={{
+                  color: isLightColor(template.layout.colors.background)
+                    ? '#1f2937'
+                    : '#ffffff',
+                }}
+              >
                 {template.name}
               </h3>
-              <p className='text-xs text-slate-600 line-clamp-3 leading-tight'>
+              <p
+                className='text-xs line-clamp-3 leading-tight'
+                style={{
+                  color: isLightColor(template.layout.colors.background)
+                    ? '#4b5563'
+                    : '#d1d5db',
+                }}
+              >
                 {template.description}
               </p>
 
               {/* Theme Colors Preview */}
               <div className='flex items-center gap-1'>
-                <span className='text-xs text-slate-500'>Theme:</span>
+                <span
+                  className='text-xs'
+                  style={{
+                    color: isLightColor(template.layout.colors.background)
+                      ? '#6b7280'
+                      : '#9ca3af',
+                  }}
+                >
+                  Theme:
+                </span>
                 <div className='flex gap-1'>
                   <div
                     className='w-3 h-3 rounded-full border border-slate-300'
@@ -247,13 +319,29 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
               </div>
 
               {/* Layout Info */}
-              <div className='text-xs text-slate-500'>
+              <div
+                className='text-xs'
+                style={{
+                  color: isLightColor(template.layout.colors.background)
+                    ? '#6b7280'
+                    : '#9ca3af',
+                }}
+              >
                 {template.layout.columns === 2 ? '2-Column' : '1-Column'} •{' '}
                 {template.layout.sidebar ? 'Sidebar' : 'No Sidebar'}
               </div>
 
               <div className='flex items-center justify-between'>
-                <span className='text-xs text-slate-500'>ATS Score</span>
+                <span
+                  className='text-xs'
+                  style={{
+                    color: isLightColor(template.layout.colors.background)
+                      ? '#6b7280'
+                      : '#9ca3af',
+                  }}
+                >
+                  ATS Score
+                </span>
                 <span className='text-xs font-bold text-green-600'>
                   {template.atsScore}%
                 </span>

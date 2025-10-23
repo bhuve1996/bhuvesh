@@ -79,6 +79,17 @@ export const PostExportATSValidation: React.FC<
             animate={{ opacity: 1, y: 0 }}
             className='space-y-4'
           >
+            {/* Reset Button */}
+            <div className='flex justify-end'>
+              <Button
+                onClick={() => setValidationResult(null)}
+                variant='outline'
+                size='sm'
+                className='text-xs'
+              >
+                Reset / Collapse
+              </Button>
+            </div>
             {/* Score */}
             <div className='text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-lg'>
               <div className='text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1'>

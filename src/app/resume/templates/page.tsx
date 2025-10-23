@@ -3,13 +3,10 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
-import { AIContentImprover } from '@/components/resume/AIContentImprover';
-import { LiveATSScore } from '@/components/resume/LiveATSScore';
-import { ModernExportButtons } from '@/components/resume/ModernExportButtons';
 import { ImprovedPaginatedTemplatePreview } from '@/components/resume/templates/ImprovedPaginatedTemplatePreview';
 import { ResumeTemplateRenderer } from '@/components/resume/templates/ResumeTemplateRenderer';
 import { TemplateCarousel } from '@/components/resume/templates/TemplateCarousel';
-import { TemplateCustomizer } from '@/components/resume/templates/TemplateCustomizer';
+import { UnifiedFloatingPanel } from '@/components/resume/UnifiedFloatingPanel';
 import { ValidationModal } from '@/components/resume/ValidationModal';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -155,11 +152,6 @@ export default function TemplateGalleryPage() {
     setCustomizedTemplate(null);
   };
 
-  // Handle template customization
-  const handleTemplateCustomize = (updatedTemplate: ResumeTemplate) => {
-    setCustomizedTemplate(updatedTemplate);
-  };
-
   // Handle validation modal actions
   const handleValidationProceed = async () => {
     if (!pendingExportFormat || !selectedTemplate) return;
@@ -238,6 +230,10 @@ export default function TemplateGalleryPage() {
     loadUserData();
   }, [userResumeData, setResumeData]);
 
+  const handleResumeDataUpdate = (updatedData: ResumeData) => {
+    setResumeData(updatedData);
+  };
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-50 to-blue-50'>
       {/* Data Choice Dialog */}
@@ -309,43 +305,31 @@ export default function TemplateGalleryPage() {
       <div className='bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 border-b border-slate-200 dark:border-slate-700'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6'>
           <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
-            <div className='flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4'>
-              {userResumeData && (
-                <Button
-                  variant='outline'
-                  onClick={() => {
-                    if (userResumeData) {
-                      localStorage.setItem(
-                        'resumeBuilderData',
-                        JSON.stringify(userResumeData)
-                      );
-                    }
-                    window.location.href = '/resume/builder';
-                  }}
-                  className='flex items-center space-x-1 text-xs sm:text-sm'
-                >
-                  <span>←</span>
-                  <span className='hidden sm:inline'>Back to Builder</span>
-                  <span className='sm:hidden'>Back</span>
-                </Button>
-              )}
-              <div>
-                <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-slate-700 dark:from-blue-400 dark:via-blue-300 dark:to-slate-200 bg-clip-text text-transparent'>
-                  Resume Templates
-                </h1>
-                <p className='text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1'>
-                  Choose from our collection of modern, professional resume
-                  templates
-                </p>
-              </div>
+            <div>
+              <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-slate-700 dark:from-blue-400 dark:via-blue-300 dark:to-slate-200 bg-clip-text text-transparent'>
+                Resume Templates
+              </h1>
+              <p className='text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1'>
+                Choose from our collection of modern, professional resume
+                templates
+              </p>
             </div>
             <Button
-              onClick={() => window.history.back()}
               variant='outline'
-              className='flex items-center gap-1 text-xs sm:text-sm'
+              onClick={() => {
+                if (userResumeData) {
+                  localStorage.setItem(
+                    'resumeBuilderData',
+                    JSON.stringify(userResumeData)
+                  );
+                }
+                window.location.href = '/resume/builder';
+              }}
+              className='flex items-center justify-center w-10 h-10 rounded-full bg-white border-2 border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 shadow-sm hover:shadow-md'
+              title='Back to Builder'
             >
               <svg
-                className='w-3 h-3'
+                className='w-5 h-5 text-slate-700'
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
@@ -353,25 +337,23 @@ export default function TemplateGalleryPage() {
                 <path
                   strokeLinecap='round'
                   strokeLinejoin='round'
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   d='M15 19l-7-7 7-7'
                 />
               </svg>
-              <span className='hidden sm:inline'>Back</span>
-              <span className='sm:hidden'>←</span>
             </Button>
           </div>
         </div>
       </div>
 
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-        {/* View Mode Toggle */}
-        <div className='flex justify-center mb-8'>
-          <div className='bg-slate-100 dark:bg-slate-800 rounded-xl p-1 flex items-center gap-2 shadow-sm border border-slate-200 dark:border-slate-700'>
+        {/* View Mode Toggle - Compact and always visible */}
+        <div className='flex justify-center mb-6'>
+          <div className='bg-slate-100 dark:bg-slate-800 rounded-lg p-1 flex items-center gap-1 shadow-sm border border-slate-200 dark:border-slate-700'>
             <div className='flex'>
               <button
                 onClick={() => setViewMode('carousel')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   viewMode === 'carousel'
                     ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -381,7 +363,7 @@ export default function TemplateGalleryPage() {
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   viewMode === 'grid'
                     ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -391,55 +373,37 @@ export default function TemplateGalleryPage() {
               </button>
             </div>
 
-            {/* Carousel Collapse Toggle - Only show in carousel mode */}
-            {viewMode === 'carousel' && (
-              <div className='h-6 w-px bg-slate-300 mx-1'></div>
-            )}
-            {viewMode === 'carousel' && (
-              <button
-                onClick={() => setIsCarouselCollapsed(!isCarouselCollapsed)}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                  isCarouselCollapsed
-                    ? 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                    : 'bg-white text-slate-900 shadow-sm hover:bg-slate-50'
+            {/* Always show collapse toggle for better UX */}
+            <div className='h-4 w-px bg-slate-300 mx-1'></div>
+            <button
+              onClick={() => setIsCarouselCollapsed(!isCarouselCollapsed)}
+              className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all ${
+                isCarouselCollapsed
+                  ? 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                  : 'bg-white text-slate-900 shadow-sm hover:bg-slate-50'
+              }`}
+              title={
+                isCarouselCollapsed
+                  ? 'Show carousel (Enter)'
+                  : 'Hide carousel (Esc)'
+              }
+            >
+              <svg
+                className={`w-3 h-3 transition-transform ${
+                  isCarouselCollapsed ? 'rotate-180' : ''
                 }`}
-                title={
-                  isCarouselCollapsed
-                    ? 'Show carousel (Enter)'
-                    : 'Hide carousel (Esc)'
-                }
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
               >
-                {isCarouselCollapsed ? (
-                  <svg
-                    className='w-4 h-4'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M19 9l-7 7-7-7'
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className='w-4 h-4'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M5 15l7-7 7 7'
-                    />
-                  </svg>
-                )}
-              </button>
-            )}
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M5 15l7-7 7 7'
+                />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -456,33 +420,7 @@ export default function TemplateGalleryPage() {
                     <h2 className='text-xl font-bold text-slate-900 dark:text-slate-100'>
                       {selectedTemplate.name}
                     </h2>
-                    <div className='text-sm text-green-600 dark:text-green-400 font-medium'>
-                      ATS Score: {selectedTemplate.atsScore}%
-                    </div>
                   </div>
-
-                  {/* Template Customizer */}
-                  <TemplateCustomizer
-                    template={customizedTemplate || selectedTemplate}
-                    onTemplateChange={setCustomizedTemplate}
-                    className='mb-6'
-                  />
-
-                  {/* AI Content Improver */}
-                  <AIContentImprover
-                    resumeData={getPreviewData()}
-                    onContentUpdate={updatedData => {
-                      // Update the resume data in the store
-                      setResumeData(updatedData);
-                    }}
-                    className='mb-6'
-                  />
-
-                  {/* Live ATS Score */}
-                  <LiveATSScore
-                    resumeData={getPreviewData()}
-                    className='mb-6'
-                  />
 
                   {/* Preview Mode Toggle */}
                   <div className='flex items-center justify-between mb-4'>
@@ -531,13 +469,6 @@ export default function TemplateGalleryPage() {
                     )}
                   </div>
 
-                  {/* Export Buttons - Hidden on mobile, shown as FAB */}
-                  <div className='hidden sm:flex justify-center pt-4'>
-                    <ModernExportButtons
-                      template={customizedTemplate || selectedTemplate}
-                      data={getPreviewData()}
-                    />
-                  </div>
                 </div>
               ) : (
                 <div className='text-center py-12'>
@@ -716,21 +647,12 @@ export default function TemplateGalleryPage() {
             <div className='lg:col-span-2 xl:col-span-3 order-1 lg:order-2 xl:order-2'>
               {selectedTemplate ? (
                 <div className='space-y-6'>
-                  {/* Template Customizer at Top */}
-                  <TemplateCustomizer
-                    template={customizedTemplate || selectedTemplate}
-                    onTemplateChange={handleTemplateCustomize}
-                  />
-
                   {/* Live Preview */}
                   <div className='bg-white rounded-xl shadow-sm border border-slate-200 p-6'>
                     <div className='flex items-center justify-between mb-4'>
                       <h2 className='text-xl font-bold text-slate-900'>
                         {selectedTemplate.name}
                       </h2>
-                      <div className='text-sm text-green-600 font-medium'>
-                        ATS Score: {selectedTemplate.atsScore}%
-                      </div>
                     </div>
 
                     <div className='border border-slate-200 rounded-lg overflow-hidden'>
@@ -742,13 +664,6 @@ export default function TemplateGalleryPage() {
                     </div>
                   </div>
 
-                  {/* Export Buttons */}
-                  <div className='flex justify-center'>
-                    <ModernExportButtons
-                      template={customizedTemplate || selectedTemplate}
-                      data={getPreviewData()}
-                    />
-                  </div>
                 </div>
               ) : (
                 <div className='bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center'>
@@ -985,6 +900,16 @@ export default function TemplateGalleryPage() {
           />
         )}
       </div>
+
+      {/* Unified Floating Panel - All tools in one place */}
+      {selectedTemplate && (
+        <UnifiedFloatingPanel
+          resumeData={getPreviewData()}
+          template={customizedTemplate || selectedTemplate}
+          onResumeDataUpdate={handleResumeDataUpdate}
+          onTemplateChange={setCustomizedTemplate}
+        />
+      )}
     </div>
   );
 }

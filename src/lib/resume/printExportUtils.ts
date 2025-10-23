@@ -1,6 +1,230 @@
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
 /**
+ * Generate HTML content from resume data when DOM element is not available
+ */
+const generateResumeHTML = (
+  template: ResumeTemplate,
+  data: ResumeData
+): string => {
+  const { colors, fonts, spacing } = template.layout;
+
+  return `
+    <div class="resume-template" style="
+      background-color: ${colors.background};
+      color: ${colors.text};
+      font-family: ${fonts.body};
+      font-size: ${fonts.size.body};
+      line-height: ${spacing.lineHeight};
+      padding: ${spacing.padding};
+      min-height: 100vh;
+    ">
+      <!-- Header -->
+      <div class="text-center mb-6" style="color: ${colors.text};">
+        <h1 style="
+          font-family: ${fonts.heading};
+          font-size: ${fonts.size.heading};
+          color: ${colors.primary};
+          font-weight: bold;
+          margin-bottom: 0.5rem;
+        ">${data.personal.fullName}</h1>
+        <div style="color: ${colors.secondary}; font-size: ${fonts.size.small};">
+          ${data.personal.email}
+          ${data.personal.phone ? ` • ${data.personal.phone}` : ''}
+          ${data.personal.location ? ` • ${data.personal.location}` : ''}
+          ${data.personal.linkedin ? ` • LinkedIn` : ''}
+          ${data.personal.github ? ` • GitHub` : ''}
+        </div>
+      </div>
+
+      <!-- Summary -->
+      ${
+        data.summary
+          ? `
+        <div class="mb-4">
+          <h2 style="
+            font-family: ${fonts.heading};
+            font-size: ${fonts.size.subheading};
+            color: ${colors.primary};
+            font-weight: bold;
+            border-bottom: 2px solid ${colors.accent};
+            padding-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+          ">Professional Summary</h2>
+          <p style="color: ${colors.text};">${data.summary}</p>
+        </div>
+      `
+          : ''
+      }
+
+      <!-- Experience -->
+      ${
+        data.experience.length > 0
+          ? `
+        <div class="mb-4">
+          <h2 style="
+            font-family: ${fonts.heading};
+            font-size: ${fonts.size.subheading};
+            color: ${colors.primary};
+            font-weight: bold;
+            border-bottom: 2px solid ${colors.accent};
+            padding-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+          ">Professional Experience</h2>
+          ${data.experience
+            .map(
+              exp => `
+            <div class="mb-3">
+              <h3 style="
+                font-family: ${fonts.heading};
+                font-size: ${fonts.size.body};
+                color: ${colors.text};
+                font-weight: bold;
+                margin-bottom: 0.25rem;
+              ">${exp.position} | ${exp.company}</h3>
+              <p style="
+                color: ${colors.secondary};
+                font-size: ${fonts.size.small};
+                margin-bottom: 0.25rem;
+              ">${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}</p>
+              ${exp.description ? `<p style="color: ${colors.text}; margin-bottom: 0.25rem;">${exp.description}</p>` : ''}
+              ${
+                exp.achievements.length > 0
+                  ? `
+                <ul style="color: ${colors.text}; margin-left: 1rem;">
+                  ${exp.achievements.map(achievement => `<li>• ${achievement}</li>`).join('')}
+                </ul>
+              `
+                  : ''
+              }
+            </div>
+          `
+            )
+            .join('')}
+        </div>
+      `
+          : ''
+      }
+
+      <!-- Education -->
+      ${
+        data.education.length > 0
+          ? `
+        <div class="mb-4">
+          <h2 style="
+            font-family: ${fonts.heading};
+            font-size: ${fonts.size.subheading};
+            color: ${colors.primary};
+            font-weight: bold;
+            border-bottom: 2px solid ${colors.accent};
+            padding-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+          ">Education</h2>
+          ${data.education
+            .map(
+              edu => `
+            <div class="mb-3">
+              <h3 style="
+                font-family: ${fonts.heading};
+                font-size: ${fonts.size.body};
+                color: ${colors.text};
+                font-weight: bold;
+                margin-bottom: 0.25rem;
+              ">${edu.degree}${edu.field ? ` in ${edu.field}` : ''}</h3>
+              <p style="color: ${colors.text}; margin-bottom: 0.25rem;">${edu.institution}</p>
+              <p style="
+                color: ${colors.secondary};
+                font-size: ${fonts.size.small};
+              ">${edu.startDate} - ${edu.current ? 'Present' : edu.endDate}${edu.gpa ? ` | GPA: ${edu.gpa}` : ''}</p>
+            </div>
+          `
+            )
+            .join('')}
+        </div>
+      `
+          : ''
+      }
+
+      <!-- Skills -->
+      <div class="mb-4">
+        <h2 style="
+          font-family: ${fonts.heading};
+          font-size: ${fonts.size.subheading};
+          color: ${colors.primary};
+          font-weight: bold;
+          border-bottom: 2px solid ${colors.accent};
+          padding-bottom: 0.25rem;
+          margin-bottom: 0.5rem;
+        ">Skills</h2>
+        ${data.skills.technical.length > 0 ? `<p style="color: ${colors.text}; margin-bottom: 0.25rem;"><strong>Technical:</strong> ${data.skills.technical.join(', ')}</p>` : ''}
+        ${data.skills.business.length > 0 ? `<p style="color: ${colors.text}; margin-bottom: 0.25rem;"><strong>Business:</strong> ${data.skills.business.join(', ')}</p>` : ''}
+        ${data.skills.soft.length > 0 ? `<p style="color: ${colors.text}; margin-bottom: 0.25rem;"><strong>Soft Skills:</strong> ${data.skills.soft.join(', ')}</p>` : ''}
+        ${data.skills.languages.length > 0 ? `<p style="color: ${colors.text}; margin-bottom: 0.25rem;"><strong>Languages:</strong> ${data.skills.languages.join(', ')}</p>` : ''}
+        ${data.skills.certifications.length > 0 ? `<p style="color: ${colors.text}; margin-bottom: 0.25rem;"><strong>Certifications:</strong> ${data.skills.certifications.join(', ')}</p>` : ''}
+      </div>
+
+      <!-- Projects -->
+      ${
+        data.projects.length > 0
+          ? `
+        <div class="mb-4">
+          <h2 style="
+            font-family: ${fonts.heading};
+            font-size: ${fonts.size.subheading};
+            color: ${colors.primary};
+            font-weight: bold;
+            border-bottom: 2px solid ${colors.accent};
+            padding-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+          ">Projects</h2>
+          ${data.projects
+            .map(
+              project => `
+            <div class="mb-3">
+              <h3 style="
+                font-family: ${fonts.heading};
+                font-size: ${fonts.size.body};
+                color: ${colors.text};
+                font-weight: bold;
+                margin-bottom: 0.25rem;
+              ">${project.name}</h3>
+              ${project.description ? `<p style="color: ${colors.text}; margin-bottom: 0.25rem;">${project.description}</p>` : ''}
+              ${project.technologies.length > 0 ? `<p style="color: ${colors.secondary}; font-size: ${fonts.size.small};">Technologies: ${project.technologies.join(', ')}</p>` : ''}
+            </div>
+          `
+            )
+            .join('')}
+        </div>
+      `
+          : ''
+      }
+
+      <!-- Achievements -->
+      ${
+        data.achievements && data.achievements.length > 0
+          ? `
+        <div class="mb-4">
+          <h2 style="
+            font-family: ${fonts.heading};
+            font-size: ${fonts.size.subheading};
+            color: ${colors.primary};
+            font-weight: bold;
+            border-bottom: 2px solid ${colors.accent};
+            padding-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+          ">Achievements</h2>
+          <ul style="color: ${colors.text}; margin-left: 1rem;">
+            ${data.achievements.map(achievement => `<li>• ${achievement}</li>`).join('')}
+          </ul>
+        </div>
+      `
+          : ''
+      }
+    </div>
+  `;
+};
+
+/**
  * Simple print-to-PDF export using browser's print functionality
  * This is the most reliable method as it uses the browser's native PDF generation
  */
@@ -20,22 +244,67 @@ export const exportToPDFViaPrint = async (
   const { data, template } = options;
 
   try {
+    console.log('Starting print PDF export with:', { template: template.name });
+
     // Create a new window for printing
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
       throw new Error('Unable to open print window. Please allow popups.');
     }
+    console.log('Print window opened successfully');
 
-    // Get the current resume preview element
-    const resumeElement = document.querySelector('.resume-template');
+    // Get the current resume preview element - try multiple selectors
+    let resumeElement = document.querySelector('.resume-template');
+    console.log(
+      'Looking for resume element, found .resume-template:',
+      !!resumeElement
+    );
+
+    // If not found, try other possible selectors for different view modes
     if (!resumeElement) {
-      throw new Error(
-        'Resume preview not found. Please ensure you have a template selected.'
+      resumeElement = document.querySelector('.template-preview');
+      console.log('Looking for .template-preview:', !!resumeElement);
+    }
+    if (!resumeElement) {
+      resumeElement = document.querySelector('.template-preview-container');
+      console.log('Looking for .template-preview-container:', !!resumeElement);
+    }
+    if (!resumeElement) {
+      resumeElement = document.querySelector('[class*="template"]');
+      console.log('Looking for [class*="template"]:', !!resumeElement);
+    }
+
+    // Debug: log all available elements with template-related classes
+    if (!resumeElement) {
+      const allElements = document.querySelectorAll(
+        '[class*="template"], [class*="resume"], [class*="preview"]'
+      );
+      console.log(
+        'Available template-related elements:',
+        Array.from(allElements).map(el => ({
+          tagName: el.tagName,
+          className: el.className,
+          id: el.id,
+        }))
       );
     }
 
-    // Clone the resume element
-    const clonedElement = resumeElement.cloneNode(true) as HTMLElement;
+    // Note: We no longer throw an error here since we have a fallback HTML generator
+
+    let resumeHTML: string;
+
+    if (resumeElement) {
+      // Use the existing DOM element
+      const clonedElement = resumeElement.cloneNode(true) as HTMLElement;
+      resumeHTML = clonedElement.outerHTML;
+      console.log('Using existing DOM element for export');
+    } else {
+      // Generate HTML from data as fallback
+      resumeHTML = generateResumeHTML(template, data);
+      console.log(
+        'Generated HTML from data as fallback - this may have slightly different styling than the preview'
+      );
+    }
 
     // Get all stylesheets from the current document
     const stylesheets = Array.from(document.styleSheets);
@@ -143,7 +412,7 @@ export const exportToPDFViaPrint = async (
           </style>
         </head>
         <body>
-          ${clonedElement.outerHTML}
+          ${resumeHTML}
         </body>
       </html>
     `);
@@ -191,17 +460,33 @@ export const exportToPDFViaPrint = async (
         printWindow.document.head.appendChild(disableHeadersScript);
 
         // Standard print call
+        console.log('Triggering print dialog');
         printWindow.print();
         // Close the window after printing
         setTimeout(() => {
           printWindow.close();
+          console.log('Print window closed');
         }, 1000);
       }, 500);
     };
-  } catch {
-    // console.error('Print export error:', error);
+  } catch (error) {
+    console.error('Print export error:', error);
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('popup')) {
+        throw new Error('Please allow popups for this site to export PDFs.');
+      } else if (error.message.includes('Resume preview not found')) {
+        throw new Error(
+          'Please ensure you have a template selected and resume data filled. The export will use generated HTML as fallback.'
+        );
+      } else if (error.message.includes('stylesheet')) {
+        throw new Error(
+          'Style loading error. Please refresh the page and try again.'
+        );
+      }
+    }
     throw new Error(
-      'Failed to generate PDF via print. Please try the classic export method.'
+      `Failed to generate PDF via print: ${error instanceof Error ? error.message : 'Unknown error'}. Please try the classic export method.`
     );
   }
 };
@@ -215,16 +500,36 @@ export const exportToDOCXViaDownload = async (
   const { data, template, filename = 'resume.docx' } = options;
 
   try {
-    // Get the current resume preview element
-    const resumeElement = document.querySelector('.resume-template');
+    // Get the current resume preview element - try multiple selectors
+    let resumeElement = document.querySelector('.resume-template');
+
+    // If not found, try other possible selectors for different view modes
     if (!resumeElement) {
-      throw new Error(
-        'Resume preview not found. Please ensure you have a template selected.'
-      );
+      resumeElement = document.querySelector('.template-preview');
+    }
+    if (!resumeElement) {
+      resumeElement = document.querySelector('.template-preview-container');
+    }
+    if (!resumeElement) {
+      resumeElement = document.querySelector('[class*="template"]');
     }
 
-    // Clone the resume element
-    const clonedElement = resumeElement.cloneNode(true) as HTMLElement;
+    // Note: We no longer throw an error here since we have a fallback HTML generator
+
+    let resumeHTML: string;
+
+    if (resumeElement) {
+      // Use the existing DOM element
+      const clonedElement = resumeElement.cloneNode(true) as HTMLElement;
+      resumeHTML = clonedElement.outerHTML;
+      console.log('Using existing DOM element for export');
+    } else {
+      // Generate HTML from data as fallback
+      resumeHTML = generateResumeHTML(template, data);
+      console.log(
+        'Generated HTML from data as fallback - this may have slightly different styling than the preview'
+      );
+    }
 
     // Get all stylesheets from the current document
     const stylesheets = Array.from(document.styleSheets);
@@ -291,7 +596,7 @@ export const exportToDOCXViaDownload = async (
           </style>
         </head>
         <body>
-          ${clonedElement.outerHTML}
+          ${resumeHTML}
         </body>
       </html>
     `;

@@ -8,6 +8,22 @@ import { ResumeTemplate } from '@/types/resume';
 
 import { TemplateCard } from './TemplateCard';
 
+// Helper function to determine if a color is light or dark
+const isLightColor = (color: string): boolean => {
+  // Remove # if present
+  const hex = color.replace('#', '');
+
+  // Convert to RGB
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+
+  // Calculate luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  return luminance > 0.5;
+};
+
 interface TemplateCarouselProps {
   templates: ResumeTemplate[];
   selectedTemplate?: ResumeTemplate | null;
@@ -47,14 +63,29 @@ export const TemplateCarousel: React.FC<TemplateCarouselProps> = ({
         {showLabels && (
           <div className='flex items-center justify-between mb-4'>
             <div>
-              <h3 className='text-lg font-semibold text-slate-900'>
+              <h3
+                className='text-lg font-semibold'
+                style={{
+                  color: isLightColor('#ffffff') ? '#1f2937' : '#ffffff',
+                }}
+              >
                 Choose Template
               </h3>
-              <p className='text-sm text-slate-600'>
+              <p
+                className='text-sm'
+                style={{
+                  color: isLightColor('#ffffff') ? '#4b5563' : '#d1d5db',
+                }}
+              >
                 {templates.length} templates available
               </p>
             </div>
-            <div className='text-sm text-slate-500'>
+            <div
+              className='text-sm'
+              style={{
+                color: isLightColor('#ffffff') ? '#6b7280' : '#9ca3af',
+              }}
+            >
               {selectedTemplate?.name || 'No template selected'}
             </div>
           </div>

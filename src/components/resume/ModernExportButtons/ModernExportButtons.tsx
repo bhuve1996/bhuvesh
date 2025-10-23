@@ -2,11 +2,11 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
-import { PostExportATSValidation } from '@/components/resume/PostExportATSValidation';
 import {
   exportToDOCX,
-  exportToPDF,
+  exportToPDFWithFallback,
   exportToTXT,
 } from '@/lib/resume/exportUtils';
 import { exportResumeFromHTML } from '@/lib/resume/htmlExportUtils';
@@ -29,8 +29,6 @@ export const ModernExportButtons: React.FC<ModernExportButtonsProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [showPostExportValidation, setShowPostExportValidation] =
-    useState(false);
   // const [exportMethod, setExportMethod] = useState<'classic' | 'modern'>('classic');
 
   const handleExport = async (
@@ -66,18 +64,50 @@ export const ModernExportButtons: React.FC<ModernExportButtonsProps> = ({
           filename: `${filename}.${format}`,
         });
       } else {
-        // Use classic export
+        // Use classic export with fallback
         if (format === 'pdf') {
-          await exportToPDF(template, data, `${filename}.pdf`);
+          await exportToPDFWithFallback(template, data, `${filename}.pdf`);
         } else if (format === 'docx') {
           await exportToDOCX(template, data, `${filename}.docx`);
         } else if (format === 'txt') {
           await exportToTXT(template, data, `${filename}.txt`);
         }
       }
-    } catch {
-      // console.error(`Export error (${method}):`, error);
-      alert(`Failed to export ${format.toUpperCase()}. Please try again.`);
+
+      // Show success message
+      toast.success(`${format.toUpperCase()} exported successfully!`, {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          background: '#dcfce7',
+          color: '#166534',
+          border: '1px solid #bbf7d0',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          fontSize: '14px',
+        },
+      });
+    } catch (error) {
+      console.error(`Export error (${method}):`, error);
+      // Show more specific error message using toast
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `Failed to export ${format.toUpperCase()}. Please try again.`;
+
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: 'top-center',
+        style: {
+          background: '#fee2e2',
+          color: '#dc2626',
+          border: '1px solid #fecaca',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          fontSize: '14px',
+          maxWidth: '400px',
+        },
+      });
     } finally {
       setIsExporting(false);
     }
@@ -320,34 +350,6 @@ export const ModernExportButtons: React.FC<ModernExportButtonsProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Post-Export ATS Validation */}
-      {showPostExportValidation && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className='mt-4'
-        >
-          <PostExportATSValidation
-            onValidate={() => {
-              setShowPostExportValidation(false);
-              // Handle validation suggestions
-            }}
-          />
-        </motion.div>
-      )}
-
-      {/* Show Post-Export Validation Button */}
-      {!showPostExportValidation && (
-        <motion.button
-          onClick={() => setShowPostExportValidation(true)}
-          className='mt-4 w-full px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors'
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          📋 Validate Exported Resume
-        </motion.button>
-      )}
     </div>
   );
 };
