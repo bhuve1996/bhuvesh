@@ -88,7 +88,7 @@ export const ModernExportButtons: React.FC<ModernExportButtonsProps> = ({
         },
       });
     } catch (error) {
-      console.error(`Export error (${method}):`, error);
+      // console.error(`Export error (${method}):`, error);
       // Show more specific error message using toast
       const errorMessage =
         error instanceof Error

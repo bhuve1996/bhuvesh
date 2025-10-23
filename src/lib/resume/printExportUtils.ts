@@ -244,50 +244,50 @@ export const exportToPDFViaPrint = async (
   const { data, template } = options;
 
   try {
-    console.log('Starting print PDF export with:', { template: template.name });
+    // console.log('Starting print PDF export with:', { template: template.name });
 
     // Create a new window for printing
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
       throw new Error('Unable to open print window. Please allow popups.');
     }
-    console.log('Print window opened successfully');
+    // console.log('Print window opened successfully');
 
     // Get the current resume preview element - try multiple selectors
     let resumeElement = document.querySelector('.resume-template');
-    console.log(
-      'Looking for resume element, found .resume-template:',
-      !!resumeElement
-    );
+    // console.log(
+    //   'Looking for resume element, found .resume-template:',
+    //   !!resumeElement
+    // );
 
     // If not found, try other possible selectors for different view modes
     if (!resumeElement) {
       resumeElement = document.querySelector('.template-preview');
-      console.log('Looking for .template-preview:', !!resumeElement);
+      // console.log('Looking for .template-preview:', !!resumeElement);
     }
     if (!resumeElement) {
       resumeElement = document.querySelector('.template-preview-container');
-      console.log('Looking for .template-preview-container:', !!resumeElement);
+      // console.log('Looking for .template-preview-container:', !!resumeElement);
     }
     if (!resumeElement) {
       resumeElement = document.querySelector('[class*="template"]');
-      console.log('Looking for [class*="template"]:', !!resumeElement);
+      // console.log('Looking for [class*="template"]:', !!resumeElement);
     }
 
     // Debug: log all available elements with template-related classes
-    if (!resumeElement) {
-      const allElements = document.querySelectorAll(
-        '[class*="template"], [class*="resume"], [class*="preview"]'
-      );
-      console.log(
-        'Available template-related elements:',
-        Array.from(allElements).map(el => ({
-          tagName: el.tagName,
-          className: el.className,
-          id: el.id,
-        }))
-      );
-    }
+    // if (!resumeElement) {
+    //   const _allElements = document.querySelectorAll(
+    //     '[class*="template"], [class*="resume"], [class*="preview"]'
+    //   );
+    //   // console.log(
+    //   //   'Available template-related elements:',
+    //   //   Array.from(_allElements).map(el => ({
+    //   //     tagName: el.tagName,
+    //   //     className: el.className,
+    //   //     id: el.id,
+    //   //   }))
+    //   // );
+    // }
 
     // Note: We no longer throw an error here since we have a fallback HTML generator
 
@@ -297,13 +297,13 @@ export const exportToPDFViaPrint = async (
       // Use the existing DOM element
       const clonedElement = resumeElement.cloneNode(true) as HTMLElement;
       resumeHTML = clonedElement.outerHTML;
-      console.log('Using existing DOM element for export');
+      // console.log('Using existing DOM element for export');
     } else {
       // Generate HTML from data as fallback
       resumeHTML = generateResumeHTML(template, data);
-      console.log(
-        'Generated HTML from data as fallback - this may have slightly different styling than the preview'
-      );
+      // console.log(
+      //   'Generated HTML from data as fallback - this may have slightly different styling than the preview'
+      // );
     }
 
     // Get all stylesheets from the current document
@@ -447,10 +447,10 @@ export const exportToPDFViaPrint = async (
             try {
               if (window.chrome && window.chrome.runtime) {
                 // This won't work in regular web pages, but worth trying
-                console.log('Chrome extension context not available');
+                // console.log('Chrome extension context not available');
               }
             } catch (e) {
-              console.log('Cannot access Chrome APIs');
+              // console.log('Cannot access Chrome APIs');
             }
             
             // Call original print
@@ -460,17 +460,17 @@ export const exportToPDFViaPrint = async (
         printWindow.document.head.appendChild(disableHeadersScript);
 
         // Standard print call
-        console.log('Triggering print dialog');
+        // console.log('Triggering print dialog');
         printWindow.print();
         // Close the window after printing
         setTimeout(() => {
           printWindow.close();
-          console.log('Print window closed');
+          // console.log('Print window closed');
         }, 1000);
       }, 500);
     };
   } catch (error) {
-    console.error('Print export error:', error);
+    // console.error('Print export error:', error);
     // Provide more specific error messages
     if (error instanceof Error) {
       if (error.message.includes('popup')) {
@@ -522,13 +522,13 @@ export const exportToDOCXViaDownload = async (
       // Use the existing DOM element
       const clonedElement = resumeElement.cloneNode(true) as HTMLElement;
       resumeHTML = clonedElement.outerHTML;
-      console.log('Using existing DOM element for export');
+      // console.log('Using existing DOM element for export');
     } else {
       // Generate HTML from data as fallback
       resumeHTML = generateResumeHTML(template, data);
-      console.log(
-        'Generated HTML from data as fallback - this may have slightly different styling than the preview'
-      );
+      // console.log(
+      //   'Generated HTML from data as fallback - this may have slightly different styling than the preview'
+      // );
     }
 
     // Get all stylesheets from the current document
@@ -617,7 +617,7 @@ export const exportToDOCXViaDownload = async (
       'HTML file downloaded! You can open it in Microsoft Word and save as DOCX for better formatting.'
     );
   } catch {
-    // console.error('DOCX export error:', error);
+    // // console.error('DOCX export error:', error);
     throw new Error(
       'Failed to generate DOCX. Please try the classic export method.'
     );

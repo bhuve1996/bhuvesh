@@ -286,12 +286,12 @@ export const FloatingTemplateCustomizer: React.FC<
     updatedTemplate.customStyles[section][property] = value;
 
     // Debug: Log the changes
-    console.log('🎨 Template Customizer - Updating:', {
-      section,
-      property,
-      value,
-      updatedTemplate: updatedTemplate.customStyles[section],
-    });
+    // console.log('🎨 Template Customizer - Updating:', {
+    //   section,
+    //   property,
+    //   value,
+    //   updatedTemplate: updatedTemplate.customStyles[section],
+    // });
 
     onTemplateChange(updatedTemplate);
   };

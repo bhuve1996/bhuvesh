@@ -102,8 +102,8 @@ export const ImprovedAIContentImprover: React.FC<
       toast.success(
         `✨ ${section} improved! Expected score increase: +${scoreIncrease} points`
       );
-    } catch (error) {
-      console.error('Content improvement error:', error);
+    } catch {
+      // console.error('Content improvement error:', error);
       toast.error('Failed to improve content. Please try again.');
     } finally {
       setIsImproving(false);
@@ -114,14 +114,14 @@ export const ImprovedAIContentImprover: React.FC<
   const applyAIImprovements = async (
     data: ResumeData,
     section: keyof ResumeData,
-    improvementPlan: any
+    improvementPlan: { improvements?: Array<{ category?: string; section?: string }> }
   ): Promise<ContentImprovement[]> => {
     const improvements: ContentImprovement[] = [];
 
     // Get relevant suggestions from the improvement plan
     const suggestions = improvementPlan.improvements || [];
     const sectionSuggestions = suggestions.filter(
-      (s: any) =>
+      (s: { category?: string; section?: string }) =>
         s.category?.toLowerCase().includes(section.toLowerCase()) ||
         s.section?.toLowerCase().includes(section.toLowerCase())
     );
@@ -184,17 +184,17 @@ export const ImprovedAIContentImprover: React.FC<
 
   const generateImprovedSummary = async (
     original: string,
-    suggestions: any[]
+    _suggestions: Array<{ category?: string; section?: string }>
   ): Promise<string> => {
     // Simulate AI improvement - in real implementation, this would call an AI service
-    const improvements = [
-      'Results-driven',
-      'Proven track record',
-      'Expertise in',
-      'Led cross-functional teams',
-      'Delivered measurable results',
-      'Optimized processes',
-    ];
+    // const _improvements = [
+    //   'Results-driven',
+    //   'Proven track record',
+    //   'Expertise in',
+    //   'Led cross-functional teams',
+    //   'Delivered measurable results',
+    //   'Optimized processes',
+    // ];
 
     let improved = original;
 
@@ -221,7 +221,7 @@ export const ImprovedAIContentImprover: React.FC<
 
   const generateImprovedExperience = (
     original: string,
-    suggestions: any[]
+    _suggestions: Array<{ category?: string; section?: string }>
   ): string => {
     let improved = original;
 
@@ -237,7 +237,7 @@ export const ImprovedAIContentImprover: React.FC<
     const randomVerb =
       actionVerbs[Math.floor(Math.random() * actionVerbs.length)];
 
-    if (!improved.toLowerCase().startsWith(randomVerb.toLowerCase())) {
+    if (randomVerb && !improved.toLowerCase().startsWith(randomVerb.toLowerCase())) {
       improved = `${randomVerb} ${improved.toLowerCase()}`;
     }
 
@@ -251,7 +251,7 @@ export const ImprovedAIContentImprover: React.FC<
     return improved;
   };
 
-  const generateImprovedSkills = (skills: any, suggestions: any[]): any => {
+  const generateImprovedSkills = (skills: Record<string, string[]>, _suggestions: Array<{ category?: string; section?: string }>): Record<string, string[]> => {
     const improved = { ...skills };
 
     // Add relevant technical skills if missing
@@ -350,7 +350,7 @@ export const ImprovedAIContentImprover: React.FC<
     return text;
   };
 
-  const getSectionData = (data: ResumeData, section: keyof ResumeData): any => {
+  const getSectionData = (data: ResumeData, section: keyof ResumeData): Record<string, unknown> => {
     switch (section) {
       case 'summary':
         return { summary: data.summary };

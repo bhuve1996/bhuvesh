@@ -98,8 +98,8 @@ export const FloatingATSScore: React.FC<FloatingATSScoreProps> = ({
       } else {
         throw new Error(result.message || 'Analysis failed');
       }
-    } catch (error) {
-      console.error('ATS Analysis error:', error);
+    } catch {
+      // console.error('ATS Analysis error:', error);
       toast.error('Failed to analyze resume. Using fallback analysis.');
 
       // Fallback to basic analysis
@@ -201,7 +201,7 @@ export const FloatingATSScore: React.FC<FloatingATSScoreProps> = ({
 
   const performBasicAnalysis = (data: ResumeData): ATSAnalysisResult => {
     const issues: string[] = [];
-    const suggestions: string[] = [];
+    // const _suggestions: string[] = [];
     let score = 100;
 
     // Check contact information

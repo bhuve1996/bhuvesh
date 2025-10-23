@@ -144,7 +144,7 @@ export const exportToPDFFromHTML = async (
     // Download the PDF
     pdf.save(filename);
   } catch {
-    // console.error('PDF export error:', error);
+    // // console.error('PDF export error:', error);
     throw new Error('Failed to generate PDF from HTML');
   }
 };
@@ -184,7 +184,7 @@ export const exportToDOCXFromHTML = async (
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch {
-    // console.error('DOCX export error:', error);
+    // // console.error('DOCX export error:', error);
     throw new Error('Failed to generate DOCX from HTML');
   }
 };

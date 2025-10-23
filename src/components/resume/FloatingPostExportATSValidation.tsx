@@ -13,7 +13,7 @@ interface FloatingPostExportATSValidationProps {
 
 export const FloatingPostExportATSValidation: React.FC<
   FloatingPostExportATSValidationProps
-> = ({ onValidate, className = '' }) => {
+> = ({ onValidate: _onValidate, className = '' }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
   const [validationResult, setValidationResult] = useState<{

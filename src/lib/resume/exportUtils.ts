@@ -16,24 +16,24 @@ export const exportToPDF = async (
   filename: string = 'resume.pdf'
 ) => {
   try {
-    console.log('Starting PDF export with:', {
-      template: template.name,
-      filename,
-    });
+    // console.log('Starting PDF export with:', {
+    //   template: template.name,
+    //   filename,
+    // });
 
     // Dynamic import to avoid SSR issues
     const { jsPDF } = await import('jspdf');
-    console.log('jsPDF loaded successfully');
+    // console.log('jsPDF loaded successfully');
 
     const doc = new jsPDF('p', 'mm', 'a4');
-    console.log('jsPDF document created');
+    // console.log('jsPDF document created');
 
     // Use unified rendering system
     const config = getRenderConfig(template);
-    console.log('Render config created:', config);
+    // console.log('Render config created:', config);
 
     const content = convertToUnifiedContent(data);
-    console.log('Content converted:', content);
+    // console.log('Content converted:', content);
 
     await renderToPDF(
       config,
@@ -42,9 +42,9 @@ export const exportToPDF = async (
       filename
     );
 
-    console.log('PDF export completed successfully');
+    // console.log('PDF export completed successfully');
   } catch (error) {
-    console.error('PDF export error:', error);
+    // console.error('PDF export error:', error);
     // Provide more specific error messages
     if (error instanceof Error) {
       if (error.message.includes('jsPDF')) {
@@ -80,7 +80,7 @@ export const exportToDOCX = async (
 
     await renderToDOCX(config, content, filename);
   } catch {
-    // console.error('DOCX export error:', error);
+    // // console.error('DOCX export error:', error);
     throw new Error('Failed to generate DOCX');
   }
 };
@@ -96,7 +96,7 @@ export const exportToTXT = (
     const content = convertToUnifiedContent(data);
     renderToTXT(content, filename);
   } catch {
-    // console.error('TXT export error:', error);
+    // // console.error('TXT export error:', error);
     throw new Error('Failed to generate TXT');
   }
 };
@@ -111,15 +111,15 @@ export const exportToPDFWithFallback = async (
     // Try classic PDF export first
     await exportToPDF(template, data, filename);
   } catch (classicError) {
-    console.warn(
-      'Classic PDF export failed, trying print method:',
-      classicError
-    );
+    // console.warn(
+    //   'Classic PDF export failed, trying print method:',
+    //   classicError
+    // );
     try {
       // Fallback to print method
       await exportToPDFViaPrint({ template, data, filename });
     } catch (printError) {
-      console.error('Print PDF export also failed:', printError);
+      // console.error('Print PDF export also failed:', printError);
       throw new Error(
         `Both PDF export methods failed. Classic: ${classicError instanceof Error ? classicError.message : 'Unknown error'}. Print: ${printError instanceof Error ? printError.message : 'Unknown error'}`
       );
