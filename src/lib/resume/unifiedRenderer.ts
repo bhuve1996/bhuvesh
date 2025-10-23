@@ -252,7 +252,9 @@ export const renderToPDF = async (
   const jsDoc = doc as any; // Cast for jsPDF operations
   const pageWidth = jsDoc.internal.pageSize.getWidth();
   const pageHeight = jsDoc.internal.pageSize.getHeight();
-  const margin = 20; // Fixed small margin in points (about 0.28 inches)
+  // Use template margin settings or default to minimal
+  const marginValue = config.spacing?.margins || '0.1in';
+  const margin = convertSpacing(marginValue); // Convert template margin to points
   const contentWidth = pageWidth - margin * 2;
   let yPosition = margin + 2; // Minimal top margin
 
@@ -284,8 +286,8 @@ export const renderToPDF = async (
     jsDoc.setTextColor(r, g, b);
 
     const lines = jsDoc.splitTextToSize(text, contentWidth);
-    const lineHeight = fontSize * 1.0; // Compact line height
-    const requiredSpace = lines.length * lineHeight + 1; // Minimal space between lines
+    const lineHeight = fontSize * 0.9; // Very compact line height
+    const requiredSpace = lines.length * lineHeight + 0.5; // Very minimal space between lines
 
     // Check if we need a new page
     checkPageBreak(requiredSpace);
@@ -300,8 +302,8 @@ export const renderToPDF = async (
 
   // Helper function to add section header
   const addSectionHeader = (title: string) => {
-    yPosition += 4; // Minimal spacing between sections
-    checkPageBreak(10);
+    yPosition += 2; // Very minimal spacing between sections
+    checkPageBreak(8);
 
     addText(
       title,
@@ -315,9 +317,9 @@ export const renderToPDF = async (
     // Add underline with accent color (border-b-2 pb-1 equivalent)
     const [r, g, b] = convertColor(config.colors.accent);
     jsDoc.setDrawColor(r, g, b);
-    jsDoc.setLineWidth(2);
-    jsDoc.line(margin, yPosition - 4, pageWidth - margin, yPosition - 4);
-    yPosition += 2; // Minimal spacing after headers
+    jsDoc.setLineWidth(1);
+    jsDoc.line(margin, yPosition - 2, pageWidth - margin, yPosition - 2);
+    yPosition += 1; // Very minimal spacing after headers
   };
   // Header
   addText(
@@ -328,7 +330,7 @@ export const renderToPDF = async (
     'center',
     config.fonts.heading
   );
-  yPosition += 8; // mb-2 equivalent (8px) - matches preview
+  yPosition += 2; // Very minimal space between name and contact
 
   addText(
     content.header.contact.join(' • '),
@@ -338,7 +340,7 @@ export const renderToPDF = async (
     'center',
     config.fonts.body
   );
-  yPosition += 6; // Minimal spacing after header
+  yPosition += 3; // Very minimal spacing after header
 
   // Summary
   if (content.sections.summary) {
@@ -351,7 +353,7 @@ export const renderToPDF = async (
       'left',
       config.fonts.body
     );
-    yPosition += 2; // Minimal spacing after summary
+    yPosition += 1; // Very minimal spacing after summary
   }
 
   // Experience
@@ -405,9 +407,9 @@ export const renderToPDF = async (
 
     // Add separator between experience entries (except for the last one)
     if (index < content.sections.experience.length - 1) {
-      yPosition += 3; // Minimal spacing between experience entries
+      yPosition += 1; // Very minimal spacing between experience entries
     } else {
-      yPosition += 4; // Minimal spacing after experience section
+      yPosition += 2; // Very minimal spacing after experience section
     }
   });
 
@@ -449,9 +451,9 @@ export const renderToPDF = async (
 
     // Add separator between education entries (except for the last one)
     if (index < content.sections.education.length - 1) {
-      yPosition += 2; // Minimal spacing between education entries
+      yPosition += 1; // Very minimal spacing between education entries
     } else {
-      yPosition += 4; // Minimal spacing after education section
+      yPosition += 2; // Very minimal spacing after education section
     }
   });
 
@@ -518,7 +520,7 @@ export const renderToPDF = async (
     );
   }
 
-  yPosition += 4; // Minimal spacing after skills section
+  yPosition += 2; // Very minimal spacing after skills section
 
   // Projects
   if (content.sections.projects && content.sections.projects.length > 0) {
@@ -571,9 +573,9 @@ export const renderToPDF = async (
         content.sections.projects &&
         index < content.sections.projects.length - 1
       ) {
-        yPosition += 3; // Minimal spacing between project entries
+        yPosition += 1; // Very minimal spacing between project entries
       } else {
-        yPosition += 4; // Minimal spacing after projects section
+        yPosition += 2; // Very minimal spacing after projects section
       }
     });
   }
@@ -594,7 +596,7 @@ export const renderToPDF = async (
         config.fonts.body
       );
     });
-    yPosition += 4; // Minimal spacing after achievements section
+    yPosition += 2; // Very minimal spacing after achievements section
   }
 
   // Save the PDF

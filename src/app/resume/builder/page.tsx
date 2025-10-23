@@ -116,16 +116,18 @@ export default function ResumeBuilderPage() {
       ) : (
         <div>
           {/* Header with back button */}
-          <div className='bg-card border-b border-border'>
-            <div className='max-w-7xl mx-auto px-6 py-4 pt-24'>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center space-x-4'>
+          <div className='bg-card border-b border-border sticky top-0 z-50'>
+            <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 pt-16 sm:pt-20 lg:pt-24'>
+              {/* Mobile layout: buttons at top, text at bottom */}
+              <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4'>
+                {/* Top row: Back button and validation status */}
+                <div className='flex items-center justify-between sm:justify-start sm:space-x-4'>
                   <button
                     onClick={handleBackToManager}
-                    className='flex items-center text-muted-foreground hover:text-foreground transition-colors'
+                    className='flex items-center text-muted-foreground hover:text-foreground transition-colors text-sm sm:text-base'
                   >
                     <svg
-                      className='w-5 h-5 mr-2'
+                      className='w-4 h-4 sm:w-5 sm:h-5 mr-2'
                       fill='none'
                       stroke='currentColor'
                       viewBox='0 0 24 24'
@@ -137,27 +139,32 @@ export default function ResumeBuilderPage() {
                         d='M15 19l-7-7 7-7'
                       />
                     </svg>
-                    Back to Resume Manager
+                    <span className='hidden sm:inline'>
+                      Back to Resume Manager
+                    </span>
+                    <span className='sm:hidden'>Back</span>
                   </button>
-                  {currentResume && (
-                    <div className='text-sm text-muted-foreground'>
-                      Editing:{' '}
-                      <span className='font-medium'>{currentResume.name}</span>
-                    </div>
-                  )}
-                </div>
-                <div className='flex items-center space-x-4'>
-                  <div className='text-sm text-muted-foreground'>
-                    {currentResume
-                      ? `Last saved: ${new Date(currentResume.updatedAt).toLocaleString()}`
-                      : 'New resume'}
-                  </div>
                   {getInitialData() && (
                     <ValidationStatus
                       resumeData={getInitialData() as ResumeData}
                       className='text-xs'
                     />
                   )}
+                </div>
+
+                {/* Bottom row: Resume info and last saved */}
+                <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm'>
+                  {currentResume && (
+                    <div className='text-muted-foreground'>
+                      Editing:{' '}
+                      <span className='font-medium'>{currentResume.name}</span>
+                    </div>
+                  )}
+                  <div className='text-muted-foreground'>
+                    {currentResume
+                      ? `Last saved: ${new Date(currentResume.updatedAt).toLocaleString()}`
+                      : 'New resume'}
+                  </div>
                 </div>
               </div>
             </div>

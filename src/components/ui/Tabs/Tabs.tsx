@@ -50,12 +50,14 @@ export const Tabs: React.FC<TabsProps> = ({
   return (
     <div className={`w-full ${className}`}>
       {/* Tab Headers */}
-      <div className={`flex gap-1 ${variantClasses.container}`}>
+      <div
+        className={`flex gap-1 overflow-x-auto scrollbar-hide ${variantClasses.container}`}
+      >
         {items.map(item => (
           <motion.button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`${variantClasses.tab} ${
+            className={`${variantClasses.tab} flex-shrink-0 ${
               activeTab === item.id
                 ? variantClasses.activeTab
                 : variantClasses.inactiveTab
@@ -74,7 +76,7 @@ export const Tabs: React.FC<TabsProps> = ({
               {item.icon && <span className='text-sm'>{item.icon}</span>}
               <span>{item.label}</span>
               {item.badge && (
-                <span className='px-1.5 py-0.5 bg-cyan-500/20 text-cyan-400 rounded-full text-xs'>
+                <span className='px-1.5 py-0.5 bg-cyan-500/20 text-cyan-400 rounded-full text-xs whitespace-nowrap'>
                   {item.badge}
                 </span>
               )}

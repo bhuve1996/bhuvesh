@@ -285,14 +285,14 @@ export default function ATSCheckerPage() {
 
   return (
     <div className='min-h-screen bg-background text-foreground'>
-      <Section id='ats-checker' className='py-20'>
-        <div className='max-w-6xl mx-auto px-6 pt-24'>
+      <Section id='ats-checker' className='py-8 sm:py-12 lg:py-20'>
+        <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'>
           {/* Header */}
-          <div className='text-center mb-12'>
-            <h1 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent'>
+          <div className='text-center mb-8 sm:mb-12'>
+            <h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent'>
               ATS Resume Checker
             </h1>
-            <p className='text-xl text-muted-foreground max-w-2xl mx-auto mb-6'>
+            <p className='text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 sm:mb-6 px-4'>
               Get your resume analyzed for ATS compatibility across all job
               profiles. Receive detailed feedback and optimization suggestions.
             </p>
@@ -314,10 +314,10 @@ export default function ATSCheckerPage() {
           {/* Tab Navigation - Show when we have results */}
           {analysisResult && (
             <div className='mb-8'>
-              <div className='flex space-x-1 bg-muted/50 p-1 rounded-lg w-fit mx-auto'>
+              <div className='flex space-x-1 bg-muted/50 p-1 rounded-lg w-full max-w-md mx-auto overflow-x-auto scrollbar-hide'>
                 <button
                   onClick={() => setActiveTab('upload')}
-                  className={`px-6 py-3 rounded-md font-medium transition-all ${
+                  className={`px-6 py-3 rounded-md font-medium transition-all flex-shrink-0 ${
                     activeTab === 'upload'
                       ? 'bg-primary-500 text-primary-foreground shadow-lg'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -327,7 +327,7 @@ export default function ATSCheckerPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('results')}
-                  className={`px-6 py-3 rounded-md font-medium transition-all ${
+                  className={`px-6 py-3 rounded-md font-medium transition-all flex-shrink-0 ${
                     activeTab === 'results'
                       ? 'bg-primary-500 text-primary-foreground shadow-lg'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'

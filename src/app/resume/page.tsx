@@ -273,7 +273,7 @@ export default function Resume() {
       {/* Hero Section */}
       <section className='pt-32 pb-16 px-6'>
         <div className='max-w-4xl mx-auto text-center'>
-          <h1 className='text-5xl md:text-6xl font-bold mb-6 text-cyan-400'>
+          <h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-cyan-400'>
             My Resume
           </h1>
           <p className='text-xl text-gray-300 mb-8 max-w-2xl mx-auto'>

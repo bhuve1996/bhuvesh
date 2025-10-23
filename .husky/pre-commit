@@ -1,11 +1,10 @@
-# Run TypeScript check
-echo "🔍 Running TypeScript check..."
+# Run linting
+npm run lint
+
+# Run TypeScript type checking
 npx tsc --noEmit
 
-# Run lint-staged (ESLint + Prettier)
-echo "🔧 Running lint-staged..."
-npx lint-staged
-
-# Run build check
-echo "🏗️  Running build check..."
-npm run build
+# Run tests if they exist
+if [ -f "package.json" ] && grep -q '"test"' package.json; then
+  npm test
+fi

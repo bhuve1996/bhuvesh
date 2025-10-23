@@ -19,9 +19,9 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
   const { colors, fonts, spacing } = layout;
 
   const renderHeader = () => (
-    <div className='text-center mb-8' style={{ color: colors.text }}>
+    <div className='text-center mb-6 lg:mb-8' style={{ color: colors.text }}>
       <h1
-        className='font-bold mb-2'
+        className='font-bold mb-2 text-lg lg:text-2xl'
         style={{
           fontFamily: fonts.heading,
           fontSize: fonts.size.heading,
@@ -31,24 +31,86 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
         {data.personal.fullName}
       </h1>
       <div
-        className='flex flex-wrap justify-center gap-4 text-sm'
+        className='flex flex-wrap justify-center gap-2 lg:gap-4 text-xs lg:text-sm'
         style={{ color: colors.secondary }}
       >
-        <span>{data.personal.email}</span>
-        <span>•</span>
-        <span>{data.personal.phone}</span>
-        <span>•</span>
-        <span>{data.personal.location}</span>
+        <a
+          href={`mailto:${data.personal.email}`}
+          className='hover:underline hover:text-blue-600 transition-colors'
+          style={{ color: colors.secondary }}
+        >
+          {data.personal.email}
+        </a>
+        {data.personal.phone && (
+          <>
+            <span>•</span>
+            <a
+              href={`tel:${data.personal.phone}`}
+              className='hover:underline hover:text-blue-600 transition-colors'
+              style={{ color: colors.secondary }}
+            >
+              {data.personal.phone}
+            </a>
+          </>
+        )}
+        {data.personal.location && (
+          <>
+            <span>•</span>
+            <span>{data.personal.location}</span>
+          </>
+        )}
         {data.personal.linkedin && (
           <>
             <span>•</span>
-            <span>{data.personal.linkedin}</span>
+            <a
+              href={
+                data.personal.linkedin.startsWith('http')
+                  ? data.personal.linkedin
+                  : `https://linkedin.com/in/${data.personal.linkedin}`
+              }
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:underline hover:text-blue-600 transition-colors'
+              style={{ color: colors.secondary }}
+            >
+              LinkedIn
+            </a>
           </>
         )}
         {data.personal.github && (
           <>
             <span>•</span>
-            <span>{data.personal.github}</span>
+            <a
+              href={
+                data.personal.github.startsWith('http')
+                  ? data.personal.github
+                  : `https://github.com/${data.personal.github}`
+              }
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:underline hover:text-blue-600 transition-colors'
+              style={{ color: colors.secondary }}
+            >
+              GitHub
+            </a>
+          </>
+        )}
+        {data.personal.portfolio && (
+          <>
+            <span>•</span>
+            <a
+              href={
+                data.personal.portfolio.startsWith('http')
+                  ? data.personal.portfolio
+                  : `https://${data.personal.portfolio}`
+              }
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:underline hover:text-blue-600 transition-colors'
+              style={{ color: colors.secondary }}
+            >
+              Portfolio
+            </a>
           </>
         )}
       </div>
@@ -59,9 +121,9 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
     if (!data.summary) return null;
 
     return (
-      <div className='mb-6'>
+      <div className='mb-4 lg:mb-6'>
         <h2
-          className='font-semibold mb-3 border-b-2 pb-1'
+          className='font-semibold mb-2 lg:mb-3 border-b-2 pb-1 text-sm lg:text-base'
           style={{
             fontFamily: fonts.heading,
             fontSize: fonts.size.subheading,
@@ -69,10 +131,11 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
             borderColor: colors.accent,
           }}
         >
-          Professional Summary
+          {layout.sections.find(s => s.type === 'summary')?.title ||
+            'Professional Summary'}
         </h2>
         <p
-          className='leading-relaxed'
+          className='leading-relaxed text-sm lg:text-base'
           style={{
             fontFamily: fonts.body,
             fontSize: fonts.size.body,
@@ -87,9 +150,9 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
   };
 
   const renderExperience = () => (
-    <div className='mb-6'>
+    <div className='mb-4 lg:mb-6'>
       <h2
-        className='font-semibold mb-4 border-b-2 pb-1'
+        className='font-semibold mb-3 lg:mb-4 border-b-2 pb-1 text-sm lg:text-base'
         style={{
           fontFamily: fonts.heading,
           fontSize: fonts.size.subheading,
@@ -97,7 +160,8 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
           borderColor: colors.accent,
         }}
       >
-        Professional Experience
+        {layout.sections.find(s => s.type === 'experience')?.title ||
+          'Professional Experience'}
       </h2>
       <div className='space-y-4'>
         {data.experience.map(exp => (
@@ -461,16 +525,46 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
         fontSize: fonts.size.body,
         lineHeight: spacing.lineHeight,
         padding: spacing.padding,
-        margin: spacing.margins,
+        minHeight: '100vh',
+        // margin removed - controlled by export functions
       }}
     >
-      {renderHeader()}
-      {renderSummary()}
-      {renderExperience()}
-      {renderProjects()}
-      {renderSkills()}
-      {renderEducation()}
-      {renderAchievements()}
+      {layout.columns === 2 && layout.sidebar ? (
+        // Two-column layout with sidebar - responsive
+        <div className='flex flex-col lg:flex-row gap-4 lg:gap-6'>
+          {/* Sidebar */}
+          <div
+            className='w-full lg:w-1/3 p-4 lg:p-6 rounded-lg'
+            style={{
+              backgroundColor: colors.sidebar || colors.primary,
+              color: colors.sidebarText || '#ffffff',
+            }}
+          >
+            {renderHeader()}
+            {renderSkills()}
+            {renderEducation()}
+          </div>
+
+          {/* Main Content */}
+          <div className='flex-1 space-y-4 lg:space-y-6'>
+            {renderSummary()}
+            {renderExperience()}
+            {renderProjects()}
+            {renderAchievements()}
+          </div>
+        </div>
+      ) : (
+        // Single column layout
+        <div className='space-y-4 lg:space-y-6'>
+          {renderHeader()}
+          {renderSummary()}
+          {renderExperience()}
+          {renderProjects()}
+          {renderSkills()}
+          {renderEducation()}
+          {renderAchievements()}
+        </div>
+      )}
     </div>
   );
 };

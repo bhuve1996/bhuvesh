@@ -1,0 +1,199 @@
+{
+  "id": "business-executive-modern",
+  "name": "Executive (Modern)",
+  "description": "Sophisticated, modern template for senior executives and C-level professionals. Features elegant typography and professional color scheme with subtle accents.",
+  "category": "business",
+  "experienceLevel": "executive",
+  "style": "modern",
+  "atsScore": 94,
+  "preview": "/resume-templates/previews/business-executive-modern-preview.png",
+  "layout": {
+    "sections": [
+      {
+        "type": "header",
+        "order": 1,
+        "optional": false,
+        "title": "Contact Information"
+      },
+      {
+        "type": "summary",
+        "order": 2,
+        "optional": false,
+        "title": "Executive Summary"
+      },
+      {
+        "type": "experience",
+        "order": 3,
+        "optional": false,
+        "title": "Executive Experience"
+      },
+      {
+        "type": "achievements",
+        "order": 4,
+        "optional": true,
+        "title": "Key Achievements"
+      },
+      {
+        "type": "education",
+        "order": 5,
+        "optional": false,
+        "title": "Education & Certifications"
+      },
+      {
+        "type": "skills",
+        "order": 6,
+        "optional": false,
+        "title": "Core Competencies"
+      }
+    ],
+    "colors": {
+      "primary": "#1e40af",
+      "secondary": "#64748b",
+      "accent": "#dc2626",
+      "text": "#0f172a",
+      "background": "#f8fafc",
+      "sidebar": "#1e40af",
+      "sidebarText": "#ffffff",
+      "card": "#ffffff",
+      "border": "#cbd5e1"
+    },
+    "fonts": {
+      "heading": "Playfair Display, serif",
+      "body": "Inter, sans-serif",
+      "size": {
+        "heading": "32px",
+        "subheading": "20px",
+        "body": "15px",
+        "small": "13px"
+      }
+    },
+    "spacing": {
+      "lineHeight": 1.4,
+      "sectionGap": "24px",
+      "margins": "0.1in",
+      "padding": "16px"
+    },
+    "columns": 1,
+    "sidebar": false
+  },
+  "sampleData": {
+    "personal": {
+      "fullName": "David Thompson",
+      "email": "david.thompson@email.com",
+      "phone": "(555) 456-7890",
+      "location": "New York, NY",
+      "linkedin": "linkedin.com/in/davidthompson"
+    },
+    "summary": "Visionary executive with 15+ years of experience driving strategic growth and operational excellence across Fortune 500 companies. Proven track record of leading digital transformation initiatives and building high-performing teams.",
+    "skills": {
+      "technical": [
+        "Strategic Planning",
+        "Digital Transformation",
+        "Data Analytics",
+        "Financial Modeling",
+        "M&A Strategy"
+      ],
+      "business": [
+        "Leadership",
+        "Change Management",
+        "Business Development",
+        "P&L Management",
+        "Stakeholder Relations"
+      ],
+      "soft": [
+        "Strategic Vision",
+        "Team Leadership",
+        "Communication",
+        "Decision Making",
+        "Innovation"
+      ],
+      "languages": [
+        "English (Native)",
+        "French (Fluent)",
+        "German (Conversational)"
+      ],
+      "certifications": [
+        "Harvard Business School Executive Program",
+        "Certified Public Accountant (CPA)",
+        "PMP Certification"
+      ]
+    },
+    "experience": [
+      {
+        "id": "exp1",
+        "company": "Global Tech Corp",
+        "position": "Chief Operating Officer",
+        "location": "New York, NY",
+        "startDate": "2020-01",
+        "endDate": "Present",
+        "current": true,
+        "description": "Oversee global operations for $2B technology company with 5,000+ employees",
+        "achievements": [
+          "Increased operational efficiency by 30% through process optimization",
+          "Led digital transformation initiative resulting in $50M cost savings",
+          "Expanded international operations to 15 new markets"
+        ]
+      },
+      {
+        "id": "exp2",
+        "company": "Fortune 500 Manufacturing",
+        "position": "VP of Strategy & Operations",
+        "location": "Chicago, IL",
+        "startDate": "2017-03",
+        "endDate": "2019-12",
+        "current": false,
+        "description": "Developed and executed strategic initiatives for $1.5B manufacturing division",
+        "achievements": [
+          "Led acquisition of 3 companies worth $200M total",
+          "Implemented lean manufacturing processes reducing costs by 25%",
+          "Built strategic partnerships increasing revenue by 40%"
+        ]
+      },
+      {
+        "id": "exp3",
+        "company": "Management Consulting",
+        "position": "Senior Principal",
+        "location": "Boston, MA",
+        "startDate": "2012-06",
+        "endDate": "2017-02",
+        "current": false,
+        "description": "Led strategic consulting engagements for Fortune 500 clients",
+        "achievements": [
+          "Delivered $100M+ in client value through strategic initiatives",
+          "Managed team of 15 consultants across multiple projects",
+          "Developed new service offerings generating $20M in revenue"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "id": "edu1",
+        "institution": "Harvard Business School",
+        "degree": "Master of Business Administration",
+        "field": "Strategy & Operations",
+        "location": "Boston, MA",
+        "startDate": "2010-09",
+        "endDate": "2012-05",
+        "current": false,
+        "gpa": "3.9"
+      },
+      {
+        "id": "edu2",
+        "institution": "University of Pennsylvania",
+        "degree": "Bachelor of Science",
+        "field": "Economics",
+        "location": "Philadelphia, PA",
+        "startDate": "2006-09",
+        "endDate": "2010-05",
+        "current": false,
+        "gpa": "3.8"
+      }
+    ],
+    "achievements": [
+      "Named 'Top 40 Under 40' by Business Journal",
+      "Led company to 300% revenue growth over 5 years",
+      "Published 5 articles in Harvard Business Review",
+      "Board member of 3 non-profit organizations"
+    ]
+  }
+}

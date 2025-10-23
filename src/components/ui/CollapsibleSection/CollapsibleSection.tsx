@@ -70,36 +70,39 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`p-6 border-l-4 ${colors.border}`}
+      className={`p-4 sm:p-6 border-l-4 ${colors.border}`}
     >
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className='flex items-center justify-between cursor-pointer mb-6'
+        className='flex items-start sm:items-center justify-between cursor-pointer mb-4 sm:mb-6 gap-3'
         onClick={onToggle}
       >
-        <div className='flex items-center space-x-3'>
+        <div className='flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0'>
           <div
-            className={`w-10 h-10 ${colors.bg} rounded-lg flex items-center justify-center`}
+            className={`w-8 h-8 sm:w-10 sm:h-10 ${colors.bg} rounded-lg flex items-center justify-center flex-shrink-0`}
           >
-            <span className='text-2xl'>{icon}</span>
+            <span className='text-lg sm:text-2xl'>{icon}</span>
           </div>
-          <h3 className='text-xl font-bold text-foreground uppercase tracking-wide'>
-            {title}
-          </h3>
-          <span
-            className={`text-sm text-muted-foreground ${colors.countBg} px-2 py-1 rounded-full`}
-          >
-            {count} {countLabel}
-          </span>
+          <div className='flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 min-w-0 flex-1'>
+            <h3 className='text-base sm:text-xl font-bold text-foreground uppercase tracking-wide truncate'>
+              {title}
+            </h3>
+            <span
+              className={`text-xs sm:text-sm text-muted-foreground ${colors.countBg} px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0`}
+            >
+              {count} {countLabel}
+            </span>
+          </div>
         </div>
         <motion.div
           animate={{ rotate: isExpanded ? 90 : 0 }}
           transition={{ duration: 0.3 }}
+          className='flex-shrink-0'
         >
           <ChevronIcon
             direction={isExpanded ? 'down' : 'right'}
-            className={`w-6 h-6 ${colors.text}`}
+            className={`w-5 h-5 sm:w-6 sm:h-6 ${colors.text}`}
           />
         </motion.div>
       </motion.div>

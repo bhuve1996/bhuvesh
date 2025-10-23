@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Card, Tabs } from '@/components/ui';
+import { Card, SectionSeparator, Tabs } from '@/components/ui';
 import type { AnalysisResult } from '@/types';
 
 interface DetailedAnalyticsDisplayProps {
@@ -58,6 +58,8 @@ export const DetailedAnalyticsDisplay: React.FC<
             </div>
           </div>
 
+          <SectionSeparator variant='dots' spacing='md' color='primary' />
+
           {/* Detailed Breakdown */}
           <div className='space-y-3 text-sm'>
             <div className='flex justify-between items-center p-2 bg-slate-50 dark:bg-slate-800/30 rounded'>
@@ -89,6 +91,8 @@ export const DetailedAnalyticsDisplay: React.FC<
           </div>
         </Card>
       )}
+
+      <SectionSeparator variant='gradient' spacing='lg' color='muted' />
 
       {/* Formatting Issues */}
       {result.formatting_issues && result.formatting_issues.length > 0 && (
@@ -153,6 +157,8 @@ export const DetailedAnalyticsDisplay: React.FC<
             </p>
           </div>
         </div>
+
+        <SectionSeparator variant='dots' spacing='md' color='primary' />
 
         {/* Keyword Analysis */}
         <div className='space-y-3'>
@@ -271,6 +277,8 @@ export const DetailedAnalyticsDisplay: React.FC<
         </Card>
       )}
 
+      <SectionSeparator variant='gradient' spacing='lg' color='muted' />
+
       {/* ATS Recommendations */}
       {result.ats_compatibility?.recommendations &&
         result.ats_compatibility.recommendations.length > 0 && (
@@ -310,6 +318,8 @@ export const DetailedAnalyticsDisplay: React.FC<
           </p>
         </div>
       </Card>
+
+      <SectionSeparator variant='gradient' spacing='lg' color='muted' />
 
       {/* Strengths & Weaknesses */}
       <div className='grid md:grid-cols-2 gap-6'>

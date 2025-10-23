@@ -367,7 +367,7 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
                       {resume.tags.map((tag, index) => (
                         <span
                           key={index}
-                          className='px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full'
+                          className='px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full whitespace-nowrap'
                         >
                           {tag}
                         </span>
@@ -424,9 +424,42 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
 
       {/* Import Modal */}
       {showImportModal && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-          <div className='bg-white rounded-lg p-6 max-w-md w-full mx-4'>
-            <h3 className='text-lg font-semibold mb-4'>Import Resume</h3>
+        <div
+          className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'
+          onClick={() => {
+            setShowImportModal(false);
+            setImportData('');
+          }}
+        >
+          <div
+            className='bg-white rounded-lg p-6 max-w-md w-full mx-4 relative'
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setShowImportModal(false);
+                setImportData('');
+              }}
+              className='absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors'
+              aria-label='Close modal'
+            >
+              <svg
+                className='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M6 18L18 6M6 6l12 12'
+                />
+              </svg>
+            </button>
+
+            <h3 className='text-lg font-semibold mb-4 pr-8'>Import Resume</h3>
             <textarea
               value={importData}
               onChange={e => setImportData(e.target.value)}

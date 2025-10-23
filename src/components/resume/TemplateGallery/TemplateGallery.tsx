@@ -356,13 +356,13 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
 
                 {/* Tags */}
                 <div className='flex flex-wrap gap-1 mt-3'>
-                  <span className='px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full'>
+                  <span className='px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full whitespace-nowrap'>
                     {getCategoryLabel(template.category)}
                   </span>
-                  <span className='px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full'>
+                  <span className='px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full whitespace-nowrap'>
                     {getExperienceLabel(template.experienceLevel)}
                   </span>
-                  <span className='px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full'>
+                  <span className='px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full whitespace-nowrap'>
                     {getStyleLabel(template.style)}
                   </span>
                 </div>

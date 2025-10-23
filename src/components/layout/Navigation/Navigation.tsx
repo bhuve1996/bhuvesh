@@ -46,7 +46,7 @@ export const Navigation: React.FC<NavigationProps> = ({
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className='fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border'
+      className='w-full bg-background border-b border-border'
       role='navigation'
       aria-label='Main navigation'
     >
@@ -69,7 +69,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                   alt='Bhuvesh Logo'
                   width={128}
                   height={50}
-                  className='w-32 h-[50px] rounded-lg object-cover group-hover:scale-105 transition-transform duration-300'
+                  className='w-24 h-8 sm:w-28 sm:h-10 lg:w-32 lg:h-[50px] rounded-lg object-cover group-hover:scale-105 transition-transform duration-300'
                   priority
                 />
                 <div className='absolute inset-0 bg-primary-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
@@ -96,7 +96,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                   <Link
                     href={item.href}
                     onClick={() => handleNavClick(item)}
-                    className={`relative px-4 py-2 rounded-lg transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+                    className={`relative px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base ${
                       isActive(item)
                         ? 'text-primary-400 bg-primary-500/10'
                         : 'text-foreground hover:text-primary-400 hover:bg-muted/50'
@@ -114,7 +114,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                 ) : (
                   <Link
                     href={item.href}
-                    className='relative px-4 py-2 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
+                    className='relative px-3 sm:px-4 py-2 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base'
                     role='menuitem'
                     tabIndex={0}
                   >
@@ -190,7 +190,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                         <Link
                           href={item.href}
                           onClick={() => handleNavClick(item)}
-                          className={`px-4 py-3 rounded-lg text-left transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+                          className={`px-4 py-3 rounded-lg text-left transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base ${
                             isActive(item)
                               ? 'text-primary-400 bg-primary-500/10 border border-primary-500/20'
                               : 'text-foreground hover:text-primary-400 hover:bg-muted/50'
@@ -204,7 +204,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                       ) : (
                         <Link
                           href={item.href}
-                          className='px-4 py-3 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
+                          className='px-4 py-3 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base'
                           onClick={() => setIsMobileMenuOpen(false)}
                           role='menuitem'
                           tabIndex={0}

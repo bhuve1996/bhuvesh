@@ -3,7 +3,13 @@
 import { motion } from 'framer-motion';
 import React, { useCallback, useState } from 'react';
 
-import { AnimatedScore, Card, DataVisualization, Tabs } from '@/components/ui';
+import {
+  AnimatedScore,
+  Card,
+  DataVisualization,
+  SectionSeparator,
+  Tabs,
+} from '@/components/ui';
 import { useResumeNavigation } from '@/contexts/ResumeNavigationContext';
 import { mapATSToResumeData } from '@/lib/utils/atsToResumeMapper';
 import { useResumeActions } from '@/store/resumeStore';
@@ -305,9 +311,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
       )}
 
       {/* Main Grid Layout */}
-      <div className='grid lg:grid-cols-3 gap-8'>
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8'>
         {/* Main Content - Left 2/3 */}
-        <div className='lg:col-span-2 space-y-6'>
+        <div className='lg:col-span-2 space-y-4 lg:space-y-6'>
           {/* Enhanced ATS Score Display */}
           <Card className='p-6' delay={0.2}>
             <div className='text-center'>
@@ -335,6 +341,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
               </p>
             </div>
           </Card>
+
+          <SectionSeparator variant='gradient' spacing='xl' color='primary' />
 
           {/* Main Results Tabs */}
           <motion.div
@@ -411,7 +419,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         </div>
 
         {/* Analysis & Metrics Sidebar - Right 1/3 */}
-        <div className='space-y-6'>
+        <div className='space-y-4 lg:space-y-6'>
           {/* Hover Popup: Analysis Grades */}
           {result.ats_compatibility && (
             <div className='group relative'>

@@ -1,0 +1,12 @@
+# Check if commit message follows conventional commit format
+commit_regex='^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\(.+\))?: .{1,50}'
+
+if ! grep -qE "$commit_regex" "$1"; then
+    echo "❌ Commit message does not follow conventional commit format!"
+    echo "Format: type(scope): description"
+    echo "Types: feat, fix, docs, style, refactor, perf, test, chore, ci, build, revert"
+    echo "Example: feat(auth): add login functionality"
+    exit 1
+fi
+
+echo "✅ Commit message follows conventional commit format"

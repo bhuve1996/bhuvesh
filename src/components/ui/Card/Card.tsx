@@ -19,7 +19,7 @@ export const Card: React.FC<EnhancedCardProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'bg-card/5 backdrop-blur-sm border border-primary-500/20 rounded-2xl p-6 relative overflow-hidden hover-lift hover-glow';
+    'bg-card/5 backdrop-blur-sm border border-primary-500/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden hover-lift hover-glow';
   const hoverClasses = hover
     ? 'hover:bg-card/10 transition-all duration-300 cursor-pointer'
     : '';
@@ -39,9 +39,9 @@ export const Card: React.FC<EnhancedCardProps> = ({
       whileHover={
         hover
           ? {
-              scale: 1.02,
-              boxShadow: '0 20px 40px rgba(6, 182, 212, 0.1)',
-              borderColor: 'rgba(6, 182, 212, 0.4)',
+              scale: 1.01,
+              boxShadow: '0 10px 25px rgba(6, 182, 212, 0.08)',
+              borderColor: 'rgba(6, 182, 212, 0.3)',
             }
           : {}
       }
@@ -53,8 +53,8 @@ export const Card: React.FC<EnhancedCardProps> = ({
       onKeyDown={onKeyDown}
       {...props}
     >
-      {/* Animated background gradient */}
-      <div className='absolute inset-0 bg-gradient-to-br from-cyan-400/5 via-transparent to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100' />
+      {/* Animated background gradient - optimized for mobile */}
+      <div className='absolute inset-0 bg-gradient-to-br from-cyan-400/3 via-transparent to-blue-500/3 sm:from-cyan-400/5 sm:to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100' />
 
       {/* Content */}
       <div className='relative z-10'>{children}</div>

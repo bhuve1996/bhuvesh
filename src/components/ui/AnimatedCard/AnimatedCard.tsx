@@ -130,14 +130,14 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
         ...springs,
         ...hoverSprings,
       }}
-      className={`bg-card/5 backdrop-blur-sm border border-primary-500/20 rounded-2xl p-6 relative overflow-hidden transition-all duration-300 ${className}`}
+      className={`bg-card/5 backdrop-blur-sm border border-primary-500/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden transition-all duration-300 ${className}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
     >
-      {/* Animated background gradient */}
+      {/* Animated background gradient - optimized for mobile */}
       <animated.div
-        className='absolute inset-0 bg-gradient-to-br from-cyan-400/5 via-transparent to-blue-500/5'
+        className='absolute inset-0 bg-gradient-to-br from-cyan-400/3 via-transparent to-blue-500/3 sm:from-cyan-400/5 sm:to-blue-500/5'
         style={{
           opacity: hoverSprings.scale.to(s => (s - 1) * 2),
         }}

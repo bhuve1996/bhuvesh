@@ -338,12 +338,12 @@ const ImprovementCard: React.FC<ImprovementCardProps> = ({
                   </span>
                   <div className='flex gap-2 flex-shrink-0'>
                     <span
-                      className={`text-xs px-2 py-1 rounded bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-white border border-slate-300 dark:border-white/20`}
+                      className={`text-xs px-2 py-1 rounded bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-white border border-slate-300 dark:border-white/20 whitespace-nowrap`}
                     >
                       {categoryLabel}
                     </span>
                     <span
-                      className={`text-xs px-2 py-1 rounded ${
+                      className={`text-xs px-2 py-1 rounded whitespace-nowrap ${
                         priorityColors[item.priority]
                       }`}
                     >

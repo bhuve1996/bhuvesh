@@ -173,7 +173,7 @@
   }
 
   .section-title {
-    @apply text-4xl md:text-5xl font-bold mb-6 gradient-text;
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 gradient-text;
   }
 
   .section-subtitle {
@@ -321,6 +321,15 @@
 /* Ensure hover works properly */
 .group:hover .group-hover\:rotate-y-180 {
   transform: rotateY(180deg);
+}
+
+/* Scrollbar Hide Utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
 }
 
 /* Orbit Animation */

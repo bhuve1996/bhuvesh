@@ -173,7 +173,7 @@ export default function Blog() {
         <div className='max-w-4xl mx-auto text-center'>
           <h1
             id='blog-title'
-            className='text-5xl md:text-6xl font-bold mb-6 text-primary-400'
+            className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-primary-400'
           >
             My Blog
           </h1>

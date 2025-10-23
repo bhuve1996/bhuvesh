@@ -127,6 +127,10 @@ export interface ColorScheme {
   accent: string;
   text: string;
   background: string;
+  sidebar?: string;
+  sidebarText?: string;
+  card?: string;
+  border?: string;
 }
 
 export interface FontConfig {

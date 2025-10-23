@@ -1,0 +1,210 @@
+{
+  "id": "tech-startup-bold",
+  "name": "Startup (Bold)",
+  "description": "Bold, energetic template perfect for startup founders and tech innovators. Features vibrant colors, modern gradients, and dynamic layout that stands out.",
+  "category": "tech",
+  "experienceLevel": "senior",
+  "style": "creative",
+  "atsScore": 90,
+  "preview": "/resume-templates/previews/tech-startup-bold-preview.png",
+  "layout": {
+    "sections": [
+      {
+        "type": "header",
+        "order": 1,
+        "optional": false,
+        "title": "Contact Information"
+      },
+      {
+        "type": "summary",
+        "order": 2,
+        "optional": false,
+        "title": "About"
+      },
+      {
+        "type": "experience",
+        "order": 3,
+        "optional": false,
+        "title": "Experience"
+      },
+      {
+        "type": "projects",
+        "order": 4,
+        "optional": true,
+        "title": "Notable Projects"
+      },
+      {
+        "type": "skills",
+        "order": 5,
+        "optional": false,
+        "title": "Skills"
+      },
+      {
+        "type": "education",
+        "order": 6,
+        "optional": false,
+        "title": "Education"
+      }
+    ],
+    "colors": {
+      "primary": "#ff6b35",
+      "secondary": "#004e89",
+      "accent": "#00a8cc",
+      "text": "#2c3e50",
+      "background": "#f0f8ff",
+      "sidebar": "#004e89",
+      "sidebarText": "#ffffff",
+      "card": "#ffffff",
+      "border": "#bde0ff"
+    },
+    "fonts": {
+      "heading": "Montserrat, sans-serif",
+      "body": "Open Sans, sans-serif",
+      "size": {
+        "heading": "26px",
+        "subheading": "19px",
+        "body": "15px",
+        "small": "13px"
+      }
+    },
+    "spacing": {
+      "lineHeight": 1.5,
+      "sectionGap": "22px",
+      "margins": "0.1in",
+      "padding": "14px"
+    },
+    "columns": 2,
+    "sidebar": true
+  },
+  "sampleData": {
+    "personal": {
+      "fullName": "Jordan Kim",
+      "email": "jordan.kim@email.com",
+      "phone": "(555) 234-5678",
+      "location": "Austin, TX",
+      "linkedin": "linkedin.com/in/jordankim",
+      "github": "github.com/jordankim",
+      "portfolio": "jordankim.dev"
+    },
+    "summary": "Innovative tech leader and startup founder with 8+ years of experience building scalable products from zero to millions of users. Passionate about solving complex problems with elegant solutions.",
+    "skills": {
+      "technical": [
+        "React/Next.js",
+        "Node.js/Python",
+        "AWS/GCP",
+        "Docker/Kubernetes",
+        "Machine Learning",
+        "Blockchain",
+        "Mobile Development"
+      ],
+      "business": [
+        "Product Strategy",
+        "Team Building",
+        "Fundraising",
+        "Go-to-Market",
+        "Technical Leadership"
+      ],
+      "soft": [
+        "Innovation",
+        "Leadership",
+        "Communication",
+        "Problem Solving",
+        "Adaptability"
+      ],
+      "languages": [
+        "English (Native)",
+        "Korean (Fluent)",
+        "Japanese (Conversational)"
+      ],
+      "certifications": [
+        "AWS Solutions Architect",
+        "Google Cloud Professional",
+        "Certified Scrum Master"
+      ]
+    },
+    "experience": [
+      {
+        "id": "exp1",
+        "company": "TechFlow (Co-founder)",
+        "position": "CTO & Co-founder",
+        "location": "Austin, TX",
+        "startDate": "2021-01",
+        "endDate": "Present",
+        "current": true,
+        "description": "Built and scaled AI-powered workflow automation platform from concept to $10M ARR",
+        "achievements": [
+          "Led technical team of 15 engineers across 3 countries",
+          "Raised $25M Series A funding from top-tier VCs",
+          "Achieved 99.9% uptime with 2M+ API calls daily"
+        ]
+      },
+      {
+        "id": "exp2",
+        "company": "BigTech Corp",
+        "position": "Senior Software Engineer",
+        "location": "San Francisco, CA",
+        "startDate": "2019-03",
+        "endDate": "2020-12",
+        "current": false,
+        "description": "Developed core infrastructure for cloud-native applications serving 50M+ users",
+        "achievements": [
+          "Reduced system latency by 60% through microservices optimization",
+          "Led migration to Kubernetes reducing infrastructure costs by 40%",
+          "Mentored 5 junior engineers and improved team productivity"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "id": "edu1",
+        "institution": "Stanford University",
+        "degree": "Master of Science",
+        "field": "Computer Science",
+        "location": "Stanford, CA",
+        "startDate": "2017-09",
+        "endDate": "2019-06",
+        "current": false,
+        "gpa": "3.9"
+      },
+      {
+        "id": "edu2",
+        "institution": "University of Texas",
+        "degree": "Bachelor of Science",
+        "field": "Computer Science",
+        "location": "Austin, TX",
+        "startDate": "2013-09",
+        "endDate": "2017-05",
+        "current": false,
+        "gpa": "3.8"
+      }
+    ],
+    "projects": [
+      {
+        "id": "proj1",
+        "name": "AI-Powered Analytics Platform",
+        "description": "Built real-time analytics platform processing 1TB+ data daily with ML insights",
+        "technologies": ["Python", "TensorFlow", "Kubernetes", "Apache Kafka"],
+        "url": "https://analytics-platform.com",
+        "github": "https://github.com/jordankim/analytics",
+        "startDate": "2023-01",
+        "endDate": "2023-09"
+      },
+      {
+        "id": "proj2",
+        "name": "Blockchain Voting System",
+        "description": "Secure, transparent voting system built on Ethereum with smart contracts",
+        "technologies": ["Solidity", "React", "Web3.js", "IPFS"],
+        "url": "https://secure-vote.app",
+        "github": "https://github.com/jordankim/voting",
+        "startDate": "2022-06",
+        "endDate": "2022-12"
+      }
+    ],
+    "achievements": [
+      "Forbes 30 Under 30 in Technology (2023)",
+      "Speaker at TechCrunch Disrupt 2023",
+      "Open source contributor with 2K+ GitHub stars",
+      "Patent holder for distributed computing algorithm"
+    ]
+  }
+}

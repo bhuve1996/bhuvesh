@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Card } from '@/components/ui';
+import { Card, SectionSeparator } from '@/components/ui';
 import type { AnalysisResult } from '@/types';
 
 interface SummaryDisplayProps {
@@ -62,6 +62,8 @@ export const SummaryDisplay: React.FC<SummaryDisplayProps> = ({ result }) => {
         </div>
       </Card>
 
+      <SectionSeparator variant='dots' spacing='md' color='primary' />
+
       {/* Quick Stats Grid */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
         <Card className='p-4 text-center'>
@@ -97,6 +99,8 @@ export const SummaryDisplay: React.FC<SummaryDisplayProps> = ({ result }) => {
           </div>
         </Card>
       </div>
+
+      <SectionSeparator variant='gradient' spacing='lg' color='muted' />
 
       {/* Key Insights */}
       <Card className='p-6'>
