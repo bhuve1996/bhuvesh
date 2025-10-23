@@ -51,16 +51,27 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
 
   // ATS Analysis States
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [atsResult, setAtsResult] = useState<any>(null);
+  const [atsResult, setAtsResult] = useState<{
+    atsScore: number;
+    issues: string[];
+    suggestions: string[];
+  } | null>(null);
 
   // AI Content Improvement States
   const [isImproving, setIsImproving] = useState(false);
-  const [improvementResult, setImprovementResult] = useState<any>(null);
+  const [improvementResult, setImprovementResult] = useState<{
+    section: string;
+    improvements: string[];
+  } | null>(null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   // Post-Export Validation States
   const [isValidating, setIsValidating] = useState(false);
-  const [validationResult, setValidationResult] = useState<any>(null);
+  const [validationResult, setValidationResult] = useState<{
+    score: number;
+    issues: string[];
+    recommendations: string[];
+  } | null>(null);
 
   // Export States
   const [isExporting, setIsExporting] = useState(false);
@@ -370,8 +381,8 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
       } else {
         throw new Error(result.message || 'Analysis failed');
       }
-    } catch (error) {
-      console.error('ATS Analysis error:', error);
+    } catch {
+      // console.error('ATS Analysis error:', error);
       toast.error('Failed to analyze resume. Using fallback analysis.');
       setAtsResult({
         atsScore: 75,
@@ -402,8 +413,8 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
       toast.success(
         `✨ ${section} improved! Expected score increase: +10 points`
       );
-    } catch (error) {
-      console.error('AI improvement error:', error);
+    } catch {
+      // console.error('AI improvement error:', error);
       toast.error('Failed to improve content. Please try again.');
     } finally {
       setIsImproving(false);
@@ -425,8 +436,8 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
         ],
       });
       toast.success('📋 Post-export validation complete!');
-    } catch (error) {
-      console.error('Validation error:', error);
+    } catch {
+      // console.error('Validation error:', error);
       toast.error('Failed to validate resume. Please try again.');
     } finally {
       setIsValidating(false);
@@ -442,11 +453,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
 
       // Use classic export with fallback
       if (format === 'pdf') {
-        await exportToPDFWithFallback(
-          template,
-          resumeData,
-          `${filename}.pdf`
-        );
+        await exportToPDFWithFallback(template, resumeData, `${filename}.pdf`);
       } else if (format === 'docx') {
         await exportToDOCX(template, resumeData, `${filename}.docx`);
       } else if (format === 'txt') {
@@ -467,7 +474,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
         },
       });
     } catch (error) {
-      console.error(`Export error:`, error);
+      // console.error(`Export error:`, error);
       // Show more specific error message using toast
       const errorMessage =
         error instanceof Error
@@ -498,7 +505,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
     property: string,
     value: string | number
   ) => {
-    const updatedTemplate = { ...template } as any;
+    const updatedTemplate = { ...template } as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> };
     if (!updatedTemplate.customStyles) {
       updatedTemplate.customStyles = {};
     }
@@ -511,7 +518,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
 
   const getCurrentValue = (section: string, property: string): string => {
     return (
-      (template as any).customStyles?.[section]?.[property] ||
+      (template as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> }).customStyles?.[section]?.[property] ||
       getDefaultValue(section, property)
     );
   };
@@ -1131,7 +1138,7 @@ export const UnifiedFloatingPanel: React.FC<UnifiedFloatingPanelProps> = ({
 
                     <Button
                       onClick={() => {
-                        const defaultTemplate = { ...template } as any;
+                        const defaultTemplate = { ...template } as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> };
                         if (defaultTemplate.customStyles) {
                           delete defaultTemplate.customStyles;
                         }
