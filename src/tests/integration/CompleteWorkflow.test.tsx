@@ -310,10 +310,8 @@ describe('Complete Resume Workflow Integration Tests', () => {
 
   describe('Export Functionality', () => {
     it('should complete export workflow for all formats', async () => {
-      const {
-        exportToPDFViaBrowserPrint,
-        exportToDOCXViaDownload,
-      } = await import('@/lib/resume/unifiedExportUtils');
+      const { exportToPDFViaBrowserPrint, exportToDOCXViaDownload } =
+        await import('@/lib/resume/unifiedExportUtils');
 
       render(
         <TestWrapper>
@@ -513,9 +511,9 @@ describe('Complete Resume Workflow Integration Tests', () => {
     });
 
     it('should handle export errors gracefully', async () => {
-      const {
-        exportToPDFViaBrowserPrint,
-      } = await import('@/lib/resume/unifiedExportUtils');
+      const { exportToPDFViaBrowserPrint } = await import(
+        '@/lib/resume/unifiedExportUtils'
+      );
       exportToPDFViaBrowserPrint.mockRejectedValueOnce(
         new Error('Export failed')
       );

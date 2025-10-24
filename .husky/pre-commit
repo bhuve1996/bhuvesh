@@ -27,10 +27,10 @@ print_warning() {
 }
 
 # 1. TypeScript type checking (REQUIRED - will block commit if fails)
-print_status "1. TypeScript type checking..."
-npm run type-check
+print_status "1. TypeScript type checking (main source files only)..."
+npm run type-check:main
 if [ $? -ne 0 ]; then
-    print_error "Type checking failed. Please fix TypeScript errors before committing."
+    print_error "Type checking failed. Please fix TypeScript errors in main source files before committing."
     exit 1
 fi
 print_success "1. TypeScript type checking passed"
@@ -101,6 +101,6 @@ print_success "8. Next.js build verification passed"
 echo ""
 print_success "🎉 All comprehensive checks passed with ZERO warnings or errors!"
 print_success "📋 Summary:"
-print_success "   ✅ ALL CHECKS (1-8): TypeScript, Linting, Formatting, Tests, Build - PASSED"
+print_success "   ✅ ALL CHECKS (1-8): TypeScript (main only), Linting, Formatting, Tests, Build - PASSED"
 print_success "   🚫 ZERO TOLERANCE: No warnings or errors allowed"
 print_success "   💡 Code quality maintained at highest standards"

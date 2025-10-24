@@ -29,7 +29,7 @@ describe('FileUpload Component', () => {
       });
 
       render(<FileUpload {...defaultProps} />);
-      
+
       const fileInput = screen.getByLabelText(/upload/i);
       await user.upload(fileInput, mockFile);
 
@@ -43,7 +43,7 @@ describe('FileUpload Component', () => {
       });
 
       render(<FileUpload {...defaultProps} />);
-      
+
       const fileInput = screen.getByLabelText(/upload/i);
       await user.upload(fileInput, mockFile);
 
@@ -59,7 +59,7 @@ describe('FileUpload Component', () => {
       Object.defineProperty(mockFile, 'size', { value: 11 * 1024 * 1024 });
 
       render(<FileUpload {...defaultProps} maxSize={10 * 1024 * 1024} />);
-      
+
       const fileInput = screen.getByLabelText(/upload/i);
       await user.upload(fileInput, mockFile);
 
@@ -75,12 +75,12 @@ describe('FileUpload Component', () => {
       });
 
       render(
-        <FileUpload 
-          {...defaultProps} 
+        <FileUpload
+          {...defaultProps}
           validation={{ allowedTypes: ['pdf', 'docx'] }}
         />
       );
-      
+
       const fileInput = screen.getByLabelText(/upload/i);
       await user.upload(fileInput, mockFile);
 
@@ -98,7 +98,7 @@ describe('FileUpload Component', () => {
       ];
 
       render(<FileUpload {...defaultProps} maxFiles={2} multiple />);
-      
+
       const fileInput = screen.getByLabelText(/upload/i);
       await user.upload(fileInput, mockFiles);
 
@@ -116,9 +116,9 @@ describe('FileUpload Component', () => {
       });
 
       render(<FileUpload {...defaultProps} dragAndDrop />);
-      
+
       const dropZone = screen.getByTestId('file-upload-dropzone');
-      
+
       // Simulate drag events
       fireEvent.dragEnter(dropZone);
       expect(dropZone).toHaveClass('drag-active');
@@ -144,9 +144,9 @@ describe('FileUpload Component', () => {
       });
 
       render(<FileUpload {...defaultProps} disabled dragAndDrop />);
-      
+
       const dropZone = screen.getByTestId('file-upload-dropzone');
-      
+
       fireEvent.drop(dropZone, {
         dataTransfer: {
           files: [mockFile],
@@ -160,14 +160,14 @@ describe('FileUpload Component', () => {
   describe('Upload Progress', () => {
     it('should show upload progress when loading', () => {
       render(<FileUpload {...defaultProps} loading />);
-      
+
       expect(screen.getByRole('progressbar')).toBeInTheDocument();
       expect(screen.getByText(/uploading/i)).toBeInTheDocument();
     });
 
     it('should disable upload button when loading', () => {
       render(<FileUpload {...defaultProps} loading />);
-      
+
       const uploadButton = screen.getByRole('button', { name: /upload/i });
       expect(uploadButton).toBeDisabled();
     });
@@ -181,7 +181,7 @@ describe('FileUpload Component', () => {
       });
 
       render(<FileUpload {...defaultProps} preview />);
-      
+
       const fileInput = screen.getByLabelText(/upload/i);
       await user.upload(fileInput, mockFile);
 
@@ -196,7 +196,7 @@ describe('FileUpload Component', () => {
       });
 
       render(<FileUpload {...defaultProps} preview={false} />);
-      
+
       const fileInput = screen.getByLabelText(/upload/i);
       await user.upload(fileInput, mockFile);
 
@@ -212,16 +212,15 @@ describe('FileUpload Component', () => {
       });
 
       render(
-        <FileUpload 
-          {...defaultProps} 
-          validation={{ allowedTypes: ['pdf'] }}
-        />
+        <FileUpload {...defaultProps} validation={{ allowedTypes: ['pdf'] }} />
       );
-      
+
       const fileInput = screen.getByLabelText(/upload/i);
       await user.upload(fileInput, mockFile);
 
-      expect(screen.getByText(/file type .txt is not allowed/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/file type .txt is not allowed/i)
+      ).toBeInTheDocument();
     });
 
     it('should handle custom validation errors', async () => {
@@ -238,23 +237,25 @@ describe('FileUpload Component', () => {
       };
 
       render(
-        <FileUpload 
-          {...defaultProps} 
+        <FileUpload
+          {...defaultProps}
           validation={{ custom: customValidation }}
         />
       );
-      
+
       const fileInput = screen.getByLabelText(/upload/i);
       await user.upload(fileInput, mockFile);
 
-      expect(screen.getByText(/file name cannot contain "test"/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/file name cannot contain "test"/i)
+      ).toBeInTheDocument();
     });
   });
 
   describe('Accessibility', () => {
     it('should have proper ARIA labels', () => {
       render(<FileUpload {...defaultProps} />);
-      
+
       const fileInput = screen.getByLabelText(/upload/i);
       expect(fileInput).toHaveAttribute('type', 'file');
     });
@@ -262,7 +263,7 @@ describe('FileUpload Component', () => {
     it('should be keyboard accessible', async () => {
       const user = userEvent.setup();
       render(<FileUpload {...defaultProps} />);
-      
+
       const uploadButton = screen.getByRole('button', { name: /upload/i });
       await user.tab();
       expect(uploadButton).toHaveFocus();
@@ -275,12 +276,9 @@ describe('FileUpload Component', () => {
       });
 
       render(
-        <FileUpload 
-          {...defaultProps} 
-          validation={{ allowedTypes: ['pdf'] }}
-        />
+        <FileUpload {...defaultProps} validation={{ allowedTypes: ['pdf'] }} />
       );
-      
+
       const fileInput = screen.getByLabelText(/upload/i);
       await user.upload(fileInput, mockFile);
 

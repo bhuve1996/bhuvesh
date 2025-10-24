@@ -12,7 +12,9 @@ jest.mock('react-hot-toast', () => ({
   success: jest.fn(),
 }));
 
-const mockValidateResumeData = validateResumeData as jest.MockedFunction<typeof validateResumeData>;
+const mockValidateResumeData = validateResumeData as jest.MockedFunction<
+  typeof validateResumeData
+>;
 
 describe('ResumeBuilder Component', () => {
   const defaultProps = {
@@ -30,7 +32,8 @@ describe('ResumeBuilder Component', () => {
       github: 'github.com/johndoe',
       portfolio: 'johndoe.dev',
     },
-    summary: 'Experienced software engineer with 5+ years of experience in full-stack development.',
+    summary:
+      'Experienced software engineer with 5+ years of experience in full-stack development.',
     experience: [
       {
         id: '1',
@@ -56,7 +59,7 @@ describe('ResumeBuilder Component', () => {
         startDate: '2016-09',
         endDate: '2020-05',
         gpa: '3.8',
-        achievements: ['Magna Cum Laude', 'Dean\'s List'],
+        achievements: ['Magna Cum Laude', "Dean's List"],
       },
     ],
     skills: {
@@ -70,7 +73,8 @@ describe('ResumeBuilder Component', () => {
       {
         id: '1',
         name: 'E-commerce Platform',
-        description: 'Built a full-stack e-commerce platform using React and Node.js',
+        description:
+          'Built a full-stack e-commerce platform using React and Node.js',
         technologies: ['React', 'Node.js', 'MongoDB', 'Stripe'],
         startDate: '2022-01',
         endDate: '2022-06',
@@ -97,7 +101,7 @@ describe('ResumeBuilder Component', () => {
   describe('Form Rendering', () => {
     it('should render all resume sections', () => {
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       expect(screen.getByText('Personal Information')).toBeInTheDocument();
       expect(screen.getByText('Professional Summary')).toBeInTheDocument();
       expect(screen.getByText('Work Experience')).toBeInTheDocument();
@@ -109,7 +113,7 @@ describe('ResumeBuilder Component', () => {
 
     it('should populate form with initial data', () => {
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
       expect(screen.getByDisplayValue('john@example.com')).toBeInTheDocument();
       expect(screen.getByDisplayValue('+1-555-0123')).toBeInTheDocument();
@@ -117,10 +121,10 @@ describe('ResumeBuilder Component', () => {
 
     it('should show empty form when no initial data provided', () => {
       render(<ResumeBuilder {...defaultProps} />);
-      
+
       const nameInput = screen.getByLabelText(/full name/i);
       const emailInput = screen.getByLabelText(/email/i);
-      
+
       expect(nameInput).toHaveValue('');
       expect(emailInput).toHaveValue('');
     });
@@ -139,7 +143,7 @@ describe('ResumeBuilder Component', () => {
       });
 
       render(<ResumeBuilder {...defaultProps} />);
-      
+
       const saveButton = screen.getByRole('button', { name: /save resume/i });
       await user.click(saveButton);
 
@@ -160,19 +164,21 @@ describe('ResumeBuilder Component', () => {
       });
 
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       const saveButton = screen.getByRole('button', { name: /save resume/i });
       await user.click(saveButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Summary could be more detailed')).toBeInTheDocument();
+        expect(
+          screen.getByText('Summary could be more detailed')
+        ).toBeInTheDocument();
       });
     });
 
     it('should validate email format', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} />);
-      
+
       const emailInput = screen.getByLabelText(/email/i);
       await user.type(emailInput, 'invalid-email');
 
@@ -189,8 +195,10 @@ describe('ResumeBuilder Component', () => {
     it('should add new experience entry', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
-      const addExperienceButton = screen.getByRole('button', { name: /add experience/i });
+
+      const addExperienceButton = screen.getByRole('button', {
+        name: /add experience/i,
+      });
       await user.click(addExperienceButton);
 
       expect(screen.getByText('Position')).toBeInTheDocument();
@@ -200,8 +208,10 @@ describe('ResumeBuilder Component', () => {
     it('should remove experience entry', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
-      const removeButton = screen.getByRole('button', { name: /remove experience/i });
+
+      const removeButton = screen.getByRole('button', {
+        name: /remove experience/i,
+      });
       await user.click(removeButton);
 
       // Confirm removal
@@ -209,15 +219,19 @@ describe('ResumeBuilder Component', () => {
       await user.click(confirmButton);
 
       await waitFor(() => {
-        expect(screen.queryByText('Senior Software Engineer')).not.toBeInTheDocument();
+        expect(
+          screen.queryByText('Senior Software Engineer')
+        ).not.toBeInTheDocument();
       });
     });
 
     it('should add new skill', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
-      const addSkillButton = screen.getByRole('button', { name: /add technical skill/i });
+
+      const addSkillButton = screen.getByRole('button', {
+        name: /add technical skill/i,
+      });
       await user.click(addSkillButton);
 
       const skillInput = screen.getByPlaceholderText(/enter skill/i);
@@ -230,8 +244,10 @@ describe('ResumeBuilder Component', () => {
     it('should remove skill', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
-      const removeSkillButton = screen.getByRole('button', { name: /remove javascript/i });
+
+      const removeSkillButton = screen.getByRole('button', {
+        name: /remove javascript/i,
+      });
       await user.click(removeSkillButton);
 
       await waitFor(() => {
@@ -244,7 +260,7 @@ describe('ResumeBuilder Component', () => {
     it('should save resume data when valid', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       const saveButton = screen.getByRole('button', { name: /save resume/i });
       await user.click(saveButton);
 
@@ -257,12 +273,14 @@ describe('ResumeBuilder Component', () => {
       const user = userEvent.setup();
       mockValidateResumeData.mockReturnValue({
         isValid: false,
-        errors: [{ field: 'personal.fullName', message: 'Full name is required' }],
+        errors: [
+          { field: 'personal.fullName', message: 'Full name is required' },
+        ],
         warnings: [],
       });
 
       render(<ResumeBuilder {...defaultProps} />);
-      
+
       const saveButton = screen.getByRole('button', { name: /save resume/i });
       await user.click(saveButton);
 
@@ -274,12 +292,14 @@ describe('ResumeBuilder Component', () => {
     it('should show save success message', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       const saveButton = screen.getByRole('button', { name: /save resume/i });
       await user.click(saveButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/resume saved successfully/i)).toBeInTheDocument();
+        expect(
+          screen.getByText(/resume saved successfully/i)
+        ).toBeInTheDocument();
       });
     });
   });
@@ -288,7 +308,7 @@ describe('ResumeBuilder Component', () => {
     it('should export to PDF', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       const exportButton = screen.getByRole('button', { name: /export/i });
       await user.click(exportButton);
 
@@ -296,29 +316,37 @@ describe('ResumeBuilder Component', () => {
       await user.click(pdfOption);
 
       await waitFor(() => {
-        expect(defaultProps.onExport).toHaveBeenCalledWith(mockResumeData, 'pdf');
+        expect(defaultProps.onExport).toHaveBeenCalledWith(
+          mockResumeData,
+          'pdf'
+        );
       });
     });
 
     it('should export to DOCX', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       const exportButton = screen.getByRole('button', { name: /export/i });
       await user.click(exportButton);
 
-      const docxOption = screen.getByRole('button', { name: /export as docx/i });
+      const docxOption = screen.getByRole('button', {
+        name: /export as docx/i,
+      });
       await user.click(docxOption);
 
       await waitFor(() => {
-        expect(defaultProps.onExport).toHaveBeenCalledWith(mockResumeData, 'docx');
+        expect(defaultProps.onExport).toHaveBeenCalledWith(
+          mockResumeData,
+          'docx'
+        );
       });
     });
 
     it('should export to TXT', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       const exportButton = screen.getByRole('button', { name: /export/i });
       await user.click(exportButton);
 
@@ -326,7 +354,10 @@ describe('ResumeBuilder Component', () => {
       await user.click(txtOption);
 
       await waitFor(() => {
-        expect(defaultProps.onExport).toHaveBeenCalledWith(mockResumeData, 'txt');
+        expect(defaultProps.onExport).toHaveBeenCalledWith(
+          mockResumeData,
+          'txt'
+        );
       });
     });
   });
@@ -335,12 +366,12 @@ describe('ResumeBuilder Component', () => {
     it('should switch between builder and preview modes', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       const previewButton = screen.getByRole('button', { name: /preview/i });
       await user.click(previewButton);
 
       expect(screen.getByText(/resume preview/i)).toBeInTheDocument();
-      
+
       const editButton = screen.getByRole('button', { name: /edit/i });
       await user.click(editButton);
 
@@ -350,14 +381,16 @@ describe('ResumeBuilder Component', () => {
     it('should expand and collapse sections', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
-      const experienceSection = screen.getByText('Work Experience').closest('div');
+
+      const experienceSection = screen
+        .getByText('Work Experience')
+        .closest('div');
       const toggleButton = experienceSection?.querySelector('button');
-      
+
       if (toggleButton) {
         await user.click(toggleButton);
         expect(experienceSection).toHaveClass('collapsed');
-        
+
         await user.click(toggleButton);
         expect(experienceSection).not.toHaveClass('collapsed');
       }
@@ -368,8 +401,10 @@ describe('ResumeBuilder Component', () => {
     it('should handle rich text input for summary', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
-      const summaryEditor = screen.getByRole('textbox', { name: /professional summary/i });
+
+      const summaryEditor = screen.getByRole('textbox', {
+        name: /professional summary/i,
+      });
       await user.clear(summaryEditor);
       await user.type(summaryEditor, 'New summary with **bold** text');
 
@@ -379,14 +414,16 @@ describe('ResumeBuilder Component', () => {
     it('should format text with toolbar buttons', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
-      const summaryEditor = screen.getByRole('textbox', { name: /professional summary/i });
+
+      const summaryEditor = screen.getByRole('textbox', {
+        name: /professional summary/i,
+      });
       await user.clear(summaryEditor);
       await user.type(summaryEditor, 'Selected text');
 
       // Select text
       await user.selectText(summaryEditor);
-      
+
       const boldButton = screen.getByRole('button', { name: /bold/i });
       await user.click(boldButton);
 
@@ -397,7 +434,7 @@ describe('ResumeBuilder Component', () => {
   describe('Accessibility', () => {
     it('should have proper ARIA labels for all form fields', () => {
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/phone/i)).toBeInTheDocument();
@@ -407,10 +444,10 @@ describe('ResumeBuilder Component', () => {
     it('should support keyboard navigation', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       await user.tab();
       expect(screen.getByLabelText(/full name/i)).toHaveFocus();
-      
+
       await user.tab();
       expect(screen.getByLabelText(/email/i)).toHaveFocus();
     });
@@ -419,12 +456,14 @@ describe('ResumeBuilder Component', () => {
       const user = userEvent.setup();
       mockValidateResumeData.mockReturnValue({
         isValid: false,
-        errors: [{ field: 'personal.fullName', message: 'Full name is required' }],
+        errors: [
+          { field: 'personal.fullName', message: 'Full name is required' },
+        ],
         warnings: [],
       });
 
       render(<ResumeBuilder {...defaultProps} />);
-      
+
       const saveButton = screen.getByRole('button', { name: /save resume/i });
       await user.click(saveButton);
 
@@ -439,15 +478,18 @@ describe('ResumeBuilder Component', () => {
     it('should auto-save changes after delay', async () => {
       const user = userEvent.setup();
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       const nameInput = screen.getByLabelText(/full name/i);
       await user.clear(nameInput);
       await user.type(nameInput, 'Jane Doe');
 
       // Wait for auto-save delay
-      await waitFor(() => {
-        expect(defaultProps.onSave).toHaveBeenCalled();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          expect(defaultProps.onSave).toHaveBeenCalled();
+        },
+        { timeout: 2000 }
+      );
     });
 
     it('should not auto-save invalid data', async () => {
@@ -459,15 +501,18 @@ describe('ResumeBuilder Component', () => {
       });
 
       render(<ResumeBuilder {...defaultProps} initialData={mockResumeData} />);
-      
+
       const emailInput = screen.getByLabelText(/email/i);
       await user.clear(emailInput);
       await user.type(emailInput, 'invalid-email');
 
       // Wait for auto-save delay
-      await waitFor(() => {
-        expect(defaultProps.onSave).not.toHaveBeenCalled();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          expect(defaultProps.onSave).not.toHaveBeenCalled();
+        },
+        { timeout: 2000 }
+      );
     });
   });
 });

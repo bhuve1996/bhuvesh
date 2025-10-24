@@ -1,6 +1,10 @@
 import { renderHook, act } from '@testing-library/react';
 
-import { useResumeStore, useResumeActions, useResumeData } from '@/store/resumeStore';
+import {
+  useResumeStore,
+  useResumeActions,
+  useResumeData,
+} from '@/store/resumeStore';
 import { ResumeData, ResumeTemplate } from '@/types';
 
 // Mock localStorage
@@ -42,7 +46,10 @@ describe('ResumeStore', () => {
         endDate: '2023-12-31',
         current: false,
         description: 'Led development of web applications.',
-        achievements: ['Improved performance by 50%', 'Led team of 5 developers'],
+        achievements: [
+          'Improved performance by 50%',
+          'Led team of 5 developers',
+        ],
       },
     ],
     education: [
@@ -121,7 +128,7 @@ describe('ResumeStore', () => {
   describe('Basic Store Operations', () => {
     it('should initialize with default state', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       expect(result.current.resumeData).toBeNull();
       expect(result.current.analysisResult).toBeNull();
       expect(result.current.selectedTemplate).toBeNull();
@@ -132,7 +139,7 @@ describe('ResumeStore', () => {
 
     it('should set resume data', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.setResumeData(mockResumeData);
       });
@@ -143,7 +150,7 @@ describe('ResumeStore', () => {
 
     it('should set selected template', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.setSelectedTemplate(mockTemplate);
       });
@@ -154,7 +161,7 @@ describe('ResumeStore', () => {
 
     it('should handle loading state', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.setLoading(true);
       });
@@ -170,7 +177,7 @@ describe('ResumeStore', () => {
 
     it('should handle error state', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.setError('Test error');
       });
@@ -188,7 +195,7 @@ describe('ResumeStore', () => {
   describe('Navigation', () => {
     it('should navigate between steps', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.navigateToStep('resume-builder');
       });
@@ -199,7 +206,7 @@ describe('ResumeStore', () => {
 
     it('should go back to previous step', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.navigateToStep('resume-builder');
         result.current.navigateToStep('templates');
@@ -218,7 +225,7 @@ describe('ResumeStore', () => {
 
     it('should clear data when navigating without preserving', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.setResumeData(mockResumeData);
         result.current.navigateToStep('ats-checker', false);
@@ -276,7 +283,7 @@ describe('ResumeStore', () => {
 
     it('should update personal info', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.updatePersonalInfo({
           fullName: 'Jane Doe',
@@ -285,13 +292,15 @@ describe('ResumeStore', () => {
       });
 
       expect(result.current.resumeData?.personal.fullName).toBe('Jane Doe');
-      expect(result.current.resumeData?.personal.email).toBe('jane@example.com');
+      expect(result.current.resumeData?.personal.email).toBe(
+        'jane@example.com'
+      );
       expect(result.current.resumeData?.personal.phone).toBe('+1234567890'); // Should remain unchanged
     });
 
     it('should update summary', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.updateSummary('New summary text');
       });
@@ -322,7 +331,7 @@ describe('ResumeStore', () => {
 
     it('should update experience', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.updateExperience('exp1', {
           position: 'Principal Developer',
@@ -330,7 +339,9 @@ describe('ResumeStore', () => {
         });
       });
 
-      const updatedExp = result.current.resumeData?.experience.find(exp => exp.id === 'exp1');
+      const updatedExp = result.current.resumeData?.experience.find(
+        exp => exp.id === 'exp1'
+      );
       expect(updatedExp?.position).toBe('Principal Developer');
       expect(updatedExp?.description).toBe('Updated description');
       expect(updatedExp?.company).toBe('Tech Corp'); // Should remain unchanged
@@ -338,7 +349,7 @@ describe('ResumeStore', () => {
 
     it('should remove experience', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.removeExperience('exp1');
       });
@@ -370,7 +381,7 @@ describe('ResumeStore', () => {
 
     it('should update education', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.updateEducation('edu1', {
           degree: 'Bachelor of Engineering',
@@ -378,7 +389,9 @@ describe('ResumeStore', () => {
         });
       });
 
-      const updatedEdu = result.current.resumeData?.education.find(edu => edu.id === 'edu1');
+      const updatedEdu = result.current.resumeData?.education.find(
+        edu => edu.id === 'edu1'
+      );
       expect(updatedEdu?.degree).toBe('Bachelor of Engineering');
       expect(updatedEdu?.gpa).toBe('3.9');
       expect(updatedEdu?.institution).toBe('University of Technology'); // Should remain unchanged
@@ -386,7 +399,7 @@ describe('ResumeStore', () => {
 
     it('should remove education', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.removeEducation('edu1');
       });
@@ -396,7 +409,7 @@ describe('ResumeStore', () => {
 
     it('should update skills', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.updateSkills({
           technical: ['Python', 'Django', 'PostgreSQL'],
@@ -404,9 +417,19 @@ describe('ResumeStore', () => {
         });
       });
 
-      expect(result.current.resumeData?.skills.technical).toEqual(['Python', 'Django', 'PostgreSQL']);
-      expect(result.current.resumeData?.skills.soft).toEqual(['Leadership', 'Communication']);
-      expect(result.current.resumeData?.skills.business).toEqual(['Project Management', 'Team Leadership']); // Should remain unchanged
+      expect(result.current.resumeData?.skills.technical).toEqual([
+        'Python',
+        'Django',
+        'PostgreSQL',
+      ]);
+      expect(result.current.resumeData?.skills.soft).toEqual([
+        'Leadership',
+        'Communication',
+      ]);
+      expect(result.current.resumeData?.skills.business).toEqual([
+        'Project Management',
+        'Team Leadership',
+      ]); // Should remain unchanged
     });
 
     it('should add project', () => {
@@ -430,7 +453,7 @@ describe('ResumeStore', () => {
 
     it('should update project', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.updateProject('proj1', {
           name: 'Updated E-commerce Platform',
@@ -438,15 +461,23 @@ describe('ResumeStore', () => {
         });
       });
 
-      const updatedProj = result.current.resumeData?.projects.find(proj => proj.id === 'proj1');
+      const updatedProj = result.current.resumeData?.projects.find(
+        proj => proj.id === 'proj1'
+      );
       expect(updatedProj?.name).toBe('Updated E-commerce Platform');
-      expect(updatedProj?.technologies).toEqual(['Next.js', 'Prisma', 'PostgreSQL']);
-      expect(updatedProj?.description).toBe('Built a full-stack e-commerce solution.'); // Should remain unchanged
+      expect(updatedProj?.technologies).toEqual([
+        'Next.js',
+        'Prisma',
+        'PostgreSQL',
+      ]);
+      expect(updatedProj?.description).toBe(
+        'Built a full-stack e-commerce solution.'
+      ); // Should remain unchanged
     });
 
     it('should remove project', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.removeProject('proj1');
       });
@@ -456,12 +487,18 @@ describe('ResumeStore', () => {
 
     it('should update achievements', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
-        result.current.updateAchievements(['New Achievement 1', 'New Achievement 2']);
+        result.current.updateAchievements([
+          'New Achievement 1',
+          'New Achievement 2',
+        ]);
       });
 
-      expect(result.current.resumeData?.achievements).toEqual(['New Achievement 1', 'New Achievement 2']);
+      expect(result.current.resumeData?.achievements).toEqual([
+        'New Achievement 1',
+        'New Achievement 2',
+      ]);
     });
 
     it('should update certifications', () => {
@@ -481,24 +518,30 @@ describe('ResumeStore', () => {
         result.current.updateCertifications(newCertifications);
       });
 
-      expect(result.current.resumeData?.certifications).toEqual(newCertifications);
+      expect(result.current.resumeData?.certifications).toEqual(
+        newCertifications
+      );
     });
 
     it('should update hobbies', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.updateHobbies(['Reading', 'Gaming', 'Cooking']);
       });
 
-      expect(result.current.resumeData?.hobbies).toEqual(['Reading', 'Gaming', 'Cooking']);
+      expect(result.current.resumeData?.hobbies).toEqual([
+        'Reading',
+        'Gaming',
+        'Cooking',
+      ]);
     });
   });
 
   describe('Data Management', () => {
     it('should clear all data', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.setResumeData(mockResumeData);
         result.current.setSelectedTemplate(mockTemplate);
@@ -513,7 +556,7 @@ describe('ResumeStore', () => {
 
     it('should clear analysis data', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.setResumeData(mockResumeData);
         result.current.setSelectedTemplate(mockTemplate);
@@ -528,7 +571,7 @@ describe('ResumeStore', () => {
 
     it('should clear template data', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       act(() => {
         result.current.setResumeData(mockResumeData);
         result.current.setSelectedTemplate(mockTemplate);
@@ -544,7 +587,7 @@ describe('ResumeStore', () => {
   describe('Utility Functions', () => {
     it('should check if resume data exists', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       expect(result.current.hasResumeData()).toBe(false);
 
       act(() => {
@@ -556,7 +599,7 @@ describe('ResumeStore', () => {
 
     it('should check if analysis result exists', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       expect(result.current.hasAnalysisResult()).toBe(false);
 
       act(() => {
@@ -579,7 +622,7 @@ describe('ResumeStore', () => {
 
     it('should check if selected template exists', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       expect(result.current.hasSelectedTemplate()).toBe(false);
 
       act(() => {
@@ -591,7 +634,7 @@ describe('ResumeStore', () => {
 
     it('should get current data', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       expect(result.current.getCurrentData()).toBeNull();
 
       act(() => {
@@ -605,7 +648,7 @@ describe('ResumeStore', () => {
   describe('Selectors', () => {
     it('should provide resume data selector', () => {
       const { result } = renderHook(() => useResumeData());
-      
+
       expect(result.current).toBeNull();
 
       const { result: storeResult } = renderHook(() => useResumeStore());
@@ -618,7 +661,7 @@ describe('ResumeStore', () => {
 
     it('should provide resume actions', () => {
       const { result } = renderHook(() => useResumeActions());
-      
+
       expect(typeof result.current.setResumeData).toBe('function');
       expect(typeof result.current.setSelectedTemplate).toBe('function');
       expect(typeof result.current.updatePersonalInfo).toBe('function');
@@ -630,7 +673,7 @@ describe('ResumeStore', () => {
   describe('Error Handling', () => {
     it('should handle content management actions when no resume data exists', () => {
       const { result } = renderHook(() => useResumeStore());
-      
+
       // These should not throw errors even when no resume data exists
       expect(() => {
         act(() => {

@@ -40,6 +40,9 @@ export const storage = {
 };
 
 // Animation delay utility for staggered animations
-export function getAnimationDelay(index: number, baseDelay: number = 100): string {
+export function getAnimationDelay(
+  index: number,
+  baseDelay: number = 100
+): string {
   return `${index * baseDelay}ms`;
 }

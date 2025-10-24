@@ -222,8 +222,9 @@ describe('Responsive Design Integration Tests', () => {
 
     it('should render floating action button with mobile text', () => {
       // Import the mock component directly
-      const MockFloatingPanel =
-        (await import('@/components/organisms/FloatingPanel/FloatingPanel')).default;
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
 
       render(
         <TestWrapper>

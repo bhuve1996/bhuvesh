@@ -34,7 +34,13 @@ describe('ResumeManager Component', () => {
         summary: 'Experienced software engineer',
         experience: [],
         education: [],
-        skills: { technical: [], business: [], soft: [], languages: [], certifications: [] },
+        skills: {
+          technical: [],
+          business: [],
+          soft: [],
+          languages: [],
+          certifications: [],
+        },
         projects: [],
         achievements: [],
       },
@@ -50,7 +56,13 @@ describe('ResumeManager Component', () => {
         summary: 'Product management expert',
         experience: [],
         education: [],
-        skills: { technical: [], business: [], soft: [], languages: [], certifications: [] },
+        skills: {
+          technical: [],
+          business: [],
+          soft: [],
+          languages: [],
+          certifications: [],
+        },
         projects: [],
         achievements: [],
       },
@@ -63,30 +75,32 @@ describe('ResumeManager Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCloudStorage.getAllResumes.mockReturnValue(mockResumes);
-    mockCloudStorage.getResume.mockImplementation((id) => 
-      mockResumes.find(r => r.id === id) || null
+    mockCloudStorage.getResume.mockImplementation(
+      id => mockResumes.find(r => r.id === id) || null
     );
   });
 
   describe('Resume List Display', () => {
     it('should display all saved resumes', () => {
       render(<ResumeManager {...defaultProps} />);
-      
+
       expect(screen.getByText('Software Engineer Resume')).toBeInTheDocument();
       expect(screen.getByText('Product Manager Resume')).toBeInTheDocument();
     });
 
     it('should show resume metadata', () => {
       render(<ResumeManager {...defaultProps} />);
-      
+
       expect(screen.getByText('john@example.com')).toBeInTheDocument();
       expect(screen.getByText('jane@example.com')).toBeInTheDocument();
     });
 
     it('should highlight current resume', () => {
-      render(<ResumeManager {...defaultProps} currentResumeId="1" />);
-      
-      const currentResume = screen.getByText('Software Engineer Resume').closest('div');
+      render(<ResumeManager {...defaultProps} currentResumeId='1' />);
+
+      const currentResume = screen
+        .getByText('Software Engineer Resume')
+        .closest('div');
       expect(currentResume).toHaveClass('bg-blue-50', 'border-blue-200');
     });
   });
@@ -94,7 +108,7 @@ describe('ResumeManager Component', () => {
   describe('Resume Selection', () => {
     it('should call onResumeSelect when resume is clicked', () => {
       render(<ResumeManager {...defaultProps} />);
-      
+
       const resumeItem = screen.getByText('Software Engineer Resume');
       fireEvent.click(resumeItem);
 
@@ -104,7 +118,7 @@ describe('ResumeManager Component', () => {
     it('should handle resume selection with keyboard', async () => {
       const user = userEvent.setup();
       render(<ResumeManager {...defaultProps} />);
-      
+
       // const _resumeItem = screen.getByText('Software Engineer Resume');
       await user.tab();
       await user.keyboard('{Enter}');
@@ -138,7 +152,13 @@ describe('ResumeManager Component', () => {
           summary: '',
           experience: [],
           education: [],
-          skills: { technical: [], business: [], soft: [], languages: [], certifications: [] },
+          skills: {
+            technical: [],
+            business: [],
+            soft: [],
+            languages: [],
+            certifications: [],
+          },
           projects: [],
           achievements: [],
         },
@@ -148,7 +168,7 @@ describe('ResumeManager Component', () => {
       });
 
       render(<ResumeManager {...defaultProps} />);
-      
+
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
@@ -166,7 +186,7 @@ describe('ResumeManager Component', () => {
       });
 
       render(<ResumeManager {...defaultProps} />);
-      
+
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
@@ -183,7 +203,7 @@ describe('ResumeManager Component', () => {
       Object.defineProperty(mockFile, 'size', { value: 11 * 1024 * 1024 });
 
       render(<ResumeManager {...defaultProps} />);
-      
+
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
@@ -201,7 +221,7 @@ describe('ResumeManager Component', () => {
       mockAtsApi.uploadFile.mockRejectedValue(new Error('Upload failed'));
 
       render(<ResumeManager {...defaultProps} />);
-      
+
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
@@ -215,7 +235,7 @@ describe('ResumeManager Component', () => {
   describe('Resume Management', () => {
     it('should create new resume when new button is clicked', () => {
       render(<ResumeManager {...defaultProps} />);
-      
+
       const newButton = screen.getByRole('button', { name: /new resume/i });
       fireEvent.click(newButton);
 
@@ -227,8 +247,10 @@ describe('ResumeManager Component', () => {
       mockCloudStorage.deleteResume.mockReturnValue(true);
 
       render(<ResumeManager {...defaultProps} />);
-      
-      const deleteButton = screen.getAllByRole('button', { name: /delete/i })[0];
+
+      const deleteButton = screen.getAllByRole('button', {
+        name: /delete/i,
+      })[0];
       await user.click(deleteButton);
 
       // Confirm deletion in modal
@@ -244,8 +266,10 @@ describe('ResumeManager Component', () => {
       const user = userEvent.setup();
 
       render(<ResumeManager {...defaultProps} />);
-      
-      const deleteButton = screen.getAllByRole('button', { name: /delete/i })[0];
+
+      const deleteButton = screen.getAllByRole('button', {
+        name: /delete/i,
+      })[0];
       await user.click(deleteButton);
 
       // Cancel deletion in modal
@@ -259,8 +283,10 @@ describe('ResumeManager Component', () => {
       mockCloudStorage.duplicateResume.mockReturnValue('duplicated-resume-id');
 
       render(<ResumeManager {...defaultProps} />);
-      
-      const duplicateButton = screen.getAllByRole('button', { name: /duplicate/i })[0];
+
+      const duplicateButton = screen.getAllByRole('button', {
+        name: /duplicate/i,
+      })[0];
       fireEvent.click(duplicateButton);
 
       expect(mockCloudStorage.duplicateResume).toHaveBeenCalledWith('1');
@@ -271,18 +297,20 @@ describe('ResumeManager Component', () => {
     it('should filter resumes by search term', async () => {
       const user = userEvent.setup();
       render(<ResumeManager {...defaultProps} />);
-      
+
       const searchInput = screen.getByPlaceholderText(/search resumes/i);
       await user.type(searchInput, 'Software');
 
       expect(screen.getByText('Software Engineer Resume')).toBeInTheDocument();
-      expect(screen.queryByText('Product Manager Resume')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Product Manager Resume')
+      ).not.toBeInTheDocument();
     });
 
     it('should show no results message when no matches found', async () => {
       const user = userEvent.setup();
       render(<ResumeManager {...defaultProps} />);
-      
+
       const searchInput = screen.getByPlaceholderText(/search resumes/i);
       await user.type(searchInput, 'NonExistent');
 
@@ -292,7 +320,7 @@ describe('ResumeManager Component', () => {
     it('should clear search when clear button is clicked', async () => {
       const user = userEvent.setup();
       render(<ResumeManager {...defaultProps} />);
-      
+
       const searchInput = screen.getByPlaceholderText(/search resumes/i);
       await user.type(searchInput, 'Software');
 
@@ -317,7 +345,7 @@ describe('ResumeManager Component', () => {
       );
 
       render(<ResumeManager {...defaultProps} />);
-      
+
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
@@ -335,7 +363,7 @@ describe('ResumeManager Component', () => {
       );
 
       render(<ResumeManager {...defaultProps} />);
-      
+
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
@@ -347,26 +375,30 @@ describe('ResumeManager Component', () => {
   describe('Accessibility', () => {
     it('should have proper ARIA labels for all interactive elements', () => {
       render(<ResumeManager {...defaultProps} />);
-      
+
       expect(screen.getByLabelText(/upload resume/i)).toBeInTheDocument();
-      expect(screen.getByPlaceholderText(/search resumes/i)).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText(/search resumes/i)
+      ).toBeInTheDocument();
     });
 
     it('should support keyboard navigation', async () => {
       const user = userEvent.setup();
       render(<ResumeManager {...defaultProps} />);
-      
+
       await user.tab();
       expect(screen.getByRole('button', { name: /new resume/i })).toHaveFocus();
-      
+
       await user.tab();
       expect(screen.getByPlaceholderText(/search resumes/i)).toHaveFocus();
     });
 
     it('should announce resume selection to screen readers', () => {
-      render(<ResumeManager {...defaultProps} currentResumeId="1" />);
-      
-      const selectedResume = screen.getByText('Software Engineer Resume').closest('div');
+      render(<ResumeManager {...defaultProps} currentResumeId='1' />);
+
+      const selectedResume = screen
+        .getByText('Software Engineer Resume')
+        .closest('div');
       expect(selectedResume).toHaveAttribute('aria-selected', 'true');
     });
   });

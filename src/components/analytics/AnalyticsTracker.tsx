@@ -189,7 +189,9 @@ export function AnalyticsTracker({
           entries.forEach(entry => {
             const fidEntry = entry as PerformanceEventTiming;
             if (fidEntry.processingStart) {
-              webVitalsMonitor.trackFID(fidEntry.processingStart - fidEntry.startTime);
+              webVitalsMonitor.trackFID(
+                fidEntry.processingStart - fidEntry.startTime
+              );
             }
           });
         });
@@ -200,7 +202,10 @@ export function AnalyticsTracker({
         const clsObserver = new PerformanceObserver(list => {
           const entries = list.getEntries();
           entries.forEach(entry => {
-            const clsEntry = entry as PerformanceEntry & { hadRecentInput?: boolean; value?: number };
+            const clsEntry = entry as PerformanceEntry & {
+              hadRecentInput?: boolean;
+              value?: number;
+            };
             if (!clsEntry.hadRecentInput && clsEntry.value !== undefined) {
               clsValue += clsEntry.value;
             }
