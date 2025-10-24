@@ -194,21 +194,21 @@ export const validateAriaAttributes = (
   // Check for valid ARIA values
   if (
     attributes['aria-expanded'] &&
-    !['true', 'false'].includes(attributes['aria-expanded'])
+    !['true', 'false'].includes(attributes['aria-expanded'] as string)
   ) {
     errors.push('aria-expanded must be "true" or "false"');
   }
 
   if (
     attributes['aria-selected'] &&
-    !['true', 'false'].includes(attributes['aria-selected'])
+    !['true', 'false'].includes(attributes['aria-selected'] as string)
   ) {
     errors.push('aria-selected must be "true" or "false"');
   }
 
   if (
     attributes['aria-checked'] &&
-    !['true', 'false', 'mixed'].includes(attributes['aria-checked'])
+    !['true', 'false', 'mixed'].includes(attributes['aria-checked'] as string)
   ) {
     errors.push('aria-checked must be "true", "false", or "mixed"');
   }

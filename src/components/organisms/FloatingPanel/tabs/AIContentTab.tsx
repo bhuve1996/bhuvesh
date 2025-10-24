@@ -42,12 +42,14 @@ export const AIContentTab: React.FC<AIContentTabProps> = ({ resumeData }) => {
         if (improvementPlan.success && improvementPlan.data) {
           setImprovementResult({
             section,
-            improvements: (improvementPlan.data as Record<string, unknown>).improvements as string[] || [],
+            improvements:
+              ((improvementPlan.data as Record<string, unknown>)
+                .improvements as string[]) || [],
           });
           toast.success('AI improvements generated!');
         }
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to generate AI improvements');
       // AI Improvement Error: error
     } finally {

@@ -18,6 +18,21 @@ export class GoogleAnalyticsProvider implements AnalyticsProvider {
   name = 'Google Analytics 4';
   enabled = false;
 
+  track(event: AnalyticsEventData): void {
+    this.trackEvent(event);
+  }
+
+  identify(userId: string, traits?: Record<string, unknown>): void {
+    this.setUserId(userId);
+    if (traits) {
+      this.setUserProperties(traits);
+    }
+  }
+
+  page(name: string, _properties?: Record<string, unknown>): void {
+    this.trackPageView(window.location.href, name);
+  }
+
   constructor() {
     this.enabled = analyticsConfig.googleAnalytics.enabled;
     if (this.enabled) {

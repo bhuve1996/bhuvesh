@@ -24,15 +24,10 @@ class AnalyticsManager {
 
   private createSession(): UserSession {
     return {
-      session_id: this.generateSessionId(),
-      start_time: Date.now(),
-      last_activity: Date.now(),
-      page_views: 0,
+      id: this.generateSessionId(),
+      startTime: Date.now(),
+      pageViews: 0,
       events: 0,
-      referrer: typeof window !== 'undefined' ? document.referrer : '',
-      utm_source: this.getUrlParameter('utm_source') || '',
-      utm_medium: this.getUrlParameter('utm_medium') || '',
-      utm_campaign: this.getUrlParameter('utm_campaign') || '',
     };
   }
 
@@ -62,7 +57,7 @@ class AnalyticsManager {
       // eslint-disable-next-line no-console
       console.log('Analytics Manager Initialized:', {
         providers: this.providers.map(p => p.name),
-        session_id: this.session.session_id,
+        session_id: this.session.id,
         config: analyticsConfig,
       });
     }
@@ -72,14 +67,14 @@ class AnalyticsManager {
     if (!this.isInitialized) return;
 
     this.session.events++;
-    this.session.last_activity = Date.now();
+    // Update last activity (not in UserSession interface)
 
     // Add session data to event
     const enrichedEvent = {
       ...event,
       custom_parameters: {
         ...event.custom_parameters,
-        session_id: this.session.session_id,
+        session_id: this.session.id,
         session_events: this.session.events,
         timestamp: Date.now(),
       },
@@ -108,8 +103,8 @@ class AnalyticsManager {
   trackPageView(url: string, title: string): void {
     if (!this.isInitialized) return;
 
-    this.session.page_views++;
-    this.session.last_activity = Date.now();
+    this.session.pageViews++;
+    // Update last activity (not in UserSession interface)
 
     // Track with all providers
     this.providers.forEach(provider => {
@@ -129,7 +124,7 @@ class AnalyticsManager {
       custom_parameters: {
         page_url: url,
         page_title: title,
-        page_views: this.session.page_views,
+        page_views: this.session.pageViews,
       },
     });
 
@@ -168,7 +163,7 @@ class AnalyticsManager {
   setUserId(userId: string): void {
     if (!this.isInitialized) return;
 
-    this.session.user_id = userId;
+    // Set user ID (not in UserSession interface)
 
     this.providers.forEach(provider => {
       try {

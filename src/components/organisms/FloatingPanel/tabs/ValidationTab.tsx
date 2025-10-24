@@ -26,7 +26,7 @@ export const ValidationTab: React.FC<ValidationTabProps> = ({ resumeData }) => {
         issues: validation.issues,
         recommendations: validation.recommendations,
       });
-    } catch (error) {
+    } catch {
       // Validation Error: error
     } finally {
       setIsValidating(false);

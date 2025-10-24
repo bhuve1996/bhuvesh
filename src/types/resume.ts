@@ -182,7 +182,7 @@ export interface ResumeTemplate {
   fontSize?: string;
   fontFamily?: string;
   colorScheme?: string;
-  spacing?: any;
+  spacing?: Record<string, unknown>;
 }
 
 // Builder State Types

@@ -18,16 +18,17 @@ export const TemplateCustomizerTab: React.FC<TemplateCustomizerTabProps> = ({
     fontSize: template.fontSize || '14',
     fontFamily: template.fontFamily || 'Arial',
     colorScheme: template.colorScheme || 'blue',
-    spacing: template.spacing || 'normal',
+    spacing: typeof template.spacing === 'string' ? template.spacing : 'normal',
   });
 
-  const handleCustomizationChange = (key: string, value: any) => {
+  const handleCustomizationChange = (key: string, value: string | number) => {
     const newCustomizations = { ...customizations, [key]: value };
     setCustomizations(newCustomizations);
 
     onTemplateChange({
       ...template,
       ...newCustomizations,
+      spacing: newCustomizations.spacing as Record<string, unknown>,
     });
   };
 
@@ -125,7 +126,7 @@ export const TemplateCustomizerTab: React.FC<TemplateCustomizerTabProps> = ({
             Spacing
           </label>
           <select
-            value={customizations.spacing}
+            value={customizations.spacing as string}
             onChange={e => handleCustomizationChange('spacing', e.target.value)}
             className='w-full p-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500'
           >

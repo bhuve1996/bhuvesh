@@ -72,31 +72,31 @@ export default function TestComponentsPage() {
     preview: '/preview.jpg',
     layout: {
       sections: [],
-      colors: { 
-        primary: '#10b981', 
-        secondary: '#059669', 
+      colors: {
+        primary: '#10b981',
+        secondary: '#059669',
         accent: '#34d399',
         text: '#1f2937',
-        background: '#ffffff'
+        background: '#ffffff',
       },
-      fonts: { 
-        heading: 'Inter', 
+      fonts: {
+        heading: 'Inter',
         body: 'Inter',
         size: {
           heading: '2rem',
           subheading: '1.5rem',
           body: '1rem',
-          small: '0.875rem'
-        }
+          small: '0.875rem',
+        },
       },
-      spacing: { 
+      spacing: {
         lineHeight: 1.5,
         sectionGap: '2rem',
         margins: '1rem',
-        padding: '1rem'
+        padding: '1rem',
       },
       columns: 1,
-      sidebar: false
+      sidebar: false,
     },
     // config: {},
   };
@@ -109,7 +109,7 @@ export default function TestComponentsPage() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       setSubmitStatus('success');
-    } catch (_error) {
+    } catch {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -285,9 +285,10 @@ export default function TestComponentsPage() {
                 data-testid='name-field'
                 label='Name'
                 required
-                {...(!formData.name && submitStatus === 'error' && {
-                  error: 'This field is required'
-                })}
+                {...(!formData.name &&
+                  submitStatus === 'error' && {
+                    error: 'This field is required',
+                  })}
               >
                 <input
                   data-testid='name-input'
@@ -304,9 +305,10 @@ export default function TestComponentsPage() {
                 data-testid='email-field'
                 label='Email'
                 required
-                {...(!formData.email && submitStatus === 'error' && {
-                  error: 'This field is required'
-                })}
+                {...(!formData.email &&
+                  submitStatus === 'error' && {
+                    error: 'This field is required',
+                  })}
               >
                 <input
                   data-testid='email-input'

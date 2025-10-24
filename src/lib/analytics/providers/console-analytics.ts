@@ -11,6 +11,21 @@ export class ConsoleAnalyticsProvider implements AnalyticsProvider {
   name = 'Console Analytics';
   enabled = true;
 
+  track(event: AnalyticsEventData): void {
+    this.trackEvent(event);
+  }
+
+  identify(userId: string, traits?: Record<string, unknown>): void {
+    this.setUserId(userId);
+    if (traits) {
+      this.setUserProperties(traits);
+    }
+  }
+
+  page(name: string, _properties?: Record<string, unknown>): void {
+    this.trackPageView(window.location.href, name);
+  }
+
   trackEvent(event: AnalyticsEventData): void {
     if (!this.enabled) return;
 

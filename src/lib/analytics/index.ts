@@ -128,8 +128,8 @@ class AnalyticsManager {
       action,
       timestamp: Date.now(),
       sessionId: this.sessionId,
-      userId: this.userId || undefined,
-      properties,
+      userId: this.userId || '',
+      properties: properties || {},
     };
   }
 
@@ -138,7 +138,10 @@ class AnalyticsManager {
     this.userId = userId;
   }
 
-  public trackPageView(page: string, properties?: Record<string, unknown>): void {
+  public trackPageView(
+    page: string,
+    properties?: Record<string, unknown>
+  ): void {
     if (!this.shouldTrack() || !this.config.trackPageViews) return;
 
     const event = this.createEvent('page_view', 'navigation', 'page_view', {
@@ -501,7 +504,7 @@ export const performanceMonitor = {
       });
 
       return result;
-    } catch {
+    } catch (error) {
       const endTime = performance.now();
       const duration = endTime - startTime;
 
@@ -587,12 +590,5 @@ export const webVitalsMonitor = {
 };
 
 // Export types and utilities
-export type {
-  AnalyticsConfig,
-  AnalyticsEvent,
-  ComponentInteraction,
-  PerformanceMetric,
-  UserEngagement,
-};
 
 export { AnalyticsManager };

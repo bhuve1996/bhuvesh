@@ -145,6 +145,9 @@ export function validateResumeData(
     warnings,
     missingRequired,
     missingRecommended,
+    score: Math.max(0, 100 - errors.length * 10 - warnings.length * 5),
+    issues: errors,
+    recommendations: warnings,
   };
 }
 

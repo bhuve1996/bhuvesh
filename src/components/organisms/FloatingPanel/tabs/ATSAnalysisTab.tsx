@@ -46,7 +46,7 @@ export const ATSAnalysisTab: React.FC<ATSAnalysisTabProps> = ({
       } else {
         throw new Error('Analysis failed');
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to analyze resume');
       // ATS Analysis Error: error
     } finally {
@@ -70,7 +70,7 @@ export const ATSAnalysisTab: React.FC<ATSAnalysisTabProps> = ({
 
     if (data.experience && data.experience.length > 0) {
       text += 'EXPERIENCE\n';
-      data.experience.forEach((exp: any) => {
+      data.experience.forEach(exp => {
         text += `${exp.title} at ${exp.company}\n`;
         text += `${exp.startDate} - ${exp.endDate}\n`;
         text += `${exp.description}\n\n`;

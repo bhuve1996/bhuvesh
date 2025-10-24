@@ -3,13 +3,13 @@ export * from './analytics';
 export * from './api';
 export * from './common';
 export * from './components';
-export * from './document';
+export type { DocumentStyle } from './document';
 export * from './forms';
 export * from './panels';
 export * from './portfolio';
 export * from './theme';
 export * from './ui';
-export * from './ui-components';
+export type { ATSAnalysisProps as UIATSAnalysisProps } from './ui-components';
 
 // Export resume types with specific names to avoid conflicts
 export type {
