@@ -324,7 +324,16 @@ export const generateSectionCSS = (
 
   // Generate specific element styles
   if ('container' in styling) {
-    const container = styling.container as Record<string, string>;
+    const container = styling.container as {
+      display: string;
+      flexDirection?: string;
+      justifyContent?: string;
+      alignItems?: string;
+      spacing: SpacingStyle;
+      border?: BorderStyle;
+      background?: BackgroundStyle;
+      shadow?: ShadowStyle;
+    };
     const containerCSS = {
       ...layoutToCSS(container),
       ...spacingToCSS(container.spacing),
@@ -348,7 +357,9 @@ export const generateSectionCSS = (
     >;
     Object.entries(typography).forEach(
       ([key, typo]: [string, Record<string, string>]) => {
-        const typographyCSS = typographyToCSS(typo);
+        const typographyCSS = typographyToCSS(
+          typo as unknown as TypographyStyle
+        );
         const typographyDeclarations = Object.entries(typographyCSS)
           .map(([key, value]) => `  ${key}: ${value};`)
           .join('\n');
@@ -360,7 +371,16 @@ export const generateSectionCSS = (
 
   // Generate specific element styles for complex sections
   if (sectionId === 'skills' && 'container' in styling) {
-    const container = styling.container as Record<string, string>;
+    const container = styling.container as {
+      display: string;
+      flexDirection?: string;
+      justifyContent?: string;
+      alignItems?: string;
+      spacing: SpacingStyle;
+      border?: BorderStyle;
+      background?: BackgroundStyle;
+      shadow?: ShadowStyle;
+    };
     const skillContainerCSS = {
       ...layoutToCSS(container),
       ...spacingToCSS(container.spacing),
@@ -481,7 +501,16 @@ export const applyStylingToElement = (
 
   // Apply container styles if available
   if ('container' in styling) {
-    const container = styling.container as Record<string, string>;
+    const container = styling.container as {
+      display: string;
+      flexDirection?: string;
+      justifyContent?: string;
+      alignItems?: string;
+      spacing: SpacingStyle;
+      border?: BorderStyle;
+      background?: BackgroundStyle;
+      shadow?: ShadowStyle;
+    };
     const containerCSS = {
       ...layoutToCSS(container),
       ...spacingToCSS(container.spacing),
@@ -497,7 +526,16 @@ export const applyStylingToElement = (
 
   // Apply positioning if available
   if ('position' in styling) {
-    const positioningCSS = positioningToCSS(styling as Record<string, string>);
+    const positioningCSS = positioningToCSS(
+      styling as unknown as {
+        position: string;
+        top?: string;
+        right?: string;
+        bottom?: string;
+        left?: string;
+        zIndex?: number;
+      }
+    );
     Object.entries(positioningCSS).forEach(([key, value]) => {
       element.style.setProperty(key, value);
     });
@@ -505,7 +543,16 @@ export const applyStylingToElement = (
 
   // Apply sizing if available
   if ('width' in styling && 'height' in styling) {
-    const sizingCSS = sizingToCSS(styling as Record<string, string>);
+    const sizingCSS = sizingToCSS(
+      styling as unknown as {
+        width: string;
+        height: string;
+        minWidth?: string;
+        maxWidth?: string;
+        minHeight?: string;
+        maxHeight?: string;
+      }
+    );
     Object.entries(sizingCSS).forEach(([key, value]) => {
       element.style.setProperty(key, value);
     });

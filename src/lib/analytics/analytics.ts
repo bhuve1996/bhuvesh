@@ -35,13 +35,6 @@ class AnalyticsManager {
     return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  private getUrlParameter(name: string): string | undefined {
-    if (typeof window === 'undefined') return undefined;
-
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name) || undefined;
-  }
-
   private initializeProviders(): void {
     // Always add console provider for development
     this.providers.push(new ConsoleAnalyticsProvider());

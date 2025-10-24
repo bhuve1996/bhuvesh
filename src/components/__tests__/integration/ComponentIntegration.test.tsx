@@ -229,7 +229,7 @@ describe('Component Integration Tests', () => {
             await new Promise(resolve => setTimeout(resolve, 100));
             setStatus('success');
             handleSubmit();
-          } catch (error) {
+          } catch (_error) {
             setStatus('error');
           } finally {
             setIsSubmitting(false);
@@ -306,7 +306,7 @@ describe('Component Integration Tests', () => {
             // Simulate analysis
             await new Promise(resolve => setTimeout(resolve, 100));
             setAnalysisResult({ score: 85, status: 'success' });
-          } catch (error) {
+          } catch (_error) {
             setAnalysisResult({ score: 0, status: 'error' });
           } finally {
             setIsAnalyzing(false);

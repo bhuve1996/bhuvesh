@@ -9,7 +9,12 @@ export * from './panels';
 export * from './portfolio';
 export * from './theme';
 export * from './ui';
-export type { ATSAnalysisProps as UIATSAnalysisProps } from './ui-components';
+export type {
+  ItemCardProps,
+  LoginButtonProps,
+  LogoutButtonProps,
+  ATSAnalysisProps as UIATSAnalysisProps,
+} from './ui-components';
 
 // Export resume types with specific names to avoid conflicts
 export type {

@@ -40,7 +40,7 @@ export interface AnalyticsEvent {
   action: string;
   label?: string;
   value?: number;
-  properties: Record<string, any>;
+  properties: Record<string, string | number | boolean | null>;
   timestamp: number;
   sessionId: string;
   userId?: string;

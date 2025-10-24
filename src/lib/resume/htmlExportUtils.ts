@@ -160,7 +160,14 @@ export const exportToDOCXFromHTML = async (
     const htmlString = generateHtmlString(template, data);
 
     // Convert HTML to DOCX
-    const docxBuffer = await (htmlDocx as { asBlob: (html: string, options: Record<string, unknown>) => Promise<Blob> }).asBlob(htmlString, {
+    const docxBuffer = await (
+      htmlDocx as unknown as {
+        asBlob: (
+          html: string,
+          options: Record<string, unknown>
+        ) => Promise<Blob>;
+      }
+    ).asBlob(htmlString, {
       orientation: 'portrait',
       margins: {
         top: 720, // 0.5 inch in twips

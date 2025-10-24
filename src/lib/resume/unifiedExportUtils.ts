@@ -246,7 +246,9 @@ export const exportToDOCXUnified = async (
     `;
 
     // Convert to DOCX
-    const docxBlob = (htmlDocx as { asBlob: (html: string) => Blob }).asBlob(htmlContent);
+    const docxBlob = (
+      htmlDocx as unknown as { asBlob: (html: string) => Blob }
+    ).asBlob(htmlContent);
 
     // Download the file
     const url = URL.createObjectURL(docxBlob);

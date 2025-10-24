@@ -28,7 +28,7 @@ export const TemplateCustomizerTab: React.FC<TemplateCustomizerTabProps> = ({
     onTemplateChange({
       ...template,
       ...newCustomizations,
-      spacing: newCustomizations.spacing as Record<string, unknown>,
+      spacing: newCustomizations.spacing as unknown as Record<string, unknown>,
     });
   };
 

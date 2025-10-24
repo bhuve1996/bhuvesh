@@ -1001,9 +1001,13 @@ const defaultStyling: ResumeStylingState = {
   resetTemplateOverride: () => {},
 
   // Getters
-  getSectionStyling: () => ({}) as Record<string, unknown>,
-  getTemplateStyling: () => ({}) as Record<string, unknown>,
-  getEffectiveStyling: () => ({}) as Record<string, unknown>,
+  getSectionStyling: () =>
+    ({}) as ResumeStylingState['sections'][keyof ResumeStylingState['sections']],
+  getTemplateStyling: () => ({}) as ResumeStylingState,
+  getEffectiveStyling: () =>
+    ({}) as
+      | ResumeStylingState
+      | ResumeStylingState['sections'][keyof ResumeStylingState['sections']],
 };
 
 export const useResumeStylingStore = create<ResumeStylingState>()(

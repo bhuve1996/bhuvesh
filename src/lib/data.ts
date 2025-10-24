@@ -83,6 +83,7 @@ export const blogPosts: BlogPost[] = [
       'Learn advanced techniques to optimize React applications for better performance and user experience.',
     content:
       'Performance optimization is crucial for React applications. This guide covers memoization, code splitting, lazy loading, and other advanced techniques to make your React apps lightning fast...',
+    author: 'Bhuvesh Singla',
     category: 'Web Development',
     date: '2024-01-01',
     readTime: '15 min read',
@@ -102,12 +103,13 @@ export const blogPosts: BlogPost[] = [
     tags: ['Accessibility', 'Web Development', 'UX', 'Inclusive Design'],
   },
   {
-    id: 6,
+    id: '6',
     title: 'My Journey from Designer to Full-Stack Developer',
     excerpt:
       'Personal insights and lessons learned while transitioning from design to development.',
     content:
       "Transitioning from design to development was one of the most challenging yet rewarding decisions of my career. Here's what I learned along the way and how it shaped my approach to building digital products...",
+    author: 'Bhuvesh Singla',
     category: 'Career',
     date: '2023-12-20',
     readTime: '6 min read',
@@ -286,6 +288,26 @@ export const certifications: Certification[] = [
 ];
 
 export const skills: Skills = {
+  technical: [
+    'React',
+    'Next.js',
+    'TypeScript',
+    'Node.js',
+    'Python',
+    'PostgreSQL',
+    'MongoDB',
+    'AWS',
+    'Docker',
+    'Kubernetes',
+  ],
+  soft: [
+    'Problem Solving',
+    'Team Leadership',
+    'Communication',
+    'Project Management',
+    'Mentoring',
+  ],
+  languages: ['English (Native)', 'Spanish (Conversational)', 'French (Basic)'],
   Frontend: [
     'React',
     'Next.js',
@@ -346,7 +368,6 @@ export const services: Service[] = [
       'Accessibility Compliance',
     ],
     technologies: ['React', 'Next.js', 'Vue.js', 'TypeScript', 'Tailwind CSS'],
-    popular: true,
   },
   {
     id: 'mobile-apps',
@@ -363,7 +384,6 @@ export const services: Service[] = [
       'User Authentication',
     ],
     technologies: ['React Native', 'Flutter', 'Swift', 'Kotlin', 'Firebase'],
-    popular: false,
   },
   {
     id: 'backend-development',
@@ -387,7 +407,6 @@ export const services: Service[] = [
       'AWS',
       'Docker',
     ],
-    popular: false,
   },
   {
     id: 'e-commerce',
@@ -411,7 +430,6 @@ export const services: Service[] = [
       'React',
       'Node.js',
     ],
-    popular: true,
   },
   {
     id: 'consulting',
@@ -428,7 +446,6 @@ export const services: Service[] = [
       'Team Training',
     ],
     technologies: ['Various', 'Best Practices', 'Industry Standards'],
-    popular: false,
   },
   {
     id: 'maintenance',
@@ -445,7 +462,6 @@ export const services: Service[] = [
       'Backup & Recovery',
     ],
     technologies: ['Various', 'Monitoring Tools', 'CI/CD'],
-    popular: false,
   },
 ];
 

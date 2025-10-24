@@ -21,7 +21,7 @@ jest.mock('next/image', () => ({
   __esModule: true,
   default: props => {
     // Filter out Next.js specific props to prevent DOM warnings
-    /* eslint-disable @typescript-eslint/no-unused-vars */
+     
     const {
       priority: _priority,
       placeholder: _placeholder,
@@ -36,7 +36,7 @@ jest.mock('next/image', () => ({
       fill: _fill,
       ...domProps
     } = props;
-    /* eslint-enable @typescript-eslint/no-unused-vars */
+     
 
     // eslint-disable-next-line @next/next/no-img-element
     return <img {...domProps} alt={props.alt || ''} />;
@@ -62,7 +62,7 @@ jest.mock('framer-motion', () => {
   const createMotionComponent = tag => {
     const Component = ({ children, ...props }) => {
       // Filter out framer-motion specific props to prevent DOM warnings
-      /* eslint-disable @typescript-eslint/no-unused-vars */
+       
       const {
         whileHover: _whileHover,
         whileTap: _whileTap,
@@ -95,7 +95,7 @@ jest.mock('framer-motion', () => {
         layoutRoot: _layoutRoot,
         ...domProps
       } = props;
-      /* eslint-enable @typescript-eslint/no-unused-vars */
+       
 
       return React.createElement(tag, domProps, children);
     };

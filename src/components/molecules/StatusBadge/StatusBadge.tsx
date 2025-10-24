@@ -67,10 +67,15 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     className
   );
 
-  const accessibleProps = createAccessibleStatusProps(status as any);
+  const accessibleProps =
+    status === 'neutral'
+      ? {}
+      : createAccessibleStatusProps(
+          status as 'error' | 'success' | 'info' | 'warning'
+        );
 
   return (
-    <span className={classes} {...(accessibleProps as any)}>
+    <span className={classes} {...accessibleProps}>
       {icon && (
         <span className={iconSizeConfig[size]} aria-hidden='true'>
           {icon}

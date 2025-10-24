@@ -7,6 +7,7 @@ import { Tooltip } from '@/components/ui/Tooltip';
 import {
   getValidationMessages,
   validateResumeData,
+  ValidationResult,
 } from '@/lib/resume/validation';
 import { useResumeStore } from '@/store/resumeStore';
 
@@ -27,7 +28,8 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
   onBackToManager,
 }) => {
   const [showValidationModal, setShowValidationModal] = useState(false);
-  const [validationResult, setValidationResult] = useState<any>(null);
+  const [validationResult, setValidationResult] =
+    useState<ValidationResult | null>(null);
   const globalResumeData = useResumeStore(state => state.resumeData);
   const getPageContent = (): {
     title: string;
