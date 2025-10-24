@@ -21,4 +21,5 @@ export { SectionSeparator } from './SectionSeparator/SectionSeparator';
 export { Tabs } from './Tabs';
 export { ThemeToggle } from './ThemeToggle';
 export { Toast } from './Toast';
+export { Tooltip } from './Tooltip';
 export { VisualSeparator } from './VisualSeparator';

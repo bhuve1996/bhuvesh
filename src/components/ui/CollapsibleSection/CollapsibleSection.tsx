@@ -101,7 +101,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           className='flex-shrink-0'
         >
           <ChevronIcon
-            direction={isExpanded ? 'down' : 'right'}
+            direction={isExpanded ? 'up' : 'down'}
             className={`w-5 h-5 sm:w-6 sm:h-6 ${colors.text}`}
           />
         </motion.div>

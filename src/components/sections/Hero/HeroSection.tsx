@@ -4,6 +4,7 @@ import React from 'react';
 import { AnimatedGif } from '@/components/ui/AnimatedGif';
 import { Button } from '@/components/ui/Button';
 import { Section } from '@/components/ui/Section';
+import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import { VisualSeparator } from '@/components/ui/VisualSeparator';
 import { sectionGifs } from '@/lib/gifs';
 import type { HeroSectionProps } from '@/types';
@@ -129,26 +130,38 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           className='flex flex-col sm:flex-row gap-6 justify-center items-center'
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              onClick={onGetStarted}
-              size='lg'
-              className='group relative overflow-hidden'
+            <Tooltip
+              content='Start building your professional resume'
+              position='bottom'
+              delay={200}
             >
-              <span className='relative z-10'>Get Started</span>
-              <div className='absolute inset-0 bg-gradient-to-r from-primary-600 to-secondary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
-            </Button>
+              <Button
+                onClick={onGetStarted}
+                size='lg'
+                className='group relative overflow-hidden'
+              >
+                <span className='relative z-10'>Get Started</span>
+                <div className='absolute inset-0 bg-gradient-to-r from-primary-600 to-secondary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+              </Button>
+            </Tooltip>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              onClick={onViewProjects}
-              variant='outline'
-              size='lg'
-              className='group'
+            <Tooltip
+              content='Explore my portfolio and projects'
+              position='bottom'
+              delay={200}
             >
-              <span className='group-hover:text-primary-950 transition-colors duration-200'>
-                View Projects
-              </span>
-            </Button>
+              <Button
+                onClick={onViewProjects}
+                variant='outline'
+                size='lg'
+                className='group'
+              >
+                <span className='group-hover:text-primary-950 transition-colors duration-200'>
+                  View Projects
+                </span>
+              </Button>
+            </Tooltip>
           </motion.div>
         </motion.div>
 

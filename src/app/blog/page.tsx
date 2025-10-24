@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 
 export default function Blog() {
@@ -106,68 +105,6 @@ export default function Blog() {
 
   return (
     <div className='min-h-screen bg-background text-foreground'>
-      {/* Navigation */}
-      <nav
-        className='fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b border-border'
-        role='navigation'
-        aria-label='Main navigation'
-      >
-        <div className='max-w-6xl mx-auto px-6 py-4'>
-          <div className='flex justify-between items-center'>
-            <div className='flex items-center space-x-2'>
-              <div className='w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center'>
-                <span className='text-primary-foreground font-bold text-lg'>
-                  B
-                </span>
-              </div>
-              <span className='text-xl font-bold text-foreground'>Bhuvesh</span>
-            </div>
-
-            <div
-              className='hidden md:flex items-center space-x-8'
-              role='menubar'
-              aria-label='Main menu'
-            >
-              <Link
-                href='/'
-                className='text-muted-foreground hover:text-foreground transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
-                role='menuitem'
-                aria-label='Go to home page'
-              >
-                Home
-              </Link>
-              <Link
-                href='/#about'
-                className='text-muted-foreground hover:text-foreground transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
-                role='menuitem'
-                aria-label='Go to about section'
-              >
-                About
-              </Link>
-              <Link
-                href='/#projects'
-                className='text-muted-foreground hover:text-foreground transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
-                role='menuitem'
-                aria-label='Go to projects section'
-              >
-                Projects
-              </Link>
-              <span className='text-primary-400' aria-current='page'>
-                Blog
-              </span>
-              <Link
-                href='/#contact'
-                className='text-muted-foreground hover:text-foreground transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
-                role='menuitem'
-                aria-label='Go to contact section'
-              >
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Section */}
       <section className='pt-32 pb-16 px-6' aria-labelledby='blog-title'>
         <div className='max-w-4xl mx-auto text-center'>

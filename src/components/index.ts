@@ -11,6 +11,9 @@ export * from './molecules';
 // Export all organisms
 export * from './organisms';
 
+// Export auth components
+export * from './auth';
+
 // Export legacy components (for backward compatibility)
 export * from './layout';
 export * from './resume';
@@ -22,9 +25,9 @@ export {
   AnimatedScore,
   Card,
   DataVisualization,
+  Icons,
   Loading,
   ProgressSteps,
-  Icons,
   SVG,
   Section,
   Tabs,

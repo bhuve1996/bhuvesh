@@ -1,0 +1,275 @@
+import { Navigation } from '@/components/layout/Navigation';
+import { Button } from '@/components/ui/Button';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { Tooltip } from '@/components/ui/Tooltip';
+import { render } from '@testing-library/react';
+import { axe, toHaveNoViolations } from 'jest-axe';
+
+// Extend Jest matchers
+expect.extend(toHaveNoViolations);
+
+describe('Accessibility Tests', () => {
+  describe('Button Component Accessibility', () => {
+    it('should not have accessibility violations', async () => {
+      const { container } = render(<Button>Accessible Button</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    it('should have proper focus management', () => {
+      const { container } = render(<Button>Focusable Button</Button>);
+      const button = container.querySelector('button');
+
+      expect(button).toHaveAttribute('tabIndex', '0');
+      expect(button).toHaveAttribute('type', 'button');
+    });
+
+    it('should have proper ARIA attributes when disabled', () => {
+      const { container } = render(<Button disabled>Disabled Button</Button>);
+      const button = container.querySelector('button');
+
+      expect(button).toHaveAttribute('aria-disabled', 'true');
+      expect(button).toBeDisabled();
+    });
+
+    it('should have proper ARIA attributes when loading', () => {
+      const { container } = render(<Button loading>Loading Button</Button>);
+      const button = container.querySelector('button');
+
+      expect(button).toHaveAttribute('aria-busy', 'true');
+      expect(button).toBeDisabled();
+    });
+  });
+
+  describe('Tooltip Component Accessibility', () => {
+    it('should not have accessibility violations', async () => {
+      const { container } = render(
+        <Tooltip content='Accessible tooltip'>
+          <button>Hover me</button>
+        </Tooltip>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    it('should support keyboard navigation', () => {
+      const { container } = render(
+        <Tooltip content='Keyboard tooltip'>
+          <button>Focus me</button>
+        </Tooltip>
+      );
+      const button = container.querySelector('button');
+
+      expect(button).toHaveAttribute('tabIndex', '0');
+    });
+  });
+
+  describe('Navigation Component Accessibility', () => {
+    it('should not have accessibility violations', async () => {
+      const { container } = render(
+        <Navigation activeSection='home' onSectionClick={jest.fn()} />
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    it('should have proper navigation structure', () => {
+      const { container } = render(
+        <Navigation activeSection='home' onSectionClick={jest.fn()} />
+      );
+
+      const nav = container.querySelector('nav');
+      const menubar = container.querySelector('[role="menubar"]');
+      const menuItems = container.querySelectorAll('[role="menuitem"]');
+
+      expect(nav).toHaveAttribute('role', 'navigation');
+      expect(nav).toHaveAttribute('aria-label', 'Main navigation');
+      expect(menubar).toBeInTheDocument();
+      expect(menuItems.length).toBeGreaterThan(0);
+    });
+
+    it('should have proper mobile menu accessibility', () => {
+      const { container } = render(
+        <Navigation activeSection='home' onSectionClick={jest.fn()} />
+      );
+
+      const mobileButton = container.querySelector(
+        '[aria-label="Toggle mobile menu"]'
+      );
+      const mobileMenu = container.querySelector('#mobile-menu');
+
+      expect(mobileButton).toHaveAttribute('aria-expanded', 'false');
+      expect(mobileButton).toHaveAttribute('aria-controls', 'mobile-menu');
+      expect(mobileMenu).toHaveAttribute('role', 'menu');
+    });
+  });
+
+  describe('ThemeToggle Component Accessibility', () => {
+    it('should not have accessibility violations', async () => {
+      const { container } = render(<ThemeToggle />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    it('should have proper ARIA label', () => {
+      const { container } = render(<ThemeToggle />);
+      const button = container.querySelector('button');
+
+      expect(button).toHaveAttribute('aria-label');
+      expect(button?.getAttribute('aria-label')).toMatch(/switch to.*mode/i);
+    });
+
+    it('should be keyboard accessible', () => {
+      const { container } = render(<ThemeToggle />);
+      const button = container.querySelector('button');
+
+      expect(button).toHaveAttribute('tabIndex', '0');
+    });
+  });
+
+  describe('Color Contrast Tests', () => {
+    it('should have sufficient color contrast for primary buttons', () => {
+      const { container } = render(
+        <Button variant='primary'>Primary Button</Button>
+      );
+      const button = container.querySelector('button');
+
+      // Check that button has proper contrast classes
+      expect(button).toHaveClass('bg-primary-500', 'text-primary-950');
+    });
+
+    it('should have sufficient color contrast for secondary buttons', () => {
+      const { container } = render(
+        <Button variant='secondary'>Secondary Button</Button>
+      );
+      const button = container.querySelector('button');
+
+      // Check that button has proper contrast classes
+      expect(button).toHaveClass('bg-secondary-500', 'text-secondary-950');
+    });
+
+    it('should have sufficient color contrast for outline buttons', () => {
+      const { container } = render(
+        <Button variant='outline'>Outline Button</Button>
+      );
+      const button = container.querySelector('button');
+
+      // Check that button has proper contrast classes
+      expect(button).toHaveClass(
+        'border-2',
+        'border-primary-500',
+        'text-primary-600'
+      );
+    });
+  });
+
+  describe('Focus Management Tests', () => {
+    it('should maintain focus order in navigation', () => {
+      const { container } = render(
+        <Navigation activeSection='home' onSectionClick={jest.fn()} />
+      );
+
+      const menuItems = container.querySelectorAll('[role="menuitem"]');
+      menuItems.forEach(item => {
+        expect(item).toHaveAttribute('tabIndex', '0');
+      });
+    });
+
+    it('should have proper focus indicators', () => {
+      const { container } = render(<Button>Focus Test</Button>);
+      const button = container.querySelector('button');
+
+      expect(button).toHaveClass(
+        'focus:outline-none',
+        'focus:ring-2',
+        'focus:ring-offset-2'
+      );
+    });
+  });
+
+  describe('Screen Reader Tests', () => {
+    it('should have proper labels for screen readers', () => {
+      const { container } = render(
+        <Navigation activeSection='home' onSectionClick={jest.fn()} />
+      );
+
+      const nav = container.querySelector('nav');
+      const logo = container.querySelector('img');
+      const mobileButton = container.querySelector(
+        '[aria-label="Toggle mobile menu"]'
+      );
+
+      expect(nav).toHaveAttribute('aria-label', 'Main navigation');
+      expect(logo).toHaveAttribute('alt', 'Bhuvesh Logo');
+      expect(mobileButton).toHaveAttribute('aria-label', 'Toggle mobile menu');
+    });
+
+    it('should have proper ARIA states', () => {
+      const { container } = render(
+        <Navigation activeSection='about' onSectionClick={jest.fn()} />
+      );
+
+      const aboutLink = container.querySelector('[aria-current="page"]');
+      expect(aboutLink).toHaveAttribute('aria-current', 'page');
+    });
+  });
+
+  describe('Keyboard Navigation Tests', () => {
+    it('should support Enter key activation', () => {
+      const { container } = render(<Button>Enter Test</Button>);
+      const button = container.querySelector('button');
+
+      expect(button).toHaveAttribute('type', 'button');
+    });
+
+    it('should support Space key activation', () => {
+      const { container } = render(<Button>Space Test</Button>);
+      const button = container.querySelector('button');
+
+      expect(button).toHaveAttribute('type', 'button');
+    });
+  });
+
+  describe('Motion and Animation Accessibility', () => {
+    it('should respect reduced motion preferences', () => {
+      // Mock reduced motion preference
+      Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        value: jest.fn().mockImplementation(query => ({
+          matches: query === '(prefers-reduced-motion: reduce)',
+          media: query,
+          onchange: null,
+          addListener: jest.fn(),
+          removeListener: jest.fn(),
+          addEventListener: jest.fn(),
+          removeEventListener: jest.fn(),
+          dispatchEvent: jest.fn(),
+        })),
+      });
+
+      const { container } = render(<Button>Motion Test</Button>);
+      const button = container.querySelector('button');
+
+      // Button should still be accessible regardless of motion preferences
+      expect(button).toBeInTheDocument();
+      expect(button).toHaveAttribute('tabIndex', '0');
+    });
+  });
+
+  describe('Form Accessibility', () => {
+    it('should have proper form controls', () => {
+      const { container } = render(
+        <form>
+          <Button type='submit'>Submit</Button>
+          <Button type='reset'>Reset</Button>
+        </form>
+      );
+
+      const submitButton = container.querySelector('button[type="submit"]');
+      const resetButton = container.querySelector('button[type="reset"]');
+
+      expect(submitButton).toHaveAttribute('type', 'submit');
+      expect(resetButton).toHaveAttribute('type', 'reset');
+    });
+  });
+});

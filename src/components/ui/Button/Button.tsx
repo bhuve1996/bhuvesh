@@ -52,7 +52,6 @@ export const Button: React.FC<ButtonProps> = ({
       className={classes}
       aria-disabled={disabled || loading}
       aria-busy={loading}
-      tabIndex={0}
       {...props}
     >
       {loading && (

@@ -9,6 +9,7 @@ import {
   DataVisualization,
   SectionSeparator,
   Tabs,
+  Tooltip,
 } from '@/components/ui';
 import { useResumeNavigation } from '@/contexts/ResumeNavigationContext';
 import { mapATSToResumeData } from '@/lib/utils/atsToResumeMapper';
@@ -149,66 +150,78 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
 
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto'>
               {/* Primary Action - Edit in Resume Builder */}
-              <button
-                onClick={handleEditInBuilder}
-                className='group relative overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl'
+              <Tooltip
+                content='Open resume builder with your parsed data pre-filled'
+                position='top'
+                delay={300}
               >
-                <div className='absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
-                <div className='relative flex items-center justify-center space-x-3'>
-                  <svg
-                    className='w-6 h-6'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
-                    />
-                  </svg>
-                  <div className='text-left'>
-                    <div className='text-lg font-bold'>
-                      Edit in Resume Builder
-                    </div>
-                    <div className='text-sm opacity-90'>
-                      Pre-filled with your data
+                <button
+                  onClick={handleEditInBuilder}
+                  className='group relative overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl'
+                >
+                  <div className='absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
+                  <div className='relative flex items-center justify-center space-x-3'>
+                    <svg
+                      className='w-6 h-6'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
+                      />
+                    </svg>
+                    <div className='text-left'>
+                      <div className='text-lg font-bold'>
+                        Edit in Resume Builder
+                      </div>
+                      <div className='text-sm opacity-90'>
+                        Pre-filled with your data
+                      </div>
                     </div>
                   </div>
-                </div>
-              </button>
+                </button>
+              </Tooltip>
 
               {/* Secondary Action - View Templates */}
-              <button
-                onClick={() => {
-                  // Store analysis result and navigate to templates
-                  setAnalysisResult(result);
-                  navigateToTemplates();
-                }}
-                className='group relative overflow-hidden bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl'
+              <Tooltip
+                content='Browse resume templates with your data'
+                position='top'
+                delay={300}
               >
-                <div className='absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
-                <div className='relative flex items-center justify-center space-x-3'>
-                  <svg
-                    className='w-6 h-6'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z'
-                    />
-                  </svg>
-                  <div className='text-left'>
-                    <div className='text-lg font-bold'>View Templates</div>
-                    <div className='text-sm opacity-90'>Choose a design</div>
+                <button
+                  onClick={() => {
+                    // Store analysis result and navigate to templates
+                    setAnalysisResult(result);
+                    navigateToTemplates();
+                  }}
+                  className='group relative overflow-hidden bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl'
+                >
+                  <div className='absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
+                  <div className='relative flex items-center justify-center space-x-3'>
+                    <svg
+                      className='w-6 h-6'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z'
+                      />
+                    </svg>
+                    <div className='text-left'>
+                      <div className='text-lg font-bold'>View Templates</div>
+                      <div className='text-sm opacity-90'>Choose a design</div>
+                    </div>
                   </div>
-                </div>
-              </button>
+                </button>
+              </Tooltip>
             </div>
 
             {/* Additional Options */}

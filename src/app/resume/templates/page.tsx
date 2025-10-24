@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
+import { UnifiedWelcomeBar } from '@/components/layout/UnifiedWelcomeBar';
 import { ImprovedPaginatedTemplatePreview } from '@/components/resume/templates/ImprovedPaginatedTemplatePreview';
 import { ResumeTemplateRenderer } from '@/components/resume/templates/ResumeTemplateRenderer';
 import { TemplateCarousel } from '@/components/resume/templates/TemplateCarousel';
@@ -10,6 +11,7 @@ import { UnifiedFloatingPanel } from '@/components/resume/UnifiedFloatingPanel';
 import { ValidationModal } from '@/components/resume/ValidationModal';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import { cloudStorage } from '@/lib/resume/cloudStorage';
 import { exportResume } from '@/lib/resume/exportUtils';
 import { modernTemplates } from '@/lib/resume/templates';
@@ -347,6 +349,13 @@ export default function TemplateGalleryPage() {
       </div>
 
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+        {/* Unified Welcome Bar */}
+        <UnifiedWelcomeBar
+          currentPage='templates'
+          analysisResult={null}
+          resumeData={userResumeData}
+        />
+
         {/* View Mode Toggle - Compact and always visible */}
         <div className='flex justify-center mb-6'>
           <div className='bg-slate-100 dark:bg-slate-800 rounded-lg p-1 flex items-center gap-1 shadow-sm border border-slate-200 dark:border-slate-700'>
@@ -790,98 +799,116 @@ export default function TemplateGalleryPage() {
                   <h3 className='text-sm font-semibold text-slate-900 mb-3'>
                     Export Resume
                   </h3>
-                  <Button
-                    onClick={() => {
-                      setShowMobileExportMenu(false);
-                      // Handle PDF export
-                      const validation = validateResumeData(getPreviewData());
-                      if (validation.errors.length > 0) {
-                        setValidationResult(validation);
-                        setPendingExportFormat('pdf');
-                        setShowValidationModal(true);
-                      } else {
-                        setPendingExportFormat('pdf');
-                        handleValidationProceed();
-                      }
-                    }}
-                    className='w-full justify-start text-sm'
-                    variant='outline'
+                  <Tooltip
+                    content='Export your resume as a PDF document'
+                    position='left'
+                    delay={200}
                   >
-                    <svg
-                      className='w-4 h-4 mr-2'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
+                    <Button
+                      onClick={() => {
+                        setShowMobileExportMenu(false);
+                        // Handle PDF export
+                        const validation = validateResumeData(getPreviewData());
+                        if (validation.errors.length > 0) {
+                          setValidationResult(validation);
+                          setPendingExportFormat('pdf');
+                          setShowValidationModal(true);
+                        } else {
+                          setPendingExportFormat('pdf');
+                          handleValidationProceed();
+                        }
+                      }}
+                      className='w-full justify-start text-sm'
+                      variant='outline'
                     >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'
-                      />
-                    </svg>
-                    Export as PDF
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      // Handle DOCX export
-                      const validation = validateResumeData(getPreviewData());
-                      if (validation.errors.length > 0) {
-                        setValidationResult(validation);
-                        setPendingExportFormat('docx');
-                        setShowValidationModal(true);
-                      } else {
-                        handleValidationProceed();
-                      }
-                    }}
-                    className='w-full justify-start text-sm'
-                    variant='outline'
+                      <svg
+                        className='w-4 h-4 mr-2'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'
+                        />
+                      </svg>
+                      Export as PDF
+                    </Button>
+                  </Tooltip>
+                  <Tooltip
+                    content='Export your resume as a Word document'
+                    position='left'
+                    delay={200}
                   >
-                    <svg
-                      className='w-4 h-4 mr-2'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
+                    <Button
+                      onClick={() => {
+                        // Handle DOCX export
+                        const validation = validateResumeData(getPreviewData());
+                        if (validation.errors.length > 0) {
+                          setValidationResult(validation);
+                          setPendingExportFormat('docx');
+                          setShowValidationModal(true);
+                        } else {
+                          handleValidationProceed();
+                        }
+                      }}
+                      className='w-full justify-start text-sm'
+                      variant='outline'
                     >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                      />
-                    </svg>
-                    Export as DOCX
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      // Handle TXT export
-                      const validation = validateResumeData(getPreviewData());
-                      if (validation.errors.length > 0) {
-                        setValidationResult(validation);
-                        setPendingExportFormat('txt');
-                        setShowValidationModal(true);
-                      } else {
-                        handleValidationProceed();
-                      }
-                    }}
-                    className='w-full justify-start text-sm'
-                    variant='outline'
+                      <svg
+                        className='w-4 h-4 mr-2'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+                        />
+                      </svg>
+                      Export as DOCX
+                    </Button>
+                  </Tooltip>
+                  <Tooltip
+                    content='Export your resume as a text file'
+                    position='left'
+                    delay={200}
                   >
-                    <svg
-                      className='w-4 h-4 mr-2'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
+                    <Button
+                      onClick={() => {
+                        // Handle TXT export
+                        const validation = validateResumeData(getPreviewData());
+                        if (validation.errors.length > 0) {
+                          setValidationResult(validation);
+                          setPendingExportFormat('txt');
+                          setShowValidationModal(true);
+                        } else {
+                          handleValidationProceed();
+                        }
+                      }}
+                      className='w-full justify-start text-sm'
+                      variant='outline'
                     >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                      />
-                    </svg>
-                    Export as TXT
-                  </Button>
+                      <svg
+                        className='w-4 h-4 mr-2'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+                        />
+                      </svg>
+                      Export as TXT
+                    </Button>
+                  </Tooltip>
                 </div>
               </motion.div>
             </div>

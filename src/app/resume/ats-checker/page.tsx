@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
+import { UnifiedWelcomeBar } from '@/components/layout/UnifiedWelcomeBar';
 import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
 import { FileUpload } from '@/components/resume/FileUpload';
 import { ResultsDisplay } from '@/components/resume/ResultsDisplay';
@@ -287,29 +288,19 @@ export default function ATSCheckerPage() {
     <div className='min-h-screen bg-background text-foreground'>
       <Section id='ats-checker' className='py-8 sm:py-12 lg:py-20'>
         <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'>
-          {/* Header */}
-          <div className='text-center mb-8 sm:mb-12'>
-            <h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent'>
-              ATS Resume Checker
-            </h1>
-            <p className='text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 sm:mb-6 px-4'>
-              Get your resume analyzed for ATS compatibility across all job
-              profiles. Receive detailed feedback and optimization suggestions.
-            </p>
-
-            {/* Start New Analysis Button - Show when there's already an analysis result */}
-            {analysisResult && (
-              <div className='mb-8'>
-                <button
-                  onClick={handleNewUpload}
-                  className='px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-background'
-                  aria-label='Start new analysis'
-                >
-                  🆕 Start New Analysis
-                </button>
-              </div>
-            )}
-          </div>
+          {/* Unified Welcome Bar */}
+          <UnifiedWelcomeBar
+            currentPage='ats-checker'
+            analysisResult={
+              analysisResult
+                ? {
+                    jobType: analysisResult.jobType,
+                    atsScore: analysisResult.atsScore?.toString(),
+                  }
+                : null
+            }
+            resumeData={null}
+          />
 
           {/* Tab Navigation - Show when we have results */}
           {analysisResult && (

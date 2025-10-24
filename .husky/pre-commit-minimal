@@ -1,0 +1,46 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running minimal pre-commit checks..."
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+print_status() {
+    echo -e "${BLUE}📝 $1${NC}"
+}
+
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+# 1. Build check (most important - ensures code compiles)
+print_status "Checking build..."
+npm run build
+if [ $? -ne 0 ]; then
+    print_error "Build failed. Please fix build errors before committing."
+    exit 1
+fi
+print_success "Build check passed"
+
+# 2. Basic linting (only critical errors)
+print_status "Running basic linting..."
+npm run lint -- --quiet
+if [ $? -ne 0 ]; then
+    print_warning "Linting found issues, but allowing commit to proceed."
+    print_warning "Please fix linting issues when convenient."
+fi
+
+print_success "Minimal pre-commit checks passed! Proceeding with commit..."

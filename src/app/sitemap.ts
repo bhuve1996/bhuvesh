@@ -4,6 +4,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://bhuvesh.com';
 
   return [
+    // Main pages
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -32,7 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/services`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/blog`,
@@ -40,8 +41,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+
+    // Resume section - main pages
     {
       url: `${baseUrl}/resume`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/resume/builder`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/resume/templates`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
@@ -52,11 +67,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
+
+    // Demo pages
     {
-      url: `${baseUrl}/resume/builder`,
+      url: `${baseUrl}/demo/progress`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.5,
     },
   ];
 }

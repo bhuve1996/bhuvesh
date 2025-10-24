@@ -5,7 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
+import { UserProfile } from '@/components/auth';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import { COMMON_CLASSES, NAV_ITEMS } from '@/lib/constants';
 import { NavItem } from '@/lib/data-types';
 import type { NavigationProps } from '@/types';
@@ -93,45 +95,58 @@ export const Navigation: React.FC<NavigationProps> = ({
                 transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
               >
                 {item.href.includes('#') ? (
-                  <Link
-                    href={item.href}
-                    onClick={() => handleNavClick(item)}
-                    className={`relative px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base ${
-                      isActive(item)
-                        ? 'text-primary-400 bg-primary-500/10'
-                        : 'text-foreground hover:text-primary-400 hover:bg-muted/50'
-                    }`}
-                    role='menuitem'
-                    aria-current={isActive(item) ? 'page' : undefined}
-                    tabIndex={0}
+                  <Tooltip
+                    content={`Go to ${item.label} section`}
+                    position='bottom'
+                    delay={200}
                   >
-                    <span className='relative z-10'>{item.label}</span>
-                    {isActive(item) && (
-                      <div className='absolute inset-0 bg-primary-500/20 rounded-lg animate-pulse'></div>
-                    )}
-                    <div className='absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
-                  </Link>
+                    <Link
+                      href={item.href}
+                      onClick={() => handleNavClick(item)}
+                      className={`relative px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base ${
+                        isActive(item)
+                          ? 'text-primary-400 bg-primary-500/10'
+                          : 'text-foreground hover:text-primary-400 hover:bg-muted/50'
+                      }`}
+                      role='menuitem'
+                      aria-current={isActive(item) ? 'page' : undefined}
+                      tabIndex={0}
+                    >
+                      <span className='relative z-10'>{item.label}</span>
+                      {isActive(item) && (
+                        <div className='absolute inset-0 bg-primary-500/20 rounded-lg animate-pulse'></div>
+                      )}
+                      <div className='absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+                    </Link>
+                  </Tooltip>
                 ) : (
-                  <Link
-                    href={item.href}
-                    className='relative px-3 sm:px-4 py-2 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base'
-                    role='menuitem'
-                    tabIndex={0}
+                  <Tooltip
+                    content={`Go to ${item.label} page`}
+                    position='bottom'
+                    delay={200}
                   >
-                    <span className='relative z-10'>{item.label}</span>
-                    <div className='absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
-                  </Link>
+                    <Link
+                      href={item.href}
+                      className='relative px-3 sm:px-4 py-2 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base'
+                      role='menuitem'
+                      tabIndex={0}
+                    >
+                      <span className='relative z-10'>{item.label}</span>
+                      <div className='absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+                    </Link>
+                  </Tooltip>
                 )}
               </motion.div>
             ))}
 
-            {/* Theme Toggle */}
+            {/* User Profile & Theme Toggle */}
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.8 }}
-              className='ml-4'
+              className='ml-4 flex items-center gap-3'
             >
+              <UserProfile />
               <ThemeToggle size='sm' />
             </motion.div>
           </motion.div>
@@ -215,13 +230,14 @@ export const Navigation: React.FC<NavigationProps> = ({
                     </motion.div>
                   ))}
 
-                  {/* Mobile Theme Toggle */}
+                  {/* Mobile User Profile & Theme Toggle */}
                   <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.3, delay: 0.5 }}
-                    className='px-4 py-3 flex justify-center'
+                    className='px-4 py-3 flex flex-col items-center gap-3'
                   >
+                    <UserProfile />
                     <ThemeToggle size='md' />
                   </motion.div>
                 </div>
