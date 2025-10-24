@@ -48,7 +48,7 @@ export const ATSAnalysisTab: React.FC<ATSAnalysisTabProps> = ({
       }
     } catch (error) {
       toast.error('Failed to analyze resume');
-      console.error('ATS Analysis Error:', error);
+      // ATS Analysis Error: error
     } finally {
       setIsAnalyzing(false);
     }

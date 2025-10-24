@@ -6,21 +6,21 @@ export interface AnalyticsEventData {
   action?: string;
   label?: string;
   value?: number;
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
   event_name?: string;
   event_category?: string;
   event_label?: string;
-  custom_parameters?: Record<string, any>;
-  [key: string]: any;
+  custom_parameters?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface AnalyticsProvider {
   track(event: AnalyticsEventData): void;
-  identify(userId: string, traits?: Record<string, any>): void;
-  page(name: string, properties?: Record<string, any>): void;
+  identify(userId: string, traits?: Record<string, unknown>): void;
+  page(name: string, properties?: Record<string, unknown>): void;
   trackEvent(event: AnalyticsEventData): void;
   trackPageView(url: string, title: string): void;
-  setUserProperties(properties: Record<string, any>): void;
+  setUserProperties(properties: Record<string, unknown>): void;
   setUserId(userId: string): void;
   name: string;
 }
@@ -49,7 +49,7 @@ export interface AnalyticsEvent {
 export interface ComponentInteraction {
   component: string;
   action: string;
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
 }
 
 export interface PerformanceMetric {

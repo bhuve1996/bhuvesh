@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import React from 'react';
 
-import { AnimatedGif } from '@/components/ui/AnimatedGif';
 import { Button } from '@/components/atoms/Button/Button';
+import { AnimatedGif } from '@/components/ui/AnimatedGif';
 import { Section } from '@/components/ui/Section';
 import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import { VisualSeparator } from '@/components/ui/VisualSeparator';

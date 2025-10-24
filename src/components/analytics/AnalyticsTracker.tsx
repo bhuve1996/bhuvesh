@@ -28,9 +28,9 @@ export function AnalyticsTracker({
   trackPageViews = true,
   trackScrollDepth = true,
   trackTimeOnPage = true,
-  trackResumeBuilder = false,
-  trackTemplateInteractions = false,
-  debug = false,
+  trackResumeBuilder: _trackResumeBuilder = false,
+  trackTemplateInteractions: _trackTemplateInteractions = false,
+  debug: _debug = false,
 }: AnalyticsTrackerProps) {
   const analytics = useAnalytics();
   const startTime = useRef<number>(Date.now());

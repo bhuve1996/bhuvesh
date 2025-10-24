@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 
-import { AnimatedProgress, Card } from '@/components/ui';
 import { Button } from '@/components/atoms/Button/Button';
+import { AnimatedProgress, Card } from '@/components/ui';
 import type { AnalysisProgress } from '@/hooks/useAnalysisProgress';
 
 interface ATSAnalysisProps {

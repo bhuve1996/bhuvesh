@@ -1,8 +1,9 @@
-import { atsApi } from '@/api/endpoints/ats';
-import { ATSChecker } from '@/components/organisms/ATSChecker/ATSChecker';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+
+import { atsApi } from '@/api/endpoints/ats';
+import { ATSChecker } from '@/components/organisms/ATSChecker/ATSChecker';
 
 // Mock dependencies
 jest.mock('@/api/endpoints/ats');

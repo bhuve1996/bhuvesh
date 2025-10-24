@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { AnimatedSection, SectionHeader, TechStack } from '@/components/common';
 import { Button } from '@/components/atoms/Button/Button';
+import { AnimatedSection, SectionHeader, TechStack } from '@/components/common';
 import { Card } from '@/components/ui/Card';
 import { Section } from '@/components/ui/Section';
 import { SectionSeparator } from '@/components/ui/SectionSeparator';

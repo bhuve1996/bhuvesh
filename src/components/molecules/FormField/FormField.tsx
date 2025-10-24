@@ -8,7 +8,6 @@ import {
   generateId,
 } from '@/lib/accessibility';
 import { cn } from '@/lib/design-tokens';
-
 import type { FormFieldProps } from '@/types';
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -37,7 +36,7 @@ export const FormField: React.FC<FormFieldProps> = ({
     invalid: !!error,
     describedBy,
     labelledBy,
-  } as any);
+  } as Record<string, unknown>);
 
   const errorStatusProps = error
     ? createAccessibleStatusProps('error', errorId)
@@ -73,7 +72,7 @@ export const FormField: React.FC<FormFieldProps> = ({
           React.cloneElement(children, {
             id: fieldId,
             ...accessibleFieldProps,
-            ...(children.props as any),
+            ...(children.props as Record<string, unknown>),
           })}
       </div>
 

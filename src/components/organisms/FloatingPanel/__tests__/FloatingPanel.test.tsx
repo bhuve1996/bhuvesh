@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import { ResumeData, ResumeTemplate } from '@/types/resume';
+
 import { FloatingPanel } from '../FloatingPanel';
 
 // Mock the tab components

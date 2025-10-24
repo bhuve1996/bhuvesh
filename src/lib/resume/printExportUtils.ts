@@ -851,10 +851,9 @@ export const exportToDOCXViaDownload = async (
 
     // Generate and download the DOCX file
     const buffer = await Packer.toBuffer(doc);
-    const arrayBuffer = buffer.buffer.slice(
-      buffer.byteOffset,
-      buffer.byteOffset + buffer.byteLength
-    );
+    const arrayBuffer = new ArrayBuffer(buffer.byteLength);
+    const uint8Array = new Uint8Array(arrayBuffer);
+    uint8Array.set(buffer);
     const blob = new Blob([arrayBuffer], {
       type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     });

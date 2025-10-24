@@ -48,7 +48,7 @@ describe('ContrastUtils', () => {
 
     it('should fallback to manual calculation when library fails', () => {
       // Mock library to throw error
-      const { ContrastChecker } = require('color-contrast-checker');
+      const { ContrastChecker } = await import('color-contrast-checker');
       const mockInstance = new ContrastChecker();
       mockInstance.getRatio.mockImplementation(() => {
         throw new Error('Library error');
@@ -224,7 +224,7 @@ describe('ContrastUtils', () => {
 
     it('should handle library errors gracefully', () => {
       // Mock library to throw error
-      const { ContrastChecker } = require('color-contrast-checker');
+      const { ContrastChecker } = await import('color-contrast-checker');
       const mockInstance = new ContrastChecker();
       mockInstance.getRatio.mockImplementation(() => {
         throw new Error('Library error');

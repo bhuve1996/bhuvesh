@@ -1,6 +1,5 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+// import { render, screen, fireEvent } from '@testing-library/react';
+
 import { exportResumeUnified, exportToPDFUnified, exportToDOCXUnified, exportToTXTUnified } from '@/lib/resume/unifiedExportUtils';
 import { useResumeStore } from '@/store/resumeStore';
 
@@ -361,9 +360,9 @@ describe('Unified Export Utils', () => {
 
   describe('Unified Export Function', () => {
     it('should route to correct export method based on format', async () => {
-      const pdfSpy = jest.spyOn(require('@/lib/resume/unifiedExportUtils'), 'exportToPDFUnified');
-      const docxSpy = jest.spyOn(require('@/lib/resume/unifiedExportUtils'), 'exportToDOCXUnified');
-      const txtSpy = jest.spyOn(require('@/lib/resume/unifiedExportUtils'), 'exportToTXTUnified');
+      const pdfSpy = jest.spyOn(await import('@/lib/resume/unifiedExportUtils'), 'exportToPDFUnified');
+      const docxSpy = jest.spyOn(await import('@/lib/resume/unifiedExportUtils'), 'exportToDOCXUnified');
+      const txtSpy = jest.spyOn(await import('@/lib/resume/unifiedExportUtils'), 'exportToTXTUnified');
 
       const options = {
         template: mockTemplate,
@@ -389,7 +388,7 @@ describe('Unified Export Utils', () => {
         template: mockTemplate,
         data: mockResumeData,
         filename: 'test-resume',
-        format: 'unsupported' as any,
+        format: 'unsupported' as 'pdf' | 'docx' | 'txt',
       };
 
       await expect(exportResumeUnified(options)).rejects.toThrow(

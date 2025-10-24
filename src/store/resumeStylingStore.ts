@@ -1001,9 +1001,9 @@ const defaultStyling: ResumeStylingState = {
   resetTemplateOverride: () => {},
 
   // Getters
-  getSectionStyling: () => ({}) as any,
-  getTemplateStyling: () => ({}) as any,
-  getEffectiveStyling: () => ({}) as any,
+  getSectionStyling: () => ({}) as Record<string, unknown>,
+  getTemplateStyling: () => ({}) as Record<string, unknown>,
+  getEffectiveStyling: () => ({}) as Record<string, unknown>,
 };
 
 export const useResumeStylingStore = create<ResumeStylingState>()(
@@ -1048,7 +1048,8 @@ export const useResumeStylingStore = create<ResumeStylingState>()(
 
       resetTemplateOverride: templateId =>
         set(state => {
-          const { [templateId]: removed, ...rest } = state.templateOverrides;
+          const { [templateId]: _, ...rest } = state.templateOverrides;
+          void _; // Suppress unused variable warning
           return { templateOverrides: rest };
         }),
 

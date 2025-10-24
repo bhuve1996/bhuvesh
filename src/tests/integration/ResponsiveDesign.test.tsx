@@ -5,9 +5,9 @@ import React from 'react';
 // Mock the FloatingPanel component
 jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
   return function MockFloatingPanel({
-    resumeData,
-    template,
-    onTemplateChange,
+    resumeData: _resumeData,
+    template: _template,
+    onTemplateChange: _onTemplateChange,
     className = '',
   }) {
     const [isVisible, setIsVisible] = React.useState(false);
@@ -223,7 +223,7 @@ describe('Responsive Design Integration Tests', () => {
     it('should render floating action button with mobile text', () => {
       // Import the mock component directly
       const MockFloatingPanel =
-        require('@/components/organisms/FloatingPanel/FloatingPanel').default;
+        (await import('@/components/organisms/FloatingPanel/FloatingPanel')).default;
 
       render(
         <TestWrapper>
@@ -517,7 +517,7 @@ describe('Responsive Design Integration Tests', () => {
 
         // Test tab navigation
         const exportTab = screen.getByTestId('tab-export');
-        const customizeTab = screen.getByTestId('tab-customize');
+        // const customizeTab = screen.getByTestId('tab-customize');
 
         exportTab.focus();
         expect(exportTab).toHaveFocus();

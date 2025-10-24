@@ -166,8 +166,8 @@ export const createScreenReaderText = (text: string): string => {
  * Get appropriate color contrast ratio
  */
 export const getColorContrast = (
-  foreground: string,
-  background: string
+  _foreground: string,
+  _background: string
 ): number => {
   // This is a simplified version - in production, you'd use a proper color contrast library
   // For now, we'll return a mock value
@@ -178,7 +178,7 @@ export const getColorContrast = (
  * Validate ARIA attributes
  */
 export const validateAriaAttributes = (
-  attributes: Record<string, any>
+  attributes: Record<string, unknown>
 ): string[] => {
   const errors: string[] = [];
 
@@ -238,7 +238,7 @@ export const createAccessibleButtonProps = (props: {
     label,
   } = props;
 
-  const accessibleProps: Record<string, any> = {
+  const accessibleProps: Record<string, unknown> = {
     'aria-disabled': disabled || loading,
     'aria-busy': loading,
   };
@@ -284,7 +284,7 @@ export const createAccessibleFormFieldProps = (props: {
     label,
   } = props;
 
-  const accessibleProps: Record<string, any> = {
+  const accessibleProps: Record<string, unknown> = {
     'aria-required': required,
     'aria-invalid': invalid,
   };
@@ -329,7 +329,7 @@ export const createAccessibleListProps = (props: {
 }) => {
   const { orientation = 'vertical', role = 'list', labelledBy } = props;
 
-  const accessibleProps: Record<string, any> = {
+  const accessibleProps: Record<string, unknown> = {
     role,
   };
 
@@ -355,7 +355,7 @@ export const createAccessibleTabProps = (props: {
 }) => {
   const { selected = false, controls, labelledBy, describedBy } = props;
 
-  const accessibleProps: Record<string, any> = {
+  const accessibleProps: Record<string, unknown> = {
     role: 'tab',
     'aria-selected': selected,
     tabIndex: selected ? 0 : -1,
@@ -385,7 +385,7 @@ export const createAccessibleTabPanelProps = (props: {
 }) => {
   const { labelledBy, describedBy } = props;
 
-  const accessibleProps: Record<string, any> = {
+  const accessibleProps: Record<string, unknown> = {
     role: 'tabpanel',
   };
 

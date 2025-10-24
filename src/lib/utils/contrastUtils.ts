@@ -30,7 +30,7 @@ const contrastChecker = new ContrastChecker();
 export function getContrastRatio(color1: string, color2: string): number {
   try {
     return contrastChecker.getRatio(color1, color2);
-  } catch (error) {
+  } catch {
     // Fallback to manual calculation if library fails
     const rgb1 = hexToRgb(color1);
     const rgb2 = hexToRgb(color2);
@@ -64,7 +64,7 @@ export function meetsContrastStandards(
         ? contrastChecker.isLevelAA(foreground, background, 18) // Large text
         : contrastChecker.isLevelAA(foreground, background, 14); // Normal text
     }
-  } catch (error) {
+  } catch {
     // Fallback to manual calculation
     const ratio = getContrastRatio(foreground, background);
 
@@ -151,7 +151,7 @@ export function getWCAGLevel(
     } else {
       return 'Fail';
     }
-  } catch (error) {
+  } catch {
     // Fallback to manual calculation
     const ratio = getContrastRatio(foreground, background);
 
@@ -185,7 +185,7 @@ export function analyzeContrast(foreground: string, background: string) {
         level: isAAALarge ? 'AAA' : isAALarge ? 'AA' : 'Fail',
       },
     };
-  } catch (error) {
+  } catch {
     // Fallback to manual calculation
     const ratio = getContrastRatio(foreground, background);
     const normalAA = ratio >= 4.5;

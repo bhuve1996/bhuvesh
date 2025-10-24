@@ -24,7 +24,7 @@ export interface AnalyticsEvent {
   action: string;
   label?: string;
   value?: number;
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
   timestamp?: number;
   userId?: string;
   sessionId?: string;
@@ -37,7 +37,7 @@ export interface ComponentInteraction {
   interactionType: 'click' | 'hover' | 'focus' | 'blur' | 'change' | 'submit';
   elementId?: string;
   elementClass?: string;
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
 }
 
 // Performance metrics
@@ -46,7 +46,7 @@ export interface PerformanceMetric {
   value: number;
   unit: 'ms' | 'bytes' | 'count' | 'percentage';
   timestamp: number;
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
 }
 
 // User engagement tracking
@@ -57,7 +57,7 @@ export interface UserEngagement {
     | 'click_frequency'
     | 'session_duration';
   value: number;
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
 }
 
 // Analytics configuration
@@ -120,7 +120,7 @@ class AnalyticsManager {
     type: AnalyticsEventType,
     category: string,
     action: string,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ): AnalyticsEvent {
     return {
       type,
@@ -138,7 +138,7 @@ class AnalyticsManager {
     this.userId = userId;
   }
 
-  public trackPageView(page: string, properties?: Record<string, any>): void {
+  public trackPageView(page: string, properties?: Record<string, unknown>): void {
     if (!this.shouldTrack() || !this.config.trackPageViews) return;
 
     const event = this.createEvent('page_view', 'navigation', 'page_view', {
@@ -171,7 +171,7 @@ class AnalyticsManager {
   public trackFormSubmission(
     formName: string,
     success: boolean,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ): void {
     if (!this.shouldTrack()) return;
 
@@ -194,7 +194,7 @@ class AnalyticsManager {
     fileSize: number,
     fileType: string,
     success: boolean,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ): void {
     if (!this.shouldTrack()) return;
 
@@ -217,7 +217,7 @@ class AnalyticsManager {
   public trackATSAnalysis(
     analysisType: 'quick' | 'full',
     score: number,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ): void {
     if (!this.shouldTrack()) return;
 
@@ -238,7 +238,7 @@ class AnalyticsManager {
   public trackAIImprovement(
     improvementType: string,
     success: boolean,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ): void {
     if (!this.shouldTrack()) return;
 
@@ -259,7 +259,7 @@ class AnalyticsManager {
   public trackTemplateChange(
     templateId: string,
     templateName: string,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ): void {
     if (!this.shouldTrack()) return;
 
@@ -280,7 +280,7 @@ class AnalyticsManager {
   public trackExportAction(
     exportFormat: 'pdf' | 'docx' | 'txt',
     success: boolean,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ): void {
     if (!this.shouldTrack()) return;
 
@@ -302,7 +302,7 @@ class AnalyticsManager {
     errorType: string,
     errorMessage: string,
     componentName?: string,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ): void {
     if (!this.shouldTrack()) return;
 
@@ -358,7 +358,7 @@ class AnalyticsManager {
   public trackFeatureUsage(
     featureName: string,
     usageType: 'start' | 'complete' | 'abandon',
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ): void {
     if (!this.shouldTrack()) return;
 
@@ -374,7 +374,7 @@ class AnalyticsManager {
     this.eventQueue.push(event);
 
     if (this.config.debug) {
-      console.log('Analytics Event:', event);
+      // Analytics Event: event
     }
 
     if (this.eventQueue.length >= this.config.batchSize) {
@@ -421,9 +421,9 @@ class AnalyticsManager {
           }),
         });
       }
-    } catch (error) {
+    } catch {
       if (this.config.debug) {
-        console.error('Analytics send error:', error);
+        // Analytics send error
       }
     }
   }
@@ -501,7 +501,7 @@ export const performanceMonitor = {
       });
 
       return result;
-    } catch (error) {
+    } catch {
       const endTime = performance.now();
       const duration = endTime - startTime;
 

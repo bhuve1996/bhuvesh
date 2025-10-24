@@ -77,7 +77,7 @@ export default function TestComponentsPage() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       setSubmitStatus('success');
-    } catch (error) {
+    } catch (_error) {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -85,15 +85,15 @@ export default function TestComponentsPage() {
   };
 
   const handleFileUpload = (files: File[]) => {
-    console.log('Files uploaded:', files);
+    // Files uploaded: files
   };
 
-  const handleResumeDataUpdate = (updatedData: ResumeData) => {
-    console.log('Resume data updated:', updatedData);
+  const _handleResumeDataUpdate = (updatedData: ResumeData) => {
+    // Resume data updated: updatedData
   };
 
   const handleTemplateChange = (template: ResumeTemplate) => {
-    console.log('Template changed:', template);
+    // Template changed: template
   };
 
   return (

@@ -1,10 +1,11 @@
+import type { AnalysisResult } from '@/types';
+
 import {
   calculateKeywordDensity,
   extractKeywords,
   parseFile,
 } from '../utils/fileParser';
 
-import type { AnalysisResult } from '@/types';
 import { JobProfile, jobProfiles } from './jobProfiles';
 
 export const analyzeResume = async (file: File): Promise<AnalysisResult> => {

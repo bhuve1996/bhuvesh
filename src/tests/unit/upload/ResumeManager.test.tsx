@@ -1,9 +1,11 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ResumeManager } from '@/components/resume/ResumeManager/ResumeManager';
-import { cloudStorage } from '@/lib/storage/cloudStorage';
+import React from 'react';
+
 import { atsApi } from '@/api/endpoints/ats';
+import { ResumeManager } from '@/components/resume/ResumeManager/ResumeManager';
+
+import { cloudStorage } from '@/lib/storage/cloudStorage';
 
 // Mock dependencies
 jest.mock('@/lib/storage/cloudStorage');
@@ -103,7 +105,7 @@ describe('ResumeManager Component', () => {
       const user = userEvent.setup();
       render(<ResumeManager {...defaultProps} />);
       
-      const resumeItem = screen.getByText('Software Engineer Resume');
+      // const _resumeItem = screen.getByText('Software Engineer Resume');
       await user.tab();
       await user.keyboard('{Enter}');
 

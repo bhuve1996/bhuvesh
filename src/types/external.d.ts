@@ -19,7 +19,7 @@ declare module 'color-contrast-checker' {
 
 declare module 'html-docx-js/dist/html-docx' {
   const htmlDocx: {
-    (html: string, options?: any): Blob;
+    (html: string, options?: Record<string, unknown>): Blob;
   };
   export default htmlDocx;
 }

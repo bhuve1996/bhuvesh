@@ -135,7 +135,7 @@ describe('Component System E2E Tests', () => {
       const fileName = 'test-resume.pdf';
       cy.get('[data-testid="file-upload"] input[type="file"]').selectFile({
         contents: 'test content',
-        fileName: fileName,
+        fileName,
         mimeType: 'application/pdf',
       });
 

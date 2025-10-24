@@ -23,12 +23,12 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   // Filter out motion props to prevent them from being passed to DOM elements
   const {
-    whileHover,
-    whileTap,
-    initial,
-    animate,
-    exit,
-    transition,
+    whileHover: _whileHover,
+    whileTap: _whileTap,
+    initial: _initial,
+    animate: _animate,
+    exit: _exit,
+    transition: _transition,
     ...domProps
   } = props as ButtonProps & {
     whileHover?: unknown;
@@ -73,7 +73,7 @@ export const Button: React.FC<ButtonProps> = ({
     loading,
     describedBy: loading ? 'loading-description' : undefined,
     label: loading ? 'Loading...' : undefined,
-  } as any);
+  } as Record<string, unknown>);
 
   const renderIcon = () => {
     if (loading) {

@@ -1,6 +1,7 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+
 import { FileUpload } from '@/components/molecules/FileUpload/FileUpload';
 import type { FileUploadComponentProps } from '@/types';
 
@@ -109,7 +110,7 @@ describe('FileUpload Component', () => {
 
   describe('Drag and Drop', () => {
     it('should handle drag and drop events', async () => {
-      const user = userEvent.setup();
+      // const _user = userEvent.setup();
       const mockFile = new File(['test content'], 'test.pdf', {
         type: 'application/pdf',
       });

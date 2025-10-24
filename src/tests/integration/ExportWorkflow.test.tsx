@@ -55,7 +55,7 @@ const mockStore = configureStore({
         },
         resumes: [],
       },
-      action
+      _action
     ) => state,
     resumeStyling: (
       state = {
@@ -72,7 +72,7 @@ const mockStore = configureStore({
           skills: { backgroundColor: '#e2e8f0', textColor: '#475569' },
         },
       },
-      action
+      _action
     ) => state,
   },
 });
@@ -374,7 +374,7 @@ describe('Export Workflow Integration Tests', () => {
                 personalInfo: { fullName: 'John Doe', email: 'john@email.com' },
               },
             },
-            action
+            _action
           ) => state,
           resumeStyling: (
             state = {
@@ -383,7 +383,7 @@ describe('Export Workflow Integration Tests', () => {
                 header: { backgroundColor: '#10b981', textColor: '#ffffff' },
               },
             },
-            action
+            _action
           ) => state,
         },
       });
@@ -426,7 +426,7 @@ describe('Export Workflow Integration Tests', () => {
                 personalInfo: { fullName: 'John Doe', email: 'john@email.com' },
               },
             },
-            action
+            _action
           ) => state,
           resumeStyling: (
             state = {
@@ -436,7 +436,7 @@ describe('Export Workflow Integration Tests', () => {
                 spacing: 'spacious',
               },
             },
-            action
+            _action
           ) => state,
         },
       });

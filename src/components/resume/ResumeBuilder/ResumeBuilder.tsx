@@ -122,7 +122,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
         achievements: initialData.achievements || [],
       });
     }
-  }, [initialData]); // Remove setResumeData from dependencies to prevent infinite loop
+  }, [initialData, resumeData, setResumeData]); // Include all dependencies
 
   const handleDataUpdate = (section: keyof ResumeData, data: unknown) => {
     // Update global store for all changes

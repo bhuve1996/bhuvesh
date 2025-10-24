@@ -43,7 +43,7 @@ export const ExportTab: React.FC<ExportTabProps> = ({
       }
     } catch (error) {
       toast.error(`Failed to export as ${format.toUpperCase()}`);
-      console.error('Export Error:', error);
+      // Export Error: error
     } finally {
       setIsExporting(false);
     }

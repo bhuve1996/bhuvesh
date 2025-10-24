@@ -195,7 +195,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                       🤖 AI-Powered Resume Enhancement
                     </h4>
                     <p className='text-sm text-purple-700 mb-3'>
-                      Improve your resume's ATS compatibility and content
+                      Improve your resume&apos;s ATS compatibility and content
                       quality with AI suggestions. Our AI will analyze your
                       current resume and provide targeted improvements for
                       better job matching.

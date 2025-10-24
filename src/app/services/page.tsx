@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 
+import { Button } from '@/components/atoms/Button/Button';
 import { AnimatedSection } from '@/components/common';
 import { PageLayout } from '@/components/layout';
-import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
 
 export default function Services() {

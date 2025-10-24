@@ -30,7 +30,7 @@ export const Carousel: React.FC<CarouselProps> = ({
   itemsPerView = { mobile: 1, tablet: 2, desktop: 3 },
   spacing = 16,
   onItemSelect,
-  selectedIndex = 0,
+  selectedIndex: _selectedIndex = 0,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);

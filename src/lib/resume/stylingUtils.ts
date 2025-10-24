@@ -208,7 +208,7 @@ export const generateSectionCSSVariables = (
 
   // Color variables
   if ('colors' in styling) {
-    const colors = styling.colors as any;
+    const colors = styling.colors as Record<string, string>;
     variables[`--${sectionId}-primary-color`] = colors.primary || '#000000';
     variables[`--${sectionId}-secondary-color`] = colors.secondary || '#666666';
     variables[`--${sectionId}-accent-color`] = colors.accent || '#007bff';
@@ -226,8 +226,8 @@ export const generateSectionCSSVariables = (
 
   // Typography variables
   if ('typography' in styling) {
-    const typography = styling.typography as any;
-    Object.entries(typography).forEach(([key, typo]: [string, any]) => {
+    const typography = styling.typography as Record<string, Record<string, string>>;
+    Object.entries(typography).forEach(([key, typo]: [string, Record<string, string>]) => {
       variables[`--${sectionId}-${key}-font-family`] =
         typo.fontFamily || 'Arial';
       variables[`--${sectionId}-${key}-font-size`] = typo.fontSize || '14px';
@@ -254,7 +254,7 @@ export const generateSectionCSSVariables = (
 
   // Spacing variables
   if ('spacing' in styling) {
-    const spacing = styling.spacing as any;
+    const spacing = styling.spacing as Record<string, string>;
     variables[`--${sectionId}-margin`] = spacing.margin || '0';
     variables[`--${sectionId}-padding`] = spacing.padding || '0';
     variables[`--${sectionId}-gap`] = spacing.gap || '0';
@@ -262,7 +262,7 @@ export const generateSectionCSSVariables = (
 
   // Border variables
   if ('border' in styling) {
-    const border = styling.border as any;
+    const border = styling.border as Record<string, string>;
     variables[`--${sectionId}-border-width`] = border.width || '1px';
     variables[`--${sectionId}-border-style`] = border.style || 'solid';
     variables[`--${sectionId}-border-color`] = border.color || '#cccccc';
@@ -271,7 +271,7 @@ export const generateSectionCSSVariables = (
 
   // Background variables
   if ('background' in styling) {
-    const background = styling.background as any;
+    const background = styling.background as Record<string, string>;
     variables[`--${sectionId}-background-color`] =
       background.color || '#ffffff';
     if (background.image) {
@@ -290,7 +290,7 @@ export const generateSectionCSSVariables = (
 
   // Shadow variables
   if ('shadow' in styling) {
-    const shadow = styling.shadow as any;
+    const shadow = styling.shadow as Record<string, string>;
     variables[`--${sectionId}-shadow`] =
       `${shadow.offsetX || 0} ${shadow.offsetY || 0} ${shadow.blur || 0} ${shadow.spread || 0} ${shadow.color || '#000000'}`;
   }
@@ -317,7 +317,7 @@ export const generateSectionCSS = (
 
   // Generate specific element styles
   if ('container' in styling) {
-    const container = styling.container as any;
+    const container = styling.container as Record<string, string>;
     const containerCSS = {
       ...layoutToCSS(container),
       ...spacingToCSS(container.spacing),
@@ -335,8 +335,8 @@ export const generateSectionCSS = (
 
   // Generate typography styles
   if ('typography' in styling) {
-    const typography = styling.typography as any;
-    Object.entries(typography).forEach(([key, typo]: [string, any]) => {
+    const typography = styling.typography as Record<string, Record<string, string>>;
+    Object.entries(typography).forEach(([key, typo]: [string, Record<string, string>]) => {
       const typographyCSS = typographyToCSS(typo);
       const typographyDeclarations = Object.entries(typographyCSS)
         .map(([key, value]) => `  ${key}: ${value};`)
@@ -348,7 +348,7 @@ export const generateSectionCSS = (
 
   // Generate specific element styles for complex sections
   if (sectionId === 'skills' && 'container' in styling) {
-    const container = styling.container as any;
+    const container = styling.container as Record<string, string>;
     const skillContainerCSS = {
       ...layoutToCSS(container),
       ...spacingToCSS(container.spacing),
@@ -469,7 +469,7 @@ export const applyStylingToElement = (
 
   // Apply container styles if available
   if ('container' in styling) {
-    const container = styling.container as any;
+    const container = styling.container as Record<string, string>;
     const containerCSS = {
       ...layoutToCSS(container),
       ...spacingToCSS(container.spacing),
@@ -485,7 +485,7 @@ export const applyStylingToElement = (
 
   // Apply positioning if available
   if ('position' in styling) {
-    const positioningCSS = positioningToCSS(styling as any);
+    const positioningCSS = positioningToCSS(styling as Record<string, string>);
     Object.entries(positioningCSS).forEach(([key, value]) => {
       element.style.setProperty(key, value);
     });
@@ -493,7 +493,7 @@ export const applyStylingToElement = (
 
   // Apply sizing if available
   if ('width' in styling && 'height' in styling) {
-    const sizingCSS = sizingToCSS(styling as any);
+    const sizingCSS = sizingToCSS(styling as Record<string, string>);
     Object.entries(sizingCSS).forEach(([key, value]) => {
       element.style.setProperty(key, value);
     });

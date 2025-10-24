@@ -7,8 +7,8 @@ import { Provider } from 'react-redux';
 // Mock the resume store
 const mockStore = configureStore({
   reducer: {
-    resume: (state = { currentResume: null, resumes: [] }, action) => state,
-    resumeStyling: (state = { global: {}, sections: {} }, action) => state,
+    resume: (state = { currentResume: null, resumes: [] }, _action) => state,
+    resumeStyling: (state = { global: {}, sections: {} }, _action) => state,
   },
 });
 
@@ -313,7 +313,7 @@ describe('Complete Resume Workflow Integration Tests', () => {
       const {
         exportToPDFViaBrowserPrint,
         exportToDOCXViaDownload,
-      } = require('@/lib/resume/unifiedExportUtils');
+      } = await import('@/lib/resume/unifiedExportUtils');
 
       render(
         <TestWrapper>
@@ -515,7 +515,7 @@ describe('Complete Resume Workflow Integration Tests', () => {
     it('should handle export errors gracefully', async () => {
       const {
         exportToPDFViaBrowserPrint,
-      } = require('@/lib/resume/unifiedExportUtils');
+      } = await import('@/lib/resume/unifiedExportUtils');
       exportToPDFViaBrowserPrint.mockRejectedValueOnce(
         new Error('Export failed')
       );

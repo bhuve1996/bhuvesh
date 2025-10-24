@@ -23,7 +23,6 @@ describe('FormField Component', () => {
   it('shows required indicator', () => {
     render(<FormField {...defaultProps} label='Required Field' required />);
 
-    const label = screen.getByText('Required Field');
     const requiredIndicator = screen.getByText('*');
 
     expect(requiredIndicator).toBeInTheDocument();

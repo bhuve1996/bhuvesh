@@ -457,7 +457,7 @@ describe('Styling System', () => {
         },
       };
 
-      applyStylingToElement(mockElement as any, 'header', headerStyling);
+      applyStylingToElement(mockElement as HTMLElement, 'header', headerStyling);
 
       expect(mockElement.style.setProperty).toHaveBeenCalledWith(
         '--header-name-font-family',
@@ -484,7 +484,7 @@ describe('Styling System', () => {
 
   describe('Global Styling Store', () => {
     it('should set and get global styling', () => {
-      const { setGlobalStyling, getSectionStyling } =
+      const { setGlobalStyling } =
         useResumeStylingStore.getState();
 
       setGlobalStyling({
