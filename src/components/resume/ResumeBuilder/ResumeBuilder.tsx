@@ -13,10 +13,11 @@ import { validateResumeData, ValidationResult } from '@/lib/resume/validation';
 import { ResumeData } from '@/types/resume';
 
 import { AIAssistant } from '../AIAssistant';
-import { ATSIntegration } from '../ATSIntegration';
 import { DOCXExporter } from '../DOCXExporter';
+import { FloatingActions } from '../FloatingActions/FloatingActions';
 import { PDFExporter } from '../PDFExporter';
 import { RichTextEditor } from '../RichTextEditor';
+import { SectionValidation } from '../SectionValidation/SectionValidation';
 import { ValidationModal } from '../ValidationModal';
 
 interface ResumeBuilderProps {
@@ -33,9 +34,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
   const [currentStep, setCurrentStep] = useState<
     'builder' | 'preview' | 'sections'
   >('builder');
-  const [currentTab, setCurrentTab] = useState<'content' | 'sections' | 'ats'>(
-    'content'
-  );
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [validationResult, setValidationResult] =
     useState<ValidationResult | null>(null);
@@ -125,7 +123,8 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
   };
 
   const capitalizeFirstLetter = (str: string) => {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
   const handleSave = () => {
@@ -197,48 +196,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                   </Button>
                 </div>
               </div>
-
-              {/* Tabs */}
-              <div className='mt-6'>
-                <div className='border-b border-border'>
-                  <nav className='-mb-px flex space-x-8'>
-                    <button
-                      onClick={() => setCurrentTab('content')}
-                      className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                        currentTab === 'content'
-                          ? 'border-cyan-500 text-cyan-600'
-                          : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                      }`}
-                    >
-                      Content
-                    </button>
-                    <button
-                      onClick={() => setCurrentTab('sections')}
-                      className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                        currentTab === 'sections'
-                          ? 'border-cyan-500 text-cyan-600'
-                          : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                      }`}
-                    >
-                      Sections
-                    </button>
-                    <button
-                      onClick={() => setCurrentTab('ats')}
-                      className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                        currentTab === 'ats'
-                          ? 'border-cyan-500 text-cyan-600'
-                          : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                      }`}
-                    >
-                      ATS Analysis
-                    </button>
-                  </nav>
-                </div>
-              </div>
             </div>
 
-            {/* Tab Content */}
-            {currentTab === 'content' ? (
+            {/* Content */}
+            <div className='mt-6'>
               <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
                 {/* Builder Form */}
                 <div className='lg:col-span-2 space-y-8'>
@@ -257,6 +218,11 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       isExpanded={expandedSections.personal || false}
                       onToggle={() => toggleSection('personal')}
                     >
+                      <SectionValidation
+                        section='personal'
+                        resumeData={resumeData}
+                        className='mb-4'
+                      />
                       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <div>
                           <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
@@ -425,6 +391,11 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       isExpanded={expandedSections.experience || false}
                       onToggle={() => toggleSection('experience')}
                     >
+                      <SectionValidation
+                        section='experience'
+                        resumeData={resumeData}
+                        className='mb-4'
+                      />
                       {resumeData.experience.map((job, index) => (
                         <ItemCard
                           key={job.id}
@@ -842,6 +813,11 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       isExpanded={expandedSections.skills || false}
                       onToggle={() => toggleSection('skills')}
                     >
+                      <SectionValidation
+                        section='skills'
+                        resumeData={resumeData}
+                        className='mb-4'
+                      />
                       <FormField
                         label='Technical Skills'
                         required
@@ -1114,7 +1090,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         Save Resume
                       </Button>
                       <Button
-                        onClick={() => setCurrentTab('ats')}
+                        onClick={() => setCurrentStep('builder')}
                         className='w-full bg-purple-500 hover:bg-purple-600'
                       >
                         <svg
@@ -1159,29 +1135,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                   </Card>
                 </div>
               </div>
-            ) : currentTab === 'sections' ? (
-              /* Sections Tab */
-              <div className='max-w-4xl mx-auto'>
-                <div className='text-center py-12'>
-                  <h3 className='text-lg font-medium text-muted-foreground'>
-                    Template sections are managed in the Templates page
-                  </h3>
-                  <p className='text-sm text-muted-foreground mt-2'>
-                    Go to the Templates page to customize template layouts
-                  </p>
-                </div>
-              </div>
-            ) : (
-              /* ATS Analysis Tab */
-              <div className='max-w-4xl mx-auto'>
-                <ATSIntegration
-                  resumeData={resumeData}
-                  onAnalysisComplete={_result => {
-                    // ATS Analysis completed
-                  }}
-                />
-              </div>
-            )}
+            </div>
           </div>
         );
 
@@ -1289,7 +1243,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 <Button
                   onClick={() => {
                     setCurrentStep('builder');
-                    setCurrentTab('ats');
                   }}
                   className='bg-purple-500 hover:bg-purple-600'
                 >
@@ -1339,46 +1292,13 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
 
   return (
     <div className='min-h-screen bg-gray-50'>
-      {/* Progress Steps */}
-      <div className='bg-white border-b'>
-        <div className='max-w-7xl mx-auto px-6 py-4 mt-8'>
-          <div className='flex items-center justify-center space-x-8'>
-            <div
-              className={`flex items-center space-x-2 ${currentStep === 'builder' || currentStep === 'preview' ? 'text-green-600' : 'text-gray-400'}`}
-            >
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'builder' || currentStep === 'preview' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'}`}
-              >
-                1
-              </div>
-              <span className='font-medium'>Build Resume</span>
-            </div>
-            <div
-              className={`flex items-center space-x-2 ${currentStep === 'builder' ? 'text-cyan-600' : currentStep === 'preview' ? 'text-green-600' : 'text-gray-400'}`}
-            >
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'builder' ? 'bg-cyan-600 text-white' : currentStep === 'preview' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'}`}
-              >
-                2
-              </div>
-              <span className='font-medium'>Build Resume</span>
-            </div>
-            <div
-              className={`flex items-center space-x-2 ${currentStep === 'preview' ? 'text-cyan-600' : 'text-gray-400'}`}
-            >
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'preview' ? 'bg-cyan-600 text-white' : 'bg-gray-200 text-gray-500'}`}
-              >
-                3
-              </div>
-              <span className='font-medium'>Preview & Export</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       {renderStepContent()}
+
+      {/* Floating Actions */}
+      {currentStep === 'builder' && (
+        <FloatingActions resumeData={resumeData} onSave={handleSave} />
+      )}
 
       {/* Validation Modal */}
       {validationResult && pendingAction && (

@@ -137,7 +137,9 @@ export const ImprovedPaginatedTemplatePreview: React.FC<
                     className='hover:underline hover:text-blue-600 transition-colors px-2 py-1 rounded-md hover:bg-blue-50'
                     style={{ color: colors.secondary }}
                   >
-                    LinkedIn
+                    {data.personal.linkedin.startsWith('http')
+                      ? data.personal.linkedin
+                      : `linkedin.com/in/${data.personal.linkedin}`}
                   </a>
                 </>
               )}

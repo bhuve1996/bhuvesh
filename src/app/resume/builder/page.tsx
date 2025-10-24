@@ -124,10 +124,11 @@ export default function ResumeBuilderPage() {
                 <div className='flex items-center justify-between sm:justify-start sm:space-x-4'>
                   <button
                     onClick={handleBackToManager}
-                    className='flex items-center text-muted-foreground hover:text-foreground transition-colors text-sm sm:text-base'
+                    className='flex items-center justify-center w-10 h-10 rounded-full bg-white border-2 border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 shadow-sm hover:shadow-md'
+                    title='Back to Resume Manager'
                   >
                     <svg
-                      className='w-4 h-4 sm:w-5 sm:h-5 mr-2'
+                      className='w-5 h-5 text-slate-700'
                       fill='none'
                       stroke='currentColor'
                       viewBox='0 0 24 24'
@@ -135,14 +136,10 @@ export default function ResumeBuilderPage() {
                       <path
                         strokeLinecap='round'
                         strokeLinejoin='round'
-                        strokeWidth={2}
+                        strokeWidth={2.5}
                         d='M15 19l-7-7 7-7'
                       />
                     </svg>
-                    <span className='hidden sm:inline'>
-                      Back to Resume Manager
-                    </span>
-                    <span className='sm:hidden'>Back</span>
                   </button>
                   {getInitialData() && (
                     <ValidationStatus
@@ -160,11 +157,12 @@ export default function ResumeBuilderPage() {
                       <span className='font-medium'>{currentResume.name}</span>
                     </div>
                   )}
-                  <div className='text-muted-foreground'>
-                    {currentResume
-                      ? `Last saved: ${new Date(currentResume.updatedAt).toLocaleString()}`
-                      : 'New resume'}
-                  </div>
+                  {currentResume && (
+                    <div className='text-muted-foreground'>
+                      Last saved:{' '}
+                      {new Date(currentResume.updatedAt).toLocaleString()}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

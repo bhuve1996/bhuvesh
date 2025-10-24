@@ -161,7 +161,9 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
               ),
             }}
           >
-            LinkedIn
+            {data.personal.linkedin.startsWith('http')
+              ? data.personal.linkedin
+              : `linkedin.com/in/${data.personal.linkedin}`}
           </a>
         )}
         {data.personal.github && (
