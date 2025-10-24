@@ -63,7 +63,7 @@ export const generateDescription = (
     return truncated.substring(0, lastSentenceEnd + 1);
   }
 
-  return truncated.substring(0, truncated.lastIndexOf(' ')) + '...';
+  return `${truncated.substring(0, truncated.lastIndexOf(' '))  }...`;
 };
 
 export const generateKeywords = (

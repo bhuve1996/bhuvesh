@@ -5,10 +5,11 @@
 
 'use client';
 
-import { analytics } from '@/lib/analytics/analytics';
-import { analyticsConfig } from '@/lib/analytics/config';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+
+import { analytics } from '@/lib/analytics/analytics';
+import { analyticsConfig } from '@/lib/analytics/config';
 
 export interface AnalyticsDebuggerProps {
   enabled?: boolean;

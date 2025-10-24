@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
+
 import { Tooltip } from '../Tooltip';
 
 // Extend Jest matchers

@@ -1,6 +1,8 @@
-import { useResumeStore } from '@/store/resumeStore';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
+
+import { useResumeStore } from '@/store/resumeStore';
+
 import { FloatingActions } from '../FloatingActions';
 
 // Extend Jest matchers
@@ -24,33 +26,29 @@ jest.mock('@/store/resumeStore', () => ({
 }));
 
 const mockResumeData = {
-  personalInfo: {
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john@example.com',
-    phone: '123-456-7890',
-    location: 'New York, NY',
-  },
   personal: {
-    firstName: 'John',
-    lastName: 'Doe',
+    fullName: 'John Doe',
     email: 'john@example.com',
     phone: '123-456-7890',
     location: 'New York, NY',
-    summary: 'Experienced developer',
-    website: 'https://johndoe.com',
     linkedin: 'https://linkedin.com/in/johndoe',
     github: 'https://github.com/johndoe',
+    portfolio: 'https://johndoe.com',
   },
+  summary: 'Experienced developer',
   experience: [],
   education: [],
-  skills: [],
+  skills: {
+    technical: [],
+    business: [],
+    soft: [],
+    languages: [],
+    certifications: [],
+  },
   projects: [],
+  achievements: [],
   certifications: [],
-  languages: [],
-  references: [],
-  templateId: 'modern',
-  templateName: 'Modern Template',
+  hobbies: [],
 };
 
 describe('FloatingActions Component', () => {
@@ -60,7 +58,7 @@ describe('FloatingActions Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useResumeStore as jest.Mock).mockReturnValue({
+    (useResumeStore as unknown as jest.Mock).mockReturnValue({
       setResumeData: mockSetResumeData,
       setShowDataChoice: mockSetShowDataChoice,
     });

@@ -1,7 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/Button/Button';
 import { signIn } from 'next-auth/react';
+
+import { Button } from '@/components/ui/Button/Button';
 
 interface LoginButtonProps {
   className?: string;

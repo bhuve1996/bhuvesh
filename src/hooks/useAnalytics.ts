@@ -3,11 +3,12 @@
  * React hook for tracking analytics events
  */
 
+import { usePathname } from 'next/navigation';
+import { useCallback, useEffect, useRef } from 'react';
+
 import { analytics } from '@/lib/analytics/analytics';
 import { ANALYTICS_EVENTS, ANALYTICS_PARAMETERS } from '@/lib/analytics/config';
 import type { AnalyticsEventData } from '@/lib/analytics/types';
-import { usePathname } from 'next/navigation';
-import { useCallback, useEffect, useRef } from 'react';
 
 export interface UseAnalyticsOptions {
   trackPageViews?: boolean;

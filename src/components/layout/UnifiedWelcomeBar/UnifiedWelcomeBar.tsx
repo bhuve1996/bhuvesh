@@ -1,7 +1,8 @@
 'use client';
 
-import { Tooltip } from '@/components/ui/Tooltip';
 import React from 'react';
+
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface UnifiedWelcomeBarProps {
   currentPage: 'ats-checker' | 'builder' | 'templates';

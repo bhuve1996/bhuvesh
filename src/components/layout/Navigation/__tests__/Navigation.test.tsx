@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
+
 import { Navigation } from '../Navigation';
 
 // Extend Jest matchers
@@ -8,7 +9,7 @@ expect.extend(toHaveNoViolations);
 // Mock Next.js Image component
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ src, alt, ...props }) => (
+  default: ({ src, alt, ...props }: { src: string; alt: string; [key: string]: any }) => (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt={alt} {...props} />
   ),
@@ -17,7 +18,7 @@ jest.mock('next/image', () => ({
 // Mock Next.js Link component
 jest.mock('next/link', () => ({
   __esModule: true,
-  default: ({ href, children, ...props }) => (
+  default: ({ href, children, ...props }: { href: string; children: React.ReactNode; [key: string]: any }) => (
     <a href={href} {...props}>
       {children}
     </a>
@@ -235,17 +236,23 @@ describe('Navigation Component', () => {
       expect(mobileMenu).toHaveAttribute('aria-hidden', 'false');
     });
 
-    const firstMenuItem = screen.getAllByRole('menuitem')[0];
-    firstMenuItem.focus();
-    expect(firstMenuItem).toHaveFocus();
+    const menuItems = screen.getAllByRole('menuitem');
+    const firstMenuItem = menuItems[0];
+    if (firstMenuItem) {
+      firstMenuItem.focus();
+      expect(firstMenuItem).toHaveFocus();
+    }
   });
 
   it('maintains focus when switching between desktop and mobile', () => {
     render(<Navigation {...defaultProps} />);
 
-    const desktopLink = screen.getAllByRole('menuitem')[0];
-    desktopLink.focus();
-    expect(desktopLink).toHaveFocus();
+    const desktopLinks = screen.getAllByRole('menuitem');
+    const desktopLink = desktopLinks[0];
+    if (desktopLink) {
+      desktopLink.focus();
+      expect(desktopLink).toHaveFocus();
+    }
 
     const mobileButton = screen.getByLabelText('Toggle mobile menu');
     mobileButton.focus();

@@ -5,11 +5,12 @@
 
 'use client';
 
+import { usePathname } from 'next/navigation';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { analytics } from '@/lib/analytics/analytics';
 import type { AnalyticsContextType } from '@/lib/analytics/types';
-import { usePathname } from 'next/navigation';
-import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const AnalyticsContext = createContext<AnalyticsContextType | null>(null);
 
