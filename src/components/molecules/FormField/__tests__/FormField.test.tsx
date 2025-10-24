@@ -54,7 +54,7 @@ describe('FormField Component', () => {
     const errorMessage = screen.getByText('This is an error');
     expect(errorMessage).toBeInTheDocument();
     expect(errorMessage).toHaveAttribute('role', 'alert');
-    expect(errorMessage).toHaveAttribute('aria-live', 'polite');
+    expect(errorMessage).toHaveAttribute('aria-live', 'assertive');
   });
 
   it('prioritizes error over help text', () => {

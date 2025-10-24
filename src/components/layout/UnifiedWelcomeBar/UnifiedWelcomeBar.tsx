@@ -103,6 +103,9 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
       setValidationResult(validation);
       setShowValidationModal(true);
     } else {
+      // Save current data to store before navigation (same as floating button)
+      const { setResumeData } = useResumeStore.getState();
+      setResumeData(currentData);
       // Proceed with navigation
       window.location.href = targetUrl;
     }
@@ -110,6 +113,12 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
 
   const handleValidationProceed = () => {
     setShowValidationModal(false);
+    // Save current data to store before navigation (same as floating button)
+    const currentData = globalResumeData;
+    if (currentData) {
+      const { setResumeData } = useResumeStore.getState();
+      setResumeData(currentData);
+    }
     // Navigate to templates anyway
     window.location.href = '/resume/templates';
   };
@@ -184,16 +193,16 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
       {(currentPage === 'templates' || currentPage === 'builder') && (
         <div className='flex justify-center mb-4'>
           <div className='flex items-center space-x-1'>
-            {/* Back to Manager Button - Show on builder page */}
+            {/* Back to ATS Checker Button - Show on builder page */}
             {currentPage === 'builder' && onBackToManager && (
               <div className='relative inline-block'>
-                <Tooltip content='Go back to resume manager' position='top'>
+                <Tooltip content='Go back to ATS checker' position='top'>
                   <button
                     type='button'
                     onClick={onBackToManager}
                     className='flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2'
-                    aria-label='Back to Resume Manager'
-                    title='Back to Resume Manager'
+                    aria-label='Back to ATS Checker'
+                    title='Back to ATS Checker'
                   >
                     <svg
                       className='w-4 h-4 text-white'
@@ -205,7 +214,7 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
                         strokeLinecap='round'
                         strokeLinejoin='round'
                         strokeWidth={2.5}
-                        d='M10 19l-7-7m0 0l7-7m-7 7h18'
+                        d='M15 19l-7-7 7-7'
                       />
                     </svg>
                   </button>

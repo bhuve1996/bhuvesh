@@ -220,7 +220,7 @@ describe('Responsive Design Integration Tests', () => {
       });
     });
 
-    it('should render floating action button with mobile text', () => {
+    it('should render floating action button with mobile text', async () => {
       // Import the mock component directly
       const MockFloatingPanel = (
         await import('@/components/organisms/FloatingPanel/FloatingPanel')

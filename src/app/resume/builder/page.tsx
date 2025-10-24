@@ -1,19 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { UnifiedWelcomeBar } from '@/components/layout/UnifiedWelcomeBar';
 import { ResumeBuilder } from '@/components/resume/ResumeBuilder';
-import { ResumeManager } from '@/components/resume/ResumeManager';
 import { CloudResume, cloudStorage } from '@/lib/resume/cloudStorage';
 import { useResumeStore } from '@/store/resumeStore';
 import { ResumeData } from '@/types/resume';
 
 export default function ResumeBuilderPage() {
-  const [currentView, setCurrentView] = useState<'manager' | 'builder'>(
-    'manager'
-  );
-  const [currentResume, setCurrentResume] = useState<CloudResume | null>(null);
+  const [currentResume] = useState<CloudResume | null>(null);
   const [currentResumeId, setCurrentResumeId] = useState<string | undefined>(
     undefined
   );
@@ -21,23 +17,6 @@ export default function ResumeBuilderPage() {
   // Use global state
   const resumeData = useResumeStore(state => state.resumeData);
   const analysisResult = useResumeStore(state => state.analysisResult);
-
-  // Load data from global state on component mount
-  useEffect(() => {
-    const loadExistingData = () => {
-      try {
-        // Check if we have data from global state
-        if (resumeData && analysisResult) {
-          // Auto-switch to builder view when data is loaded from ATS checker
-          setCurrentView('builder');
-        }
-      } catch {
-        // Error loading resume data - silently handle
-      }
-    };
-
-    loadExistingData();
-  }, [resumeData, analysisResult]);
 
   const handleSave = (data: ResumeData, resumeName?: string) => {
     try {
@@ -64,20 +43,8 @@ export default function ResumeBuilderPage() {
     alert(`Exporting resume as ${format.toUpperCase()}...`);
   };
 
-  const handleResumeSelect = (resume: CloudResume) => {
-    setCurrentResume(resume);
-    setCurrentResumeId(resume.id);
-    setCurrentView('builder');
-  };
-
-  const handleNewResume = () => {
-    setCurrentResume(null);
-    setCurrentResumeId(undefined);
-    setCurrentView('builder');
-  };
-
-  const handleBackToManager = () => {
-    setCurrentView('manager');
+  const handleBackToATSChecker = () => {
+    window.location.href = '/resume/ats-checker';
   };
 
   // Get initial data for the resume builder
@@ -96,36 +63,28 @@ export default function ResumeBuilderPage() {
 
   return (
     <div className='min-h-screen bg-background text-foreground'>
-      {currentView === 'manager' ? (
-        <ResumeManager
-          onResumeSelect={handleResumeSelect}
-          onNewResume={handleNewResume}
-          currentResumeId={currentResumeId}
+      <div>
+        {/* Unified Welcome Bar */}
+        <UnifiedWelcomeBar
+          currentPage='builder'
+          analysisResult={
+            analysisResult
+              ? {
+                  jobType: analysisResult.jobType,
+                  atsScore: analysisResult.atsScore?.toString(),
+                }
+              : null
+          }
+          resumeData={resumeData}
+          onBackToManager={handleBackToATSChecker}
         />
-      ) : (
-        <div>
-          {/* Unified Welcome Bar */}
-          <UnifiedWelcomeBar
-            currentPage='builder'
-            analysisResult={
-              analysisResult
-                ? {
-                    jobType: analysisResult.jobType,
-                    atsScore: analysisResult.atsScore?.toString(),
-                  }
-                : null
-            }
-            resumeData={resumeData}
-            onBackToManager={handleBackToManager}
-          />
 
-          <ResumeBuilder
-            initialData={getInitialData()}
-            onSave={handleSave}
-            onExport={handleExport}
-          />
-        </div>
-      )}
+        <ResumeBuilder
+          initialData={getInitialData()}
+          onSave={handleSave}
+          onExport={handleExport}
+        />
+      </div>
     </div>
   );
 }

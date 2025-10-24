@@ -72,7 +72,8 @@ export const FormField: React.FC<FormFieldProps> = ({
           React.cloneElement(children, {
             ...accessibleFieldProps,
             ...(children.props as Record<string, unknown>),
-          })}
+            id: fieldId,
+          } as Record<string, unknown>)}
       </div>
 
       {helpText && !error && (

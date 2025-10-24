@@ -13,20 +13,95 @@ jest.mock('color-contrast-checker', () => {
   return {
     ContrastChecker: jest.fn().mockImplementation(() => ({
       getRatio: jest.fn((color1: string, color2: string) => {
+        // Normalize colors for comparison
+        const normalizeColor = (color: string) => {
+          if (!color) return color;
+          color = color.replace('#', '');
+          if (color.length === 3) {
+            color = color
+              .split('')
+              .map(char => char + char)
+              .join('');
+          }
+          return color.toLowerCase();
+        };
+
+        const norm1 = normalizeColor(color1);
+        const norm2 = normalizeColor(color2);
+
         // Mock some known contrast ratios
-        if (color1 === '#000000' && color2 === '#ffffff') return 21;
-        if (color1 === '#ffffff' && color2 === '#000000') return 21;
-        if (color1 === '#3b82f6' && color2 === '#ffffff') return 4.5;
-        if (color1 === '#64748b' && color2 === '#ffffff') return 4.6;
+        if (
+          (norm1 === '000000' && norm2 === 'ffffff') ||
+          (norm1 === 'ffffff' && norm2 === '000000')
+        )
+          return 21;
+        if (norm1 === '3b82f6' && norm2 === 'ffffff') return 4.5;
+        if (norm1 === '64748b' && norm2 === 'ffffff') return 4.6;
+        if (norm1 === '0f172a' && norm2 === 'ffffff') return 16.5; // Dark text on white
+        if (norm1 === '1e40af' && norm2 === 'ffffff') return 8.2; // Blue on white
+        if (norm1 === '475569' && norm2 === 'ffffff') return 7.1; // Gray on white
+        if (norm1 === 'ffffff' && norm2 === '1e40af') return 8.2; // White on blue
         return 3.2; // Default mock ratio
       }),
       isLevelAA: jest.fn((color1: string, color2: string, fontSize: number) => {
-        const ratio = color1 === '#000000' && color2 === '#ffffff' ? 21 : 3.2;
+        // Normalize colors for comparison
+        const normalizeColor = (color: string) => {
+          if (!color) return color;
+          color = color.replace('#', '');
+          if (color.length === 3) {
+            color = color
+              .split('')
+              .map(char => char + char)
+              .join('');
+          }
+          return color.toLowerCase();
+        };
+
+        const norm1 = normalizeColor(color1);
+        const norm2 = normalizeColor(color2);
+
+        let ratio = 3.2; // Default
+        if (
+          (norm1 === '000000' && norm2 === 'ffffff') ||
+          (norm1 === 'ffffff' && norm2 === '000000')
+        )
+          ratio = 21;
+        else if (norm1 === '3b82f6' && norm2 === 'ffffff') ratio = 4.5;
+        else if (norm1 === '64748b' && norm2 === 'ffffff') ratio = 4.6;
+        else if (norm1 === '0f172a' && norm2 === 'ffffff') ratio = 16.5;
+        else if (norm1 === '1e40af' && norm2 === 'ffffff') ratio = 8.2;
+        else if (norm1 === '475569' && norm2 === 'ffffff') ratio = 7.1;
+        else if (norm1 === 'ffffff' && norm2 === '1e40af') ratio = 8.2;
+
         return fontSize >= 18 ? ratio >= 3 : ratio >= 4.5;
       }),
       isLevelAAA: jest.fn(
         (color1: string, color2: string, fontSize: number) => {
-          const ratio = color1 === '#000000' && color2 === '#ffffff' ? 21 : 3.2;
+          // Normalize colors for comparison
+          const normalizeColor = (color: string) => {
+            if (!color) return color;
+            color = color.replace('#', '');
+            if (color.length === 3) {
+              color = color
+                .split('')
+                .map(char => char + char)
+                .join('');
+            }
+            return color.toLowerCase();
+          };
+
+          const norm1 = normalizeColor(color1);
+          const norm2 = normalizeColor(color2);
+
+          let ratio = 3.2; // Default
+          if (
+            (norm1 === '000000' && norm2 === 'ffffff') ||
+            (norm1 === 'ffffff' && norm2 === '000000')
+          )
+            ratio = 21;
+          else if (norm1 === '3b82f6' && norm2 === 'ffffff') ratio = 4.5;
+          else if (norm1 === '64748b' && norm2 === 'ffffff') ratio = 4.6;
+
           return fontSize >= 18 ? ratio >= 4.5 : ratio >= 7;
         }
       ),
@@ -46,7 +121,7 @@ describe('ContrastUtils', () => {
       expect(ratio).toBe(0);
     });
 
-    it('should fallback to manual calculation when library fails', () => {
+    it('should fallback to manual calculation when library fails', async () => {
       // Mock library to throw error
       const { ContrastChecker } = await import('color-contrast-checker');
       const mockInstance = new ContrastChecker();
@@ -177,7 +252,7 @@ describe('ContrastUtils', () => {
 
     it('should handle large text differently', () => {
       const level = getWCAGLevel('#3b82f6', '#ffffff', 'large');
-      expect(level).toBe('AA');
+      expect(level).toBe('AAA'); // 4.5 ratio meets AAA standard for large text
     });
   });
 
@@ -222,7 +297,7 @@ describe('ContrastUtils', () => {
       expect(analysis.largeText.level).toBe('AAA');
     });
 
-    it('should handle library errors gracefully', () => {
+    it('should handle library errors gracefully', async () => {
       // Mock library to throw error
       const { ContrastChecker } = await import('color-contrast-checker');
       const mockInstance = new ContrastChecker();

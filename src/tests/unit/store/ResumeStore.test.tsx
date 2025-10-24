@@ -1,9 +1,9 @@
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 
 import {
-  useResumeStore,
   useResumeActions,
   useResumeData,
+  useResumeStore,
 } from '@/store/resumeStore';
 import { ResumeData, ResumeTemplate } from '@/types';
 
@@ -24,6 +24,12 @@ describe('ResumeStore', () => {
     localStorageMock.setItem.mockClear();
     localStorageMock.removeItem.mockClear();
     localStorageMock.clear.mockClear();
+
+    // Clear the store state between tests
+    const { result } = renderHook(() => useResumeStore());
+    act(() => {
+      result.current.clearAllData();
+    });
   });
 
   const mockResumeData: ResumeData = {

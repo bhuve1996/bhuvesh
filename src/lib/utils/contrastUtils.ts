@@ -4,14 +4,28 @@ import { ColorScheme } from '@/types/resume';
 
 // Convert hex color to RGB
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result && result[1] && result[2] && result[3]
-    ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      }
-    : null;
+  // Handle empty or invalid input
+  if (!hex || typeof hex !== 'string') return null;
+
+  // Remove hash if present
+  hex = hex.replace('#', '');
+
+  // Handle 3-character hex (e.g., #000 -> #000000)
+  if (hex.length === 3) {
+    hex = hex
+      .split('')
+      .map(char => char + char)
+      .join('');
+  }
+
+  // Validate hex format (6 characters, valid hex digits)
+  if (!/^[a-f\d]{6}$/i.test(hex)) return null;
+
+  return {
+    r: parseInt(hex.substring(0, 2), 16),
+    g: parseInt(hex.substring(2, 4), 16),
+    b: parseInt(hex.substring(4, 6), 16),
+  };
 }
 
 // Calculate relative luminance
@@ -28,15 +42,16 @@ const contrastChecker = new ContrastChecker();
 
 // Calculate contrast ratio between two colors using the library
 export function getContrastRatio(color1: string, color2: string): number {
+  // Validate colors first
+  const rgb1 = hexToRgb(color1);
+  const rgb2 = hexToRgb(color2);
+
+  if (!rgb1 || !rgb2) return 0;
+
   try {
     return contrastChecker.getRatio(color1, color2);
   } catch {
     // Fallback to manual calculation if library fails
-    const rgb1 = hexToRgb(color1);
-    const rgb2 = hexToRgb(color2);
-
-    if (!rgb1 || !rgb2) return 0;
-
     const lum1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
     const lum2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
 

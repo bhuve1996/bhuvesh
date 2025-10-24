@@ -121,13 +121,14 @@ describe('StatusBadge Component', () => {
     const { rerender } = render(
       <StatusBadge {...defaultProps} icon={icon} size='sm' />
     );
-    expect(screen.getByTestId('icon')).toHaveClass('w-3', 'h-3');
+    const iconWrapper = screen.getByTestId('icon').parentElement;
+    expect(iconWrapper).toHaveClass('w-3', 'h-3');
 
     rerender(<StatusBadge {...defaultProps} icon={icon} size='md' />);
-    expect(screen.getByTestId('icon')).toHaveClass('w-4', 'h-4');
+    expect(iconWrapper).toHaveClass('w-4', 'h-4');
 
     rerender(<StatusBadge {...defaultProps} icon={icon} size='lg' />);
-    expect(screen.getByTestId('icon')).toHaveClass('w-5', 'h-5');
+    expect(iconWrapper).toHaveClass('w-5', 'h-5');
   });
 
   it('does not render icon when not provided', () => {
@@ -179,7 +180,8 @@ describe('StatusBadge Component', () => {
       'custom-class'
     );
 
-    expect(screen.getByTestId('icon')).toHaveClass('w-5', 'h-5');
+    const iconWrapper = screen.getByTestId('icon').parentElement;
+    expect(iconWrapper).toHaveClass('w-5', 'h-5');
   });
 
   it('handles all status and variant combinations', () => {

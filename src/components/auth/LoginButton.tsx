@@ -43,7 +43,7 @@ export const LoginButton: React.FC<LoginButtonProps> = ({
           fill='#EA4335'
         />
       </svg>
-      Sign in with Google
+      Sign In
     </Button>
   );
 };
