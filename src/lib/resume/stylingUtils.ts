@@ -224,47 +224,143 @@ export const generateSectionCSSVariables = (
     }
   }
 
-  // Typography variables
-  if ('typography' in styling) {
-    const typography = styling.typography as Record<
-      string,
-      Record<string, string>
-    >;
-    Object.entries(typography).forEach(
-      ([key, typo]: [string, Record<string, string>]) => {
-        variables[`--${sectionId}-${key}-font-family`] =
-          typo.fontFamily || 'Arial';
-        variables[`--${sectionId}-${key}-font-size`] = typo.fontSize || '14px';
-        if (typo.fontWeight) {
-          variables[`--${sectionId}-${key}-font-weight`] =
-            typo.fontWeight.toString();
-        }
-        if (typo.lineHeight) {
-          variables[`--${sectionId}-${key}-line-height`] =
-            typo.lineHeight.toString();
-        }
-        if (typo.letterSpacing) {
-          variables[`--${sectionId}-${key}-letter-spacing`] =
-            typo.letterSpacing;
-        }
-        if (typo.textTransform) {
-          variables[`--${sectionId}-${key}-text-transform`] =
-            typo.textTransform;
-        }
-        if (typo.textDecoration) {
-          variables[`--${sectionId}-${key}-text-decoration`] =
-            typo.textDecoration;
+  // Typography variables - handle nested structure recursively
+  const processTypographyObject = (
+    obj: Record<string, unknown>,
+    prefix: string = ''
+  ) => {
+    Object.entries(obj).forEach(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        // Check if this is a typography object (has fontFamily, fontSize, etc.)
+        if (
+          'fontFamily' in value ||
+          'fontSize' in value ||
+          'fontWeight' in value
+        ) {
+          const varPrefix = prefix ? `${prefix}-${key}` : key;
+          const typoValue = value as Record<string, unknown>;
+          variables[`--${sectionId}-${varPrefix}-font-family`] =
+            (typoValue.fontFamily as string) || 'Arial';
+          variables[`--${sectionId}-${varPrefix}-font-size`] =
+            (typoValue.fontSize as string) || '14px';
+          if (typoValue.fontWeight) {
+            variables[`--${sectionId}-${varPrefix}-font-weight`] =
+              typoValue.fontWeight.toString();
+          }
+          if (typoValue.lineHeight) {
+            variables[`--${sectionId}-${varPrefix}-line-height`] =
+              typoValue.lineHeight.toString();
+          }
+          if (typoValue.letterSpacing) {
+            variables[`--${sectionId}-${varPrefix}-letter-spacing`] =
+              typoValue.letterSpacing as string;
+          }
+          if (typoValue.textTransform) {
+            variables[`--${sectionId}-${varPrefix}-text-transform`] =
+              typoValue.textTransform as string;
+          }
+          if (typoValue.textDecoration) {
+            variables[`--${sectionId}-${varPrefix}-text-decoration`] =
+              typoValue.textDecoration as string;
+          }
+        } else {
+          // Recursively process nested objects
+          const newPrefix = prefix ? `${prefix}-${key}` : key;
+          processTypographyObject(value as Record<string, unknown>, newPrefix);
         }
       }
-    );
+    });
+  };
+
+  // Process the styling object for typography
+  processTypographyObject(styling as Record<string, unknown>);
+
+  // Border and background variables - handle nested structure
+  const processBorderBackgroundObject = (
+    obj: Record<string, unknown>,
+    prefix: string = ''
+  ) => {
+    Object.entries(obj).forEach(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        // Check if this is a border object
+        if ('width' in value && 'style' in value && 'color' in value) {
+          // Special case: if this is container.border, generate top-level variables
+          if (prefix === 'container' && key === 'border') {
+            const borderValue = value as Record<string, unknown>;
+            variables[`--${sectionId}-border-width`] =
+              (borderValue.width as string) || '0';
+            variables[`--${sectionId}-border-style`] =
+              (borderValue.style as string) || 'none';
+            variables[`--${sectionId}-border-color`] =
+              (borderValue.color as string) || 'transparent';
+            if (borderValue.radius) {
+              variables[`--${sectionId}-border-radius`] =
+                borderValue.radius as string;
+            }
+          } else {
+            const varPrefix = prefix ? `${prefix}-${key}` : key;
+            const borderValue = value as Record<string, unknown>;
+            variables[`--${sectionId}-${varPrefix}-border-width`] =
+              (borderValue.width as string) || '0';
+            variables[`--${sectionId}-${varPrefix}-border-style`] =
+              (borderValue.style as string) || 'none';
+            variables[`--${sectionId}-${varPrefix}-border-color`] =
+              (borderValue.color as string) || 'transparent';
+            if (borderValue.radius) {
+              variables[`--${sectionId}-${varPrefix}-border-radius`] =
+                borderValue.radius as string;
+            }
+          }
+        }
+        // Check if this is a background object
+        else if ('color' in value && !('width' in value)) {
+          // Special case: if this is container.background, generate top-level variables
+          if (prefix === 'container' && key === 'background') {
+            const bgValue = value as Record<string, unknown>;
+            variables[`--${sectionId}-background-color`] =
+              (bgValue.color as string) || 'transparent';
+          } else {
+            const varPrefix = prefix ? `${prefix}-${key}` : key;
+            const bgValue = value as Record<string, unknown>;
+            variables[`--${sectionId}-${varPrefix}-background-color`] =
+              (bgValue.color as string) || 'transparent';
+          }
+        }
+        // Recursively process nested objects
+        else {
+          const newPrefix = prefix ? `${prefix}-${key}` : key;
+          processBorderBackgroundObject(
+            value as Record<string, unknown>,
+            newPrefix
+          );
+        }
+      }
+    });
+  };
+
+  // Process the styling object for border and background
+  processBorderBackgroundObject(styling as Record<string, unknown>);
+
+  // Spacing variables - handle both direct spacing and nested container.spacing
+  let spacingData: Record<string, string> | null = null;
+
+  if ('spacing' in styling) {
+    spacingData = styling.spacing as Record<string, string>;
+  } else if (
+    'container' in styling &&
+    typeof styling.container === 'object' &&
+    styling.container !== null &&
+    'spacing' in styling.container
+  ) {
+    spacingData = (
+      styling.container as unknown as { spacing: Record<string, string> }
+    ).spacing;
   }
 
-  // Spacing variables
-  if ('spacing' in styling) {
-    const spacing = styling.spacing as Record<string, string>;
-    variables[`--${sectionId}-margin`] = spacing.margin || '0';
-    variables[`--${sectionId}-padding`] = spacing.padding || '0';
-    variables[`--${sectionId}-gap`] = spacing.gap || '0';
+  if (spacingData) {
+    variables[`--${sectionId}-margin`] = spacingData.margin || '0';
+    variables[`--${sectionId}-padding`] = spacingData.padding || '0';
+    variables[`--${sectionId}-gap`] = spacingData.gap || '0';
   }
 
   // Border variables
@@ -349,25 +445,41 @@ export const generateSectionCSS = (
     css.push(`.${sectionId}__container {\n${containerDeclarations}\n}`);
   }
 
-  // Generate typography styles
-  if ('typography' in styling) {
-    const typography = styling.typography as Record<
-      string,
-      Record<string, string>
-    >;
-    Object.entries(typography).forEach(
-      ([key, typo]: [string, Record<string, string>]) => {
-        const typographyCSS = typographyToCSS(
-          typo as unknown as TypographyStyle
-        );
-        const typographyDeclarations = Object.entries(typographyCSS)
-          .map(([key, value]) => `  ${key}: ${value};`)
-          .join('\n');
+  // Generate typography styles - handle nested structure recursively
+  const processTypographyCSS = (
+    obj: Record<string, unknown>,
+    prefix: string = ''
+  ) => {
+    Object.entries(obj).forEach(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        // Check if this is a typography object (has fontFamily, fontSize, etc.)
+        if (
+          'fontFamily' in value ||
+          'fontSize' in value ||
+          'fontWeight' in value
+        ) {
+          const typographyCSS = typographyToCSS(
+            value as unknown as TypographyStyle
+          );
+          const typographyDeclarations = Object.entries(typographyCSS)
+            .map(([cssKey, cssValue]) => `  ${cssKey}: ${cssValue};`)
+            .join('\n');
 
-        css.push(`.${sectionId}__${key} {\n${typographyDeclarations}\n}`);
+          const className = prefix ? `${prefix}-${key}` : key;
+          css.push(
+            `.${sectionId}__${className} {\n${typographyDeclarations}\n}`
+          );
+        } else {
+          // Recursively process nested objects
+          const newPrefix = prefix ? `${prefix}-${key}` : key;
+          processTypographyCSS(value as Record<string, unknown>, newPrefix);
+        }
       }
-    );
-  }
+    });
+  };
+
+  // Process the styling object for typography CSS
+  processTypographyCSS(styling as Record<string, unknown>);
 
   // Generate specific element styles for complex sections
   if (sectionId === 'skills' && 'container' in styling) {

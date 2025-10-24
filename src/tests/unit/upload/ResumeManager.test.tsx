@@ -4,11 +4,10 @@ import React from 'react';
 
 import { atsApi } from '@/api/endpoints/ats';
 import { ResumeManager } from '@/components/resume/ResumeManager/ResumeManager';
-
-import { cloudStorage } from '@/lib/storage/cloudStorage';
+import { cloudStorage } from '@/lib/resume/cloudStorage';
 
 // Mock dependencies
-jest.mock('@/lib/storage/cloudStorage');
+jest.mock('@/lib/resume/cloudStorage');
 jest.mock('@/api/endpoints/ats');
 jest.mock('react-hot-toast', () => ({
   error: jest.fn(),
@@ -29,52 +28,76 @@ describe('ResumeManager Component', () => {
     {
       id: '1',
       name: 'Software Engineer Resume',
-      data: {
-        personal: { fullName: 'John Doe', email: 'john@example.com' },
-        summary: 'Experienced software engineer',
-        experience: [],
-        education: [],
-        skills: {
-          technical: [],
-          business: [],
-          soft: [],
-          languages: [],
-          certifications: [],
+      templateId: 'modern',
+      currentVersion: 1,
+      versions: [
+        {
+          id: 'version-1',
+          data: {
+            personal: { fullName: 'John Doe', email: 'john@example.com' },
+            summary: 'Experienced software engineer',
+            experience: [],
+            education: [],
+            skills: {
+              technical: [],
+              business: [],
+              soft: [],
+              languages: [],
+              certifications: [],
+            },
+            projects: [],
+            achievements: [],
+          },
+          timestamp: new Date(),
+          version: 1,
+          name: 'Initial version',
+          isAutoSave: false,
         },
-        projects: [],
-        achievements: [],
-      },
-      template: 'modern',
+      ],
       createdAt: new Date(),
       updatedAt: new Date(),
+      isPublic: false,
+      tags: [],
     },
     {
       id: '2',
       name: 'Product Manager Resume',
-      data: {
-        personal: { fullName: 'Jane Smith', email: 'jane@example.com' },
-        summary: 'Product management expert',
-        experience: [],
-        education: [],
-        skills: {
-          technical: [],
-          business: [],
-          soft: [],
-          languages: [],
-          certifications: [],
+      templateId: 'classic',
+      currentVersion: 1,
+      versions: [
+        {
+          id: 'version-2',
+          data: {
+            personal: { fullName: 'Jane Smith', email: 'jane@example.com' },
+            summary: 'Product management expert',
+            experience: [],
+            education: [],
+            skills: {
+              technical: [],
+              business: [],
+              soft: [],
+              languages: [],
+              certifications: [],
+            },
+            projects: [],
+            achievements: [],
+          },
+          timestamp: new Date(),
+          version: 1,
+          name: 'Initial version',
+          isAutoSave: false,
         },
-        projects: [],
-        achievements: [],
-      },
-      template: 'classic',
+      ],
       createdAt: new Date(),
       updatedAt: new Date(),
+      isPublic: false,
+      tags: [],
     },
   ];
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCloudStorage.getAllResumes.mockReturnValue(mockResumes);
+    mockCloudStorage.getResumes.mockReturnValue(mockResumes);
     mockCloudStorage.getResume.mockImplementation(
       id => mockResumes.find(r => r.id === id) || null
     );
