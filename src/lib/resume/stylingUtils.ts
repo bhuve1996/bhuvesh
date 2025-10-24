@@ -213,7 +213,8 @@ export const generateSectionCSSVariables = (
     variables[`--${sectionId}-secondary-color`] = colors.secondary || '#666666';
     variables[`--${sectionId}-accent-color`] = colors.accent || '#007bff';
     variables[`--${sectionId}-text-color`] = colors.text || '#000000';
-    variables[`--${sectionId}-background-color`] = colors.background || '#ffffff';
+    variables[`--${sectionId}-background-color`] =
+      colors.background || '#ffffff';
     variables[`--${sectionId}-border-color`] = colors.border || '#cccccc';
     if (colors.hover) {
       variables[`--${sectionId}-hover-color`] = colors.hover;
@@ -227,13 +228,16 @@ export const generateSectionCSSVariables = (
   if ('typography' in styling) {
     const typography = styling.typography as any;
     Object.entries(typography).forEach(([key, typo]: [string, any]) => {
-      variables[`--${sectionId}-${key}-font-family`] = typo.fontFamily || 'Arial';
+      variables[`--${sectionId}-${key}-font-family`] =
+        typo.fontFamily || 'Arial';
       variables[`--${sectionId}-${key}-font-size`] = typo.fontSize || '14px';
       if (typo.fontWeight) {
-        variables[`--${sectionId}-${key}-font-weight`] = typo.fontWeight.toString();
+        variables[`--${sectionId}-${key}-font-weight`] =
+          typo.fontWeight.toString();
       }
       if (typo.lineHeight) {
-        variables[`--${sectionId}-${key}-line-height`] = typo.lineHeight.toString();
+        variables[`--${sectionId}-${key}-line-height`] =
+          typo.lineHeight.toString();
       }
       if (typo.letterSpacing) {
         variables[`--${sectionId}-${key}-letter-spacing`] = typo.letterSpacing;
@@ -242,7 +246,8 @@ export const generateSectionCSSVariables = (
         variables[`--${sectionId}-${key}-text-transform`] = typo.textTransform;
       }
       if (typo.textDecoration) {
-        variables[`--${sectionId}-${key}-text-decoration`] = typo.textDecoration;
+        variables[`--${sectionId}-${key}-text-decoration`] =
+          typo.textDecoration;
       }
     });
   }
@@ -267,7 +272,8 @@ export const generateSectionCSSVariables = (
   // Background variables
   if ('background' in styling) {
     const background = styling.background as any;
-    variables[`--${sectionId}-background-color`] = background.color || '#ffffff';
+    variables[`--${sectionId}-background-color`] =
+      background.color || '#ffffff';
     if (background.image) {
       variables[`--${sectionId}-background-image`] = `url(${background.image})`;
     }

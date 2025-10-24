@@ -3,15 +3,19 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
-import { Button } from '@/components/atoms/Button/Button';
 import { UnifiedWelcomeBar } from '@/components/layout/UnifiedWelcomeBar';
 import { FloatingPanel } from '@/components/organisms/FloatingPanel/FloatingPanel';
+import { CollapsedCarouselHint } from '@/components/resume/CollapsedCarouselHint';
+import { DataChoiceDialog } from '@/components/resume/DataChoiceDialog';
+import { MobileExportMenu } from '@/components/resume/MobileExportMenu';
+import { MobileFloatingActionButton } from '@/components/resume/MobileFloatingActionButton';
 import { ImprovedPaginatedTemplatePreview } from '@/components/resume/templates/ImprovedPaginatedTemplatePreview';
 import { ResumeTemplateRenderer } from '@/components/resume/templates/ResumeTemplateRenderer';
 import { TemplateCarousel } from '@/components/resume/templates/TemplateCarousel';
+import { TemplateSearch } from '@/components/resume/TemplateSearch';
 import { ValidationModal } from '@/components/resume/ValidationModal';
+import { ViewModeToggle } from '@/components/resume/ViewModeToggle';
 import { Card } from '@/components/ui/Card';
-import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import { cloudStorage } from '@/lib/resume/cloudStorage';
 import { exportResume } from '@/lib/resume/exportUtils';
 import { modernTemplates } from '@/lib/resume/templates';
@@ -44,9 +48,7 @@ export default function TemplateGalleryPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'carousel'>('carousel');
   const [showMobileExportMenu, setShowMobileExportMenu] = useState(false);
   const [isCarouselCollapsed, setIsCarouselCollapsed] = useState(false);
-  const [previewMode, setPreviewMode] = useState<'full' | 'paginated'>(
-    'paginated'
-  );
+  const [previewMode, setPreviewMode] = useState<'full' | 'paginated'>('full');
 
   // Filter templates
   const filteredTemplates = modernTemplates.filter(template => {
@@ -235,69 +237,12 @@ export default function TemplateGalleryPage() {
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-50 to-blue-50'>
       {/* Data Choice Dialog */}
-      <AnimatePresence>
-        {showDataChoice && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'
-            onClick={() => setShowDataChoice(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className='bg-white rounded-xl shadow-2xl p-6 max-w-md w-full relative'
-              onClick={e => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setShowDataChoice(false)}
-                className='absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors'
-                aria-label='Close dialog'
-              >
-                <svg
-                  className='w-5 h-5'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M6 18L18 6M6 6l12 12'
-                  />
-                </svg>
-              </button>
-
-              <h3 className='text-xl font-bold text-slate-900 mb-4 pr-8'>
-                Choose Data Source
-              </h3>
-              <p className='text-slate-600 mb-6'>
-                We found your existing resume data. Would you like to use it for
-                the preview, or use sample data instead?
-              </p>
-
-              <div className='space-y-3'>
-                <Button
-                  onClick={() => handleDataChoice(true)}
-                  className='w-full bg-blue-600 hover:bg-blue-700 text-white'
-                >
-                  Use My Resume Data
-                </Button>
-                <Button
-                  onClick={() => handleDataChoice(false)}
-                  variant='outline'
-                  className='w-full'
-                >
-                  Use Sample Data
-                </Button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <DataChoiceDialog
+        isOpen={showDataChoice}
+        onClose={() => setShowDataChoice(false)}
+        onUseUserData={() => handleDataChoice(true)}
+        onUseSampleData={() => handleDataChoice(false)}
+      />
 
       <div className='max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8'>
         {/* Unified Welcome Bar */}
@@ -308,64 +253,12 @@ export default function TemplateGalleryPage() {
         />
 
         {/* View Mode Toggle - Compact and always visible */}
-        <div className='flex justify-center mb-6 mt-8'>
-          <div className='bg-slate-100 dark:bg-slate-800 rounded-lg p-1 flex items-center gap-1 shadow-sm border border-slate-200 dark:border-slate-700'>
-            <div className='flex'>
-              <button
-                onClick={() => setViewMode('carousel')}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                  viewMode === 'carousel'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-                }`}
-              >
-                📱 Carousel
-              </button>
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                  viewMode === 'grid'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-                }`}
-              >
-                🔲 Grid
-              </button>
-            </div>
-
-            {/* Always show collapse toggle for better UX */}
-            <div className='h-4 w-px bg-slate-300 mx-1'></div>
-            <button
-              onClick={() => setIsCarouselCollapsed(!isCarouselCollapsed)}
-              className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all ${
-                isCarouselCollapsed
-                  ? 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                  : 'bg-white text-slate-900 shadow-sm hover:bg-slate-50'
-              }`}
-              title={
-                isCarouselCollapsed
-                  ? 'Show carousel (Enter)'
-                  : 'Hide carousel (Esc)'
-              }
-            >
-              <svg
-                className={`w-3 h-3 transition-transform ${
-                  isCarouselCollapsed ? 'rotate-180' : ''
-                }`}
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M5 15l7-7 7 7'
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
+        <ViewModeToggle
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          isCarouselCollapsed={isCarouselCollapsed}
+          onCarouselToggle={() => setIsCarouselCollapsed(!isCarouselCollapsed)}
+        />
 
         {viewMode === 'carousel' ? (
           /* Carousel Layout - Mobile First */
@@ -462,35 +355,10 @@ export default function TemplateGalleryPage() {
             {/* Left Sidebar - Template Gallery */}
             <div className='lg:col-span-1 xl:col-span-1 order-2 lg:order-1 xl:order-1'>
               {/* Search and Filters */}
-              <div className='bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6'>
-                <div className='flex flex-col md:flex-row gap-4'>
-                  {/* Search */}
-                  <div className='flex-1'>
-                    <div className='relative'>
-                      <input
-                        type='text'
-                        placeholder='Search templates...'
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        className='w-full px-4 py-3 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-500'
-                      />
-                      <svg
-                        className='absolute left-3 top-3.5 h-5 w-5 text-slate-400'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
-                        <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth={2}
-                          d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <TemplateSearch
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+              />
 
               {/* Template Grid */}
               <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-1.5'>
@@ -672,198 +540,37 @@ export default function TemplateGalleryPage() {
         )}
 
         {/* Collapsed Carousel Hint */}
-        {viewMode === 'carousel' && isCarouselCollapsed && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.2 }}
-            className='fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30'
-          >
-            <button
-              onClick={() => setIsCarouselCollapsed(false)}
-              className='bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-full text-sm shadow-lg flex items-center gap-2 transition-colors duration-200'
-            >
-              <svg
-                className='w-4 h-4'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M19 9l-7 7-7-7'
-                />
-              </svg>
-              <span>Click to show templates</span>
-            </button>
-          </motion.div>
-        )}
+        <CollapsedCarouselHint
+          isVisible={viewMode === 'carousel' && isCarouselCollapsed}
+          onShowCarousel={() => setIsCarouselCollapsed(false)}
+        />
 
         {/* Floating Action Button for Mobile Export - Only show in carousel mode */}
-        {viewMode === 'carousel' && selectedTemplate && (
-          <div className='fixed bottom-20 right-4 z-50 sm:hidden'>
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            >
-              <Button
-                onClick={() => setShowMobileExportMenu(!showMobileExportMenu)}
-                className='w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center'
-                aria-label='Export Resume'
-              >
-                <svg
-                  className='w-6 h-6'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                  />
-                </svg>
-              </Button>
-            </motion.div>
-          </div>
-        )}
+        <MobileFloatingActionButton
+          isVisible={viewMode === 'carousel' && !!selectedTemplate}
+          onToggle={() => setShowMobileExportMenu(!showMobileExportMenu)}
+        />
 
         {/* Mobile Export Menu */}
-        {viewMode === 'carousel' &&
-          selectedTemplate &&
-          showMobileExportMenu && (
-            <div className='fixed bottom-32 right-4 z-40 sm:hidden'>
-              <motion.div
-                initial={{ scale: 0, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0, opacity: 0, y: 20 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                className='bg-white rounded-xl shadow-xl border border-slate-200 p-4 min-w-[200px]'
-              >
-                <div className='space-y-2'>
-                  <h3 className='text-sm font-semibold text-slate-900 mb-3'>
-                    Export Resume
-                  </h3>
-                  <Tooltip
-                    content='Export your resume as a PDF document'
-                    position='left'
-                    delay={200}
-                  >
-                    <Button
-                      onClick={() => {
-                        setShowMobileExportMenu(false);
-                        // Handle PDF export
-                        const validation = validateResumeData(getPreviewData());
-                        if (validation.errors.length > 0) {
-                          setValidationResult(validation);
-                          setPendingExportFormat('pdf');
-                          setShowValidationModal(true);
-                        } else {
-                          setPendingExportFormat('pdf');
-                          handleValidationProceed();
-                        }
-                      }}
-                      className='w-full justify-start text-sm'
-                      variant='outline'
-                    >
-                      <svg
-                        className='w-4 h-4 mr-2'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
-                        <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth={2}
-                          d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'
-                        />
-                      </svg>
-                      Export as PDF
-                    </Button>
-                  </Tooltip>
-                  <Tooltip
-                    content='Export your resume as a Word document'
-                    position='left'
-                    delay={200}
-                  >
-                    <Button
-                      onClick={() => {
-                        // Handle DOCX export
-                        const validation = validateResumeData(getPreviewData());
-                        if (validation.errors.length > 0) {
-                          setValidationResult(validation);
-                          setPendingExportFormat('docx');
-                          setShowValidationModal(true);
-                        } else {
-                          handleValidationProceed();
-                        }
-                      }}
-                      className='w-full justify-start text-sm'
-                      variant='outline'
-                    >
-                      <svg
-                        className='w-4 h-4 mr-2'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
-                        <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth={2}
-                          d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                        />
-                      </svg>
-                      Export as DOCX
-                    </Button>
-                  </Tooltip>
-                  <Tooltip
-                    content='Export your resume as a text file'
-                    position='left'
-                    delay={200}
-                  >
-                    <Button
-                      onClick={() => {
-                        // Handle TXT export
-                        const validation = validateResumeData(getPreviewData());
-                        if (validation.errors.length > 0) {
-                          setValidationResult(validation);
-                          setPendingExportFormat('txt');
-                          setShowValidationModal(true);
-                        } else {
-                          handleValidationProceed();
-                        }
-                      }}
-                      className='w-full justify-start text-sm'
-                      variant='outline'
-                    >
-                      <svg
-                        className='w-4 h-4 mr-2'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
-                        <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth={2}
-                          d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                        />
-                      </svg>
-                      Export as TXT
-                    </Button>
-                  </Tooltip>
-                </div>
-              </motion.div>
-            </div>
-          )}
+        <MobileExportMenu
+          isOpen={
+            viewMode === 'carousel' &&
+            !!selectedTemplate &&
+            showMobileExportMenu
+          }
+          onClose={() => setShowMobileExportMenu(false)}
+          onExport={format => {
+            const validation = validateResumeData(getPreviewData());
+            if (validation.errors.length > 0) {
+              setValidationResult(validation);
+              setPendingExportFormat(format);
+              setShowValidationModal(true);
+            } else {
+              setPendingExportFormat(format);
+              handleValidationProceed();
+            }
+          }}
+        />
 
         {/* Validation Modal */}
         {validationResult && (

@@ -76,6 +76,10 @@ export default function ResumeBuilderPage() {
     setCurrentView('builder');
   };
 
+  const handleBackToManager = () => {
+    setCurrentView('manager');
+  };
+
   // Get initial data for the resume builder
   const getInitialData = (): Partial<ResumeData> | undefined => {
     // Priority: current resume data > global state data (as fallback only)
@@ -112,6 +116,7 @@ export default function ResumeBuilderPage() {
                 : null
             }
             resumeData={resumeData}
+            onBackToManager={handleBackToManager}
           />
 
           <ResumeBuilder

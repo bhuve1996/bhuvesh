@@ -1,11 +1,12 @@
 'use client';
 
-import Image from 'next/image';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
+
+import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 
 import { LoginButton } from './LoginButton';
 import { LogoutButton } from './LogoutButton';
-import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 
 interface UserProfileProps {
   className?: string;
@@ -41,7 +42,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ className = '' }) => {
       .slice(0, 2);
   };
 
-  const userInitials = session.user?.name ? getInitials(session.user.name) : 'U';
+  const userInitials = session.user?.name
+    ? getInitials(session.user.name)
+    : 'U';
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
@@ -69,11 +72,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ className = '' }) => {
       </Tooltip>
 
       {/* Logout Button with Tooltip */}
-      <Tooltip
-        content='Sign Out'
-        position='bottom'
-        delay={200}
-      >
+      <Tooltip content='Sign Out' position='bottom' delay={200}>
         <div>
           <LogoutButton size='sm' showText={false} />
         </div>

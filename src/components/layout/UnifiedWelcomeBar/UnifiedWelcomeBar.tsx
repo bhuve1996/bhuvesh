@@ -17,12 +17,14 @@ interface UnifiedWelcomeBarProps {
     atsScore?: string | number;
   } | null;
   resumeData?: unknown;
+  onBackToManager?: () => void;
 }
 
 export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
   currentPage,
   analysisResult,
   resumeData,
+  onBackToManager,
 }) => {
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [validationResult, setValidationResult] = useState<any>(null);
@@ -114,6 +116,16 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
     setShowValidationModal(false);
   };
 
+  const handleAIImprove = () => {
+    setShowValidationModal(false);
+    // TODO: Implement AI improvement flow
+    // For now, show a toast and navigate to templates
+    alert(
+      'AI improvement feature coming soon! This will analyze your resume and provide targeted suggestions for better ATS compatibility.'
+    );
+    window.location.href = '/resume/templates';
+  };
+
   // Get page-specific styling
   const getPageStyling = () => {
     switch (currentPage) {
@@ -152,29 +164,57 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
 
   return (
     <div
-      className={`${styling.gradient} ${styling.textColor} p-6 mt-4 rounded-lg shadow-lg border border-white/10 dark:border-white/5`}
+      className={`${styling.gradient} ${styling.textColor} p-4 mt-2 rounded-lg shadow-lg border border-white/10 dark:border-white/5`}
     >
       {/* ATS Resume Checker Header */}
-      <div className='text-center mb-6'>
+      <div className='text-center mb-4'>
         <h1
-          className={`text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r ${styling.accentColor} bg-clip-text text-transparent`}
+          className={`text-xl sm:text-2xl md:text-3xl font-bold mb-3 bg-gradient-to-r ${styling.accentColor} bg-clip-text text-transparent`}
         >
           {content.title}
         </h1>
-        <p className='text-sm sm:text-base text-white/90 max-w-2xl mx-auto mb-4'>
+        <p className='text-xs sm:text-sm text-white/90 max-w-2xl mx-auto mb-3'>
           {content.description}
         </p>
       </div>
 
       {/* Navigation Actions - Show on templates and builder pages */}
       {(currentPage === 'templates' || currentPage === 'builder') && (
-        <div className='flex justify-center mb-6'>
-          <div className='flex items-center space-x-2'>
+        <div className='flex justify-center mb-4'>
+          <div className='flex items-center space-x-1'>
+            {/* Back to Manager Button - Show on builder page */}
+            {currentPage === 'builder' && onBackToManager && (
+              <div className='relative inline-block'>
+                <Tooltip content='Go back to resume manager' position='top'>
+                  <button
+                    type='button'
+                    onClick={onBackToManager}
+                    className='flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2'
+                    aria-label='Back to Resume Manager'
+                    title='Back to Resume Manager'
+                  >
+                    <svg
+                      className='w-4 h-4 text-white'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2.5}
+                        d='M10 19l-7-7m0 0l7-7m-7 7h18'
+                      />
+                    </svg>
+                  </button>
+                </Tooltip>
+              </div>
+            )}
             {currentPage === 'templates' && (
               <Tooltip content='Back to Builder' position='bottom'>
                 <button
                   type='button'
-                  className='flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2'
+                  className='flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2'
                   aria-disabled='false'
                   aria-busy='false'
                   tabIndex={0}
@@ -182,7 +222,7 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
                   onClick={() => (window.location.href = '/resume/builder')}
                 >
                   <svg
-                    className='w-5 h-5 text-white'
+                    className='w-4 h-4 text-white'
                     fill='none'
                     stroke='currentColor'
                     viewBox='0 0 24 24'
@@ -201,7 +241,7 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
               <Tooltip content='View Templates' position='bottom'>
                 <button
                   type='button'
-                  className='flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2'
+                  className='flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2'
                   aria-disabled='false'
                   aria-busy='false'
                   tabIndex={0}
@@ -211,7 +251,7 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
                   }
                 >
                   <svg
-                    className='w-5 h-5 text-white'
+                    className='w-4 h-4 text-white'
                     fill='none'
                     stroke='currentColor'
                     viewBox='0 0 24 24'
@@ -232,11 +272,11 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
 
       {/* ATS Analysis Info - Show on builder page when data is available */}
       {currentPage === 'builder' && analysisResult && Boolean(resumeData) && (
-        <div className='bg-white/10 rounded-lg p-4 mb-6 border border-white/20'>
-          <div className='flex items-center space-x-3'>
-            <div className='w-8 h-8 bg-white/20 rounded-full flex items-center justify-center'>
+        <div className='bg-white/10 rounded-lg p-3 mb-4 border border-white/20'>
+          <div className='flex items-center space-x-2'>
+            <div className='w-6 h-6 bg-white/20 rounded-full flex items-center justify-center'>
               <svg
-                className='w-5 h-5'
+                className='w-4 h-4'
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
@@ -250,7 +290,7 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
               </svg>
             </div>
             <div>
-              <p className='text-sm opacity-90'>
+              <p className='text-xs opacity-90'>
                 Your resume data from the ATS checker has been loaded.
                 {analysisResult.jobType && (
                   <>
@@ -277,11 +317,11 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
       )}
 
       {/* Start New Analysis Button */}
-      <div className='text-center mt-6'>
+      <div className='text-center mt-4'>
         <Tooltip content='Start a new ATS analysis' position='top'>
           <button
             onClick={() => (window.location.href = '/resume/ats-checker')}
-            className={`px-6 py-3 bg-gradient-to-r ${styling.gradient} hover:opacity-90 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-background`}
+            className={`px-4 py-2 bg-gradient-to-r ${styling.gradient} hover:opacity-90 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-background text-sm`}
             aria-label='Start new analysis'
           >
             🆕 Start New Analysis
@@ -295,8 +335,9 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
           isOpen={showValidationModal}
           onClose={handleValidationCancel}
           onProceed={handleValidationProceed}
+          onAIImprove={handleAIImprove}
           validationResult={validationResult}
-          actionType='export'
+          actionType='navigate'
         />
       )}
     </div>

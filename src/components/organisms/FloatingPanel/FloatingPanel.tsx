@@ -75,7 +75,13 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
     {
       id: 'export',
       label: 'Export',
-      content: <ExportTab resumeData={resumeData} template={template} onTemplateChange={onTemplateChange} />,
+      content: (
+        <ExportTab
+          resumeData={resumeData}
+          template={template}
+          onTemplateChange={onTemplateChange}
+        />
+      ),
     },
     {
       id: 'ats',
@@ -194,61 +200,71 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                 customization, validation, and export tools
               </p>
               <div className='flex items-center gap-1 sm:gap-2'>
-                <Button
-                  onClick={toggleExpanded}
-                  variant='ghost'
-                  size='sm'
-                  className='hidden md:flex'
-                  aria-label={isExpanded ? 'Collapse panel' : 'Expand panel'}
-                  icon={
-                    <svg
-                      className='w-4 h-4'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                      aria-hidden='true'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d={
-                          isExpanded
-                            ? 'M9 9V4.5M9 9H4.5M9 9L3.5 3.5M15 9h4.5M15 9V4.5M15 9l5.5-5.5M9 15v4.5M9 15H4.5M9 15l-5.5 5.5M15 15h4.5M15 15v4.5m0-4.5l5.5 5.5'
-                            : 'M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4'
-                        }
-                      />
-                    </svg>
-                  }
-                >
-                  <span className='hidden lg:inline'>
-                    {isExpanded ? 'Collapse' : 'Expand'}
-                  </span>
-                </Button>
-                <Button
-                  onClick={closePanel}
-                  variant='ghost'
-                  size='sm'
-                  aria-label='Close panel'
-                  icon={
-                    <svg
-                      className='w-4 h-4'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                      aria-hidden='true'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M6 18L18 6M6 6l12 12'
-                      />
-                    </svg>
-                  }
-                >
-                  <span className='hidden sm:inline'>Close</span>
-                </Button>
+                <div className='relative group hidden md:block'>
+                  <Button
+                    onClick={toggleExpanded}
+                    variant='ghost'
+                    size='sm'
+                    className='p-2'
+                    aria-label={isExpanded ? 'Collapse panel' : 'Expand panel'}
+                    icon={
+                      <svg
+                        className='w-4 h-4'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                        aria-hidden='true'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d={
+                            isExpanded
+                              ? 'M9 9V4.5M9 9H4.5M9 9L3.5 3.5M15 9h4.5M15 9V4.5M15 9l5.5-5.5M9 15v4.5M9 15H4.5M9 15l-5.5 5.5M15 15h4.5M15 15v4.5m0-4.5l5.5 5.5'
+                              : 'M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4'
+                          }
+                        />
+                      </svg>
+                    }
+                  />
+                  {/* Tooltip */}
+                  <div className='absolute bottom-full right-0 mb-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
+                    {isExpanded ? 'Collapse panel' : 'Expand panel'}
+                    <div className='absolute top-full right-4 border-4 border-transparent border-t-neutral-900'></div>
+                  </div>
+                </div>
+
+                <div className='relative group'>
+                  <Button
+                    onClick={closePanel}
+                    variant='ghost'
+                    size='sm'
+                    className='p-2'
+                    aria-label='Close panel'
+                    icon={
+                      <svg
+                        className='w-4 h-4'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                        aria-hidden='true'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='M6 18L18 6M6 6l12 12'
+                        />
+                      </svg>
+                    }
+                  />
+                  {/* Tooltip */}
+                  <div className='absolute bottom-full right-0 mb-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
+                    Close panel
+                    <div className='absolute top-full right-4 border-4 border-transparent border-t-neutral-900'></div>
+                  </div>
+                </div>
               </div>
             </div>
 

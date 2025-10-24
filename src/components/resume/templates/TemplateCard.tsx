@@ -58,8 +58,8 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
   };
   const sizeClasses = {
     micro: {
-      container: 'p-0',
-      preview: 'aspect-square rounded-sm mb-0 h-8 w-8',
+      container: 'p-0.5',
+      preview: 'aspect-square rounded-sm mb-0.5 h-8 w-8',
       icon: 'w-2 h-2',
       text: 'text-xs',
       name: 'text-xs',
@@ -121,17 +121,17 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
         className={`group relative ${className}`}
       >
         <Card
-          className={`cursor-pointer transition-all duration-300 border-2 ${
+          className={`cursor-pointer transition-all duration-300 w-full ${
             isSelected
-              ? 'ring-2 ring-blue-500 shadow-xl scale-105 border-blue-200 bg-blue-50/30'
-              : 'border-slate-200 hover:border-slate-300 hover:shadow-lg bg-white'
+              ? 'border-4 border-blue-600 shadow-lg shadow-blue-500/20'
+              : 'border border-gray-300'
           }`}
           {...(onClick && { onClick: handleClick })}
         >
           <div className={currentSize.container}>
             {/* Template Preview */}
             <div
-              className={`${currentSize.preview} overflow-hidden shadow-md border-2 border-slate-200 relative group-hover:shadow-xl transition-all duration-300 rounded-lg`}
+              className={`${currentSize.preview} overflow-hidden relative transition-all duration-300 rounded-lg`}
               style={{
                 background: `linear-gradient(135deg, ${template.layout.colors.primary}15, ${template.layout.colors.accent}15, ${template.layout.colors.secondary}10)`,
               }}

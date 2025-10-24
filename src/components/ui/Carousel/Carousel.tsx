@@ -152,13 +152,13 @@ export const Carousel: React.FC<CarouselProps> = ({
             damping: 30,
           }}
           style={{
-            width: `${(totalItems * 100) / itemsPerView.desktop}%`,
+            width: `${Math.ceil(totalItems / itemsPerView.desktop) * 100}%`,
           }}
         >
           {children.map((child, index) => (
             <motion.div
               key={index}
-              className='flex-shrink-0'
+              className='flex-shrink-0 my-1'
               style={{
                 width: `${100 / totalItems}%`,
                 paddingRight: index < totalItems - 1 ? `${spacing}px` : '0',
@@ -167,11 +167,7 @@ export const Carousel: React.FC<CarouselProps> = ({
               whileTap={{ scale: 0.98 }}
             >
               <div
-                className={`cursor-pointer transition-all duration-300 flex justify-center ${
-                  selectedIndex === index
-                    ? 'ring-2 ring-blue-500 shadow-lg'
-                    : 'hover:shadow-md'
-                }`}
+                className='cursor-pointer transition-all duration-300 w-full'
                 onClick={() => selectItem(index)}
               >
                 {child}
@@ -187,7 +183,7 @@ export const Carousel: React.FC<CarouselProps> = ({
           <button
             onClick={prevSlide}
             disabled={currentIndex === 0}
-            className='absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-blue-500/90 hover:bg-blue-600 shadow-lg rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+            className='absolute -left-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-blue-500/90 hover:bg-blue-600 shadow-lg rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
             aria-label='Previous slide'
           >
             <svg
@@ -207,7 +203,7 @@ export const Carousel: React.FC<CarouselProps> = ({
           <button
             onClick={nextSlide}
             disabled={currentIndex === maxIndex}
-            className='absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-slate-600/90 hover:bg-slate-700 shadow-lg rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+            className='absolute -right-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-slate-600/90 hover:bg-slate-700 shadow-lg rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
             aria-label='Next slide'
           >
             <svg

@@ -4,8 +4,16 @@ declare module 'color-contrast-checker' {
   export class ContrastChecker {
     constructor();
     getRatio(color1: string, color2: string): number;
-    isLevelAA(foreground: string, background: string, fontSize: number): boolean;
-    isLevelAAA(foreground: string, background: string, fontSize: number): boolean;
+    isLevelAA(
+      foreground: string,
+      background: string,
+      fontSize: number
+    ): boolean;
+    isLevelAAA(
+      foreground: string,
+      background: string,
+      fontSize: number
+    ): boolean;
   }
 }
 

@@ -13,6 +13,7 @@ interface ResumeState {
   // Core resume data
   resumeData: ResumeData | null;
   analysisResult: AnalysisResult | null;
+  extractedDataBackup: ResumeData | null; // Backup of original extracted data
   selectedTemplate: ResumeTemplate | null;
   customizedTemplate: ResumeTemplate | null;
 
@@ -42,6 +43,7 @@ interface ResumeState {
   // Actions
   setResumeData: (data: ResumeData) => void;
   setAnalysisResult: (result: AnalysisResult) => void;
+  setExtractedDataBackup: (data: ResumeData) => void;
   setSelectedTemplate: (template: ResumeTemplate) => void;
   setCustomizedTemplate: (template: ResumeTemplate) => void;
   setCurrentStep: (step: ResumeState['currentStep']) => void;
@@ -72,6 +74,7 @@ interface ResumeState {
   clearAllData: () => void;
   clearAnalysisData: () => void;
   clearTemplateData: () => void;
+  resetToExtractedData: () => void; // Reset to original extracted data
 
   // Utility functions
   hasResumeData: () => boolean;
@@ -109,6 +112,7 @@ interface ResumeState {
 const initialState = {
   resumeData: null,
   analysisResult: null,
+  extractedDataBackup: null,
   selectedTemplate: null,
   customizedTemplate: null,
   isLoading: false,
@@ -153,6 +157,7 @@ export const useResumeStore = create<ResumeState>()(
       // Core setters
       setResumeData: data => set({ resumeData: data, error: null }),
       setAnalysisResult: result => set({ analysisResult: result, error: null }),
+      setExtractedDataBackup: data => set({ extractedDataBackup: data }),
       setSelectedTemplate: template =>
         set({
           selectedTemplate: template,
@@ -234,6 +239,15 @@ export const useResumeStore = create<ResumeState>()(
           selectedTemplate: null,
           customizedTemplate: null,
         }),
+      resetToExtractedData: () => {
+        const state = get();
+        if (state.extractedDataBackup) {
+          set({
+            resumeData: state.extractedDataBackup,
+            error: null,
+          });
+        }
+      },
 
       // Utility functions
       hasResumeData: () => !!get().resumeData,
@@ -581,6 +595,9 @@ export const useNavigation = () => {
 export const useResumeActions = () => {
   const setResumeData = useResumeStore(state => state.setResumeData);
   const setAnalysisResult = useResumeStore(state => state.setAnalysisResult);
+  const setExtractedDataBackup = useResumeStore(
+    state => state.setExtractedDataBackup
+  );
   const setSelectedTemplate = useResumeStore(
     state => state.setSelectedTemplate
   );
@@ -594,6 +611,9 @@ export const useResumeActions = () => {
   const clearAllData = useResumeStore(state => state.clearAllData);
   const clearAnalysisData = useResumeStore(state => state.clearAnalysisData);
   const clearTemplateData = useResumeStore(state => state.clearTemplateData);
+  const resetToExtractedData = useResumeStore(
+    state => state.resetToExtractedData
+  );
   const setSectionColors = useResumeStore(state => state.setSectionColors);
   const getSectionColors = useResumeStore(state => state.getSectionColors);
   const resetSectionColors = useResumeStore(state => state.resetSectionColors);
@@ -621,6 +641,7 @@ export const useResumeActions = () => {
     () => ({
       setResumeData,
       setAnalysisResult,
+      setExtractedDataBackup,
       setSelectedTemplate,
       setCustomizedTemplate,
       setUseUserData,
@@ -630,6 +651,7 @@ export const useResumeActions = () => {
       clearAllData,
       clearAnalysisData,
       clearTemplateData,
+      resetToExtractedData,
       setSectionColors,
       getSectionColors,
       resetSectionColors,
@@ -653,6 +675,7 @@ export const useResumeActions = () => {
     [
       setResumeData,
       setAnalysisResult,
+      setExtractedDataBackup,
       setSelectedTemplate,
       setCustomizedTemplate,
       setUseUserData,
@@ -662,6 +685,7 @@ export const useResumeActions = () => {
       clearAllData,
       clearAnalysisData,
       clearTemplateData,
+      resetToExtractedData,
       setSectionColors,
       getSectionColors,
       resetSectionColors,

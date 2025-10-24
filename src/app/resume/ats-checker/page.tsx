@@ -11,7 +11,12 @@ import { Section } from '@/components/ui/Section';
 // import { useResumeNavigation } from '@/contexts/ResumeNavigationContext';
 import { useAnalysisProgress } from '@/hooks/useAnalysisProgress';
 import { useResumeActions, useResumeStore } from '@/store/resumeStore';
-import type { ATSAnalysisBackendResponse, AnalysisResult } from '@/types';
+import type {
+  ATSAnalysisBackendResponse,
+  AnalysisResult,
+  CategorizedResume,
+  ResumeData,
+} from '@/types';
 
 // Note: Metadata is defined in layout.tsx
 
@@ -22,7 +27,13 @@ export default function ATSCheckerPage() {
   // Use global state
   const analysisResult = useResumeStore(state => state.analysisResult);
   const error = useResumeStore(state => state.error);
-  const { setAnalysisResult, setError, clearAnalysisData } = useResumeActions();
+  const {
+    setAnalysisResult,
+    setResumeData,
+    setExtractedDataBackup,
+    setError,
+    clearAnalysisData,
+  } = useResumeActions();
 
   // Progress tracking
   const {
@@ -33,6 +44,97 @@ export default function ATSCheckerPage() {
     completeAnalysis,
     setError: setProgressError,
   } = useAnalysisProgress();
+
+  // Convert categorized resume data to our ResumeData format
+  const convertCategorizedResumeToResumeData = (
+    categorizedResume: CategorizedResume,
+    skillsFound?: {
+      technical_programming?: string[];
+      technical_tools?: string[];
+      tools_software?: string[];
+      business_management?: string[];
+      financial_accounting?: string[];
+      sales_marketing?: string[];
+      soft_skills?: string[];
+      languages_spoken?: string[];
+      certifications?: string[];
+    }
+  ): ResumeData => {
+    return {
+      personal: {
+        fullName: categorizedResume.contact_info?.full_name || '',
+        email: categorizedResume.contact_info?.email || '',
+        phone:
+          typeof categorizedResume.contact_info?.phone === 'string'
+            ? categorizedResume.contact_info.phone
+            : categorizedResume.contact_info?.phone?.raw || '',
+        location:
+          typeof categorizedResume.contact_info?.location === 'string'
+            ? categorizedResume.contact_info.location
+            : categorizedResume.contact_info?.location?.full || '',
+        linkedin:
+          typeof categorizedResume.contact_info?.linkedin === 'string'
+            ? categorizedResume.contact_info.linkedin
+            : categorizedResume.contact_info?.linkedin?.url || '',
+        github:
+          typeof categorizedResume.contact_info?.github === 'string'
+            ? categorizedResume.contact_info.github
+            : categorizedResume.contact_info?.github?.url || '',
+        portfolio: categorizedResume.contact_info?.portfolio || '',
+      },
+      summary: categorizedResume.summary_profile || '',
+      experience:
+        categorizedResume.work_experience?.map(exp => ({
+          id: `exp-${Date.now()}-${Math.random()}`,
+          company: exp.company || '',
+          position: exp.role || '',
+          location: exp.location || '',
+          startDate: exp.start_date || '',
+          endDate: exp.end_date || '',
+          current: false, // Not available in ATS data
+          description: exp.duration || '',
+          achievements: [],
+          skills: [],
+        })) || [],
+      education:
+        categorizedResume.education?.map(edu => ({
+          id: `edu-${Date.now()}-${Math.random()}`,
+          institution:
+            typeof edu.institution === 'string'
+              ? edu.institution
+              : edu.institution?.name || '',
+          degree: edu.degree_full || '',
+          field: edu.major || '',
+          location: edu.institution?.location || '',
+          startDate: edu.duration?.start_year || '',
+          endDate: edu.duration?.end_year || '',
+          current: false, // Not available in ATS data
+          gpa: edu.grade?.value || '',
+          achievements: [],
+          relevantCoursework: [],
+        })) || [],
+      skills: {
+        technical: [
+          ...(skillsFound?.technical_programming || []),
+          ...(skillsFound?.technical_tools || []),
+          ...(skillsFound?.tools_software || []),
+        ],
+        business: [
+          ...(skillsFound?.business_management || []),
+          ...(skillsFound?.financial_accounting || []),
+          ...(skillsFound?.sales_marketing || []),
+        ],
+        soft: skillsFound?.soft_skills || [],
+        languages:
+          skillsFound?.languages_spoken || categorizedResume.languages || [],
+        certifications: skillsFound?.certifications || [],
+      },
+      projects: [], // Projects are not in categorized resume, will be empty
+      achievements: categorizedResume.achievements || [],
+      certifications: [], // Will be populated from skills if available
+      hobbies: categorizedResume.hobbies_interests || [],
+    };
+  };
 
   const handleFileUpload = (files: File[]) => {
     const uploadedFile = files[0]; // Take the first file
@@ -83,6 +185,19 @@ export default function ATSCheckerPage() {
 
       // Set the analysis result to display inline and switch to results tab
       setAnalysisResult(result);
+
+      // Extract and save structured resume data to global store
+      if (result.extraction_details?.categorized_resume) {
+        const extractedResumeData = convertCategorizedResumeToResumeData(
+          result.extraction_details.categorized_resume,
+          result.extraction_details.skills_found
+        );
+
+        // Save to both current resume data and backup
+        setResumeData(extractedResumeData);
+        setExtractedDataBackup(extractedResumeData);
+      }
+
       setActiveTab('results');
 
       toast.dismiss(loadingToast);
@@ -101,6 +216,8 @@ export default function ATSCheckerPage() {
   const handleNewUpload = () => {
     setFile(null);
     setAnalysisResult(null as unknown as AnalysisResult);
+    setResumeData(null as unknown as ResumeData);
+    setExtractedDataBackup(null as unknown as ResumeData);
     setError(null);
     setActiveTab('upload');
     // Clear analysis data from global state

@@ -1,6 +1,6 @@
 import { useResumeStore } from '@/store/resumeStore';
-import { useResumeStylingStore } from '@/store/resumeStylingStore';
 import type { ResumeStylingState } from '@/store/resumeStylingStore';
+import { useResumeStylingStore } from '@/store/resumeStylingStore';
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
 import { applyStylingToElement, generateCompleteCSS } from './stylingUtils';
@@ -126,7 +126,9 @@ export const exportToPDFUnified = async (
     const effectiveStyling = stylingState.getEffectiveStyling(
       options.template.id
     );
-    const allStyles = generateCompleteCSS(effectiveStyling as ResumeStylingState);
+    const allStyles = generateCompleteCSS(
+      effectiveStyling as ResumeStylingState
+    );
 
     // Create a complete HTML document with all styling preserved
     const htmlContent = `
@@ -201,7 +203,9 @@ export const exportToDOCXUnified = async (
     const effectiveStyling = stylingState.getEffectiveStyling(
       options.template.id
     );
-    const allStyles = generateCompleteCSS(effectiveStyling as ResumeStylingState);
+    const allStyles = generateCompleteCSS(
+      effectiveStyling as ResumeStylingState
+    );
 
     // Create HTML content
     const htmlContent = `
@@ -266,7 +270,6 @@ export const exportToDOCXUnified = async (
 export const exportToTXTUnified = async (
   options: UnifiedExportOptions
 ): Promise<void> => {
-
   try {
     // Get the current resume preview element
     const resumeElement = getResumePreviewElement();

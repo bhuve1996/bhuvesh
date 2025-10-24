@@ -13,14 +13,16 @@ interface ValidationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onProceed: () => void;
+  onAIImprove?: () => void;
   validationResult: ValidationResult;
-  actionType: 'save' | 'export';
+  actionType: 'save' | 'export' | 'navigate';
 }
 
 export const ValidationModal: React.FC<ValidationModalProps> = ({
   isOpen,
   onClose,
   onProceed,
+  onAIImprove,
   validationResult,
   actionType,
 }) => {
@@ -49,9 +51,17 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
             <div className='flex items-center justify-between'>
               <div>
                 <h2 className='text-2xl font-bold'>
-                  {actionType === 'save' ? 'Save Resume' : 'Export Resume'}
+                  {actionType === 'save'
+                    ? 'Save Resume'
+                    : actionType === 'export'
+                      ? 'Export Resume'
+                      : 'Navigate to Templates'}
                 </h2>
-                <p className='text-blue-100 mt-1'>Validation Check</p>
+                <p className='text-blue-100 mt-1'>
+                  {actionType === 'navigate'
+                    ? 'Resume Validation & AI Enhancement'
+                    : 'Validation Check'}
+                </p>
               </div>
               <button
                 onClick={onClose}
@@ -161,6 +171,54 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
               </div>
             )}
 
+            {/* AI Improvement Section - Show for navigate action */}
+            {actionType === 'navigate' && onAIImprove && (
+              <div className='mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200'>
+                <div className='flex items-start space-x-3'>
+                  <div className='w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0'>
+                    <svg
+                      className='w-5 h-5 text-white'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z'
+                      />
+                    </svg>
+                  </div>
+                  <div className='flex-1'>
+                    <h4 className='font-medium text-purple-900 mb-2'>
+                      🤖 AI-Powered Resume Enhancement
+                    </h4>
+                    <p className='text-sm text-purple-700 mb-3'>
+                      Improve your resume's ATS compatibility and content
+                      quality with AI suggestions. Our AI will analyze your
+                      current resume and provide targeted improvements for
+                      better job matching.
+                    </p>
+                    <div className='flex flex-wrap gap-2'>
+                      <button
+                        onClick={onAIImprove}
+                        className='px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white text-sm rounded-lg font-medium transition-all duration-200 transform hover:scale-105 shadow-md'
+                      >
+                        ✨ Enhance with AI
+                      </button>
+                      <button
+                        onClick={onProceed}
+                        className='px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg font-medium transition-colors'
+                      >
+                        Continue to Templates
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Quick Actions */}
             {validationResult.missingRequired.length > 0 && (
               <div className='mt-6 p-4 bg-blue-50 rounded-lg'>
@@ -216,7 +274,11 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                 }`}
               >
                 {messages.canProceed
-                  ? `${actionType === 'save' ? 'Save' : 'Export'} Anyway`
+                  ? actionType === 'save'
+                    ? 'Save Anyway'
+                    : actionType === 'export'
+                      ? 'Export Anyway'
+                      : 'Continue to Templates'
                   : 'Complete Required Fields'}
               </Button>
             </div>

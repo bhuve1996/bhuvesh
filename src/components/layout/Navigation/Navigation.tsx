@@ -178,7 +178,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                 </Tooltip>
               </motion.div>
             ))}
-            
+
             {/* User Profile & Theme Toggle for Medium Screens */}
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
@@ -203,7 +203,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               <UserProfile />
               <ThemeToggle size='sm' />
             </div>
-            
+
             {/* Mobile Menu Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -286,7 +286,6 @@ export const Navigation: React.FC<NavigationProps> = ({
                       )}
                     </motion.div>
                   ))}
-
                 </div>
               </div>
             </motion.div>

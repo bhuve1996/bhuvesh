@@ -1,12 +1,12 @@
 import {
-  Project,
   BlogPost,
-  Experience,
-  Education,
   Certification,
-  Skills,
-  Service,
+  Education,
+  Experience,
   ProcessStep,
+  Project,
+  Service,
+  Skills,
   Testimonial,
 } from './data-types';
 

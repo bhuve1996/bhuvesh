@@ -59,7 +59,7 @@ export const TemplateCarousel: React.FC<TemplateCarouselProps> = ({
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className={`w-full bg-white border-t border-slate-200 shadow-lg ${className}`}
     >
-      <div className='max-w-6xl mx-auto px-4 py-4'>
+      <div className='max-w-6xl mx-auto px-4 py-6'>
         {showLabels && (
           <div className='flex items-center justify-between mb-4'>
             <div>
@@ -91,26 +91,28 @@ export const TemplateCarousel: React.FC<TemplateCarouselProps> = ({
           </div>
         )}
 
-        <Carousel
-          itemsPerView={{ mobile: 2, tablet: 3, desktop: 5 }}
-          spacing={16}
-          onItemSelect={handleTemplateSelect}
-          selectedIndex={selectedIndex}
-          showDots={false}
-          showArrows={true}
-          className='template-carousel'
-        >
-          {templates.map(template => (
-            <TemplateCard
-              key={template.id}
-              template={template}
-              isSelected={selectedTemplate?.id === template.id}
-              onClick={() => onTemplateSelect(template)}
-              size='micro'
-              showDetails={false}
-            />
-          ))}
-        </Carousel>
+        <div className='h-20 my-2'>
+          <Carousel
+            itemsPerView={{ mobile: 3, tablet: 4, desktop: 6 }}
+            spacing={8}
+            onItemSelect={handleTemplateSelect}
+            selectedIndex={selectedIndex}
+            showDots={false}
+            showArrows={true}
+            className='template-carousel h-full'
+          >
+            {templates.map(template => (
+              <TemplateCard
+                key={template.id}
+                template={template}
+                isSelected={selectedTemplate?.id === template.id}
+                onClick={() => onTemplateSelect(template)}
+                size='micro'
+                showDetails={false}
+              />
+            ))}
+          </Carousel>
+        </div>
       </div>
     </motion.div>
   );

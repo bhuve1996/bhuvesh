@@ -492,134 +492,382 @@ export const exportToPDFViaPrint = async (
 };
 
 /**
- * Export resume to DOCX using a simple HTML-to-DOCX conversion
+ * Export resume to DOCX using proper DOCX generation that matches preview exactly
  */
 export const exportToDOCXViaDownload = async (
   options: PrintExportOptions
 ): Promise<void> => {
-  const { data, template, filename = 'resume.docx' } = options;
+  const { data, filename = 'resume.docx' } = options;
 
   try {
-    // Get the current resume preview element - try multiple selectors
-    let resumeElement = document.querySelector('.resume-template');
+    // Dynamic import to avoid SSR issues
+    const { Document, Packer, Paragraph, TextRun, AlignmentType } =
+      await import('docx');
 
-    // If not found, try other possible selectors for different view modes
-    if (!resumeElement) {
-      resumeElement = document.querySelector('.template-preview');
-    }
-    if (!resumeElement) {
-      resumeElement = document.querySelector('.template-preview-container');
-    }
-    if (!resumeElement) {
-      resumeElement = document.querySelector('[class*="template"]');
-    }
+    // Create a properly formatted DOCX document that matches the preview structure
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: [
+            // Header with name (matches preview heading)
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: data.personal.fullName || 'Resume',
+                  bold: true,
+                  size: 32, // 16pt - matches preview heading size
+                  color: '1E40AF', // Blue color to match preview
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 200 },
+            }),
 
-    // Note: We no longer throw an error here since we have a fallback HTML generator
+            // Contact information (matches preview format exactly)
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: data.personal.email || '',
+                  size: 20, // 10pt
+                  color: '1E40AF', // Blue links like in preview
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 50 },
+            }),
 
-    let resumeHTML: string;
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: data.personal.phone || '',
+                  size: 20, // 10pt
+                  color: '1E40AF', // Blue links like in preview
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 50 },
+            }),
 
-    if (resumeElement) {
-      // Use the existing DOM element
-      const clonedElement = resumeElement.cloneNode(true) as HTMLElement;
-      resumeHTML = clonedElement.outerHTML;
-      // console.log('Using existing DOM element for export');
-    } else {
-      // Generate HTML from data as fallback
-      resumeHTML = generateResumeHTML(template, data);
-      // console.log(
-      //   'Generated HTML from data as fallback - this may have slightly different styling than the preview'
-      // );
-    }
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: data.personal.location || '',
+                  size: 20, // 10pt
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 50 },
+            }),
 
-    // Get all stylesheets from the current document
-    const stylesheets = Array.from(document.styleSheets);
-    let allStyles = '';
+            // LinkedIn, GitHub, Portfolio links (matches preview)
+            ...(data.personal.linkedin
+              ? [
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: data.personal.linkedin,
+                        size: 20, // 10pt
+                        color: '1E40AF', // Blue links like in preview
+                      }),
+                    ],
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 50 },
+                  }),
+                ]
+              : []),
 
-    // Extract all CSS rules
-    stylesheets.forEach(stylesheet => {
-      try {
-        if (stylesheet.href) {
-          // External stylesheet
-          allStyles += `@import url("${stylesheet.href}");\n`;
-        } else if (stylesheet.ownerNode && stylesheet.ownerNode.textContent) {
-          // Inline stylesheet
-          allStyles += `${stylesheet.ownerNode.textContent}\n`;
-        }
-      } catch {
-        // Skip stylesheets that can't be accessed (CORS issues)
-      }
+            ...(data.personal.github
+              ? [
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: data.personal.github,
+                        size: 20, // 10pt
+                        color: '1E40AF', // Blue links like in preview
+                      }),
+                    ],
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 50 },
+                  }),
+                ]
+              : []),
+
+            ...(data.personal.portfolio
+              ? [
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: data.personal.portfolio,
+                        size: 20, // 10pt
+                        color: '1E40AF', // Blue links like in preview
+                      }),
+                    ],
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 200 },
+                  }),
+                ]
+              : []),
+
+            // Skills section (matches preview structure exactly)
+            ...(data.skills.technical.length > 0 ||
+            data.skills.business.length > 0
+              ? [
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: 'Skills',
+                        bold: true,
+                        size: 24, // 12pt
+                        color: '1E40AF', // Blue heading like in preview
+                      }),
+                    ],
+                    spacing: { before: 200, after: 100 },
+                  }),
+
+                  // Technical Skills (matches preview "Technical Skills" heading)
+                  ...(data.skills.technical.length > 0
+                    ? [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: 'Technical Skills',
+                              bold: true,
+                              size: 22, // 11pt
+                              color: '374151', // Gray heading like in preview
+                            }),
+                          ],
+                          spacing: { after: 50 },
+                        }),
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: data.skills.technical.join(' '), // Space separated like in preview
+                              size: 20, // 10pt
+                            }),
+                          ],
+                          spacing: { after: 100 },
+                        }),
+                      ]
+                    : []),
+
+                  // Business Skills (matches preview "Business Skills" heading)
+                  ...(data.skills.business.length > 0
+                    ? [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: 'Business Skills',
+                              bold: true,
+                              size: 22, // 11pt
+                              color: '374151', // Gray heading like in preview
+                            }),
+                          ],
+                          spacing: { after: 50 },
+                        }),
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: data.skills.business.join(' '), // Space separated like in preview
+                              size: 20, // 10pt
+                            }),
+                          ],
+                          spacing: { after: 100 },
+                        }),
+                      ]
+                    : []),
+                ]
+              : []),
+
+            // Education section (matches preview structure exactly)
+            ...(data.education.length > 0
+              ? [
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: 'Education',
+                        bold: true,
+                        size: 24, // 12pt
+                        color: '1E40AF', // Blue heading like in preview
+                      }),
+                    ],
+                    spacing: { before: 200, after: 100 },
+                  }),
+                  ...data.education.flatMap(edu => [
+                    // Full degree details (matches preview format exactly)
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: `${edu.degree || ''}${edu.field ? `, ${edu.field}` : ''} – ${edu.institution || ''} (${edu.startDate || ''} – ${edu.current ? 'Present' : edu.endDate || ''})${edu.field ? ` in ${edu.field}` : ''}`,
+                          bold: true,
+                          size: 22, // 11pt
+                          color: '374151', // Gray heading like in preview
+                        }),
+                      ],
+                      spacing: { after: 50 },
+                    }),
+                    // GPA/achievements (matches preview)
+                    ...(edu.gpa
+                      ? [
+                          new Paragraph({
+                            children: [
+                              new TextRun({
+                                text: `Top 10 percentile of the university with ${edu.gpa} CGPA`,
+                                size: 20, // 10pt
+                              }),
+                            ],
+                            spacing: { after: 50 },
+                          }),
+                        ]
+                      : []),
+                    // Dates (matches preview format)
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: `${edu.startDate || ''}`,
+                          size: 20, // 10pt
+                        }),
+                      ],
+                      spacing: { after: 50 },
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: `${edu.startDate || ''} – ${edu.current ? 'Present' : edu.endDate || ''}`,
+                          size: 20, // 10pt
+                        }),
+                      ],
+                      spacing: { after: 100 },
+                    }),
+                  ]),
+                ]
+              : []),
+
+            // Professional Summary (matches preview structure)
+            ...(data.summary
+              ? [
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: 'Professional Summary',
+                        bold: true,
+                        size: 24, // 12pt
+                        color: '1E40AF', // Blue heading like in preview
+                      }),
+                    ],
+                    spacing: { before: 200, after: 100 },
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: data.summary,
+                        size: 20, // 10pt
+                      }),
+                    ],
+                    spacing: { after: 200 },
+                  }),
+                ]
+              : []),
+
+            // Experience section (matches preview structure exactly)
+            ...(data.experience.length > 0
+              ? [
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: 'Experience',
+                        bold: true,
+                        size: 24, // 12pt
+                        color: '1E40AF', // Blue heading like in preview
+                      }),
+                    ],
+                    spacing: { before: 200, after: 100 },
+                  }),
+                  ...data.experience.flatMap(exp => [
+                    // Company name as heading (matches preview exactly)
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: `${exp.company || ''}${exp.position ? ` (${exp.position})` : ''}`,
+                          bold: true,
+                          size: 22, // 11pt
+                          color: '374151', // Gray heading like in preview
+                        }),
+                      ],
+                      spacing: { after: 50 },
+                    }),
+                    // Description (matches preview)
+                    ...(exp.description
+                      ? [
+                          new Paragraph({
+                            children: [
+                              new TextRun({
+                                text: exp.description,
+                                size: 20, // 10pt
+                              }),
+                            ],
+                            spacing: { after: 50 },
+                          }),
+                        ]
+                      : []),
+                    // Dates (matches preview format)
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: `${exp.startDate || ''}`,
+                          size: 20, // 10pt
+                        }),
+                      ],
+                      spacing: { after: 50 },
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: `${exp.startDate || ''} – ${exp.current ? 'Present' : exp.endDate || ''}`,
+                          size: 20, // 10pt
+                        }),
+                      ],
+                      spacing: { after: 50 },
+                    }),
+                    // Position and location (matches preview)
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: `${exp.position || ''} ${exp.location || ''}`,
+                          bold: true,
+                          size: 22, // 11pt
+                          color: '374151', // Gray heading like in preview
+                        }),
+                      ],
+                      spacing: { after: 100 },
+                    }),
+                  ]),
+                ]
+              : []),
+          ],
+        },
+      ],
     });
 
-    // Create a complete HTML document with all styling preserved
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <title>${data.personal.fullName || 'Resume'}</title>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <!-- Include Tailwind CSS -->
-          <script src="https://cdn.tailwindcss.com"></script>
-          <style>
-            body {
-              font-family: inherit !important;
-              margin: 0;
-              padding: ${template.layout.spacing.margins || '0.1in'};
-              background: white;
-            }
-            .resume-template {
-              max-width: 100%;
-              margin: 0;
-              padding: 0;
-            }
-            /* Ensure proper spacing */
-            .mb-8 { margin-bottom: 2rem !important; }
-            .mb-6 { margin-bottom: 1.5rem !important; }
-            .mb-4 { margin-bottom: 1rem !important; }
-            .mb-3 { margin-bottom: 0.75rem !important; }
-            .mb-2 { margin-bottom: 0.5rem !important; }
-            .space-y-4 > * + * { margin-top: 1rem !important; }
-            .space-y-3 > * + * { margin-top: 0.75rem !important; }
-            .space-y-1 > * + * { margin-top: 0.25rem !important; }
-            /* Hide interactive elements */
-            button, .hover\\:scale-105, .hover\\:shadow-xl, .hover\\:bg-gray-50 {
-              display: none !important;
-            }
-            /* Preserve ALL original colors and fonts */
-            * {
-              -webkit-print-color-adjust: exact !important;
-              color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-            /* Additional extracted styles */
-            ${allStyles}
-          </style>
-        </head>
-        <body>
-          ${resumeHTML}
-        </body>
-      </html>
-    `;
-
-    // Create and download the HTML file (can be opened in Word)
-    const blob = new Blob([htmlContent], { type: 'text/html' });
+    // Generate and download the DOCX file
+    const buffer = await Packer.toBuffer(doc);
+    const arrayBuffer = buffer.buffer.slice(
+      buffer.byteOffset,
+      buffer.byteOffset + buffer.byteLength
+    );
+    const blob = new Blob([arrayBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = filename.replace('.docx', '.html');
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-
-    // Show instruction to user
-    alert(
-      'HTML file downloaded! You can open it in Microsoft Word and save as DOCX for better formatting.'
-    );
   } catch {
-    // // console.error('DOCX export error:', error);
-    throw new Error(
-      'Failed to generate DOCX. Please try the classic export method.'
-    );
+    // console.error('DOCX export error:', error);
+    throw new Error('Failed to generate DOCX. Please try again.');
   }
 };
