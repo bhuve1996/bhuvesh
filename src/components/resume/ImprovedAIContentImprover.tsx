@@ -58,7 +58,8 @@ export const ImprovedAIContentImprover: React.FC<
         throw new Error('Failed to analyze current resume');
       }
 
-      const currentScore = (analysisResult.data as { ats_score?: number }).ats_score || 0;
+      const currentScore =
+        (analysisResult.data as { ats_score?: number }).ats_score || 0;
 
       // Generate improvement plan using the backend API
       const improvementPlan = await atsApi.getImprovementPlan(
@@ -75,7 +76,9 @@ export const ImprovedAIContentImprover: React.FC<
       const improvements = await applyAIImprovements(
         resumeData,
         section,
-        improvementPlan.data as { improvements?: Array<{ category?: string; section?: string }> }
+        improvementPlan.data as {
+          improvements?: Array<{ category?: string; section?: string }>;
+        }
       );
 
       // Calculate new score (simulate improvement)
@@ -107,7 +110,9 @@ export const ImprovedAIContentImprover: React.FC<
   const applyAIImprovements = async (
     data: ResumeData,
     section: keyof ResumeData,
-    improvementPlan: { improvements?: Array<{ category?: string; section?: string }> }
+    improvementPlan: {
+      improvements?: Array<{ category?: string; section?: string }>;
+    }
   ): Promise<ContentImprovement[]> => {
     const improvements: ContentImprovement[] = [];
 
@@ -230,7 +235,10 @@ export const ImprovedAIContentImprover: React.FC<
     const randomVerb =
       actionVerbs[Math.floor(Math.random() * actionVerbs.length)];
 
-    if (randomVerb && !improved.toLowerCase().startsWith(randomVerb.toLowerCase())) {
+    if (
+      randomVerb &&
+      !improved.toLowerCase().startsWith(randomVerb.toLowerCase())
+    ) {
       improved = `${randomVerb} ${improved.toLowerCase()}`;
     }
 
@@ -244,7 +252,10 @@ export const ImprovedAIContentImprover: React.FC<
     return improved;
   };
 
-  const generateImprovedSkills = (skills: Record<string, string[]>, _suggestions: Array<{ category?: string; section?: string }>): Record<string, string[]> => {
+  const generateImprovedSkills = (
+    skills: Record<string, string[]>,
+    _suggestions: Array<{ category?: string; section?: string }>
+  ): Record<string, string[]> => {
     const improved = { ...skills };
 
     // Add relevant technical skills if missing
@@ -345,7 +356,10 @@ export const ImprovedAIContentImprover: React.FC<
     return text;
   };
 
-  const getSectionData = (data: ResumeData, section: keyof ResumeData): Record<string, unknown> => {
+  const getSectionData = (
+    data: ResumeData,
+    section: keyof ResumeData
+  ): Record<string, unknown> => {
     switch (section) {
       case 'summary':
         return { summary: data.summary };

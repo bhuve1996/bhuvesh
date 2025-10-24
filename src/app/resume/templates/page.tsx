@@ -468,7 +468,6 @@ export default function TemplateGalleryPage() {
                       />
                     )}
                   </div>
-
                 </div>
               ) : (
                 <div className='text-center py-12'>
@@ -663,7 +662,6 @@ export default function TemplateGalleryPage() {
                       />
                     </div>
                   </div>
-
                 </div>
               ) : (
                 <div className='bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center'>

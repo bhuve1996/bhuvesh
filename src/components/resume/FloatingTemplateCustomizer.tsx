@@ -249,7 +249,9 @@ export const FloatingTemplateCustomizer: React.FC<
     property: string,
     value: string | number
   ) => {
-    const updatedTemplate = { ...template } as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> };
+    const updatedTemplate = { ...template } as ResumeTemplate & {
+      customStyles?: Record<string, Record<string, string>>;
+    };
 
     if (!updatedTemplate.layout) {
       updatedTemplate.layout = {
@@ -272,7 +274,12 @@ export const FloatingTemplateCustomizer: React.FC<
             small: '0.875rem',
           },
         },
-        spacing: { padding: '1rem', margins: '0.5rem', lineHeight: 1.5, sectionGap: '1rem' },
+        spacing: {
+          padding: '1rem',
+          margins: '0.5rem',
+          lineHeight: 1.5,
+          sectionGap: '1rem',
+        },
       };
     }
 
@@ -300,7 +307,11 @@ export const FloatingTemplateCustomizer: React.FC<
 
   const getCurrentValue = (section: string, property: string): string => {
     return (
-      (template as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> }).customStyles?.[section]?.[property] ||
+      (
+        template as ResumeTemplate & {
+          customStyles?: Record<string, Record<string, string>>;
+        }
+      ).customStyles?.[section]?.[property] ||
       getDefaultValue(section, property)
     );
   };
@@ -725,7 +736,11 @@ export const FloatingTemplateCustomizer: React.FC<
                 <Button
                   onClick={() => {
                     // Reset to default template
-                    const defaultTemplate = { ...template } as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> };
+                    const defaultTemplate = {
+                      ...template,
+                    } as ResumeTemplate & {
+                      customStyles?: Record<string, Record<string, string>>;
+                    };
                     if (defaultTemplate.customStyles) {
                       delete defaultTemplate.customStyles;
                     }
