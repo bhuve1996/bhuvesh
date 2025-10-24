@@ -180,6 +180,7 @@ export interface TabItem {
 
 export interface TabsProps {
   items: TabItem[];
+  activeTab?: string;
   defaultActiveTab?: string;
   className?: string;
   variant?: 'default' | 'pills' | 'underline';

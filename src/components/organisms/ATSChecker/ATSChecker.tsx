@@ -233,7 +233,8 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
       {/* Tabs */}
       <Tabs
         items={tabItems}
-        defaultActiveTab={activeTab}
+        activeTab={activeTab}
+        onTabChange={tabId => setActiveTab(tabId as 'upload' | 'results')}
         className='max-w-6xl mx-auto'
       />
     </div>

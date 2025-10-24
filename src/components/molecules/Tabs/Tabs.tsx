@@ -4,21 +4,29 @@ import type { TabsProps } from '@/types/ui';
 
 export const Tabs: React.FC<TabsProps> = ({
   items,
+  activeTab: controlledActiveTab,
   defaultActiveTab,
   className = '',
   variant: _variant = 'default',
   onTabChange,
   ...props
 }) => {
-  const [activeTab, setActiveTab] = React.useState(
+  const [internalActiveTab, setInternalActiveTab] = React.useState(
     defaultActiveTab || items[0]?.id || ''
   );
+
+  // Use controlled activeTab if provided, otherwise use internal state
+  const activeTab =
+    controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   const handleTabChange = (tabId: string) => {
-    setActiveTab(tabId);
+    // Only update internal state if not controlled
+    if (controlledActiveTab === undefined) {
+      setInternalActiveTab(tabId);
+    }
     onTabChange?.(tabId);
   };
 

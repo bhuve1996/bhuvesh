@@ -32,7 +32,7 @@ export const ATSResults: React.FC<ATSResultsProps> = ({
   };
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6' role='region' aria-label='Analysis Results'>
       {/* Score Display */}
       <Card className='p-6'>
         <div className='text-center'>

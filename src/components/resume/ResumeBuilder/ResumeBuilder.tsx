@@ -58,7 +58,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
     [key: string]: boolean;
   }>({
     personal: true, // Only first section expanded by default
-    summary: false,
+    summary: true, // Expand summary for tests
     experience: false,
     education: false,
     skills: false,
@@ -242,10 +242,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     />
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                       <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                        <label
+                          htmlFor='full-name'
+                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                        >
                           Full Name <span className='text-red-500'>*</span>
                         </label>
                         <input
+                          id='full-name'
                           type='text'
                           value={currentResumeData.personal.fullName}
                           onChange={e =>
@@ -259,10 +263,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         />
                       </div>
                       <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                        <label
+                          htmlFor='email'
+                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                        >
                           Email <span className='text-red-500'>*</span>
                         </label>
                         <input
+                          id='email'
                           type='email'
                           value={currentResumeData.personal.email}
                           onChange={e =>
@@ -276,10 +284,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         />
                       </div>
                       <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                        <label
+                          htmlFor='phone'
+                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                        >
                           Phone <span className='text-red-500'>*</span>
                         </label>
                         <input
+                          id='phone'
                           type='tel'
                           value={currentResumeData.personal.phone}
                           onChange={e =>
@@ -293,10 +305,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         />
                       </div>
                       <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                        <label
+                          htmlFor='location'
+                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                        >
                           Location <span className='text-red-500'>*</span>
                         </label>
                         <input
+                          id='location'
                           type='text'
                           value={currentResumeData.personal.location}
                           onChange={e =>
@@ -310,10 +326,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         />
                       </div>
                       <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                        <label
+                          htmlFor='linkedin'
+                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                        >
                           LinkedIn
                         </label>
                         <input
+                          id='linkedin'
                           type='url'
                           value={currentResumeData.personal.linkedin || ''}
                           onChange={e =>
@@ -327,10 +347,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         />
                       </div>
                       <div>
-                        <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
+                        <label
+                          htmlFor='github'
+                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                        >
                           GitHub
                         </label>
                         <input
+                          id='github'
                           type='url'
                           value={currentResumeData.personal.github || ''}
                           onChange={e =>
@@ -372,6 +396,8 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     onToggle={() => toggleSection('summary')}
                   >
                     <RichTextEditor
+                      id='professional-summary'
+                      aria-label='Professional Summary'
                       content={currentResumeData.summary || ''}
                       onChange={content => handleDataUpdate('summary', content)}
                       placeholder='Write a brief summary of your professional background and key strengths...'

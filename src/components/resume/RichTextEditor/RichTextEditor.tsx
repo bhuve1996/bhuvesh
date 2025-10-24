@@ -13,6 +13,8 @@ interface RichTextEditorProps {
   placeholder?: string;
   className?: string;
   maxLength?: number;
+  id?: string;
+  'aria-label'?: string;
 }
 
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -21,6 +23,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   placeholder = 'Start typing...',
   className = '',
   maxLength = 500,
+  id,
+  'aria-label': ariaLabel,
 }) => {
   const [isClient, setIsClient] = React.useState(false);
 
@@ -40,10 +44,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         },
       }),
       Placeholder.configure({
-        placeholder,
+        placeholder: placeholder || 'Start typing...',
       }),
     ],
-    content,
+    content: content || '',
     immediatelyRender: false, // Fix SSR hydration issues
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
@@ -60,6 +64,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     editorProps: {
       attributes: {
         class: `prose prose-sm max-w-none focus:outline-none ${className}`,
+        ...(id && { id }),
+        ...(ariaLabel && { 'aria-label': ariaLabel }),
+        role: 'textbox',
+        'aria-multiline': 'true',
       },
     },
   });
