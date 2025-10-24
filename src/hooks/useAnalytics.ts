@@ -44,6 +44,7 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
     scrollDepthRef.current.clear();
 
     if (debug) {
+      // eslint-disable-next-line no-console
       console.log('Analytics: Page view tracked', { url, title });
     }
   }, [pathname, trackPageViews, debug]);
@@ -80,6 +81,7 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
         });
 
         if (debug) {
+          // eslint-disable-next-line no-console
           console.log('Analytics: Scroll depth tracked', {
             milestone,
             scrollPercentage,
@@ -115,6 +117,7 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
       });
 
       if (debug) {
+        // eslint-disable-next-line no-console
         console.log('Analytics: Time on page tracked', { timeSpent });
       }
     }, 30000);
@@ -132,6 +135,7 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
       analytics.trackEvent(event);
 
       if (debug) {
+        // eslint-disable-next-line no-console
         console.log('Analytics: Event tracked', event);
       }
     },
@@ -144,6 +148,7 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
       analytics.trackPageView(url, title);
 
       if (debug) {
+        // eslint-disable-next-line no-console
         console.log('Analytics: Page view tracked', { url, title });
       }
     },
@@ -152,10 +157,11 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
 
   // Set user properties function
   const setUserProperties = useCallback(
-    (properties: Record<string, any>) => {
+    (properties: Record<string, unknown>) => {
       analytics.setUserProperties(properties);
 
       if (debug) {
+        // eslint-disable-next-line no-console
         console.log('Analytics: User properties set', properties);
       }
     },
@@ -168,6 +174,7 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
       analytics.setUserId(userId);
 
       if (debug) {
+        // eslint-disable-next-line no-console
         console.log('Analytics: User ID set', userId);
       }
     },
@@ -179,7 +186,7 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
     (
       buttonId: string,
       buttonText?: string,
-      additionalData?: Record<string, any>
+      additionalData?: Record<string, unknown>
     ) => {
       trackEvent({
         event_name: ANALYTICS_EVENTS.INTERACTION.BUTTON_CLICKED,
@@ -200,7 +207,7 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
     (
       linkUrl: string,
       linkText?: string,
-      additionalData?: Record<string, any>
+      additionalData?: Record<string, unknown>
     ) => {
       trackEvent({
         event_name: ANALYTICS_EVENTS.INTERACTION.LINK_CLICKED,
@@ -218,7 +225,7 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
 
   // Track form submission
   const trackFormSubmission = useCallback(
-    (formId: string, formData?: Record<string, any>) => {
+    (formId: string, formData?: Record<string, unknown>) => {
       trackEvent({
         event_name: ANALYTICS_EVENTS.INTERACTION.FORM_SUBMITTED,
         event_category: 'interaction',

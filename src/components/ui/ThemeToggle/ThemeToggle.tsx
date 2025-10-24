@@ -79,6 +79,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
           ${className}
         `}
         aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        tabIndex={0}
       >
         {/* Sun Icon - Enhanced with rays */}
         <svg

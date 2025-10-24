@@ -8,7 +8,7 @@ export interface BaseAnalyticsEvent {
   event_category?: string;
   event_label?: string;
   value?: number;
-  custom_parameters?: Record<string, any>;
+  custom_parameters?: Record<string, unknown>;
 }
 
 export interface PageViewEvent extends BaseAnalyticsEvent {
@@ -89,14 +89,14 @@ export interface AnalyticsProvider {
   enabled: boolean;
   trackEvent: (event: AnalyticsEventData) => void;
   trackPageView: (url: string, title: string) => void;
-  setUserProperties: (properties: Record<string, any>) => void;
+  setUserProperties: (properties: Record<string, unknown>) => void;
   setUserId: (userId: string) => void;
 }
 
 export interface AnalyticsContextType {
   trackEvent: (event: AnalyticsEventData) => void;
   trackPageView: (url: string, title: string) => void;
-  setUserProperties: (properties: Record<string, any>) => void;
+  setUserProperties: (properties: Record<string, unknown>) => void;
   setUserId: (userId: string) => void;
   isEnabled: boolean;
 }

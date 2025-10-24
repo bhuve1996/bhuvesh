@@ -58,7 +58,10 @@ describe('Button Component', () => {
 
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute('aria-disabled', 'true');
-    expect(button).toHaveClass('opacity-50', 'cursor-not-allowed');
+    expect(button).toHaveClass(
+      'disabled:opacity-50',
+      'disabled:cursor-not-allowed'
+    );
   });
 
   it('shows loading state', () => {

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import React, { useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
@@ -83,10 +84,11 @@ export const ContactSection: React.FC = () => {
 
         {/* Theme-aware animated coding GIF */}
         <div className='absolute inset-0 opacity-85'>
-          <img
+          <Image
             src={getGifUrl()}
             alt='Coding animation background'
-            className='w-full h-full object-cover'
+            fill
+            className='object-cover'
             style={{
               filter:
                 theme === 'light'
@@ -97,6 +99,7 @@ export const ContactSection: React.FC = () => {
             onError={e => {
               e.currentTarget.style.display = 'none';
             }}
+            priority
           />
         </div>
         <div

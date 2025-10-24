@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Google Analytics 4 Provider
  * Implementation of Google Analytics 4 tracking
@@ -8,8 +9,8 @@ import type { AnalyticsEventData, AnalyticsProvider } from '../types';
 
 declare global {
   interface Window {
-    gtag: (...args: any[]) => void;
-    dataLayer: any[];
+    gtag: (...args: unknown[]) => void;
+    dataLayer: unknown[];
   }
 }
 
@@ -31,8 +32,8 @@ export class GoogleAnalyticsProvider implements AnalyticsProvider {
     window.dataLayer = window.dataLayer || [];
 
     // Define gtag function
-    window.gtag = function () {
-      window.dataLayer.push(arguments);
+    window.gtag = function (...args: unknown[]) {
+      window.dataLayer.push(args);
     };
 
     // Configure GA4
@@ -59,7 +60,7 @@ export class GoogleAnalyticsProvider implements AnalyticsProvider {
     if (!this.enabled || typeof window === 'undefined') return;
 
     try {
-      const eventData: Record<string, any> = {
+      const eventData: Record<string, unknown> = {
         event_category: event.event_category || 'general',
         event_label: event.event_label,
         value: event.value,
@@ -103,7 +104,7 @@ export class GoogleAnalyticsProvider implements AnalyticsProvider {
     }
   }
 
-  setUserProperties(properties: Record<string, any>): void {
+  setUserProperties(properties: Record<string, unknown>): void {
     if (!this.enabled || typeof window === 'undefined') return;
 
     try {

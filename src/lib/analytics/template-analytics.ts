@@ -12,7 +12,7 @@ export interface TemplateAnalyticsData {
   templateCategory: string;
   filterApplied?: string;
   searchQuery?: string;
-  additionalData?: Record<string, any>;
+  additionalData?: Record<string, unknown>;
 }
 
 export class TemplateAnalytics {

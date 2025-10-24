@@ -4,6 +4,12 @@ import './commands';
 // Import cypress-axe for accessibility testing
 import 'cypress-axe';
 
+// Import React and mount from cypress/react
+import { mount } from 'cypress/react';
+
+// Make mount available globally
+Cypress.Commands.add('mount', mount);
+
 // Global configuration for component testing
 beforeEach(() => {
   // Inject axe-core into the page

@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
 import { useResumeStore } from '@/store/resumeStore';
@@ -67,7 +73,9 @@ describe('FloatingActions Component', () => {
   it('renders floating action button', () => {
     render(<FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />);
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
     expect(fab).toBeInTheDocument();
     expect(fab).toHaveClass('w-14', 'h-14', 'rounded-full');
   });
@@ -75,7 +83,9 @@ describe('FloatingActions Component', () => {
   it('expands menu when clicked', async () => {
     render(<FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />);
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
     fireEvent.click(fab);
 
     await waitFor(() => {
@@ -88,7 +98,9 @@ describe('FloatingActions Component', () => {
   it('collapses menu when clicked again', async () => {
     render(<FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />);
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
     fireEvent.click(fab);
 
     await waitFor(() => {
@@ -107,7 +119,9 @@ describe('FloatingActions Component', () => {
   it('handles preview with templates action', async () => {
     render(<FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />);
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
     fireEvent.click(fab);
 
     await waitFor(() => {
@@ -124,7 +138,9 @@ describe('FloatingActions Component', () => {
 
     render(<FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />);
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
     fireEvent.click(fab);
 
     await waitFor(() => {
@@ -139,7 +155,9 @@ describe('FloatingActions Component', () => {
   it('handles save resume action', async () => {
     render(<FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />);
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
     fireEvent.click(fab);
 
     await waitFor(() => {
@@ -153,15 +171,21 @@ describe('FloatingActions Component', () => {
   it('has proper ARIA labels', () => {
     render(<FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />);
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
     expect(fab).toHaveAttribute('aria-label');
   });
 
   it('supports keyboard navigation', () => {
     render(<FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />);
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
-    fab.focus();
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
+    act(() => {
+      fab.focus();
+    });
     expect(fab).toHaveFocus();
 
     fireEvent.keyDown(fab, { key: 'Enter' });
@@ -171,7 +195,9 @@ describe('FloatingActions Component', () => {
   it('has proper focus management', () => {
     render(<FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />);
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
     expect(fab).toHaveAttribute('tabIndex', '0');
   });
 
@@ -188,7 +214,9 @@ describe('FloatingActions Component', () => {
       <FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />
     );
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
     fireEvent.click(fab);
 
     await waitFor(() => {
@@ -209,15 +237,17 @@ describe('FloatingActions Component', () => {
     );
 
     const container = screen
-      .getByRole('button', { name: /open actions menu/i })
-      .closest('div');
+      .getByRole('button', { name: /open floating actions menu/i })
+      .closest('.fixed');
     expect(container).toHaveClass('custom-floating-actions');
   });
 
   it('maintains state when toggling', async () => {
     render(<FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />);
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
 
     // Open menu
     fireEvent.click(fab);
@@ -243,7 +273,9 @@ describe('FloatingActions Component', () => {
   it('handles rapid clicks gracefully', async () => {
     render(<FloatingActions resumeData={mockResumeData} onSave={mockOnSave} />);
 
-    const fab = screen.getByRole('button', { name: /open actions menu/i });
+    const fab = screen.getByRole('button', {
+      name: /open floating actions menu/i,
+    });
 
     // Rapid clicks
     fireEvent.click(fab);

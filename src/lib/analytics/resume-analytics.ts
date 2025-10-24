@@ -16,7 +16,7 @@ export interface ResumeAnalyticsData {
   aiProvider?: string;
   exportFormat?: string;
   exportSize?: number;
-  additionalData?: Record<string, any>;
+  additionalData?: Record<string, unknown>;
 }
 
 export class ResumeAnalytics {

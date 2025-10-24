@@ -15,6 +15,7 @@ import type { NavigationProps } from '@/types';
 export const Navigation: React.FC<NavigationProps> = ({
   activeSection = 'home',
   onSectionClick,
+  className,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -48,7 +49,7 @@ export const Navigation: React.FC<NavigationProps> = ({
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className='w-full bg-background border-b border-border'
+      className={`w-full bg-background border-b border-border ${className || ''}`}
       role='navigation'
       aria-label='Main navigation'
     >
@@ -85,7 +86,6 @@ export const Navigation: React.FC<NavigationProps> = ({
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             className='hidden md:flex items-center space-x-1'
-            role='menubar'
           >
             {navItems.map((item, index) => (
               <motion.div
@@ -108,7 +108,6 @@ export const Navigation: React.FC<NavigationProps> = ({
                           ? 'text-primary-400 bg-primary-500/10'
                           : 'text-foreground hover:text-primary-400 hover:bg-muted/50'
                       }`}
-                      role='menuitem'
                       aria-current={isActive(item) ? 'page' : undefined}
                       tabIndex={0}
                     >
@@ -128,7 +127,6 @@ export const Navigation: React.FC<NavigationProps> = ({
                     <Link
                       href={item.href}
                       className='relative px-3 sm:px-4 py-2 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base'
-                      role='menuitem'
                       tabIndex={0}
                     >
                       <span className='relative z-10'>{item.label}</span>
@@ -160,6 +158,12 @@ export const Navigation: React.FC<NavigationProps> = ({
             whileTap={{ scale: 0.95 }}
             className='md:hidden relative p-2 text-foreground hover:text-primary-400 hover:bg-muted/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+              }
+            }}
             aria-label='Toggle mobile menu'
             aria-expanded={isMobileMenuOpen}
             aria-controls='mobile-menu'
@@ -229,17 +233,6 @@ export const Navigation: React.FC<NavigationProps> = ({
                       )}
                     </motion.div>
                   ))}
-
-                  {/* Mobile User Profile & Theme Toggle */}
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.3, delay: 0.5 }}
-                    className='px-4 py-3 flex flex-col items-center gap-3'
-                  >
-                    <UserProfile />
-                    <ThemeToggle size='md' />
-                  </motion.div>
                 </div>
               </div>
             </motion.div>

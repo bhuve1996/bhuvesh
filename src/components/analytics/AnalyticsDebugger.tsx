@@ -23,14 +23,31 @@ export function AnalyticsDebugger({
   maxEvents = 50,
 }: AnalyticsDebuggerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [events, setEvents] = useState<any[]>([]);
+  interface AnalyticsEventData {
+    event_name?: string;
+    event?: string;
+    event_category?: string;
+    event_label?: string;
+    custom_parameters?: Record<string, unknown>;
+  }
+
+  interface AnalyticsEvent {
+    id: number;
+    timestamp: string;
+    data: AnalyticsEventData;
+    level: string;
+  }
+
+  const [events, setEvents] = useState<AnalyticsEvent[]>([]);
   const [session, setSession] = useState(analytics.getSession());
 
   useEffect(() => {
     if (!enabled || !analyticsConfig.customEvents.debug) return;
 
     // Override console.log to capture analytics events
+    // eslint-disable-next-line no-console
     const originalLog = console.log;
+    // eslint-disable-next-line no-console
     console.log = (...args) => {
       if (
         args[0]?.includes?.('[Analytics]') ||
@@ -41,8 +58,8 @@ export function AnalyticsDebugger({
           {
             id: Date.now(),
             timestamp: new Date().toISOString(),
-            data: eventData,
-            type: 'event',
+            data: eventData as AnalyticsEventData,
+            level: 'event',
           },
           ...prev.slice(0, maxEvents - 1),
         ]);
@@ -51,6 +68,7 @@ export function AnalyticsDebugger({
     };
 
     return () => {
+      // eslint-disable-next-line no-console
       console.log = originalLog;
     };
   }, [enabled, maxEvents]);

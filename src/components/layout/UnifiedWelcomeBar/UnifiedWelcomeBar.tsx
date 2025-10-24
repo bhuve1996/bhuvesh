@@ -10,7 +10,7 @@ interface UnifiedWelcomeBarProps {
     jobType?: string;
     atsScore?: string | number;
   } | null;
-  resumeData?: any;
+  resumeData?: unknown;
 }
 
 export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
@@ -18,7 +18,14 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
   analysisResult,
   resumeData,
 }) => {
-  const getPageContent = () => {
+  const getPageContent = (): {
+    title: string;
+    description: string;
+    showWelcome: boolean;
+    showTemplates: boolean;
+    showBuilder: boolean;
+    showNavigation: boolean;
+  } => {
     switch (currentPage) {
       case 'ats-checker':
         return {
@@ -125,7 +132,8 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
               Resume Builder
             </h1>
             <p className='text-sm sm:text-base text-white/80 mt-1'>
-              Build and customize your professional resume with our intuitive editor
+              Build and customize your professional resume with our intuitive
+              editor
             </p>
           </div>
           <Tooltip content='View Templates' position='bottom'>
@@ -157,59 +165,15 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
       )}
 
       {/* Welcome Message and Navigation - Only show on builder page */}
-      {content.showWelcome && currentPage === 'builder' && analysisResult && resumeData && (
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center space-x-3'>
-            <div className='w-10 h-10 bg-white/20 rounded-full flex items-center justify-center'>
-              <svg
-                className='w-6 h-6'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-                />
-              </svg>
-            </div>
-            <div>
-              <h3 className='font-semibold text-lg'>
-                Welcome to the Resume Builder!
-              </h3>
-              <p className='text-sm opacity-90'>
-                Your resume data from the ATS checker has been loaded.
-                {analysisResult.jobType && (
-                  <>
-                    {' '}
-                    Detected job type:{' '}
-                    <span className='font-medium'>
-                      {analysisResult.jobType}
-                    </span>
-                  </>
-                )}
-                {analysisResult.atsScore && (
-                  <>
-                    {' '}
-                    • Previous ATS Score:{' '}
-                    <span className='font-medium'>
-                      {analysisResult.atsScore}/100
-                    </span>
-                  </>
-                )}
-              </p>
-            </div>
-          </div>
-          <div className='flex items-center space-x-3'>
-            <Tooltip content='Back to ATS Checker' position='bottom'>
-              <button
-                onClick={() => window.history.back()}
-                className='flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm font-medium transition-all duration-200 backdrop-blur-sm'
-              >
+      {content.showWelcome &&
+        currentPage === 'builder' &&
+        analysisResult &&
+        Boolean(resumeData) && (
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center space-x-3'>
+              <div className='w-10 h-10 bg-white/20 rounded-full flex items-center justify-center'>
                 <svg
-                  className='w-4 h-4'
+                  className='w-6 h-6'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
@@ -218,44 +182,91 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
                     strokeLinecap='round'
                     strokeLinejoin='round'
                     strokeWidth={2}
-                    d='M15 19l-7-7 7-7'
+                    d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
                   />
                 </svg>
-                <span>Back</span>
-              </button>
-            </Tooltip>
-            <Tooltip content='Next to Resume Builder' position='bottom'>
-              <button
-                onClick={() => {
-                  // Scroll to the first section or trigger next step
-                  const firstSection = document.querySelector(
-                    '[data-section="personal"]'
-                  );
-                  if (firstSection) {
-                    firstSection.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-                className='flex items-center space-x-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl'
-              >
-                <span>Next</span>
-                <svg
-                  className='w-4 h-4'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
+              </div>
+              <div>
+                <h3 className='font-semibold text-lg'>
+                  Welcome to the Resume Builder!
+                </h3>
+                <p className='text-sm opacity-90'>
+                  Your resume data from the ATS checker has been loaded.
+                  {analysisResult.jobType && (
+                    <>
+                      {' '}
+                      Detected job type:{' '}
+                      <span className='font-medium'>
+                        {analysisResult.jobType}
+                      </span>
+                    </>
+                  )}
+                  {analysisResult.atsScore && (
+                    <>
+                      {' '}
+                      • Previous ATS Score:{' '}
+                      <span className='font-medium'>
+                        {analysisResult.atsScore}/100
+                      </span>
+                    </>
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className='flex items-center space-x-3'>
+              <Tooltip content='Back to ATS Checker' position='bottom'>
+                <button
+                  onClick={() => window.history.back()}
+                  className='flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm font-medium transition-all duration-200 backdrop-blur-sm'
                 >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M9 5l7 7-7 7'
-                  />
-                </svg>
-              </button>
-            </Tooltip>
+                  <svg
+                    className='w-4 h-4'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M15 19l-7-7 7-7'
+                    />
+                  </svg>
+                  <span>Back</span>
+                </button>
+              </Tooltip>
+              <Tooltip content='Next to Resume Builder' position='bottom'>
+                <button
+                  onClick={() => {
+                    // Scroll to the first section or trigger next step
+                    const firstSection = document.querySelector(
+                      '[data-section="personal"]'
+                    );
+                    if (firstSection) {
+                      firstSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className='flex items-center space-x-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl'
+                >
+                  <span>Next</span>
+                  <svg
+                    className='w-4 h-4'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M9 5l7 7-7 7'
+                    />
+                  </svg>
+                </button>
+              </Tooltip>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Start New Analysis Button */}
       <div className='text-center mt-6'>

@@ -28,8 +28,9 @@ export const SEOPerformanceMonitor: React.FC<SEOPerformanceMonitorProps> = ({
 }) => {
   const [seoData, setSeoData] = useState<SEOPerformanceData | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  
+
   // Use the variable to avoid TypeScript warning
+  // eslint-disable-next-line no-console
   console.log('SEO analysis status:', isAnalyzing);
 
   const analyzePage = (): SEOPerformanceData => {

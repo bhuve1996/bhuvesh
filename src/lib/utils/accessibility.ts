@@ -7,7 +7,7 @@ export interface AccessibilityTestOptions {
   include?: string[];
   exclude?: string[];
   tags?: string[];
-  rules?: Record<string, any>;
+  rules?: Record<string, unknown>;
 }
 
 export interface ColorContrastResult {
@@ -19,10 +19,10 @@ export interface ColorContrastResult {
 }
 
 export interface AccessibilityTestResult {
-  violations: any[];
-  passes: any[];
-  incomplete: any[];
-  inapplicable: any[];
+  violations: unknown[];
+  passes: unknown[];
+  incomplete: unknown[];
+  inapplicable: unknown[];
 }
 
 /**
@@ -242,7 +242,7 @@ export class AccessibilityTester {
    */
   static async generateReport(container: HTMLElement): Promise<{
     score: number;
-    violations: any[];
+    violations: unknown[];
     recommendations: string[];
     passed: boolean;
   }> {
@@ -312,6 +312,7 @@ export const accessibilityMatchers = {
 
 // Extend Jest matchers
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
     interface Matchers<R> {
       toBeAccessible(): R;

@@ -59,6 +59,7 @@ class AnalyticsManager {
     this.isInitialized = true;
 
     if (analyticsConfig.customEvents.debug) {
+      // eslint-disable-next-line no-console
       console.log('Analytics Manager Initialized:', {
         providers: this.providers.map(p => p.name),
         session_id: this.session.session_id,
@@ -89,11 +90,13 @@ class AnalyticsManager {
       try {
         provider.trackEvent(enrichedEvent);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(`Analytics provider ${provider.name} error:`, error);
       }
     });
 
     if (analyticsConfig.customEvents.debug) {
+      // eslint-disable-next-line no-console
       console.log('Analytics Event Tracked:', {
         event: enrichedEvent,
         session: this.session,
@@ -113,6 +116,7 @@ class AnalyticsManager {
       try {
         provider.trackPageView(url, title);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(`Analytics provider ${provider.name} error:`, error);
       }
     });
@@ -130,6 +134,7 @@ class AnalyticsManager {
     });
 
     if (analyticsConfig.customEvents.debug) {
+      // eslint-disable-next-line no-console
       console.log('Analytics Page View Tracked:', {
         url,
         title,
@@ -139,18 +144,20 @@ class AnalyticsManager {
     }
   }
 
-  setUserProperties(properties: Record<string, any>): void {
+  setUserProperties(properties: Record<string, unknown>): void {
     if (!this.isInitialized) return;
 
     this.providers.forEach(provider => {
       try {
         provider.setUserProperties(properties);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(`Analytics provider ${provider.name} error:`, error);
       }
     });
 
     if (analyticsConfig.customEvents.debug) {
+      // eslint-disable-next-line no-console
       console.log('Analytics User Properties Set:', {
         properties,
         providers: this.providers.length,
@@ -167,11 +174,13 @@ class AnalyticsManager {
       try {
         provider.setUserId(userId);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(`Analytics provider ${provider.name} error:`, error);
       }
     });
 
     if (analyticsConfig.customEvents.debug) {
+      // eslint-disable-next-line no-console
       console.log('Analytics User ID Set:', {
         user_id: userId,
         session: this.session,

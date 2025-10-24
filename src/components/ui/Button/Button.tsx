@@ -13,6 +13,25 @@ export const Button: React.FC<ButtonProps> = ({
   loading = false,
   ...props
 }) => {
+  // Filter out motion props to prevent them from being passed to DOM elements
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const {
+    whileHover: _whileHover,
+    whileTap: _whileTap,
+    initial: _initial,
+    animate: _animate,
+    exit: _exit,
+    transition: _transition,
+    ...domProps
+  } = props as ButtonProps & {
+    whileHover?: unknown;
+    whileTap?: unknown;
+    initial?: unknown;
+    animate?: unknown;
+    exit?: unknown;
+    transition?: unknown;
+  };
+  /* eslint-enable @typescript-eslint/no-unused-vars */
   const baseClasses =
     'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background hover-lift hover-glow click-bounce';
 
@@ -44,15 +63,26 @@ export const Button: React.FC<ButtonProps> = ({
 
   const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (onClick && !disabled && !loading) {
+        onClick();
+      }
+    }
+  };
+
   return (
     <button
       type={type}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
       disabled={disabled || loading}
       className={classes}
       aria-disabled={disabled || loading}
       aria-busy={loading}
-      {...props}
+      tabIndex={0}
+      {...domProps}
     >
       {loading && (
         <svg

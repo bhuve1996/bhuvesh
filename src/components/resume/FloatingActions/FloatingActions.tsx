@@ -187,6 +187,11 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
                 ? 'bg-red-500 hover:bg-red-600'
                 : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600'
             }`}
+            aria-label={
+              isExpanded
+                ? 'Close floating actions menu'
+                : 'Open floating actions menu'
+            }
           >
             <motion.svg
               className='w-6 h-6 text-white'

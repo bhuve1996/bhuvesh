@@ -27,7 +27,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   const showTooltip = () => {
     if (disabled) return;
-    
+
     const id = setTimeout(() => {
       setIsVisible(true);
     }, delay);
@@ -90,7 +90,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
       onBlur={hideTooltip}
     >
       {children}
-      
+
       <AnimatePresence>
         {isVisible && (
           <motion.div
@@ -101,8 +101,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
             transition={{ duration: 0.2 }}
             className={`absolute z-50 ${getPositionClasses()}`}
           >
-            <div className="relative">
-              <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs font-medium px-2 py-1 rounded shadow-lg whitespace-nowrap">
+            <div className='relative'>
+              <div className='bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs font-medium px-2 py-1 rounded shadow-lg whitespace-nowrap'>
                 {content}
               </div>
               <div

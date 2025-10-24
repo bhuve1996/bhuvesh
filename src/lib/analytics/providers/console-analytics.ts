@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Console Analytics Provider
  * Development and debugging analytics provider that logs to console
@@ -57,7 +58,7 @@ export class ConsoleAnalyticsProvider implements AnalyticsProvider {
     }
   }
 
-  setUserProperties(properties: Record<string, any>): void {
+  setUserProperties(properties: Record<string, unknown>): void {
     if (!this.enabled) return;
 
     const timestamp = new Date().toISOString();

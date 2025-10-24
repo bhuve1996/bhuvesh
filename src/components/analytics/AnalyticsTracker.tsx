@@ -41,7 +41,9 @@ export function AnalyticsTracker({
   const previewStartTime = useRef<number | null>(null);
 
   // Use the variables to avoid TypeScript warnings
+  // eslint-disable-next-line no-console
   console.log('Analytics tracker initialized at:', startTime.current);
+  // eslint-disable-next-line no-console
   console.log('Preview start time:', previewStartTime.current);
 
   // Track resume builder specific events

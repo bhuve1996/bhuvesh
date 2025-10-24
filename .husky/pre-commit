@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-echo "🔍 Running comprehensive pre-commit checks with all tests..."
+echo "🔍 Running comprehensive pre-commit checks with ZERO tolerance for warnings..."
 
 # Colors for output
 RED='\033[0;31m'
@@ -26,71 +26,81 @@ print_warning() {
     echo -e "${YELLOW}⚠️  $1${NC}"
 }
 
-# 1. Type checking
-print_status "Type checking..."
+# 1. TypeScript type checking (REQUIRED - will block commit if fails)
+print_status "1. TypeScript type checking..."
 npm run type-check
 if [ $? -ne 0 ]; then
     print_error "Type checking failed. Please fix TypeScript errors before committing."
     exit 1
 fi
-print_success "Type checking passed"
+print_success "1. TypeScript type checking passed"
 
-# 2. Linting
-print_status "Linting code..."
+# 2. Linting (REQUIRED - will block commit if fails)
+print_status "2. ESLint code linting..."
 npm run lint
 if [ $? -ne 0 ]; then
-    print_warning "Linting failed, but allowing commit to proceed."
-    print_warning "Please fix linting issues when convenient."
+    print_error "Linting failed. Please fix ALL linting errors and warnings before committing."
+    exit 1
 fi
+print_success "2. ESLint linting passed"
 
-# 3. Code formatting
-print_status "Checking code formatting..."
+# 3. Code formatting (REQUIRED - will block commit if fails)
+print_status "3. Prettier code formatting check..."
 npm run format:check
 if [ $? -ne 0 ]; then
-    print_warning "Code formatting check failed, but allowing commit to proceed."
-    print_warning "Please run 'npm run format' to fix formatting issues when convenient."
+    print_error "Code formatting check failed. Please run 'npm run format' to fix formatting issues before committing."
+    exit 1
 fi
+print_success "3. Code formatting check passed"
 
-# 4. Unit tests
-print_status "Running unit tests..."
+# 4. Unit tests (REQUIRED - will block commit if fails)
+print_status "4. Unit tests (Jest)..."
 npm run test:ci
 if [ $? -ne 0 ]; then
-    print_warning "Unit tests failed, but allowing commit to proceed."
-    print_warning "Please fix failing tests when convenient."
+    print_error "Unit tests failed. Please fix ALL failing tests before committing."
+    exit 1
 fi
+print_success "4. Unit tests passed"
 
-# 5. Accessibility tests
-print_status "Running accessibility tests..."
+# 5. Accessibility tests (REQUIRED - will block commit if fails)
+print_status "5. Accessibility tests (jest-axe)..."
 npm run test:a11y
 if [ $? -ne 0 ]; then
-    print_warning "Accessibility tests failed, but allowing commit to proceed."
-    print_warning "Please fix accessibility issues when convenient."
+    print_error "Accessibility tests failed. Please fix ALL accessibility issues before committing."
+    exit 1
 fi
+print_success "5. Accessibility tests passed"
 
-# 6. E2E tests
-print_status "Running E2E tests..."
+# 6. E2E tests (REQUIRED - will block commit if fails)
+print_status "6. End-to-End tests (Cypress)..."
 npm run test:e2e
 if [ $? -ne 0 ]; then
-    print_warning "E2E tests failed, but allowing commit to proceed."
-    print_warning "Please fix failing E2E tests when convenient."
+    print_error "E2E tests failed. Please fix ALL failing E2E tests before committing."
+    exit 1
 fi
+print_success "6. E2E tests passed"
 
-# 7. Component tests
-print_status "Running component tests..."
+# 7. Component tests (REQUIRED - will block commit if fails)
+print_status "7. Component tests (Cypress Component)..."
 npm run test:component
 if [ $? -ne 0 ]; then
-    print_warning "Component tests failed, but allowing commit to proceed."
-    print_warning "Please fix failing component tests when convenient."
+    print_error "Component tests failed. Please fix ALL failing component tests before committing."
+    exit 1
 fi
+print_success "7. Component tests passed"
 
-# 8. Build check
-print_status "Checking build..."
-npm run build -- --no-lint
+# 8. Build check (REQUIRED - will block commit if fails)
+print_status "8. Next.js build verification..."
+npm run build
 if [ $? -ne 0 ]; then
     print_error "Build failed. Please fix build errors before committing."
     exit 1
 fi
-print_success "Build check passed"
+print_success "8. Next.js build verification passed"
 
-print_success "All comprehensive checks completed! Proceeding with commit..."
-print_warning "Note: Some tests, linting, or formatting may have failed, but essential checks (type checking and build) passed."
+echo ""
+print_success "🎉 All comprehensive checks passed with ZERO warnings or errors!"
+print_success "📋 Summary:"
+print_success "   ✅ ALL CHECKS (1-8): TypeScript, Linting, Formatting, Tests, Build - PASSED"
+print_success "   🚫 ZERO TOLERANCE: No warnings or errors allowed"
+print_success "   💡 Code quality maintained at highest standards"
