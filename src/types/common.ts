@@ -206,6 +206,8 @@ export interface ValidationResult {
   errors: ValidationRule[];
   warnings: ValidationRule[];
   score: number;
+  issues?: string[];
+  recommendations?: string[];
 }
 
 // Export Types

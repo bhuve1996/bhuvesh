@@ -70,7 +70,6 @@ export const FormField: React.FC<FormFieldProps> = ({
       <div className='relative'>
         {React.isValidElement(children) &&
           React.cloneElement(children, {
-            id: fieldId,
             ...accessibleFieldProps,
             ...(children.props as Record<string, unknown>),
           })}

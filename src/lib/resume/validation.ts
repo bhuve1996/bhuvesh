@@ -6,6 +6,9 @@ export interface ValidationResult {
   warnings: string[];
   missingRequired: string[];
   missingRecommended: string[];
+  score: number;
+  issues: string[];
+  recommendations: string[];
 }
 
 export interface ValidationOptions {

@@ -7,7 +7,7 @@ import { atsApi } from '@/api/endpoints/ats';
 import { Button } from '@/components/atoms/Button/Button';
 import { StatusBadge } from '@/components/molecules/StatusBadge/StatusBadge';
 import { Card } from '@/components/ui/Card';
-import type { ATSAnalysisTabProps } from '@/types';
+import type { ATSAnalysisTabProps, ResumeData } from '@/types';
 
 export const ATSAnalysisTab: React.FC<ATSAnalysisTabProps> = ({
   resumeData,
@@ -70,7 +70,7 @@ export const ATSAnalysisTab: React.FC<ATSAnalysisTabProps> = ({
 
     if (data.experience && data.experience.length > 0) {
       text += 'EXPERIENCE\n';
-      data.experience.forEach(exp => {
+      data.experience.forEach((exp: any) => {
         text += `${exp.title} at ${exp.company}\n`;
         text += `${exp.startDate} - ${exp.endDate}\n`;
         text += `${exp.description}\n\n`;

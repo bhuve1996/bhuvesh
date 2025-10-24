@@ -28,6 +28,7 @@ export interface ResumeBuilderWorkExperience {
   current: boolean;
   description: string;
   achievements: string[];
+  title?: string;
 }
 
 export interface ResumeBuilderEducation {
@@ -97,6 +98,7 @@ export interface AnalysisResult {
   extraction_details?: ExtractionDetails;
   ats_compatibility?: ATSCompatibility;
   format_analysis?: FormatAnalysis;
+  issues?: string[];
   detailed_scores?: DetailedScores;
   semantic_similarity?: number;
   match_category?: string;
@@ -177,6 +179,10 @@ export interface ResumeTemplate {
   preview: string; // Base64 image or URL
   layout: LayoutConfig;
   sampleData?: Partial<ResumeData>;
+  fontSize?: string;
+  fontFamily?: string;
+  colorScheme?: string;
+  spacing?: any;
 }
 
 // Builder State Types

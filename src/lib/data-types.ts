@@ -8,6 +8,7 @@ export interface Project {
   github?: string;
   live?: string;
   image?: string;
+  status?: string;
 }
 
 export interface Experience {
@@ -18,6 +19,11 @@ export interface Experience {
   endDate?: string;
   description: string;
   achievements: string[];
+  title?: string;
+  location?: string;
+  period?: string;
+  type?: string;
+  technologies?: string[];
 }
 
 export interface Education {
@@ -28,6 +34,10 @@ export interface Education {
   startDate: string;
   endDate?: string;
   gpa?: string;
+  school?: string;
+  location?: string;
+  period?: string;
+  relevant_courses?: string[];
 }
 
 export interface Skill {
@@ -43,6 +53,7 @@ export interface Certification {
   issuer: string;
   date: string;
   credentialId?: string;
+  credential_id?: string;
   url?: string;
 }
 
@@ -62,18 +73,26 @@ export interface Hobby {
 }
 
 export interface BlogPost {
-  id: string;
+  id: string | number;
   title: string;
   content: string;
   author: string;
   date: string;
   tags: string[];
+  excerpt?: string;
+  category?: string;
+  readTime?: string;
 }
 
 export interface Skills {
   technical: string[];
   soft: string[];
   languages: string[];
+  Frontend?: string[];
+  Backend?: string[];
+  Database?: string[];
+  DevOps?: string[];
+  Tools?: string[];
 }
 
 export interface Service {
@@ -82,6 +101,7 @@ export interface Service {
   description: string;
   icon: string;
   features: string[];
+  technologies?: string[];
 }
 
 export interface ProcessStep {
@@ -90,6 +110,7 @@ export interface ProcessStep {
   description: string;
   icon: string;
   order: number;
+  step?: number;
 }
 
 export interface Testimonial {
@@ -100,4 +121,6 @@ export interface Testimonial {
   content: string;
   rating: number;
   avatar?: string;
+  position?: string;
+  image?: string;
 }

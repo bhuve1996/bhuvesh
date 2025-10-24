@@ -95,7 +95,7 @@ export interface AnalyticsProvider {
 }
 
 export interface AnalyticsContextType {
-  trackEvent: (event: AnalyticsEventData) => void;
+  trackEvent: (event: import('@/lib/analytics/types').AnalyticsEventData) => void;
   trackPageView: (url: string, title: string) => void;
   setUserProperties: (properties: Record<string, unknown>) => void;
   setUserId: (userId: string) => void;

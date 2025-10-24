@@ -7,7 +7,7 @@ import { atsApi } from '@/api/endpoints/ats';
 import { Button } from '@/components/atoms/Button/Button';
 import { StatusBadge } from '@/components/molecules/StatusBadge/StatusBadge';
 import { Card } from '@/components/ui/Card';
-import type { AIContentTabProps } from '@/types';
+import type { AIContentTabProps, ResumeData } from '@/types';
 
 export const AIContentTab: React.FC<AIContentTabProps> = ({ resumeData }) => {
   const [isImproving, setIsImproving] = useState(false);
@@ -19,7 +19,7 @@ export const AIContentTab: React.FC<AIContentTabProps> = ({ resumeData }) => {
 
   const improveContent = async (section: keyof ResumeData) => {
     setIsImproving(true);
-    setActiveSection(section);
+    setActiveSection(section as string);
 
     try {
       // Convert resume data to text for analysis

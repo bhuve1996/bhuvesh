@@ -143,11 +143,11 @@ export function AnalyticsDebugger({
                 Session Info
               </h4>
               <div className='text-xs space-y-1'>
-                <div>Session ID: {session.session_id}</div>
-                <div>Page Views: {session.page_views}</div>
+                <div>Session ID: {session.id}</div>
+                <div>Page Views: {session.pageViews}</div>
                 <div>Events: {session.events}</div>
                 <div>
-                  Time: {Math.round((Date.now() - session.start_time) / 1000)}s
+                  Time: {Math.round((Date.now() - session.startTime) / 1000)}s
                 </div>
               </div>
             </div>

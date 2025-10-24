@@ -1,12 +1,22 @@
 // import { render, screen, fireEvent } from '@testing-library/react';
 
-import { exportResumeUnified, exportToPDFUnified, exportToDOCXUnified, exportToTXTUnified } from '@/lib/resume/unifiedExportUtils';
+import {
+  exportResumeUnified,
+  exportToDOCXUnified,
+  exportToPDFUnified,
+  exportToTXTUnified,
+} from '@/lib/resume/unifiedExportUtils';
 import { useResumeStore } from '@/store/resumeStore';
 
 // Mock dependencies
 jest.mock('html-docx-js', () => ({
   default: {
-    asBlob: jest.fn(() => new Blob(['mock docx content'], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })),
+    asBlob: jest.fn(
+      () =>
+        new Blob(['mock docx content'], {
+          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        })
+    ),
   },
 }));
 
@@ -45,7 +55,7 @@ const mockLink = {
 };
 
 Object.defineProperty(document, 'createElement', {
-  value: jest.fn((tagName) => {
+  value: jest.fn(tagName => {
     if (tagName === 'a') {
       return mockLink;
     }
@@ -168,15 +178,18 @@ describe('Unified Export Utils', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Mock DOM elements
     const mockResumeElement = document.createElement('div');
     mockResumeElement.className = 'resume-template';
     mockResumeElement.innerHTML = '<div>Mock Resume Content</div>';
     mockResumeElement.offsetHeight = 1000;
-    
-    document.querySelector = jest.fn((selector) => {
-      if (selector.includes('resume-template') || selector.includes('template-preview')) {
+
+    document.querySelector = jest.fn(selector => {
+      if (
+        selector.includes('resume-template') ||
+        selector.includes('template-preview')
+      ) {
         return mockResumeElement;
       }
       return null;
@@ -341,7 +354,8 @@ describe('Unified Export Utils', () => {
 
     it('should clean up text formatting', async () => {
       const mockElement = document.createElement('div');
-      mockElement.innerText = '  Multiple   spaces\n\n\nMultiple\n\n\nline breaks  ';
+      mockElement.innerText =
+        '  Multiple   spaces\n\n\nMultiple\n\n\nline breaks  ';
       document.querySelector = jest.fn(() => mockElement);
 
       const options = {
@@ -360,9 +374,18 @@ describe('Unified Export Utils', () => {
 
   describe('Unified Export Function', () => {
     it('should route to correct export method based on format', async () => {
-      const pdfSpy = jest.spyOn(await import('@/lib/resume/unifiedExportUtils'), 'exportToPDFUnified');
-      const docxSpy = jest.spyOn(await import('@/lib/resume/unifiedExportUtils'), 'exportToDOCXUnified');
-      const txtSpy = jest.spyOn(await import('@/lib/resume/unifiedExportUtils'), 'exportToTXTUnified');
+      const pdfSpy = jest.spyOn(
+        await import('@/lib/resume/unifiedExportUtils'),
+        'exportToPDFUnified'
+      );
+      const docxSpy = jest.spyOn(
+        await import('@/lib/resume/unifiedExportUtils'),
+        'exportToDOCXUnified'
+      );
+      const txtSpy = jest.spyOn(
+        await import('@/lib/resume/unifiedExportUtils'),
+        'exportToTXTUnified'
+      );
 
       const options = {
         template: mockTemplate,
@@ -422,8 +445,9 @@ describe('Unified Export Utils', () => {
     });
 
     it('should reset section colors', () => {
-      const { setSectionColors, resetSectionColors, getSectionColors } = useResumeStore.getState();
-      
+      const { setSectionColors, resetSectionColors, getSectionColors } =
+        useResumeStore.getState();
+
       setSectionColors('header', {
         primary: '#ff0000',
         secondary: '#00ff00',
@@ -442,7 +466,9 @@ describe('Unified Export Utils', () => {
   describe('Error Handling', () => {
     it('should handle HTML-to-DOCX conversion errors', async () => {
       const { default: htmlDocx } = await import('html-docx-js');
-      (htmlDocx.asBlob as jest.Mock).mockRejectedValue(new Error('Conversion failed'));
+      (htmlDocx.asBlob as jest.Mock).mockRejectedValue(
+        new Error('Conversion failed')
+      );
 
       const options = {
         template: mockTemplate,

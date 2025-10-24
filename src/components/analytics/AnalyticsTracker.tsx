@@ -167,6 +167,7 @@ export function AnalyticsTracker({
           });
         }
       }
+      return undefined;
     };
 
     // Track Web Vitals
@@ -176,7 +177,9 @@ export function AnalyticsTracker({
         const lcpObserver = new PerformanceObserver(list => {
           const entries = list.getEntries();
           const lastEntry = entries[entries.length - 1];
-          webVitalsMonitor.trackLCP(lastEntry.startTime);
+          if (lastEntry) {
+            webVitalsMonitor.trackLCP(lastEntry.startTime);
+          }
         });
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
 
@@ -184,7 +187,10 @@ export function AnalyticsTracker({
         const fidObserver = new PerformanceObserver(list => {
           const entries = list.getEntries();
           entries.forEach(entry => {
-            webVitalsMonitor.trackFID(entry.processingStart - entry.startTime);
+            const fidEntry = entry as PerformanceEventTiming;
+            if (fidEntry.processingStart) {
+              webVitalsMonitor.trackFID(fidEntry.processingStart - fidEntry.startTime);
+            }
           });
         });
         fidObserver.observe({ entryTypes: ['first-input'] });
@@ -194,8 +200,9 @@ export function AnalyticsTracker({
         const clsObserver = new PerformanceObserver(list => {
           const entries = list.getEntries();
           entries.forEach(entry => {
-            if (!entry.hadRecentInput) {
-              clsValue += entry.value;
+            const clsEntry = entry as PerformanceEntry & { hadRecentInput?: boolean; value?: number };
+            if (!clsEntry.hadRecentInput && clsEntry.value !== undefined) {
+              clsValue += clsEntry.value;
             }
           });
           webVitalsMonitor.trackCLS(clsValue);
@@ -208,6 +215,7 @@ export function AnalyticsTracker({
           clsObserver.disconnect();
         };
       }
+      return undefined;
     };
 
     // Track performance after page load
@@ -220,6 +228,7 @@ export function AnalyticsTracker({
         trackPerformance();
         trackWebVitals();
       });
+      return undefined;
     }
   }, [analytics]);
 

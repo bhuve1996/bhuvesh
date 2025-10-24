@@ -226,30 +226,37 @@ export const generateSectionCSSVariables = (
 
   // Typography variables
   if ('typography' in styling) {
-    const typography = styling.typography as Record<string, Record<string, string>>;
-    Object.entries(typography).forEach(([key, typo]: [string, Record<string, string>]) => {
-      variables[`--${sectionId}-${key}-font-family`] =
-        typo.fontFamily || 'Arial';
-      variables[`--${sectionId}-${key}-font-size`] = typo.fontSize || '14px';
-      if (typo.fontWeight) {
-        variables[`--${sectionId}-${key}-font-weight`] =
-          typo.fontWeight.toString();
+    const typography = styling.typography as Record<
+      string,
+      Record<string, string>
+    >;
+    Object.entries(typography).forEach(
+      ([key, typo]: [string, Record<string, string>]) => {
+        variables[`--${sectionId}-${key}-font-family`] =
+          typo.fontFamily || 'Arial';
+        variables[`--${sectionId}-${key}-font-size`] = typo.fontSize || '14px';
+        if (typo.fontWeight) {
+          variables[`--${sectionId}-${key}-font-weight`] =
+            typo.fontWeight.toString();
+        }
+        if (typo.lineHeight) {
+          variables[`--${sectionId}-${key}-line-height`] =
+            typo.lineHeight.toString();
+        }
+        if (typo.letterSpacing) {
+          variables[`--${sectionId}-${key}-letter-spacing`] =
+            typo.letterSpacing;
+        }
+        if (typo.textTransform) {
+          variables[`--${sectionId}-${key}-text-transform`] =
+            typo.textTransform;
+        }
+        if (typo.textDecoration) {
+          variables[`--${sectionId}-${key}-text-decoration`] =
+            typo.textDecoration;
+        }
       }
-      if (typo.lineHeight) {
-        variables[`--${sectionId}-${key}-line-height`] =
-          typo.lineHeight.toString();
-      }
-      if (typo.letterSpacing) {
-        variables[`--${sectionId}-${key}-letter-spacing`] = typo.letterSpacing;
-      }
-      if (typo.textTransform) {
-        variables[`--${sectionId}-${key}-text-transform`] = typo.textTransform;
-      }
-      if (typo.textDecoration) {
-        variables[`--${sectionId}-${key}-text-decoration`] =
-          typo.textDecoration;
-      }
-    });
+    );
   }
 
   // Spacing variables
@@ -335,15 +342,20 @@ export const generateSectionCSS = (
 
   // Generate typography styles
   if ('typography' in styling) {
-    const typography = styling.typography as Record<string, Record<string, string>>;
-    Object.entries(typography).forEach(([key, typo]: [string, Record<string, string>]) => {
-      const typographyCSS = typographyToCSS(typo);
-      const typographyDeclarations = Object.entries(typographyCSS)
-        .map(([key, value]) => `  ${key}: ${value};`)
-        .join('\n');
+    const typography = styling.typography as Record<
+      string,
+      Record<string, string>
+    >;
+    Object.entries(typography).forEach(
+      ([key, typo]: [string, Record<string, string>]) => {
+        const typographyCSS = typographyToCSS(typo);
+        const typographyDeclarations = Object.entries(typographyCSS)
+          .map(([key, value]) => `  ${key}: ${value};`)
+          .join('\n');
 
-      css.push(`.${sectionId}__${key} {\n${typographyDeclarations}\n}`);
-    });
+        css.push(`.${sectionId}__${key} {\n${typographyDeclarations}\n}`);
+      }
+    );
   }
 
   // Generate specific element styles for complex sections

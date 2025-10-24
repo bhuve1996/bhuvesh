@@ -121,7 +121,7 @@ export default function Resume() {
                       Technologies Used:
                     </h4>
                     <div className='flex flex-wrap gap-2'>
-                      {job.technologies.map(tech => (
+                      {job.technologies?.map((tech: string) => (
                         <span
                           key={tech}
                           className='bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 px-3 py-1 rounded-full text-sm'
@@ -164,7 +164,7 @@ export default function Resume() {
                       Relevant Coursework:
                     </h4>
                     <div className='flex flex-wrap gap-2'>
-                      {edu.relevant_courses.map(course => (
+                      {edu.relevant_courses?.map((course: string) => (
                         <span
                           key={course}
                           className='bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 px-3 py-1 rounded-full text-sm'
@@ -195,7 +195,7 @@ export default function Resume() {
                       {category}
                     </h3>
                     <div className='flex flex-wrap gap-3'>
-                      {skillList.map(skill => (
+                      {skillList.map((skill: string) => (
                         <span
                           key={skill}
                           className='bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-cyan-400/20 transition-colors cursor-pointer'

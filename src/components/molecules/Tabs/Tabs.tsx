@@ -39,6 +39,7 @@ export const Tabs: React.FC<TabsProps> = ({
       nav.addEventListener('scroll', checkScrollPosition);
       return () => nav.removeEventListener('scroll', checkScrollPosition);
     }
+    return undefined;
   }, [items]);
 
   // Scroll to show more tabs

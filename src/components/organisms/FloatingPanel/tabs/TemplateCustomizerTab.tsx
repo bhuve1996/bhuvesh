@@ -15,7 +15,7 @@ export const TemplateCustomizerTab: React.FC<TemplateCustomizerTabProps> = ({
   onTemplateChange,
 }) => {
   const [customizations, setCustomizations] = useState({
-    fontSize: template.fontSize || 14,
+    fontSize: template.fontSize || '14',
     fontFamily: template.fontFamily || 'Arial',
     colorScheme: template.colorScheme || 'blue',
     spacing: template.spacing || 'normal',

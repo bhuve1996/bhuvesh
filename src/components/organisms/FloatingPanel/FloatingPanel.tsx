@@ -227,7 +227,9 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                         />
                       </svg>
                     }
-                  />
+                  >
+                    {isExpanded ? 'Collapse' : 'Expand'}
+                  </Button>
                   {/* Tooltip */}
                   <div className='absolute bottom-full right-0 mb-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
                     {isExpanded ? 'Collapse panel' : 'Expand panel'}
@@ -258,7 +260,9 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                         />
                       </svg>
                     }
-                  />
+                  >
+                    {isExpanded ? 'Collapse' : 'Expand'}
+                  </Button>
                   {/* Tooltip */}
                   <div className='absolute bottom-full right-0 mb-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
                     Close panel

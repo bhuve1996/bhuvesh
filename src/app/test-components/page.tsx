@@ -64,8 +64,40 @@ export default function TestComponentsPage() {
   const mockTemplate: ResumeTemplate = {
     id: 'template-1',
     name: 'Professional Template',
+    description: 'A professional resume template',
     category: 'business',
+    experienceLevel: 'mid',
+    style: 'modern',
+    atsScore: 85,
     preview: '/preview.jpg',
+    layout: {
+      sections: [],
+      colors: { 
+        primary: '#10b981', 
+        secondary: '#059669', 
+        accent: '#34d399',
+        text: '#1f2937',
+        background: '#ffffff'
+      },
+      fonts: { 
+        heading: 'Inter', 
+        body: 'Inter',
+        size: {
+          heading: '2rem',
+          subheading: '1.5rem',
+          body: '1rem',
+          small: '0.875rem'
+        }
+      },
+      spacing: { 
+        lineHeight: 1.5,
+        sectionGap: '2rem',
+        margins: '1rem',
+        padding: '1rem'
+      },
+      columns: 1,
+      sidebar: false
+    },
     // config: {},
   };
 
@@ -84,16 +116,16 @@ export default function TestComponentsPage() {
     }
   };
 
-  const handleFileUpload = (files: File[]) => {
-    // Files uploaded: files
+  const handleFileUpload = (_files: File[]) => {
+    // Files uploaded: _files
   };
 
-  const _handleResumeDataUpdate = (updatedData: ResumeData) => {
-    // Resume data updated: updatedData
-  };
+  // const _handleResumeDataUpdate = (_updatedData: ResumeData) => {
+  //   // Resume data updated: _updatedData
+  // };
 
-  const handleTemplateChange = (template: ResumeTemplate) => {
-    // Template changed: template
+  const handleTemplateChange = (_template: ResumeTemplate) => {
+    // Template changed: _template
   };
 
   return (
@@ -253,11 +285,9 @@ export default function TestComponentsPage() {
                 data-testid='name-field'
                 label='Name'
                 required
-                error={
-                  !formData.name && submitStatus === 'error'
-                    ? 'This field is required'
-                    : undefined
-                }
+                {...(!formData.name && submitStatus === 'error' && {
+                  error: 'This field is required'
+                })}
               >
                 <input
                   data-testid='name-input'
@@ -274,11 +304,9 @@ export default function TestComponentsPage() {
                 data-testid='email-field'
                 label='Email'
                 required
-                error={
-                  !formData.email && submitStatus === 'error'
-                    ? 'This field is required'
-                    : undefined
-                }
+                {...(!formData.email && submitStatus === 'error' && {
+                  error: 'This field is required'
+                })}
               >
                 <input
                   data-testid='email-input'
