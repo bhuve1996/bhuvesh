@@ -73,7 +73,6 @@ export const Navigation: React.FC<NavigationProps> = ({
                   width={128}
                   height={50}
                   className='w-24 h-8 sm:w-28 sm:h-10 lg:w-32 lg:h-[50px] rounded-lg object-cover group-hover:scale-105 transition-transform duration-300'
-                  priority
                 />
                 <div className='absolute inset-0 bg-primary-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
               </div>
