@@ -26,15 +26,12 @@ export interface CardProps {
   children: React.ReactNode;
   className?: string;
   hover?: boolean;
-  padding?: 'sm' | 'md' | 'lg';
 }
 
 export interface LoadingProps {
   size?: 'sm' | 'md' | 'lg';
-  text?: string;
   message?: string;
   subMessage?: string;
-  className?: string;
 }
 
 export interface ProgressStep {
@@ -186,4 +183,5 @@ export interface TabsProps {
   defaultActiveTab?: string;
   className?: string;
   variant?: 'default' | 'pills' | 'underline';
+  onTabChange?: (tabId: string) => void;
 }

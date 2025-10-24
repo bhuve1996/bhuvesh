@@ -2,16 +2,13 @@
 
 import { signOut } from 'next-auth/react';
 
-import { Button } from '@/components/ui/Button/Button';
-
-interface LogoutButtonProps {
-  className?: string;
-  size?: 'sm' | 'md' | 'lg';
-}
+import { Button } from '@/components/atoms/Button/Button';
+import type { LogoutButtonProps } from '@/types';
 
 export const LogoutButton: React.FC<LogoutButtonProps> = ({
   className = '',
   size = 'md',
+  showText = true,
 }) => {
   const handleLogout = () => {
     signOut({ callbackUrl: '/' });
@@ -22,7 +19,8 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({
       onClick={handleLogout}
       variant='outline'
       size={size}
-      className={`flex items-center gap-2 ${className}`}
+      className={`flex items-center ${showText ? 'gap-2' : ''} ${className}`}
+      title={showText ? 'Sign Out' : 'Sign Out'}
     >
       <svg
         className='w-5 h-5'
@@ -38,7 +36,7 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({
           d='M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1'
         />
       </svg>
-      Sign Out
+      {showText && 'Sign Out'}
     </Button>
   );
 };

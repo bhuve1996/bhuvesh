@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import React from 'react';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
 import { Section } from '@/components/ui/Section';
 import { VisualSeparator } from '@/components/ui/VisualSeparator';

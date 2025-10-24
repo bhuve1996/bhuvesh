@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
 import { ProgressSteps } from '@/components/ui/ProgressSteps';
 

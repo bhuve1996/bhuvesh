@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
 import { Section } from '@/components/ui/Section';
 import { Icons } from '@/components/ui/SVG';

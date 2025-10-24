@@ -8,7 +8,7 @@ export const sectionGifs = {
       position: 'right' as const,
       width: 120,
       height: 120,
-      opacity: 0.25,
+      opacity: 0.78,
       animation: 'float' as const,
       speed: 'slow' as const,
       showSeparator: true,
@@ -21,7 +21,7 @@ export const sectionGifs = {
       position: 'left' as const,
       width: 110,
       height: 110,
-      opacity: 0.2,
+      opacity: 0.65,
       animation: 'pulse' as const,
       speed: 'normal' as const,
       showSeparator: true,
@@ -115,7 +115,7 @@ export const sectionGifs = {
   resume: [
     {
       id: 'document-1',
-      src: 'https://media.giphy.com/media/3o7aTskHEUdgCQAXde/giphy.gif',
+      src: 'https://media.giphy.com/media/3o7aD2d7hy9ktXNDP2/giphy.gif',
       alt: 'Document animation',
       position: 'right' as const,
       width: 100,
@@ -128,7 +128,7 @@ export const sectionGifs = {
     },
     {
       id: 'success-1',
-      src: 'https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif',
+      src: 'https://media.giphy.com/media/3o7btM0ScE3jZ8g1sI/giphy.gif',
       alt: 'Success animation',
       position: 'left' as const,
       width: 95,
@@ -143,7 +143,7 @@ export const sectionGifs = {
   services: [
     {
       id: 'service-1',
-      src: 'https://media.giphy.com/media/3o7aTskHEUdgCQAXde/giphy.gif',
+      src: 'https://media.giphy.com/media/3o7btT1T9qpQZWhNlK/giphy.gif',
       alt: 'Service animation',
       position: 'left' as const,
       width: 100,
@@ -156,7 +156,7 @@ export const sectionGifs = {
     },
     {
       id: 'support-1',
-      src: 'https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif',
+      src: 'https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif',
       alt: 'Support animation',
       position: 'right' as const,
       width: 95,

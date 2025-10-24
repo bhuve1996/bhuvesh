@@ -8,7 +8,7 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { analytics } from '@/lib/analytics/analytics';
 import { ANALYTICS_EVENTS, ANALYTICS_PARAMETERS } from '@/lib/analytics/config';
-import type { AnalyticsEventData } from '@/lib/analytics/types';
+import type { AnalyticsEventData } from '@/types';
 
 export interface UseAnalyticsOptions {
   trackPageViews?: boolean;

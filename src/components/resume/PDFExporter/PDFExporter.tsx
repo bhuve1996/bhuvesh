@@ -10,7 +10,7 @@ import {
 } from '@react-pdf/renderer';
 import React, { useState } from 'react';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
 interface PDFExporterProps {

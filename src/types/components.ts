@@ -2,7 +2,7 @@
 import type { AnalysisResult } from './resume';
 
 export interface FileUploadComponentProps {
-  onFileUpload: (files: File[]) => void;
+  onFileUpload?: (files: File[]) => void;
   accept?: string;
   multiple?: boolean;
   maxSize?: number;
@@ -13,6 +13,7 @@ export interface FileUploadComponentProps {
   disabled?: boolean;
   dragAndDrop?: boolean;
   preview?: boolean;
+  showToast?: boolean;
   validation?: {
     allowedTypes?: string[];
     maxSize?: number;
@@ -20,14 +21,6 @@ export interface FileUploadComponentProps {
   };
   className?: string;
 }
-
-// TabsProps moved to ui.ts to avoid conflicts
-// export interface TabsProps {
-//   tabs: Tab[];
-//   activeTab: string;
-//   onTabChange: (tabId: string) => void;
-//   className?: string;
-// }
 
 export interface Tab {
   id: string;

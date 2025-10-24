@@ -5,7 +5,7 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import React from 'react';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
 
 interface RichTextEditorProps {
   content: string;

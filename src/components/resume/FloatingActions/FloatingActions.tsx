@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
 import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import { ResumeAnalytics } from '@/lib/analytics/resume-analytics';
 import { useResumeStore } from '@/store/resumeStore';

@@ -2,7 +2,12 @@ import { useMemo } from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { AnalysisResult, ResumeData, ResumeTemplate } from '@/types';
+import {
+  AnalysisResult,
+  Certification,
+  ResumeData,
+  ResumeTemplate,
+} from '@/types';
 
 interface ResumeState {
   // Core resume data
@@ -23,6 +28,17 @@ interface ResumeState {
   useUserData: boolean;
   showDataChoice: boolean;
 
+  // Section color state for consistent preview/export
+  sectionColors: {
+    [sectionId: string]: {
+      primary: string;
+      secondary: string;
+      accent: string;
+      text: string;
+      background: string;
+    };
+  };
+
   // Actions
   setResumeData: (data: ResumeData) => void;
   setAnalysisResult: (result: AnalysisResult) => void;
@@ -34,6 +50,16 @@ interface ResumeState {
   setShowDataChoice: (show: boolean) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+
+  // Section color actions
+  setSectionColors: (
+    sectionId: string,
+    colors: ResumeState['sectionColors'][string]
+  ) => void;
+  getSectionColors: (
+    sectionId: string
+  ) => ResumeState['sectionColors'][string] | null;
+  resetSectionColors: () => void;
 
   // Navigation helpers
   navigateToStep: (
@@ -52,6 +78,32 @@ interface ResumeState {
   hasAnalysisResult: () => boolean;
   hasSelectedTemplate: () => boolean;
   getCurrentData: () => ResumeData | null;
+
+  // Enhanced content management actions
+  updatePersonalInfo: (personal: Partial<ResumeData['personal']>) => void;
+  updateSummary: (summary: string) => void;
+  addExperience: (experience: ResumeData['experience'][0]) => void;
+  updateExperience: (
+    id: string,
+    experience: Partial<ResumeData['experience'][0]>
+  ) => void;
+  removeExperience: (id: string) => void;
+  addEducation: (education: ResumeData['education'][0]) => void;
+  updateEducation: (
+    id: string,
+    education: Partial<ResumeData['education'][0]>
+  ) => void;
+  removeEducation: (id: string) => void;
+  updateSkills: (skills: Partial<ResumeData['skills']>) => void;
+  addProject: (project: ResumeData['projects'][0]) => void;
+  updateProject: (
+    id: string,
+    project: Partial<ResumeData['projects'][0]>
+  ) => void;
+  removeProject: (id: string) => void;
+  updateAchievements: (achievements: string[]) => void;
+  updateCertifications: (certifications: Certification[]) => void;
+  updateHobbies: (hobbies: string[]) => void;
 }
 
 const initialState = {
@@ -65,7 +117,33 @@ const initialState = {
   previousStep: null,
   useUserData: false,
   showDataChoice: false,
+  sectionColors: {},
 };
+
+// Helper function to create default resume data
+// const createDefaultResumeData = (): ResumeData => ({
+//   personal: {
+//     fullName: '',
+//     email: '',
+//     phone: '',
+//     location: '',
+//     linkedin: '',
+//     github: '',
+//     portfolio: '',
+//   },
+//   summary: '',
+//   experience: [],
+//   education: [],
+//   skills: {
+//     technical: [],
+//     business: [],
+//     soft: [],
+//     languages: [],
+//     certifications: [],
+//   },
+//   projects: [],
+//   achievements: [],
+// });
 
 export const useResumeStore = create<ResumeState>()(
   persist(
@@ -90,6 +168,20 @@ export const useResumeStore = create<ResumeState>()(
       setShowDataChoice: show => set({ showDataChoice: show }),
       setLoading: loading => set({ isLoading: loading }),
       setError: error => set({ error }),
+
+      // Section color actions
+      setSectionColors: (sectionId, colors) =>
+        set(state => ({
+          sectionColors: {
+            ...state.sectionColors,
+            [sectionId]: colors,
+          },
+        })),
+      getSectionColors: sectionId => {
+        const state = get();
+        return state.sectionColors[sectionId] || null;
+      },
+      resetSectionColors: () => set({ sectionColors: {} }),
 
       // Navigation helpers
       navigateToStep: (step, preserveData = true) => {
@@ -151,6 +243,296 @@ export const useResumeStore = create<ResumeState>()(
         const { resumeData } = get();
         return resumeData;
       },
+
+      // Enhanced content management actions
+      updatePersonalInfo: personal => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              personal: { ...state.resumeData.personal, ...personal },
+            },
+          });
+        }
+        // If no resumeData exists, the ResumeBuilder should initialize it first
+      },
+
+      updateSummary: summary => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              summary,
+            },
+          });
+        }
+        // If no resumeData exists, the ResumeBuilder should initialize it first
+      },
+
+      addExperience: experience => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              experience: [...state.resumeData.experience, experience],
+            },
+          });
+        } else {
+          // Create new resume data if none exists
+          const defaultResumeData: ResumeData = {
+            personal: {
+              fullName: '',
+              email: '',
+              phone: '',
+              location: '',
+              linkedin: '',
+              github: '',
+              portfolio: '',
+            },
+            summary: '',
+            experience: [],
+            education: [],
+            skills: {
+              technical: [],
+              business: [],
+              soft: [],
+              languages: [],
+              certifications: [],
+            },
+            projects: [],
+            achievements: [],
+          };
+          set({
+            resumeData: {
+              ...defaultResumeData,
+              experience: [experience],
+            },
+          });
+        }
+      },
+
+      updateExperience: (id, experience) => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              experience: state.resumeData.experience.map(exp =>
+                exp.id === id ? { ...exp, ...experience } : exp
+              ),
+            },
+          });
+        }
+        // Note: updateExperience requires existing data, so we don't create new data here
+      },
+
+      removeExperience: id => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              experience: state.resumeData.experience.filter(
+                exp => exp.id !== id
+              ),
+            },
+          });
+        }
+        // Note: removeExperience requires existing data, so we don't create new data here
+      },
+
+      addEducation: education => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              education: [...state.resumeData.education, education],
+            },
+          });
+        } else {
+          // Create new resume data if none exists
+          const defaultResumeData: ResumeData = {
+            personal: {
+              fullName: '',
+              email: '',
+              phone: '',
+              location: '',
+              linkedin: '',
+              github: '',
+              portfolio: '',
+            },
+            summary: '',
+            experience: [],
+            education: [],
+            skills: {
+              technical: [],
+              business: [],
+              soft: [],
+              languages: [],
+              certifications: [],
+            },
+            projects: [],
+            achievements: [],
+          };
+          set({
+            resumeData: {
+              ...defaultResumeData,
+              education: [education],
+            },
+          });
+        }
+      },
+
+      updateEducation: (id, education) => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              education: state.resumeData.education.map(edu =>
+                edu.id === id ? { ...edu, ...education } : edu
+              ),
+            },
+          });
+        }
+      },
+
+      removeEducation: id => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              education: state.resumeData.education.filter(
+                edu => edu.id !== id
+              ),
+            },
+          });
+        }
+      },
+
+      updateSkills: skills => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              skills: { ...state.resumeData.skills, ...skills },
+            },
+          });
+        } else {
+          // Create new resume data if none exists
+          const defaultResumeData: ResumeData = {
+            personal: {
+              fullName: '',
+              email: '',
+              phone: '',
+              location: '',
+              linkedin: '',
+              github: '',
+              portfolio: '',
+            },
+            summary: '',
+            experience: [],
+            education: [],
+            skills: {
+              technical: [],
+              business: [],
+              soft: [],
+              languages: [],
+              certifications: [],
+            },
+            projects: [],
+            achievements: [],
+          };
+          set({
+            resumeData: {
+              ...defaultResumeData,
+              skills: { ...defaultResumeData.skills, ...skills },
+            },
+          });
+        }
+      },
+
+      addProject: project => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              projects: [...state.resumeData.projects, project],
+            },
+          });
+        }
+      },
+
+      updateProject: (id, project) => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              projects: state.resumeData.projects.map(proj =>
+                proj.id === id ? { ...proj, ...project } : proj
+              ),
+            },
+          });
+        }
+      },
+
+      removeProject: id => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              projects: state.resumeData.projects.filter(
+                proj => proj.id !== id
+              ),
+            },
+          });
+        }
+      },
+
+      updateAchievements: achievements => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              achievements,
+            },
+          });
+        }
+      },
+
+      updateCertifications: certifications => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              certifications,
+            },
+          });
+        }
+      },
+
+      updateHobbies: hobbies => {
+        const state = get();
+        if (state.resumeData) {
+          set({
+            resumeData: {
+              ...state.resumeData,
+              hobbies,
+            },
+          });
+        }
+      },
     }),
     {
       name: 'resume-store',
@@ -163,6 +545,7 @@ export const useResumeStore = create<ResumeState>()(
         customizedTemplate: state.customizedTemplate,
         useUserData: state.useUserData,
         currentStep: state.currentStep,
+        sectionColors: state.sectionColors,
       }),
     }
   )
@@ -211,6 +594,28 @@ export const useResumeActions = () => {
   const clearAllData = useResumeStore(state => state.clearAllData);
   const clearAnalysisData = useResumeStore(state => state.clearAnalysisData);
   const clearTemplateData = useResumeStore(state => state.clearTemplateData);
+  const setSectionColors = useResumeStore(state => state.setSectionColors);
+  const getSectionColors = useResumeStore(state => state.getSectionColors);
+  const resetSectionColors = useResumeStore(state => state.resetSectionColors);
+
+  // Enhanced content management actions
+  const updatePersonalInfo = useResumeStore(state => state.updatePersonalInfo);
+  const updateSummary = useResumeStore(state => state.updateSummary);
+  const addExperience = useResumeStore(state => state.addExperience);
+  const updateExperience = useResumeStore(state => state.updateExperience);
+  const removeExperience = useResumeStore(state => state.removeExperience);
+  const addEducation = useResumeStore(state => state.addEducation);
+  const updateEducation = useResumeStore(state => state.updateEducation);
+  const removeEducation = useResumeStore(state => state.removeEducation);
+  const updateSkills = useResumeStore(state => state.updateSkills);
+  const addProject = useResumeStore(state => state.addProject);
+  const updateProject = useResumeStore(state => state.updateProject);
+  const removeProject = useResumeStore(state => state.removeProject);
+  const updateAchievements = useResumeStore(state => state.updateAchievements);
+  const updateCertifications = useResumeStore(
+    state => state.updateCertifications
+  );
+  const updateHobbies = useResumeStore(state => state.updateHobbies);
 
   return useMemo(
     () => ({
@@ -225,6 +630,25 @@ export const useResumeActions = () => {
       clearAllData,
       clearAnalysisData,
       clearTemplateData,
+      setSectionColors,
+      getSectionColors,
+      resetSectionColors,
+      // Enhanced content management
+      updatePersonalInfo,
+      updateSummary,
+      addExperience,
+      updateExperience,
+      removeExperience,
+      addEducation,
+      updateEducation,
+      removeEducation,
+      updateSkills,
+      addProject,
+      updateProject,
+      removeProject,
+      updateAchievements,
+      updateCertifications,
+      updateHobbies,
     }),
     [
       setResumeData,
@@ -238,6 +662,24 @@ export const useResumeActions = () => {
       clearAllData,
       clearAnalysisData,
       clearTemplateData,
+      setSectionColors,
+      getSectionColors,
+      resetSectionColors,
+      updatePersonalInfo,
+      updateSummary,
+      addExperience,
+      updateExperience,
+      removeExperience,
+      addEducation,
+      updateEducation,
+      removeEducation,
+      updateSkills,
+      addProject,
+      updateProject,
+      removeProject,
+      updateAchievements,
+      updateCertifications,
+      updateHobbies,
     ]
   );
 };
@@ -272,3 +714,21 @@ export const useResumeUtils = () => {
     ]
   );
 };
+
+// Section color selectors
+export const useSectionColors = (sectionId: string) => {
+  const sectionColors = useResumeStore(state => state.sectionColors[sectionId]);
+  const setSectionColors = useResumeStore(state => state.setSectionColors);
+
+  return useMemo(
+    () => ({
+      colors: sectionColors,
+      setColors: (colors: ResumeState['sectionColors'][string]) =>
+        setSectionColors(sectionId, colors),
+    }),
+    [sectionColors, setSectionColors, sectionId]
+  );
+};
+
+export const useAllSectionColors = () =>
+  useResumeStore(state => state.sectionColors);

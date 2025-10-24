@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { atsApi } from '@/api/endpoints/ats';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
 import { ResumeData } from '@/types/resume';
 

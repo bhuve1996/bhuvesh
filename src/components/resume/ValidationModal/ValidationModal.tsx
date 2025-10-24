@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
 import {
   ValidationResult,
   getValidationMessages,

@@ -1,53 +1,63 @@
 // Export all types from a central location
-export * from './ui';
-export * from './components';
+export * from './analytics';
 export * from './api';
 export * from './common';
+export * from './components';
+export * from './document';
+export * from './forms';
+export * from './panels';
+export * from './portfolio';
+export * from './theme';
+export * from './ui';
+export * from './ui-components';
 
 // Export resume types with specific names to avoid conflicts
 export type {
-  PersonalInfo,
-  WorkExperience as ResumeWorkExperience,
-  Education as ResumeEducation,
-  Project as ResumeProject,
-  Skills,
-  ResumeData,
   AnalysisResult,
-  SectionConfig,
+  BuilderState,
   ColorScheme,
   FontConfig,
-  SpacingConfig,
   LayoutConfig,
-  ResumeTemplate,
-  BuilderState,
+  PersonalInfo,
+  ResumeData,
+  Education as ResumeEducation,
   ExportOptions as ResumeExportOptions,
+  Project as ResumeProject,
+  ResumeTemplate,
+  WorkExperience as ResumeWorkExperience,
+  SectionConfig,
+  Skills,
+  SpacingConfig,
   TemplateFilter,
   TemplateGalleryState,
 } from './resume';
 
 // Export ATS types with specific names to avoid conflicts
 export type {
-  ContactInfo,
-  Education as ATSEducation,
-  ProjectDetail,
-  WorkExperience as ATSWorkExperience,
-  SkillsFound,
-  FormattingAnalysis,
-  CategorizedResume,
-  ExtractionDetails,
+  ATSAnalysisBackendResponse,
   ATSCompatibility,
-  FormatAnalysis,
-  DetailedScores,
+  Education as ATSEducation,
   Project as ATSProject,
+  WorkExperience as ATSWorkExperience,
+  Automation,
+  Award,
+  CategorizedResume,
+  Certification,
+  ContactInfo,
+  DetailedScores,
+  ExtractionDetails,
+  FormatAnalysis,
+  FormattingAnalysis,
   Position,
-  StructuredWorkExperience,
-  StructuredContactInfo,
+  ProjectDetail,
   Skill,
   SkillCategory,
+  SkillsFound,
+  StructuredContactInfo,
   StructuredEducation,
-  Certification,
-  Award,
-  Automation,
   StructuredExperience,
-  ATSAnalysisBackendResponse,
+  StructuredWorkExperience,
 } from './ats';
+
+// Export ATS-specific types from lib
+export type { JobProfile } from '@/lib/ats/jobProfiles';

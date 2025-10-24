@@ -1,8 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
+import { ValidationModal } from '@/components/resume/ValidationModal';
 import { Tooltip } from '@/components/ui/Tooltip';
+import {
+  getValidationMessages,
+  validateResumeData,
+} from '@/lib/resume/validation';
+import { useResumeStore } from '@/store/resumeStore';
 
 interface UnifiedWelcomeBarProps {
   currentPage: 'ats-checker' | 'builder' | 'templates';
@@ -18,6 +24,9 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
   analysisResult,
   resumeData,
 }) => {
+  const [showValidationModal, setShowValidationModal] = useState(false);
+  const [validationResult, setValidationResult] = useState<any>(null);
+  const globalResumeData = useResumeStore(state => state.resumeData);
   const getPageContent = (): {
     title: string;
     description: string;
@@ -39,19 +48,19 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
         };
       case 'builder':
         return {
-          title: 'ATS Resume Checker',
+          title: 'Resume Builder',
           description:
-            'Get your resume analyzed for ATS compatibility across all job profiles. Receive detailed feedback and optimization suggestions.',
+            'Build and customize your professional resume with our intuitive editor. Your changes are automatically saved and reflected in templates.',
           showWelcome: true,
           showTemplates: true,
           showBuilder: false,
-          showNavigation: true,
+          showNavigation: false, // Remove navigation to avoid duplication
         };
       case 'templates':
         return {
-          title: 'ATS Resume Checker',
+          title: 'Resume Templates',
           description:
-            'Get your resume analyzed for ATS compatibility across all job profiles. Receive detailed feedback and optimization suggestions.',
+            'Choose from our collection of modern, professional resume templates. Preview with your data and export in multiple formats.',
           showWelcome: false,
           showTemplates: true,
           showBuilder: true,
@@ -72,11 +81,84 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
 
   const content = getPageContent();
 
+  // Validation function for navigation
+  const handleNavigationWithValidation = (targetUrl: string) => {
+    const currentData = globalResumeData;
+    if (!currentData) {
+      // No data to validate, proceed
+      window.location.href = targetUrl;
+      return;
+    }
+
+    // Validate the current resume data
+    const validation = validateResumeData(currentData);
+    const messages = getValidationMessages(validation);
+
+    // If there are critical errors, show validation modal
+    if (!messages.canProceed) {
+      setValidationResult(validation);
+      setShowValidationModal(true);
+    } else {
+      // Proceed with navigation
+      window.location.href = targetUrl;
+    }
+  };
+
+  const handleValidationProceed = () => {
+    setShowValidationModal(false);
+    // Navigate to templates anyway
+    window.location.href = '/resume/templates';
+  };
+
+  const handleValidationCancel = () => {
+    setShowValidationModal(false);
+  };
+
+  // Get page-specific styling
+  const getPageStyling = () => {
+    switch (currentPage) {
+      case 'ats-checker':
+        return {
+          gradient:
+            'bg-gradient-to-r from-emerald-500 to-teal-600 dark:from-emerald-600 dark:to-teal-700',
+          textColor: 'text-white',
+          accentColor: 'from-emerald-400 to-teal-300',
+        };
+      case 'builder':
+        return {
+          gradient:
+            'bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-700',
+          textColor: 'text-white',
+          accentColor: 'from-blue-400 to-indigo-300',
+        };
+      case 'templates':
+        return {
+          gradient:
+            'bg-gradient-to-r from-purple-500 to-pink-600 dark:from-purple-600 dark:to-pink-700',
+          textColor: 'text-white',
+          accentColor: 'from-purple-400 to-pink-300',
+        };
+      default:
+        return {
+          gradient:
+            'bg-gradient-to-r from-slate-500 to-gray-600 dark:from-slate-600 dark:to-gray-700',
+          textColor: 'text-white',
+          accentColor: 'from-slate-400 to-gray-300',
+        };
+    }
+  };
+
+  const styling = getPageStyling();
+
   return (
-    <div className='bg-gradient-to-r from-cyan-500 to-blue-500 text-white p-6 mt-4 rounded-lg shadow-lg'>
+    <div
+      className={`${styling.gradient} ${styling.textColor} p-6 mt-4 rounded-lg shadow-lg border border-white/10 dark:border-white/5`}
+    >
       {/* ATS Resume Checker Header */}
       <div className='text-center mb-6'>
-        <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white to-cyan-100 bg-clip-text text-transparent'>
+        <h1
+          className={`text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r ${styling.accentColor} bg-clip-text text-transparent`}
+        >
           {content.title}
         </h1>
         <p className='text-sm sm:text-base text-white/90 max-w-2xl mx-auto mb-4'>
@@ -84,143 +166,23 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
         </p>
       </div>
 
-      {/* Resume Templates Header - Only show on templates page */}
-      {content.showTemplates && currentPage === 'templates' && (
-        <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6'>
-          <div>
-            <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-cyan-100 to-white bg-clip-text text-transparent'>
-              Resume Templates
-            </h1>
-            <p className='text-sm sm:text-base text-white/80 mt-1'>
-              Choose from our collection of modern, professional resume
-              templates
-            </p>
-          </div>
-          <Tooltip content='Back to Builder' position='bottom'>
-            <button
-              type='button'
-              className='flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2'
-              aria-disabled='false'
-              aria-busy='false'
-              tabIndex={0}
-              title='Back to Builder'
-              onClick={() => (window.location.href = '/resume/builder')}
-            >
-              <svg
-                className='w-5 h-5 text-white'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2.5}
-                  d='M15 19l-7-7 7-7'
-                ></path>
-              </svg>
-            </button>
-          </Tooltip>
-        </div>
-      )}
-
-      {/* Resume Builder Section - Only show on builder page */}
-      {content.showTemplates && currentPage === 'builder' && (
-        <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6'>
-          <div>
-            <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-cyan-100 to-white bg-clip-text text-transparent'>
-              Resume Builder
-            </h1>
-            <p className='text-sm sm:text-base text-white/80 mt-1'>
-              Build and customize your professional resume with our intuitive
-              editor
-            </p>
-          </div>
-          <Tooltip content='View Templates' position='bottom'>
-            <button
-              type='button'
-              className='flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2'
-              aria-disabled='false'
-              aria-busy='false'
-              tabIndex={0}
-              title='View Templates'
-              onClick={() => (window.location.href = '/resume/templates')}
-            >
-              <svg
-                className='w-5 h-5 text-white'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2.5}
-                  d='M9 5l7 7-7 7'
-                ></path>
-              </svg>
-            </button>
-          </Tooltip>
-        </div>
-      )}
-
-      {/* Welcome Message and Navigation - Only show on builder page */}
-      {content.showWelcome &&
-        currentPage === 'builder' &&
-        analysisResult &&
-        Boolean(resumeData) && (
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center space-x-3'>
-              <div className='w-10 h-10 bg-white/20 rounded-full flex items-center justify-center'>
-                <svg
-                  className='w-6 h-6'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-                  />
-                </svg>
-              </div>
-              <div>
-                <h3 className='font-semibold text-lg'>
-                  Welcome to the Resume Builder!
-                </h3>
-                <p className='text-sm opacity-90'>
-                  Your resume data from the ATS checker has been loaded.
-                  {analysisResult.jobType && (
-                    <>
-                      {' '}
-                      Detected job type:{' '}
-                      <span className='font-medium'>
-                        {analysisResult.jobType}
-                      </span>
-                    </>
-                  )}
-                  {analysisResult.atsScore && (
-                    <>
-                      {' '}
-                      • Previous ATS Score:{' '}
-                      <span className='font-medium'>
-                        {analysisResult.atsScore}/100
-                      </span>
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className='flex items-center space-x-3'>
-              <Tooltip content='Back to ATS Checker' position='bottom'>
+      {/* Navigation Actions - Show on templates and builder pages */}
+      {(currentPage === 'templates' || currentPage === 'builder') && (
+        <div className='flex justify-center mb-6'>
+          <div className='flex items-center space-x-2'>
+            {currentPage === 'templates' && (
+              <Tooltip content='Back to Builder' position='bottom'>
                 <button
-                  onClick={() => window.history.back()}
-                  className='flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm font-medium transition-all duration-200 backdrop-blur-sm'
+                  type='button'
+                  className='flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2'
+                  aria-disabled='false'
+                  aria-busy='false'
+                  tabIndex={0}
+                  title='Back to Builder'
+                  onClick={() => (window.location.href = '/resume/builder')}
                 >
                   <svg
-                    className='w-4 h-4'
+                    className='w-5 h-5 text-white'
                     fill='none'
                     stroke='currentColor'
                     viewBox='0 0 24 24'
@@ -228,29 +190,28 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
                     <path
                       strokeLinecap='round'
                       strokeLinejoin='round'
-                      strokeWidth={2}
+                      strokeWidth={2.5}
                       d='M15 19l-7-7 7-7'
-                    />
+                    ></path>
                   </svg>
-                  <span>Back</span>
                 </button>
               </Tooltip>
-              <Tooltip content='Next to Resume Builder' position='bottom'>
+            )}
+            {currentPage === 'builder' && (
+              <Tooltip content='View Templates' position='bottom'>
                 <button
-                  onClick={() => {
-                    // Scroll to the first section or trigger next step
-                    const firstSection = document.querySelector(
-                      '[data-section="personal"]'
-                    );
-                    if (firstSection) {
-                      firstSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  className='flex items-center space-x-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl'
+                  type='button'
+                  className='flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2'
+                  aria-disabled='false'
+                  aria-busy='false'
+                  tabIndex={0}
+                  title='View Templates'
+                  onClick={() =>
+                    handleNavigationWithValidation('/resume/templates')
+                  }
                 >
-                  <span>Next</span>
                   <svg
-                    className='w-4 h-4'
+                    className='w-5 h-5 text-white'
                     fill='none'
                     stroke='currentColor'
                     viewBox='0 0 24 24'
@@ -258,28 +219,86 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
                     <path
                       strokeLinecap='round'
                       strokeLinejoin='round'
-                      strokeWidth={2}
+                      strokeWidth={2.5}
                       d='M9 5l7 7-7 7'
-                    />
+                    ></path>
                   </svg>
                 </button>
               </Tooltip>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ATS Analysis Info - Show on builder page when data is available */}
+      {currentPage === 'builder' && analysisResult && Boolean(resumeData) && (
+        <div className='bg-white/10 rounded-lg p-4 mb-6 border border-white/20'>
+          <div className='flex items-center space-x-3'>
+            <div className='w-8 h-8 bg-white/20 rounded-full flex items-center justify-center'>
+              <svg
+                className='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+                />
+              </svg>
+            </div>
+            <div>
+              <p className='text-sm opacity-90'>
+                Your resume data from the ATS checker has been loaded.
+                {analysisResult.jobType && (
+                  <>
+                    {' '}
+                    Detected job type:{' '}
+                    <span className='font-medium'>
+                      {analysisResult.jobType}
+                    </span>
+                  </>
+                )}
+                {analysisResult.atsScore && (
+                  <>
+                    {' '}
+                    • Previous ATS Score:{' '}
+                    <span className='font-medium'>
+                      {analysisResult.atsScore}/100
+                    </span>
+                  </>
+                )}
+              </p>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
       {/* Start New Analysis Button */}
       <div className='text-center mt-6'>
         <Tooltip content='Start a new ATS analysis' position='top'>
           <button
             onClick={() => (window.location.href = '/resume/ats-checker')}
-            className='px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-background'
+            className={`px-6 py-3 bg-gradient-to-r ${styling.gradient} hover:opacity-90 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-background`}
             aria-label='Start new analysis'
           >
             🆕 Start New Analysis
           </button>
         </Tooltip>
       </div>
+
+      {/* Validation Modal */}
+      {validationResult && (
+        <ValidationModal
+          isOpen={showValidationModal}
+          onClose={handleValidationCancel}
+          onProceed={handleValidationProceed}
+          validationResult={validationResult}
+          actionType='export'
+        />
+      )}
     </div>
   );
 };

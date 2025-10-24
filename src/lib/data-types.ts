@@ -1,112 +1,103 @@
-// Data structure type definitions
+// Data types for the application
 
-// Navigation types
-export interface NavItem {
-  label: string;
-  href: string;
-  isActive?: boolean;
-}
-
-// Project types
 export interface Project {
-  id: number;
+  id: string;
   title: string;
   description: string;
   tech: string[];
-  status: 'Completed' | 'In Progress' | 'Planned';
-  image?: string;
-  link?: string;
   github?: string;
+  live?: string;
+  image?: string;
 }
 
-// Blog types
-export interface BlogPost {
-  id: number;
-  title: string;
-  excerpt: string;
-  content: string;
-  category: string;
-  date: string;
-  readTime: string;
-  tags: string[];
-  featured: boolean;
-  slug?: string;
-}
-
-// Experience types
 export interface Experience {
-  id: number;
-  title: string;
+  id: string;
   company: string;
-  location: string;
-  period: string;
-  type: string;
+  position: string;
+  startDate: string;
+  endDate?: string;
   description: string;
   achievements: string[];
-  technologies: string[];
 }
 
-// Education types
 export interface Education {
-  id: number;
+  id: string;
+  institution: string;
   degree: string;
-  school: string;
-  location: string;
-  period: string;
-  gpa: string;
-  relevant_courses: string[];
+  field: string;
+  startDate: string;
+  endDate?: string;
+  gpa?: string;
 }
 
-// Certification types
+export interface Skill {
+  id: string;
+  name: string;
+  level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  category: string;
+}
+
 export interface Certification {
-  id: number;
+  id: string;
   name: string;
   issuer: string;
   date: string;
-  credential_id: string;
-  link: string;
+  credentialId?: string;
+  url?: string;
 }
 
-// Skills types
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  category: string;
+}
+
+export interface Hobby {
+  id: string;
+  name: string;
+  description?: string;
+  category: string;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  date: string;
+  tags: string[];
+}
+
 export interface Skills {
-  [category: string]: string[];
+  technical: string[];
+  soft: string[];
+  languages: string[];
 }
 
-// Service types
 export interface Service {
   id: string;
   title: string;
-  icon: string;
   description: string;
+  icon: string;
   features: string[];
-  technologies: string[];
-  pricing: string;
-  timeline: string;
-  popular: boolean;
 }
 
-// Process types
 export interface ProcessStep {
-  step: number;
+  id: string;
   title: string;
   description: string;
-  duration: string;
-  deliverables: string[];
+  icon: string;
+  order: number;
 }
 
-// Testimonial types
 export interface Testimonial {
-  id: number;
+  id: string;
   name: string;
   role: string;
+  company: string;
   content: string;
   rating: number;
-  project: string;
-}
-
-// Contact form types
-export interface ContactForm {
-  name: string;
-  email: string;
-  message: string;
+  avatar?: string;
 }

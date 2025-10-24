@@ -4,8 +4,8 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { UnifiedWelcomeBar } from '@/components/layout/UnifiedWelcomeBar';
+import { FileUpload } from '@/components/molecules/FileUpload/FileUpload';
 import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
-import { FileUpload } from '@/components/resume/FileUpload';
 import { ResultsDisplay } from '@/components/resume/ResultsDisplay';
 import { Section } from '@/components/ui/Section';
 // import { useResumeNavigation } from '@/contexts/ResumeNavigationContext';
@@ -34,11 +34,14 @@ export default function ATSCheckerPage() {
     setError: setProgressError,
   } = useAnalysisProgress();
 
-  const handleFileUpload = (uploadedFile: File) => {
-    setFile(uploadedFile);
-    setAnalysisResult(null as unknown as AnalysisResult);
-    setError(null);
-    toast.success(`File "${uploadedFile.name}" uploaded successfully!`);
+  const handleFileUpload = (files: File[]) => {
+    const uploadedFile = files[0]; // Take the first file
+    if (uploadedFile) {
+      setFile(uploadedFile);
+      setAnalysisResult(null as unknown as AnalysisResult);
+      setError(null);
+      toast.success(`File "${uploadedFile.name}" uploaded successfully!`);
+    }
   };
 
   const handleAnalysis = async (jobDescription: string) => {
@@ -336,7 +339,7 @@ export default function ATSCheckerPage() {
               {/* File Upload Section */}
               {!file && (
                 <div>
-                  <FileUpload onFileUpload={handleFileUpload} />
+                  <FileUpload onUpload={handleFileUpload} />
                 </div>
               )}
 

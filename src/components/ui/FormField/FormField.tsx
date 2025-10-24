@@ -1,12 +1,6 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 
-interface FormFieldProps {
-  label: string;
-  required?: boolean;
-  children: ReactNode;
-  helperText?: string;
-  className?: string;
-}
+import type { FormFieldProps } from '@/types';
 
 export const FormField: React.FC<FormFieldProps> = ({
   label,

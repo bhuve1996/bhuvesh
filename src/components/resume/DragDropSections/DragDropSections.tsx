@@ -19,7 +19,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
 import { SectionConfig } from '@/types/resume';
 

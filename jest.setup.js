@@ -235,6 +235,9 @@ global.ResizeObserver = class ResizeObserver {
 // Mock scrollTo
 global.scrollTo = jest.fn();
 
+// Mock fetch
+global.fetch = jest.fn();
+
 // Suppress console warnings in tests
 // eslint-disable-next-line no-console
 const originalWarn = console.warn;

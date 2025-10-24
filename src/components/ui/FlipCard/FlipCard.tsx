@@ -50,7 +50,7 @@ export const FlipCard: React.FC<FlipCardProps> = ({
             className={`w-full h-full bg-gradient-to-br ${gradientFrom} ${gradientTo} p-6 flex flex-col justify-between relative overflow-hidden`}
           >
             {/* Background GIF */}
-            <div className='absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-500'>
+            <div className='absolute inset-0 opacity-70 group-hover:opacity-80 transition-opacity duration-500'>
               <Image
                 src={gifSrc}
                 alt={gifAlt}
@@ -98,7 +98,7 @@ export const FlipCard: React.FC<FlipCardProps> = ({
             className={`w-full h-full bg-gradient-to-br ${gradientFrom} ${gradientTo} p-6 flex flex-col justify-center relative overflow-hidden`}
           >
             {/* Background GIF */}
-            <div className='absolute inset-0 opacity-30 group-hover:opacity-40 transition-opacity duration-500'>
+            <div className='absolute inset-0 opacity-60 group-hover:opacity-70 transition-opacity duration-500'>
               <Image
                 src={gifSrc}
                 alt={gifAlt}

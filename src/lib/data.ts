@@ -12,7 +12,7 @@ import {
 
 export const projects: Project[] = [
   {
-    id: 1,
+    id: '1',
     title: 'E-Commerce Platform',
     description:
       'Full-stack e-commerce solution with React, Node.js, and MongoDB',
@@ -20,14 +20,14 @@ export const projects: Project[] = [
     status: 'Completed',
   },
   {
-    id: 2,
+    id: '2',
     title: 'Task Management App',
     description: 'Collaborative task management tool with real-time updates',
     tech: ['Next.js', 'TypeScript', 'Prisma', 'PostgreSQL'],
     status: 'In Progress',
   },
   {
-    id: 3,
+    id: '3',
     title: 'Portfolio Website',
     description:
       'Modern portfolio website with animations and responsive design',
@@ -51,7 +51,7 @@ export const blogPosts: BlogPost[] = [
     featured: true,
   },
   {
-    id: 2,
+    id: '2',
     title: 'Mastering TypeScript for Large-Scale Applications',
     excerpt:
       'Discover best practices for using TypeScript in enterprise-level applications and how it improves code quality.',
@@ -64,7 +64,7 @@ export const blogPosts: BlogPost[] = [
     featured: false,
   },
   {
-    id: 3,
+    id: '3',
     title: 'The Future of Web Development: AI and Machine Learning Integration',
     excerpt:
       'Exploring how AI and ML are revolutionizing web development and what developers need to know.',
@@ -77,7 +77,7 @@ export const blogPosts: BlogPost[] = [
     featured: true,
   },
   {
-    id: 4,
+    id: '4',
     title: 'Optimizing React Performance: A Complete Guide',
     excerpt:
       'Learn advanced techniques to optimize React applications for better performance and user experience.',
@@ -143,7 +143,7 @@ export const experience: Experience[] = [
     ],
   },
   {
-    id: 2,
+    id: '2',
     title: 'Full-Stack Developer',
     company: 'Digital Solutions Ltd.',
     location: 'New York, NY',
@@ -167,7 +167,7 @@ export const experience: Experience[] = [
     ],
   },
   {
-    id: 3,
+    id: '3',
     title: 'Frontend Developer',
     company: 'Creative Agency Pro',
     location: 'Los Angeles, CA',
@@ -191,7 +191,7 @@ export const experience: Experience[] = [
     ],
   },
   {
-    id: 4,
+    id: '4',
     title: 'Junior Web Developer',
     company: 'StartupHub',
     location: 'Austin, TX',
@@ -226,7 +226,7 @@ export const education: Education[] = [
     ],
   },
   {
-    id: 2,
+    id: '2',
     degree: 'Full-Stack Web Development Bootcamp',
     school: 'General Assembly',
     location: 'San Francisco, CA',
@@ -252,7 +252,7 @@ export const certifications: Certification[] = [
     link: '#',
   },
   {
-    id: 2,
+    id: '2',
     name: 'Google Cloud Professional Developer',
     issuer: 'Google Cloud',
     date: '2022',
@@ -260,7 +260,7 @@ export const certifications: Certification[] = [
     link: '#',
   },
   {
-    id: 3,
+    id: '3',
     name: 'Certified Kubernetes Administrator',
     issuer: 'Cloud Native Computing Foundation',
     date: '2022',
@@ -268,7 +268,7 @@ export const certifications: Certification[] = [
     link: '#',
   },
   {
-    id: 4,
+    id: '4',
     name: 'React Developer Certification',
     issuer: 'Meta',
     date: '2021',
@@ -519,7 +519,7 @@ export const testimonials: Testimonial[] = [
     project: 'E-commerce Platform',
   },
   {
-    id: 2,
+    id: '2',
     name: 'Michael Chen',
     role: 'Founder, Digital Agency',
     content:
@@ -528,7 +528,7 @@ export const testimonials: Testimonial[] = [
     project: 'Mobile App Development',
   },
   {
-    id: 3,
+    id: '3',
     name: 'Emily Rodriguez',
     role: 'Marketing Director, Retail Corp',
     content:

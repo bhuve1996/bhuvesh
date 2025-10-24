@@ -4,20 +4,8 @@ import {
   parseFile,
 } from '../utils/fileParser';
 
+import type { AnalysisResult } from '@/types';
 import { JobProfile, jobProfiles } from './jobProfiles';
-
-export interface AnalysisResult {
-  jobType: string;
-  atsScore: number;
-  keywordMatches: string[];
-  missingKeywords: string[];
-  suggestions: string[];
-  strengths: string[];
-  weaknesses: string[];
-  keywordDensity: { [key: string]: number };
-  wordCount: number;
-  characterCount: number;
-}
 
 export const analyzeResume = async (file: File): Promise<AnalysisResult> => {
   // Parse the file

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { atsApi } from '@/api/endpoints/ats';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
 import { CloudResume, cloudStorage } from '@/lib/resume/cloudStorage';
 import { ResumeData } from '@/types/resume';

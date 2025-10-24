@@ -34,4 +34,7 @@ export {
   Toast,
 } from './ui';
 
+// Export new molecules
+export { ActionButton, FormField, StatusBadge } from './molecules';
+
 // Types are available from @/types directly

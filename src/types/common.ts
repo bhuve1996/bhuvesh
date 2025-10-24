@@ -24,35 +24,11 @@ export interface PaginatedResponse<T> {
   };
 }
 
-export interface SelectOption {
-  value: string;
-  label: string;
-  disabled?: boolean;
-}
+// SelectOption interface moved to types/forms.ts to eliminate duplication
 
-export interface FormField {
-  name: string;
-  label: string;
-  type:
-    | 'text'
-    | 'email'
-    | 'password'
-    | 'number'
-    | 'select'
-    | 'textarea'
-    | 'file';
-  required?: boolean;
-  placeholder?: string;
-  options?: SelectOption[];
-  validation?: {
-    min?: number;
-    max?: number;
-    pattern?: string;
-    message?: string;
-  };
-}
+// FormField interface moved to types/forms.ts to eliminate duplication
 
-export interface Theme {
+export interface ThemeConfig {
   colors: {
     primary: string;
     secondary: string;
@@ -151,8 +127,8 @@ export interface AnalysisStep {
   duration?: number;
 }
 
-// Job Types
-export interface JobProfile {
+// Job Types (General job posting profile, different from ATS JobProfile)
+export interface GeneralJobProfile {
   id: string;
   title: string;
   category: string;

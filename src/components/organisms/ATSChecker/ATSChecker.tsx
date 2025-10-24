@@ -147,13 +147,18 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
                 Provide a job description for more targeted analysis
               </p>
               <textarea
+                id='job-description-input'
                 value={jobDescription}
                 onChange={e => setJobDescription(e.target.value)}
                 placeholder='Paste the job description here for better analysis...'
                 className='w-full p-3 border border-gray-300 rounded-lg resize-none'
                 rows={6}
                 disabled={loading}
+                aria-label='Job description for analysis'
               />
+              <label htmlFor='job-description-input' className='sr-only'>
+                Job description for analysis
+              </label>
               <div className='mt-4 flex justify-end space-x-3'>
                 <Button
                   variant='outline'

@@ -11,7 +11,7 @@ import {
 import { saveAs } from 'file-saver';
 import React, { useState } from 'react';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
 interface DOCXExporterProps {

@@ -1,13 +1,7 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 
-import { Button } from '../Button';
-
-interface ItemCardProps {
-  children: ReactNode;
-  onRemove: () => void;
-  removeLabel: string;
-  removeIcon?: string;
-}
+import { Button } from '@/components/atoms/Button/Button';
+import type { ItemCardProps } from '@/types';
 
 export const ItemCard: React.FC<ItemCardProps> = ({
   children,

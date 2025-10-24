@@ -3,13 +3,13 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
+import { Button } from '@/components/atoms/Button/Button';
 import { UnifiedWelcomeBar } from '@/components/layout/UnifiedWelcomeBar';
+import { FloatingPanel } from '@/components/organisms/FloatingPanel/FloatingPanel';
 import { ImprovedPaginatedTemplatePreview } from '@/components/resume/templates/ImprovedPaginatedTemplatePreview';
 import { ResumeTemplateRenderer } from '@/components/resume/templates/ResumeTemplateRenderer';
 import { TemplateCarousel } from '@/components/resume/templates/TemplateCarousel';
-import { UnifiedFloatingPanel } from '@/components/resume/UnifiedFloatingPanel';
 import { ValidationModal } from '@/components/resume/ValidationModal';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import { cloudStorage } from '@/lib/resume/cloudStorage';
@@ -27,7 +27,6 @@ export default function TemplateGalleryPage() {
     setUseUserData,
     setResumeData,
     setSelectedTemplate,
-    useUserData,
     showDataChoice,
     setShowDataChoice,
   } = useResumeStore();
@@ -57,13 +56,14 @@ export default function TemplateGalleryPage() {
     return matchesSearch;
   });
 
-  // Get preview data
+  // Get preview data - prioritize extracted data over sample data
   const getPreviewData = (): ResumeData => {
-    if (useUserData && userResumeData) {
+    // First priority: User's extracted data (if available and user wants to use it)
+    if (userResumeData) {
       return userResumeData;
     }
 
-    // Return sample data
+    // Second priority: Sample data (fallback)
     return {
       personal: {
         fullName: 'John Doe',
@@ -232,10 +232,6 @@ export default function TemplateGalleryPage() {
     loadUserData();
   }, [userResumeData, setResumeData]);
 
-  const handleResumeDataUpdate = (updatedData: ResumeData) => {
-    setResumeData(updatedData);
-  };
-
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-50 to-blue-50'>
       {/* Data Choice Dialog */}
@@ -303,52 +299,7 @@ export default function TemplateGalleryPage() {
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <div className='bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 border-b border-slate-200 dark:border-slate-700'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6'>
-          <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
-            <div>
-              <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-slate-700 dark:from-blue-400 dark:via-blue-300 dark:to-slate-200 bg-clip-text text-transparent'>
-                Resume Templates
-              </h1>
-              <p className='text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1'>
-                Choose from our collection of modern, professional resume
-                templates
-              </p>
-            </div>
-            <Button
-              variant='outline'
-              onClick={() => {
-                if (userResumeData) {
-                  localStorage.setItem(
-                    'resumeBuilderData',
-                    JSON.stringify(userResumeData)
-                  );
-                }
-                window.location.href = '/resume/builder';
-              }}
-              className='flex items-center justify-center w-10 h-10 rounded-full bg-white border-2 border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 shadow-sm hover:shadow-md'
-              title='Back to Builder'
-            >
-              <svg
-                className='w-5 h-5 text-slate-700'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2.5}
-                  d='M15 19l-7-7 7-7'
-                />
-              </svg>
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+      <div className='max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8'>
         {/* Unified Welcome Bar */}
         <UnifiedWelcomeBar
           currentPage='templates'
@@ -357,7 +308,7 @@ export default function TemplateGalleryPage() {
         />
 
         {/* View Mode Toggle - Compact and always visible */}
-        <div className='flex justify-center mb-6'>
+        <div className='flex justify-center mb-6 mt-8'>
           <div className='bg-slate-100 dark:bg-slate-800 rounded-lg p-1 flex items-center gap-1 shadow-sm border border-slate-200 dark:border-slate-700'>
             <div className='flex'>
               <button
@@ -928,10 +879,9 @@ export default function TemplateGalleryPage() {
 
       {/* Unified Floating Panel - All tools in one place */}
       {selectedTemplate && (
-        <UnifiedFloatingPanel
+        <FloatingPanel
           resumeData={getPreviewData()}
           template={customizedTemplate || selectedTemplate}
-          onResumeDataUpdate={handleResumeDataUpdate}
           onTemplateChange={setCustomizedTemplate}
         />
       )}

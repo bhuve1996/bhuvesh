@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import toast from 'react-hot-toast';
 
 import type { FileUploadComponentProps } from '@/types';
 
@@ -11,6 +12,7 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
   multiple = false,
   maxSize = 10 * 1024 * 1024, // 10MB
   maxFiles = 1,
+  onFileUpload,
   onUpload,
   onError,
   loading = false,
@@ -19,6 +21,7 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
   preview = true,
   validation,
   className = '',
+  showToast = true,
   ...props
 }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -59,14 +62,18 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
 
       // Check file count
       if (fileArray.length > maxFiles) {
-        newErrors.push(`Maximum ${maxFiles} file(s) allowed`);
+        const errorMsg = `Maximum ${maxFiles} file(s) allowed`;
+        newErrors.push(errorMsg);
+        if (showToast) toast.error(errorMsg);
       }
 
       // Validate each file
       fileArray.forEach(file => {
         const error = validateFile(file);
         if (error) {
-          newErrors.push(`${file.name}: ${error}`);
+          const errorMsg = `${file.name}: ${error}`;
+          newErrors.push(errorMsg);
+          if (showToast) toast.error(errorMsg);
         } else {
           validFiles.push(file);
         }
@@ -75,11 +82,16 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
       setErrors(newErrors);
       setSelectedFiles(validFiles);
 
+      // Call onFileUpload immediately when files are selected (for ATSChecker compatibility)
+      if (validFiles.length > 0 && onFileUpload) {
+        onFileUpload(validFiles);
+      }
+
       if (newErrors.length > 0 && onError) {
         onError(newErrors.join(', '));
       }
     },
-    [maxFiles, validateFile, onError]
+    [maxFiles, validateFile, onError, showToast, onFileUpload]
   );
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -181,7 +193,11 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
           onChange={handleFileInput}
           className='hidden'
           disabled={disabled || loading}
+          aria-label='Upload resume file'
         />
+        <label htmlFor='file-input' className='sr-only'>
+          Upload resume file
+        </label>
 
         <div className='space-y-4'>
           <div className='text-4xl'>📁</div>

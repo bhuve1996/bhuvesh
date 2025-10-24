@@ -1,4 +1,3 @@
-// @ts-expect-error - html-docx-js doesn't have type definitions
 import htmlDocx from 'html-docx-js/dist/html-docx';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -161,7 +160,7 @@ export const exportToDOCXFromHTML = async (
     const htmlString = generateHtmlString(template, data);
 
     // Convert HTML to DOCX
-    const docxBuffer = await htmlDocx.asBlob(htmlString, {
+    const docxBuffer = await (htmlDocx as any).asBlob(htmlString, {
       orientation: 'portrait',
       margins: {
         top: 720, // 0.5 inch in twips

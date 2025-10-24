@@ -9,8 +9,8 @@ import { UserProfile } from '@/components/auth';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import { COMMON_CLASSES, NAV_ITEMS } from '@/lib/constants';
-import { NavItem } from '@/lib/data-types';
 import type { NavigationProps } from '@/types';
+import { NavItem } from '@/types';
 
 export const Navigation: React.FC<NavigationProps> = ({
   activeSection = 'home',
@@ -49,12 +49,12 @@ export const Navigation: React.FC<NavigationProps> = ({
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className={`w-full bg-background border-b border-border ${className || ''}`}
+      className={`w-full bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-50 ${className || ''}`}
       role='navigation'
       aria-label='Main navigation'
     >
       <div className={`${COMMON_CLASSES.container} py-4`}>
-        <div className='flex justify-between items-center'>
+        <div className='flex justify-between items-center min-h-[4rem]'>
           {/* Logo */}
           <motion.div
             initial={{ x: -50, opacity: 0 }}
@@ -84,7 +84,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className='hidden md:flex items-center space-x-1'
+            className='hidden lg:flex items-center space-x-1 h-full flex-nowrap'
           >
             {navItems.map((item, index) => (
               <motion.div
@@ -141,45 +141,99 @@ export const Navigation: React.FC<NavigationProps> = ({
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.8 }}
-              className='ml-4 flex items-center gap-3'
+              className='ml-4 flex items-center gap-3 h-full'
             >
               <UserProfile />
               <ThemeToggle size='sm' />
             </motion.div>
           </motion.div>
 
-          {/* Mobile Menu Button */}
-          <motion.button
+          {/* Medium Screen Navigation (Tablet) */}
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className='hidden md:flex lg:hidden items-center space-x-0.5 h-full flex-nowrap'
+          >
+            {navItems.slice(0, 3).map((item, index) => (
+              <motion.div
+                key={item.label}
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+              >
+                <Tooltip
+                  content={`Go to ${item.label} page`}
+                  position='bottom'
+                  delay={200}
+                >
+                  <Link
+                    href={item.href}
+                    className='relative px-2 py-2 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-xs'
+                    tabIndex={0}
+                  >
+                    <span className='relative z-10'>{item.label}</span>
+                    <div className='absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+                  </Link>
+                </Tooltip>
+              </motion.div>
+            ))}
+            
+            {/* User Profile & Theme Toggle for Medium Screens */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.8 }}
+              className='ml-2 flex items-center gap-2 h-full'
+            >
+              <UserProfile />
+              <ThemeToggle size='sm' />
+            </motion.div>
+          </motion.div>
+
+          {/* Mobile Navigation Controls */}
+          <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.5 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className='md:hidden relative p-2 text-foreground hover:text-primary-400 hover:bg-muted/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setIsMobileMenuOpen(!isMobileMenuOpen);
-              }
-            }}
-            aria-label='Toggle mobile menu'
-            aria-expanded={isMobileMenuOpen}
-            aria-controls='mobile-menu'
-            tabIndex={0}
+            className='md:hidden flex items-center gap-2'
           >
-            <div className='relative w-6 h-6'>
-              <span
-                className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45' : '-translate-y-1'}`}
-              ></span>
-              <span
-                className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : 'opacity-100'}`}
-              ></span>
-              <span
-                className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45' : 'translate-y-1'}`}
-              ></span>
+            {/* User Profile & Theme Toggle for Mobile */}
+            <div className='flex items-center gap-2'>
+              <UserProfile />
+              <ThemeToggle size='sm' />
             </div>
-          </motion.button>
+            
+            {/* Mobile Menu Button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className='relative p-2 text-foreground hover:text-primary-400 hover:bg-muted/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setIsMobileMenuOpen(!isMobileMenuOpen);
+                }
+              }}
+              aria-label='Toggle mobile menu'
+              aria-expanded={isMobileMenuOpen}
+              aria-controls='mobile-menu'
+              tabIndex={0}
+            >
+              <div className='relative w-6 h-6'>
+                <span
+                  className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45' : '-translate-y-1'}`}
+                ></span>
+                <span
+                  className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : 'opacity-100'}`}
+                ></span>
+                <span
+                  className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45' : 'translate-y-1'}`}
+                ></span>
+              </div>
+            </motion.button>
+          </motion.div>
         </div>
 
         {/* Mobile Navigation */}
@@ -191,7 +245,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className='md:hidden overflow-hidden'
+              className='lg:hidden overflow-hidden'
               role='menu'
               aria-hidden={!isMobileMenuOpen}
             >
@@ -232,6 +286,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                       )}
                     </motion.div>
                   ))}
+
                 </div>
               </div>
             </motion.div>

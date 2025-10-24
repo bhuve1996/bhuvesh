@@ -2,12 +2,8 @@
 
 import { signIn } from 'next-auth/react';
 
-import { Button } from '@/components/ui/Button/Button';
-
-interface LoginButtonProps {
-  className?: string;
-  size?: 'sm' | 'md' | 'lg';
-}
+import { Button } from '@/components/atoms/Button/Button';
+import type { LoginButtonProps } from '@/types';
 
 export const LoginButton: React.FC<LoginButtonProps> = ({
   className = '',

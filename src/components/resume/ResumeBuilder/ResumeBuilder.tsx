@@ -2,14 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/atoms/Button/Button';
+import { FormField } from '@/components/molecules/FormField/FormField';
 import { Card } from '@/components/ui/Card';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
-import { FormField } from '@/components/ui/FormField';
 import { ItemCard } from '@/components/ui/ItemCard';
 import { ResumeInput } from '@/components/ui/ResumeInput';
 import { RichTextInput } from '@/components/ui/RichTextInput';
 import { validateResumeData, ValidationResult } from '@/lib/resume/validation';
+import { useResumeStore } from '@/store/resumeStore';
 import { ResumeData } from '@/types/resume';
 
 import { AIAssistant } from '../AIAssistant';
@@ -31,6 +32,18 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
   onSave,
   onExport,
 }) => {
+  // Use global store for all data management
+  const {
+    updatePersonalInfo,
+    updateSummary,
+    updateSkills,
+    setResumeData,
+    updateAchievements,
+    updateCertifications,
+    updateHobbies,
+  } = useResumeStore();
+  const resumeData = useResumeStore(state => state.resumeData);
+
   const [currentStep, setCurrentStep] = useState<
     'builder' | 'preview' | 'sections'
   >('builder');
@@ -53,7 +66,8 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
     achievements: false,
     certifications: false,
   });
-  const [resumeData, setResumeData] = useState<ResumeData>({
+  // Create default resume data structure if none exists
+  const defaultResumeData: ResumeData = {
     personal: {
       fullName: '',
       email: '',
@@ -75,45 +89,67 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
     },
     projects: [],
     achievements: [],
-  });
+  };
 
-  // Initialize with ATS data
+  // Use global data or default if none exists - ensure it's never null
+  const currentResumeData: ResumeData = resumeData || defaultResumeData;
+
+  // Initialize with ATS data - only run once when initialData changes
   useEffect(() => {
-    if (initialData) {
-      setResumeData(_prev => {
-        // Use ONLY parsed data - no sample data at all
-        return {
-          personal: {
-            fullName: initialData.personal?.fullName || '',
-            email: initialData.personal?.email || '',
-            phone: initialData.personal?.phone || '',
-            location: initialData.personal?.location || '',
-            linkedin: initialData.personal?.linkedin || '',
-            github: initialData.personal?.github || '',
-            portfolio: initialData.personal?.portfolio || '',
-          },
-          summary: initialData.summary || '',
-          experience: initialData.experience || [],
-          education: initialData.education || [],
-          skills: {
-            technical: initialData.skills?.technical || [],
-            business: initialData.skills?.business || [],
-            soft: initialData.skills?.soft || [],
-            languages: initialData.skills?.languages || [],
-            certifications: initialData.skills?.certifications || [],
-          },
-          projects: initialData.projects || [],
-          achievements: initialData.achievements || [],
-        };
+    if (initialData && !resumeData) {
+      // Only update if we don't already have resume data
+      setResumeData({
+        personal: {
+          fullName: initialData.personal?.fullName || '',
+          email: initialData.personal?.email || '',
+          phone: initialData.personal?.phone || '',
+          location: initialData.personal?.location || '',
+          linkedin: initialData.personal?.linkedin || '',
+          github: initialData.personal?.github || '',
+          portfolio: initialData.personal?.portfolio || '',
+        },
+        summary: initialData.summary || '',
+        experience: initialData.experience || [],
+        education: initialData.education || [],
+        skills: {
+          technical: initialData.skills?.technical || [],
+          business: initialData.skills?.business || [],
+          soft: initialData.skills?.soft || [],
+          languages: initialData.skills?.languages || [],
+          certifications: initialData.skills?.certifications || [],
+        },
+        projects: initialData.projects || [],
+        achievements: initialData.achievements || [],
       });
     }
-  }, [initialData]);
+  }, [initialData]); // Remove setResumeData from dependencies to prevent infinite loop
 
   const handleDataUpdate = (section: keyof ResumeData, data: unknown) => {
-    setResumeData(prev => ({
-      ...prev,
-      [section]: data,
-    }));
+    // Update global store for all changes
+    if (section === 'personal' && typeof data === 'object' && data !== null) {
+      updatePersonalInfo(data as Partial<ResumeData['personal']>);
+    } else if (section === 'summary' && typeof data === 'string') {
+      updateSummary(data);
+    } else if (
+      section === 'skills' &&
+      typeof data === 'object' &&
+      data !== null
+    ) {
+      updateSkills(data as Partial<ResumeData['skills']>);
+    } else if (section === 'achievements' && Array.isArray(data)) {
+      updateAchievements(data);
+    } else if (section === 'certifications' && Array.isArray(data)) {
+      updateCertifications(data);
+    } else if (section === 'hobbies' && Array.isArray(data)) {
+      updateHobbies(data);
+    } else {
+      // For other sections, update the entire resume data
+      const updatedData = {
+        ...currentResumeData,
+        [section]: data,
+      };
+      setResumeData(updatedData);
+    }
   };
 
   const toggleSection = (section: string) => {
@@ -130,7 +166,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
 
   const handleSave = () => {
     // Validate resume data before saving
-    const validation = validateResumeData(resumeData);
+    const validation = validateResumeData(currentResumeData);
     setValidationResult(validation);
     setPendingAction({ type: 'save' });
     setShowValidationModal(true);
@@ -138,7 +174,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
 
   const handleExport = (format: 'pdf' | 'docx' | 'txt') => {
     // Validate resume data before exporting
-    const validation = validateResumeData(resumeData);
+    const validation = validateResumeData(currentResumeData);
     setValidationResult(validation);
     setPendingAction({ type: 'export', format });
     setShowValidationModal(true);
@@ -149,15 +185,18 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
 
     if (pendingAction.type === 'save') {
       if (onSave) {
-        onSave(resumeData);
+        onSave(currentResumeData);
       }
       // Also save to localStorage (client-side only)
       if (typeof window !== 'undefined') {
-        localStorage.setItem('resume-builder-data', JSON.stringify(resumeData));
+        localStorage.setItem(
+          'resume-builder-data',
+          JSON.stringify(currentResumeData)
+        );
       }
     } else if (pendingAction.type === 'export' && pendingAction.format) {
       if (onExport) {
-        onExport(resumeData, pendingAction.format);
+        onExport(currentResumeData, pendingAction.format);
       }
     }
 
@@ -188,7 +227,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     icon='👤'
                     color='primary'
                     count={
-                      Object.values(resumeData.personal).filter(
+                      Object.values(currentResumeData.personal).filter(
                         value => value && value.trim() !== ''
                       ).length
                     }
@@ -198,20 +237,20 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                   >
                     <SectionValidation
                       section='personal'
-                      resumeData={resumeData}
+                      resumeData={currentResumeData}
                       className='mb-4'
                     />
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                       <div>
                         <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
-                          Full Name *
+                          Full Name <span className='text-red-500'>*</span>
                         </label>
                         <input
                           type='text'
-                          value={resumeData.personal.fullName}
+                          value={currentResumeData.personal.fullName}
                           onChange={e =>
                             handleDataUpdate('personal', {
-                              ...resumeData.personal,
+                              ...currentResumeData.personal,
                               fullName: e.target.value,
                             })
                           }
@@ -221,14 +260,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       </div>
                       <div>
                         <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
-                          Email *
+                          Email <span className='text-red-500'>*</span>
                         </label>
                         <input
                           type='email'
-                          value={resumeData.personal.email}
+                          value={currentResumeData.personal.email}
                           onChange={e =>
                             handleDataUpdate('personal', {
-                              ...resumeData.personal,
+                              ...currentResumeData.personal,
                               email: e.target.value,
                             })
                           }
@@ -238,14 +277,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       </div>
                       <div>
                         <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
-                          Phone *
+                          Phone <span className='text-red-500'>*</span>
                         </label>
                         <input
                           type='tel'
-                          value={resumeData.personal.phone}
+                          value={currentResumeData.personal.phone}
                           onChange={e =>
                             handleDataUpdate('personal', {
-                              ...resumeData.personal,
+                              ...currentResumeData.personal,
                               phone: e.target.value,
                             })
                           }
@@ -255,14 +294,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       </div>
                       <div>
                         <label className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'>
-                          Location *
+                          Location <span className='text-red-500'>*</span>
                         </label>
                         <input
                           type='text'
-                          value={resumeData.personal.location}
+                          value={currentResumeData.personal.location}
                           onChange={e =>
                             handleDataUpdate('personal', {
-                              ...resumeData.personal,
+                              ...currentResumeData.personal,
                               location: e.target.value,
                             })
                           }
@@ -276,10 +315,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         </label>
                         <input
                           type='url'
-                          value={resumeData.personal.linkedin || ''}
+                          value={currentResumeData.personal.linkedin || ''}
                           onChange={e =>
                             handleDataUpdate('personal', {
-                              ...resumeData.personal,
+                              ...currentResumeData.personal,
                               linkedin: e.target.value,
                             })
                           }
@@ -293,10 +332,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         </label>
                         <input
                           type='url'
-                          value={resumeData.personal.github || ''}
+                          value={currentResumeData.personal.github || ''}
                           onChange={e =>
                             handleDataUpdate('personal', {
-                              ...resumeData.personal,
+                              ...currentResumeData.personal,
                               github: e.target.value,
                             })
                           }
@@ -314,7 +353,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           //   suggestion
                           // );
                         }}
-                        context={`Personal information for ${resumeData.personal.fullName || 'resume'}`}
+                        context={`Personal information for ${currentResumeData.personal.fullName || 'resume'}`}
                         type='personal'
                       />
                     </div>
@@ -327,13 +366,13 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     title='Professional Summary'
                     icon='📝'
                     color='blue'
-                    count={resumeData.summary ? 1 : 0}
+                    count={currentResumeData.summary ? 1 : 0}
                     countLabel='summary'
                     isExpanded={expandedSections.summary || false}
                     onToggle={() => toggleSection('summary')}
                   >
                     <RichTextEditor
-                      content={resumeData.summary || ''}
+                      content={currentResumeData.summary || ''}
                       onChange={content => handleDataUpdate('summary', content)}
                       placeholder='Write a brief summary of your professional background and key strengths...'
                       maxLength={500}
@@ -344,8 +383,8 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           handleDataUpdate('summary', suggestion)
                         }
                         context={
-                          resumeData.personal.fullName
-                            ? `Professional summary for ${resumeData.personal.fullName}`
+                          currentResumeData.personal.fullName
+                            ? `Professional summary for ${currentResumeData.personal.fullName}`
                             : ''
                         }
                         type='summary'
@@ -357,28 +396,29 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 {/* Work Experience */}
                 <Card>
                   <CollapsibleSection
-                    title='Work Experience'
+                    title='Work Experience *'
                     icon='💼'
                     color='green'
-                    count={resumeData.experience.length}
+                    count={currentResumeData.experience.length}
                     countLabel={
-                      resumeData.experience.length === 1 ? 'job' : 'jobs'
+                      currentResumeData.experience.length === 1 ? 'job' : 'jobs'
                     }
                     isExpanded={expandedSections.experience || false}
                     onToggle={() => toggleSection('experience')}
                   >
                     <SectionValidation
                       section='experience'
-                      resumeData={resumeData}
+                      resumeData={currentResumeData}
                       className='mb-4'
                     />
-                    {resumeData.experience.map((job, index) => (
+                    {currentResumeData.experience.map((job, index) => (
                       <ItemCard
                         key={job.id}
                         onRemove={() => {
-                          const newExperience = resumeData.experience.filter(
-                            (_, i) => i !== index
-                          );
+                          const newExperience =
+                            currentResumeData.experience.filter(
+                              (_, i) => i !== index
+                            );
                           handleDataUpdate('experience', newExperience);
                         }}
                         removeLabel='Remove Job'
@@ -389,7 +429,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               value={job.position}
                               onChange={value => {
                                 const newExperience = [
-                                  ...resumeData.experience,
+                                  ...currentResumeData.experience,
                                 ];
                                 newExperience[index] = {
                                   ...job,
@@ -405,7 +445,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               value={job.company}
                               onChange={value => {
                                 const newExperience = [
-                                  ...resumeData.experience,
+                                  ...currentResumeData.experience,
                                 ];
                                 newExperience[index] = {
                                   ...job,
@@ -421,7 +461,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               value={job.location}
                               onChange={value => {
                                 const newExperience = [
-                                  ...resumeData.experience,
+                                  ...currentResumeData.experience,
                                 ];
                                 newExperience[index] = {
                                   ...job,
@@ -437,7 +477,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               value={`${job.startDate} - ${job.endDate || 'Present'}`}
                               onChange={value => {
                                 const newExperience = [
-                                  ...resumeData.experience,
+                                  ...currentResumeData.experience,
                                 ];
                                 const [startDate, endDate] = value.split(' - ');
                                 newExperience[index] = {
@@ -456,7 +496,9 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           <RichTextInput
                             content={job.description}
                             onChange={content => {
-                              const newExperience = [...resumeData.experience];
+                              const newExperience = [
+                                ...currentResumeData.experience,
+                              ];
                               newExperience[index] = {
                                 ...job,
                                 description: content,
@@ -485,7 +527,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           technologies: [],
                         };
                         handleDataUpdate('experience', [
-                          ...resumeData.experience,
+                          ...currentResumeData.experience,
                           newJob,
                         ]);
                       }}
@@ -499,23 +541,26 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 {/* Education */}
                 <Card>
                   <CollapsibleSection
-                    title='Education'
+                    title='Education *'
                     icon='🎓'
                     color='purple'
-                    count={resumeData.education.length}
+                    count={currentResumeData.education.length}
                     countLabel={
-                      resumeData.education.length === 1 ? 'degree' : 'degrees'
+                      currentResumeData.education.length === 1
+                        ? 'degree'
+                        : 'degrees'
                     }
                     isExpanded={expandedSections.education || false}
                     onToggle={() => toggleSection('education')}
                   >
-                    {resumeData.education.map((edu, index) => (
+                    {currentResumeData.education.map((edu, index) => (
                       <ItemCard
                         key={edu.id}
                         onRemove={() => {
-                          const newEducation = resumeData.education.filter(
-                            (_, i) => i !== index
-                          );
+                          const newEducation =
+                            currentResumeData.education.filter(
+                              (_, i) => i !== index
+                            );
                           handleDataUpdate('education', newEducation);
                         }}
                         removeLabel='Remove Education'
@@ -525,7 +570,9 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                             <ResumeInput
                               value={edu.degree}
                               onChange={value => {
-                                const newEducation = [...resumeData.education];
+                                const newEducation = [
+                                  ...currentResumeData.education,
+                                ];
                                 newEducation[index] = {
                                   ...edu,
                                   degree: value,
@@ -539,7 +586,9 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                             <ResumeInput
                               value={edu.institution}
                               onChange={value => {
-                                const newEducation = [...resumeData.education];
+                                const newEducation = [
+                                  ...currentResumeData.education,
+                                ];
                                 newEducation[index] = {
                                   ...edu,
                                   institution: value,
@@ -553,7 +602,9 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                             <ResumeInput
                               value={edu.location}
                               onChange={value => {
-                                const newEducation = [...resumeData.education];
+                                const newEducation = [
+                                  ...currentResumeData.education,
+                                ];
                                 newEducation[index] = {
                                   ...edu,
                                   location: value,
@@ -567,7 +618,9 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                             <ResumeInput
                               value={`${edu.startDate} - ${edu.endDate || 'Present'}`}
                               onChange={value => {
-                                const newEducation = [...resumeData.education];
+                                const newEducation = [
+                                  ...currentResumeData.education,
+                                ];
                                 const [startDate, endDate] = value.split(' - ');
                                 newEducation[index] = {
                                   ...edu,
@@ -584,7 +637,9 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                             <ResumeInput
                               value={edu.gpa || ''}
                               onChange={value => {
-                                const newEducation = [...resumeData.education];
+                                const newEducation = [
+                                  ...currentResumeData.education,
+                                ];
                                 newEducation[index] = { ...edu, gpa: value };
                                 handleDataUpdate('education', newEducation);
                               }}
@@ -607,7 +662,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           relevant_courses: [],
                         };
                         handleDataUpdate('education', [
-                          ...resumeData.education,
+                          ...currentResumeData.education,
                           newEducation,
                         ]);
                       }}
@@ -624,7 +679,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           //   suggestion
                           // );
                         }}
-                        context={`Education section for ${resumeData.personal.fullName || 'resume'}`}
+                        context={`Education section for ${currentResumeData.personal.fullName || 'resume'}`}
                         type='education'
                       />
                     </div>
@@ -637,19 +692,21 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     title='Projects'
                     icon='🚀'
                     color='orange'
-                    count={resumeData.projects?.length || 0}
+                    count={currentResumeData.projects?.length || 0}
                     countLabel={
-                      resumeData.projects?.length === 1 ? 'project' : 'projects'
+                      currentResumeData.projects?.length === 1
+                        ? 'project'
+                        : 'projects'
                     }
                     isExpanded={expandedSections.projects || false}
                     onToggle={() => toggleSection('projects')}
                   >
-                    {resumeData.projects?.map((project, index) => (
+                    {currentResumeData.projects?.map((project, index) => (
                       <ItemCard
                         key={project.id}
                         onRemove={() => {
                           const newProjects = (
-                            resumeData.projects || []
+                            currentResumeData.projects || []
                           ).filter((_, i) => i !== index);
                           handleDataUpdate('projects', newProjects);
                         }}
@@ -661,7 +718,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               value={project.name}
                               onChange={value => {
                                 const newProjects = [
-                                  ...(resumeData.projects || []),
+                                  ...(currentResumeData.projects || []),
                                 ];
                                 newProjects[index] = {
                                   ...project,
@@ -678,7 +735,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               value={project.url || ''}
                               onChange={value => {
                                 const newProjects = [
-                                  ...(resumeData.projects || []),
+                                  ...(currentResumeData.projects || []),
                                 ];
                                 newProjects[index] = {
                                   ...project,
@@ -695,7 +752,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                             content={project.description}
                             onChange={content => {
                               const newProjects = [
-                                ...(resumeData.projects || []),
+                                ...(currentResumeData.projects || []),
                               ];
                               newProjects[index] = {
                                 ...project,
@@ -717,7 +774,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                             value={project.technologies.join(', ')}
                             onChange={value => {
                               const newProjects = [
-                                ...(resumeData.projects || []),
+                                ...(currentResumeData.projects || []),
                               ];
                               newProjects[index] = {
                                 ...project,
@@ -744,7 +801,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           link: '',
                         };
                         handleDataUpdate('projects', [
-                          ...(resumeData.projects || []),
+                          ...(currentResumeData.projects || []),
                           newProject,
                         ]);
                       }}
@@ -758,12 +815,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 {/* Skills */}
                 <Card>
                   <CollapsibleSection
-                    title='Skills'
+                    title='Skills *'
                     icon='⚡'
                     color='cyan'
                     count={
-                      resumeData.skills.technical.length +
-                      resumeData.skills.soft.length
+                      currentResumeData.skills.technical.length +
+                      currentResumeData.skills.soft.length
                     }
                     countLabel='skills'
                     isExpanded={expandedSections.skills || false}
@@ -771,7 +828,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                   >
                     <SectionValidation
                       section='skills'
-                      resumeData={resumeData}
+                      resumeData={currentResumeData}
                       className='mb-4'
                     />
                     <FormField
@@ -780,10 +837,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       helperText='Separate skills with commas'
                     >
                       <ResumeInput
-                        value={resumeData.skills.technical.join(', ')}
+                        value={currentResumeData.skills.technical.join(', ')}
                         onChange={value =>
                           handleDataUpdate('skills', {
-                            ...resumeData.skills,
+                            ...currentResumeData.skills,
                             technical: value
                               .split(',')
                               .map(s => capitalizeFirstLetter(s.trim()))
@@ -798,10 +855,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       helperText='Separate skills with commas'
                     >
                       <ResumeInput
-                        value={resumeData.skills.soft.join(', ')}
+                        value={currentResumeData.skills.soft.join(', ')}
                         onChange={value =>
                           handleDataUpdate('skills', {
-                            ...resumeData.skills,
+                            ...currentResumeData.skills,
                             soft: value
                               .split(',')
                               .map(s => capitalizeFirstLetter(s.trim()))
@@ -820,7 +877,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           //   suggestion
                           // );
                         }}
-                        context={`Skills section for ${resumeData.personal.fullName || 'resume'}`}
+                        context={`Skills section for ${currentResumeData.personal.fullName || 'resume'}`}
                         type='skills'
                       />
                     </div>
@@ -833,18 +890,18 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     title='Certifications'
                     icon='🏆'
                     color='purple'
-                    count={resumeData.certifications?.length || 0}
+                    count={currentResumeData.certifications?.length || 0}
                     countLabel='certifications'
                     isExpanded={expandedSections.certifications || false}
                     onToggle={() => toggleSection('certifications')}
                   >
                     <SectionValidation
                       section='certifications'
-                      resumeData={resumeData}
+                      resumeData={currentResumeData}
                       className='mb-4'
                     />
                     <div className='space-y-4'>
-                      {resumeData.certifications?.map((cert, index) => (
+                      {currentResumeData.certifications?.map((cert, index) => (
                         <div
                           key={index}
                           className='flex items-center space-x-2'
@@ -854,7 +911,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                             value={typeof cert === 'string' ? cert : cert.name}
                             onChange={e => {
                               const newCerts = [
-                                ...(resumeData.certifications || []),
+                                ...(currentResumeData.certifications || []),
                               ];
                               newCerts[index] = {
                                 name: e.target.value,
@@ -871,7 +928,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                             size='sm'
                             onClick={() => {
                               const newCerts = (
-                                resumeData.certifications || []
+                                currentResumeData.certifications || []
                               ).filter((_, i) => i !== index);
                               handleDataUpdate('certifications', newCerts);
                             }}
@@ -885,7 +942,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         variant='outline'
                         onClick={() => {
                           handleDataUpdate('certifications', [
-                            ...(resumeData.certifications || []),
+                            ...(currentResumeData.certifications || []),
                             '',
                           ]);
                         }}
@@ -903,7 +960,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           //   suggestion
                           // );
                         }}
-                        context={`Certifications section for ${resumeData.personal.fullName || 'resume'}`}
+                        context={`Certifications section for ${currentResumeData.personal.fullName || 'resume'}`}
                         type='certifications'
                       />
                     </div>
@@ -916,9 +973,9 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     title='Achievements'
                     icon='🏆'
                     color='purple'
-                    count={resumeData.achievements?.length || 0}
+                    count={currentResumeData.achievements?.length || 0}
                     countLabel={
-                      resumeData.achievements?.length === 1
+                      currentResumeData.achievements?.length === 1
                         ? 'achievement'
                         : 'achievements'
                     }
@@ -926,44 +983,52 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     onToggle={() => toggleSection('achievements')}
                   >
                     <div className='space-y-4'>
-                      {resumeData.achievements?.map((achievement, index) => (
-                        <div
-                          key={index}
-                          className='flex items-center space-x-2'
-                        >
-                          <input
-                            type='text'
-                            value={achievement}
-                            onChange={e => {
-                              const newAchievements = [
-                                ...(resumeData.achievements || []),
-                              ];
-                              newAchievements[index] = e.target.value;
-                              handleDataUpdate('achievements', newAchievements);
-                            }}
-                            className='flex-1 px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
-                            placeholder='Led team of 5 developers to deliver project 2 weeks early'
-                          />
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={() => {
-                              const newAchievements = (
-                                resumeData.achievements || []
-                              ).filter((_, i) => i !== index);
-                              handleDataUpdate('achievements', newAchievements);
-                            }}
-                            className='text-red-600 hover:bg-red-50'
+                      {currentResumeData.achievements?.map(
+                        (achievement, index) => (
+                          <div
+                            key={index}
+                            className='flex items-center space-x-2'
                           >
-                            Remove
-                          </Button>
-                        </div>
-                      ))}
+                            <input
+                              type='text'
+                              value={achievement}
+                              onChange={e => {
+                                const newAchievements = [
+                                  ...(currentResumeData.achievements || []),
+                                ];
+                                newAchievements[index] = e.target.value;
+                                handleDataUpdate(
+                                  'achievements',
+                                  newAchievements
+                                );
+                              }}
+                              className='flex-1 px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                              placeholder='Led team of 5 developers to deliver project 2 weeks early'
+                            />
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              onClick={() => {
+                                const newAchievements = (
+                                  currentResumeData.achievements || []
+                                ).filter((_, i) => i !== index);
+                                handleDataUpdate(
+                                  'achievements',
+                                  newAchievements
+                                );
+                              }}
+                              className='text-red-600 hover:bg-red-50'
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        )
+                      )}
                       <Button
                         variant='outline'
                         onClick={() => {
                           handleDataUpdate('achievements', [
-                            ...(resumeData.achievements || []),
+                            ...(currentResumeData.achievements || []),
                             '',
                           ]);
                         }}
@@ -981,7 +1046,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           //   suggestion
                           // );
                         }}
-                        context={`Achievements section for ${resumeData.personal.fullName || 'resume'}`}
+                        context={`Achievements section for ${currentResumeData.personal.fullName || 'resume'}`}
                         type='achievements'
                       />
                     </div>
@@ -1018,53 +1083,58 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 {/* Header */}
                 <div className='text-center mb-6'>
                   <h1 className='text-2xl font-bold text-gray-900 mb-2'>
-                    {resumeData.personal.fullName || 'Your Name'}
+                    {currentResumeData.personal.fullName || 'Your Name'}
                   </h1>
                   <div className='text-sm text-gray-600 space-y-1'>
                     <p>
-                      {resumeData.personal.email || 'your.email@example.com'}
+                      {currentResumeData.personal.email ||
+                        'your.email@example.com'}
                     </p>
-                    <p>{resumeData.personal.phone || '(555) 123-4567'}</p>
-                    <p>{resumeData.personal.location || 'Your Location'}</p>
-                    {resumeData.personal.linkedin && (
-                      <p>LinkedIn: {resumeData.personal.linkedin}</p>
+                    <p>
+                      {currentResumeData.personal.phone || '(555) 123-4567'}
+                    </p>
+                    <p>
+                      {currentResumeData.personal.location || 'Your Location'}
+                    </p>
+                    {currentResumeData.personal.linkedin && (
+                      <p>LinkedIn: {currentResumeData.personal.linkedin}</p>
                     )}
-                    {resumeData.personal.github && (
-                      <p>GitHub: {resumeData.personal.github}</p>
+                    {currentResumeData.personal.github && (
+                      <p>GitHub: {currentResumeData.personal.github}</p>
                     )}
                   </div>
                 </div>
 
                 {/* Summary */}
-                {resumeData.summary && (
+                {currentResumeData.summary && (
                   <div className='mb-6'>
                     <h2 className='text-lg font-semibold text-gray-900 mb-2'>
                       Professional Summary
                     </h2>
-                    <p className='text-gray-700'>{resumeData.summary}</p>
+                    <p className='text-gray-700'>{currentResumeData.summary}</p>
                   </div>
                 )}
 
                 {/* Skills */}
-                {resumeData.skills.technical.length > 0 && (
+                {currentResumeData.skills.technical.length > 0 && (
                   <div className='mb-6'>
                     <h2 className='text-lg font-semibold text-gray-900 mb-2'>
                       Technical Skills
                     </h2>
                     <p className='text-gray-700'>
-                      {resumeData.skills.technical.join(', ')}
+                      {currentResumeData.skills.technical.join(', ')}
                     </p>
                   </div>
                 )}
 
                 {/* Soft Skills */}
-                {resumeData.skills.soft.length > 0 && (
+                {currentResumeData.skills.soft.length > 0 && (
                   <div className='mb-6'>
                     <h2 className='text-lg font-semibold text-gray-900 mb-2'>
                       Soft Skills
                     </h2>
                     <p className='text-gray-700'>
-                      {resumeData.skills.soft.join(', ')}
+                      {currentResumeData.skills.soft.join(', ')}
                     </p>
                   </div>
                 )}
@@ -1116,14 +1186,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 </Button>
                 <div className='flex gap-2'>
                   <PDFExporter
-                    resumeData={resumeData}
+                    resumeData={currentResumeData}
                     template={null}
                     onExport={() => {
                       /* PDF exported */
                     }}
                   />
                   <DOCXExporter
-                    resumeData={resumeData}
+                    resumeData={currentResumeData}
                     template={null}
                     onExport={() => {
                       /* DOCX exported */
@@ -1150,7 +1220,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
 
       {/* Floating Actions */}
       {currentStep === 'builder' && (
-        <FloatingActions resumeData={resumeData} onSave={handleSave} />
+        <FloatingActions resumeData={currentResumeData} onSave={handleSave} />
       )}
 
       {/* Validation Modal */}

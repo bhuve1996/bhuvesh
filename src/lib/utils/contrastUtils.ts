@@ -1,3 +1,5 @@
+import { ContrastChecker } from 'color-contrast-checker';
+
 import { ColorScheme } from '@/types/resume';
 
 // Convert hex color to RGB
@@ -21,35 +23,56 @@ function getLuminance(r: number, g: number, b: number): number {
   return 0.2126 * (rs ?? 0) + 0.7152 * (gs ?? 0) + 0.0722 * (bs ?? 0);
 }
 
-// Calculate contrast ratio between two colors
+// Initialize contrast checker
+const contrastChecker = new ContrastChecker();
+
+// Calculate contrast ratio between two colors using the library
 export function getContrastRatio(color1: string, color2: string): number {
-  const rgb1 = hexToRgb(color1);
-  const rgb2 = hexToRgb(color2);
+  try {
+    return contrastChecker.getRatio(color1, color2);
+  } catch (error) {
+    // Fallback to manual calculation if library fails
+    const rgb1 = hexToRgb(color1);
+    const rgb2 = hexToRgb(color2);
 
-  if (!rgb1 || !rgb2) return 0;
+    if (!rgb1 || !rgb2) return 0;
 
-  const lum1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
-  const lum2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
+    const lum1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
+    const lum2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
 
-  const brightest = Math.max(lum1, lum2);
-  const darkest = Math.min(lum1, lum2);
+    const brightest = Math.max(lum1, lum2);
+    const darkest = Math.min(lum1, lum2);
 
-  return (brightest + 0.05) / (darkest + 0.05);
+    return (brightest + 0.05) / (darkest + 0.05);
+  }
 }
 
-// Check if contrast ratio meets WCAG standards
+// Check if contrast ratio meets WCAG standards using the library
 export function meetsContrastStandards(
   foreground: string,
   background: string,
   level: 'AA' | 'AAA' = 'AA',
   size: 'normal' | 'large' = 'normal'
 ): boolean {
-  const ratio = getContrastRatio(foreground, background);
+  try {
+    if (level === 'AAA') {
+      return size === 'large'
+        ? contrastChecker.isLevelAAA(foreground, background, 18) // Large text
+        : contrastChecker.isLevelAAA(foreground, background, 14); // Normal text
+    } else {
+      return size === 'large'
+        ? contrastChecker.isLevelAA(foreground, background, 18) // Large text
+        : contrastChecker.isLevelAA(foreground, background, 14); // Normal text
+    }
+  } catch (error) {
+    // Fallback to manual calculation
+    const ratio = getContrastRatio(foreground, background);
 
-  if (level === 'AAA') {
-    return size === 'large' ? ratio >= 4.5 : ratio >= 7;
-  } else {
-    return size === 'large' ? ratio >= 3 : ratio >= 4.5;
+    if (level === 'AAA') {
+      return size === 'large' ? ratio >= 4.5 : ratio >= 7;
+    } else {
+      return size === 'large' ? ratio >= 3 : ratio >= 4.5;
+    }
   }
 }
 
@@ -112,17 +135,76 @@ export function getContrastRatioString(color1: string, color2: string): string {
   return `${ratio.toFixed(2)}:1`;
 }
 
-// Get WCAG compliance level
+// Get WCAG compliance level using the library
 export function getWCAGLevel(
   foreground: string,
   background: string,
   size: 'normal' | 'large' = 'normal'
 ): 'AAA' | 'AA' | 'Fail' {
-  const ratio = getContrastRatio(foreground, background);
+  try {
+    const fontSize = size === 'large' ? 18 : 14;
 
-  if (size === 'large') {
-    return ratio >= 4.5 ? 'AAA' : ratio >= 3 ? 'AA' : 'Fail';
-  } else {
-    return ratio >= 7 ? 'AAA' : ratio >= 4.5 ? 'AA' : 'Fail';
+    if (contrastChecker.isLevelAAA(foreground, background, fontSize)) {
+      return 'AAA';
+    } else if (contrastChecker.isLevelAA(foreground, background, fontSize)) {
+      return 'AA';
+    } else {
+      return 'Fail';
+    }
+  } catch (error) {
+    // Fallback to manual calculation
+    const ratio = getContrastRatio(foreground, background);
+
+    if (size === 'large') {
+      return ratio >= 4.5 ? 'AAA' : ratio >= 3 ? 'AA' : 'Fail';
+    } else {
+      return ratio >= 7 ? 'AAA' : ratio >= 4.5 ? 'AA' : 'Fail';
+    }
+  }
+}
+
+// Comprehensive contrast analysis using the library
+export function analyzeContrast(foreground: string, background: string) {
+  try {
+    const ratio = contrastChecker.getRatio(foreground, background);
+    const isAA = contrastChecker.isLevelAA(foreground, background, 14);
+    const isAAA = contrastChecker.isLevelAAA(foreground, background, 14);
+    const isAALarge = contrastChecker.isLevelAA(foreground, background, 18);
+    const isAAALarge = contrastChecker.isLevelAAA(foreground, background, 18);
+
+    return {
+      ratio: parseFloat(ratio.toFixed(2)),
+      normalText: {
+        AA: isAA,
+        AAA: isAAA,
+        level: isAAA ? 'AAA' : isAA ? 'AA' : 'Fail',
+      },
+      largeText: {
+        AA: isAALarge,
+        AAA: isAAALarge,
+        level: isAAALarge ? 'AAA' : isAALarge ? 'AA' : 'Fail',
+      },
+    };
+  } catch (error) {
+    // Fallback to manual calculation
+    const ratio = getContrastRatio(foreground, background);
+    const normalAA = ratio >= 4.5;
+    const normalAAA = ratio >= 7;
+    const largeAA = ratio >= 3;
+    const largeAAA = ratio >= 4.5;
+
+    return {
+      ratio: parseFloat(ratio.toFixed(2)),
+      normalText: {
+        AA: normalAA,
+        AAA: normalAAA,
+        level: normalAAA ? 'AAA' : normalAA ? 'AA' : 'Fail',
+      },
+      largeText: {
+        AA: largeAA,
+        AAA: largeAAA,
+        level: largeAAA ? 'AAA' : largeAA ? 'AA' : 'Fail',
+      },
+    };
   }
 }
