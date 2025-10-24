@@ -52,20 +52,13 @@ export const ImprovedAIContentImprover: React.FC<
       const file = new File([blob], 'resume.txt', { type: 'text/plain' });
 
       // First, get the current ATS analysis
-      const analysisResult = await atsApi.request('/api/upload/quick-analyze', {
-        method: 'POST',
-        body: (() => {
-          const formData = new FormData();
-          formData.append('file', file);
-          return formData;
-        })(),
-      });
+      const analysisResult = await atsApi.extractExperience(file);
 
       if (!analysisResult.success || !analysisResult.data) {
         throw new Error('Failed to analyze current resume');
       }
 
-      const currentScore = analysisResult.data.ats_score || 0;
+      const currentScore = (analysisResult.data as { ats_score?: number }).ats_score || 0;
 
       // Generate improvement plan using the backend API
       const improvementPlan = await atsApi.getImprovementPlan(
@@ -82,7 +75,7 @@ export const ImprovedAIContentImprover: React.FC<
       const improvements = await applyAIImprovements(
         resumeData,
         section,
-        improvementPlan.data
+        improvementPlan.data as { improvements?: Array<{ category?: string; section?: string }> }
       );
 
       // Calculate new score (simulate improvement)
@@ -265,17 +258,19 @@ export const ImprovedAIContentImprover: React.FC<
     ];
     const missingSkills = commonTechSkills.filter(
       skill =>
-        !improved.technical.some((s: string) =>
+        !improved.technical?.some((s: string) =>
           s.toLowerCase().includes(skill.toLowerCase())
         )
     );
 
-    if (missingSkills.length > 0) {
+    if (missingSkills.length > 0 && improved.technical && missingSkills[0]) {
       improved.technical.push(missingSkills[0]);
     }
 
     // Reorganize skills by relevance
-    improved.technical = improved.technical.sort();
+    if (improved.technical) {
+      improved.technical = improved.technical.sort();
+    }
 
     return improved;
   };

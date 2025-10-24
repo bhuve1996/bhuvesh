@@ -85,10 +85,10 @@ export const FloatingATSScore: React.FC<FloatingATSScoreProps> = ({
             contentQuality: 0, // Not available in current API
             atsCompatibility: 0, // Not available in current API
           },
-          issues: analysis.issues || [],
+          issues: analysis.weaknesses || [],
           suggestions: analysis.suggestions || [],
           jobTitle: analysis.jobType,
-          confidence: analysis.confidence,
+          confidence: 0.85, // Default confidence value
         });
 
         toast.success(

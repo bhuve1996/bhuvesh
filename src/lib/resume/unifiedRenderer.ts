@@ -241,7 +241,7 @@ export const convertToUnifiedContent = (data: ResumeData): UnifiedContent => {
         ...(data.achievements && { achievements: data.achievements }),
       },
     };
-    } catch {
+  } catch {
     // console.error('Error converting resume data to unified content:', error);
     throw new Error('Failed to process resume data for export');
   }
@@ -616,11 +616,9 @@ export const renderToPDF = async (
 
     // Save the PDF
     jsDoc.save(filename);
-    } catch {
+  } catch {
     // console.error('Error rendering PDF:', error);
-    throw new Error(
-      `PDF rendering failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+    throw new Error(`PDF rendering failed: Unknown error`);
   }
 };
 

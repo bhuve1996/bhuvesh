@@ -249,10 +249,12 @@ export const FloatingTemplateCustomizer: React.FC<
     property: string,
     value: string | number
   ) => {
-    const updatedTemplate = { ...template };
+    const updatedTemplate = { ...template } as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> };
 
     if (!updatedTemplate.layout) {
       updatedTemplate.layout = {
+        sections: [],
+        columns: 1,
         colors: {
           primary: '#1e40af',
           secondary: '#6b7280',
@@ -270,7 +272,7 @@ export const FloatingTemplateCustomizer: React.FC<
             small: '0.875rem',
           },
         },
-        spacing: { padding: '1rem', margin: '0.5rem', lineHeight: '1.5' },
+        spacing: { padding: '1rem', margins: '0.5rem', lineHeight: 1.5, sectionGap: '1rem' },
       };
     }
 
@@ -283,7 +285,7 @@ export const FloatingTemplateCustomizer: React.FC<
       updatedTemplate.customStyles[section] = {};
     }
 
-    updatedTemplate.customStyles[section][property] = value;
+    updatedTemplate.customStyles[section][property] = String(value);
 
     // Debug: Log the changes
     // console.log('🎨 Template Customizer - Updating:', {
@@ -298,7 +300,7 @@ export const FloatingTemplateCustomizer: React.FC<
 
   const getCurrentValue = (section: string, property: string): string => {
     return (
-      template.customStyles?.[section]?.[property] ||
+      (template as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> }).customStyles?.[section]?.[property] ||
       getDefaultValue(section, property)
     );
   };
@@ -723,7 +725,7 @@ export const FloatingTemplateCustomizer: React.FC<
                 <Button
                   onClick={() => {
                     // Reset to default template
-                    const defaultTemplate = { ...template };
+                    const defaultTemplate = { ...template } as ResumeTemplate & { customStyles?: Record<string, Record<string, string>> };
                     if (defaultTemplate.customStyles) {
                       delete defaultTemplate.customStyles;
                     }
