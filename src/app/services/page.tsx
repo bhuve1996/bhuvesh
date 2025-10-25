@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { ResponsiveAd } from '@/components/ads';
 import { Button } from '@/components/atoms/Button/Button';
 import { AnimatedSection } from '@/components/common';
 import { PageLayout } from '@/components/layout';
@@ -329,6 +330,13 @@ export default function Services() {
           </div>
         </div>
       </section>
+
+      {/* Ad Placement */}
+      <div className='px-6 pb-8'>
+        <div className='max-w-7xl mx-auto'>
+          <ResponsiveAd />
+        </div>
+      </div>
 
       {/* Selected Service Details */}
       {selectedServiceData && (

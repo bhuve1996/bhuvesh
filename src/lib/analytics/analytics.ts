@@ -5,6 +5,7 @@
 
 import { analyticsConfig } from './config';
 import { ConsoleAnalyticsProvider } from './providers/console-analytics';
+// import { GoogleAdsProvider } from './providers/google-ads'; // DISABLED - using AdSense instead
 import { GoogleAnalyticsProvider } from './providers/google-analytics';
 import type {
   AnalyticsEventData,
@@ -43,6 +44,11 @@ class AnalyticsManager {
     if (analyticsConfig.googleAnalytics.enabled) {
       this.providers.push(new GoogleAnalyticsProvider());
     }
+
+    // Add Google Ads provider if enabled - DISABLED (using AdSense instead)
+    // if (analyticsConfig.googleAds.enabled) {
+    //   this.providers.push(new GoogleAdsProvider());
+    // }
 
     this.isInitialized = true;
 

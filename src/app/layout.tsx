@@ -189,6 +189,24 @@ export default function RootLayout({
           `}
         </Script>
 
+        {/* Google Ads Campaign Scripts - DISABLED (using AdSense instead) */}
+        {/* {process.env.NEXT_PUBLIC_GOOGLE_ADS_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}`}
+              strategy='afterInteractive'
+            />
+            <Script id='google-ads' strategy='afterInteractive'>
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}');
+              `}
+            </Script>
+          </>
+        )} */}
+
         {/* Theme initialization script - removed to prevent hydration mismatch */}
       </head>
       <body

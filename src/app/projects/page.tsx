@@ -1,5 +1,6 @@
 'use client';
 
+import { ProjectAdPlacement } from '@/components/ads';
 import { Footer } from '@/components/layout';
 import { ProjectsSection } from '@/components/sections';
 import { StructuredData } from '@/components/SEO/StructuredData';
@@ -20,7 +21,9 @@ export default function Projects() {
           <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-accent-500/2 rounded-full blur-3xl animate-pulse-slow delay-2000'></div>
         </div>
 
-        <ProjectsSection />
+        <ProjectAdPlacement>
+          <ProjectsSection />
+        </ProjectAdPlacement>
 
         <SectionSeparator variant='gradient' color='muted' spacing='lg' />
 

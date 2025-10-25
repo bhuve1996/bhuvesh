@@ -8,6 +8,12 @@ export interface AnalyticsConfig {
     measurementId: string;
     enabled: boolean;
   };
+  // Google Ads Campaign Tracking - DISABLED (using AdSense instead)
+  // googleAds: {
+  //   conversionId: string;
+  //   conversionLabels: string[];
+  //   enabled: boolean;
+  // };
   customEvents: {
     enabled: boolean;
     debug: boolean;
@@ -21,6 +27,15 @@ export const analyticsConfig: AnalyticsConfig = {
       process.env.NODE_ENV === 'production' &&
       !!process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
   },
+  // Google Ads Campaign Tracking - DISABLED (using AdSense instead)
+  // googleAds: {
+  //   conversionId: process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || '',
+  //   conversionLabels:
+  //     process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABELS?.split(',') || [],
+  //   enabled:
+  //     process.env.NODE_ENV === 'production' &&
+  //     !!process.env.NEXT_PUBLIC_GOOGLE_ADS_ID,
+  // },
   customEvents: {
     enabled: true,
     debug: process.env.NODE_ENV === 'development',
@@ -50,6 +65,12 @@ export const ANALYTICS_EVENTS = {
     PREVIEW_OPENED: 'resume_preview_opened',
     PREVIEW_CLOSED: 'resume_preview_closed',
   },
+
+  // Google Ads conversion events - DISABLED (using AdSense instead)
+  // GOOGLE_ADS: {
+  //   CONVERSION: 'google_ads_conversion',
+  //   REMARKETING: 'google_ads_remarketing',
+  // },
 
   // Template events
   TEMPLATE: {
@@ -107,6 +128,12 @@ export const ANALYTICS_PARAMETERS = {
   AI_PROVIDER: 'ai_provider',
   EXPORT_FORMAT: 'export_format',
   EXPORT_SIZE: 'export_size',
+
+  // Google Ads parameters - DISABLED (using AdSense instead)
+  // CONVERSION_LABEL: 'conversion_label',
+  // CONVERSION_VALUE: 'conversion_value',
+  // CURRENCY_CODE: 'currency_code',
+  // TRANSACTION_ID: 'transaction_id',
 
   // User interaction parameters
   ELEMENT_ID: 'element_id',

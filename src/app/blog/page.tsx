@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { BlogAdPlacement } from '@/components/ads';
+
 export default function Blog() {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -232,67 +234,68 @@ export default function Blog() {
 
               <div className='space-y-8'>
                 {filteredPosts.map(post => (
-                  <article
-                    key={post.id}
-                    className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8 hover:bg-white/10 transition-colors group cursor-pointer'
-                    aria-labelledby={`post-${post.id}-title`}
-                    role='article'
-                  >
-                    <div className='flex flex-col md:flex-row gap-6'>
-                      <div className='md:w-2/3'>
-                        <div className='flex items-center gap-4 mb-4'>
-                          <span className='bg-primary-400/20 text-primary-400 px-3 py-1 rounded-full text-sm font-semibold'>
-                            {post.category}
-                          </span>
-                          {post.featured && (
-                            <span className='bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-sm font-semibold'>
-                              Featured
+                  <BlogAdPlacement key={post.id}>
+                    <article
+                      className='bg-white/5 backdrop-blur-sm border border-cyan-400/20 rounded-2xl p-8 hover:bg-white/10 transition-colors group cursor-pointer'
+                      aria-labelledby={`post-${post.id}-title`}
+                      role='article'
+                    >
+                      <div className='flex flex-col md:flex-row gap-6'>
+                        <div className='md:w-2/3'>
+                          <div className='flex items-center gap-4 mb-4'>
+                            <span className='bg-primary-400/20 text-primary-400 px-3 py-1 rounded-full text-sm font-semibold'>
+                              {post.category}
                             </span>
-                          )}
+                            {post.featured && (
+                              <span className='bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-sm font-semibold'>
+                                Featured
+                              </span>
+                            )}
+                          </div>
+
+                          <h3
+                            id={`post-${post.id}-title`}
+                            className='text-2xl font-bold text-foreground mb-3 group-hover:text-primary-400 transition-colors'
+                          >
+                            {post.title}
+                          </h3>
+
+                          <p className='text-muted-foreground mb-4 leading-relaxed'>
+                            {post.excerpt}
+                          </p>
+
+                          <div className='flex items-center justify-between text-sm text-muted-foreground mb-4'>
+                            <span>{post.date}</span>
+                            <span>{post.readTime}</span>
+                          </div>
+
+                          <div className='flex flex-wrap gap-2 mb-4'>
+                            {post.tags.map(tag => (
+                              <span
+                                key={tag}
+                                className='bg-muted/50 text-muted-foreground px-2 py-1 rounded text-xs'
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+
+                          <button
+                            className='text-primary-400 hover:text-primary-300 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
+                            aria-label={`Read full article: ${post.title}`}
+                          >
+                            Read Full Article →
+                          </button>
                         </div>
 
-                        <h3
-                          id={`post-${post.id}-title`}
-                          className='text-2xl font-bold text-foreground mb-3 group-hover:text-primary-400 transition-colors'
-                        >
-                          {post.title}
-                        </h3>
-
-                        <p className='text-muted-foreground mb-4 leading-relaxed'>
-                          {post.excerpt}
-                        </p>
-
-                        <div className='flex items-center justify-between text-sm text-muted-foreground mb-4'>
-                          <span>{post.date}</span>
-                          <span>{post.readTime}</span>
+                        <div className='md:w-1/3 flex items-center justify-center'>
+                          <div className='w-full h-48 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-lg flex items-center justify-center border border-cyan-400/20'>
+                            <span className='text-4xl'>📝</span>
+                          </div>
                         </div>
-
-                        <div className='flex flex-wrap gap-2 mb-4'>
-                          {post.tags.map(tag => (
-                            <span
-                              key={tag}
-                              className='bg-muted/50 text-muted-foreground px-2 py-1 rounded text-xs'
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-
-                        <button
-                          className='text-primary-400 hover:text-primary-300 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background rounded'
-                          aria-label={`Read full article: ${post.title}`}
-                        >
-                          Read Full Article →
-                        </button>
                       </div>
-
-                      <div className='md:w-1/3 flex items-center justify-center'>
-                        <div className='w-full h-48 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-lg flex items-center justify-center border border-cyan-400/20'>
-                          <span className='text-4xl'>📝</span>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
+                    </article>
+                  </BlogAdPlacement>
                 ))}
               </div>
             </div>
