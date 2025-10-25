@@ -104,7 +104,9 @@ describe('Button Component', () => {
     const iconElement = screen.getByTestId('icon');
 
     expect(button).toContainElement(iconElement);
-    expect(iconElement).toHaveClass('ml-2');
+    // The icon is wrapped in a span with ml-2 class
+    const iconWrapper = iconElement.parentElement;
+    expect(iconWrapper).toHaveClass('ml-2');
   });
 
   it('applies full width class', () => {

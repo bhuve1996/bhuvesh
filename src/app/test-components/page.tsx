@@ -103,6 +103,13 @@ export default function TestComponentsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check for required fields
+    if (!formData.name || !formData.email) {
+      setSubmitStatus('error');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -271,6 +278,9 @@ export default function TestComponentsPage() {
             maxSize={10 * 1024 * 1024}
             maxFiles={3}
             multiple
+            validation={{
+              allowedTypes: ['pdf', 'docx', 'doc'],
+            }}
           />
         </section>
 

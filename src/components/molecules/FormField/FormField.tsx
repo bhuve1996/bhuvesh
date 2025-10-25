@@ -19,6 +19,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   children,
   helpText,
   id,
+  ...props
 }) => {
   const fieldId = id || generateId('field');
   const labelId = label ? `${fieldId}-label` : undefined;
@@ -43,13 +44,13 @@ export const FormField: React.FC<FormFieldProps> = ({
     : {};
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('space-y-2', className)} {...props}>
       {label && (
         <label
           id={labelId}
           htmlFor={fieldId}
           className={cn(
-            'block text-sm font-medium text-neutral-700 dark:text-neutral-300',
+            'block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300',
             error && 'text-error-600 dark:text-error-400',
             disabled && 'text-neutral-400 dark:text-neutral-500'
           )}
@@ -79,7 +80,7 @@ export const FormField: React.FC<FormFieldProps> = ({
       {helpText && !error && (
         <p
           id={helpId}
-          className='text-sm text-neutral-500 dark:text-neutral-400'
+          className='text-xs sm:text-sm text-neutral-500 dark:text-neutral-400'
         >
           {helpText}
         </p>
@@ -88,7 +89,8 @@ export const FormField: React.FC<FormFieldProps> = ({
       {error && (
         <p
           id={errorId}
-          className='text-sm text-error-600 dark:text-error-400'
+          className='text-xs sm:text-sm text-error-600 dark:text-error-400'
+          role='alert'
           {...errorStatusProps}
         >
           {error}

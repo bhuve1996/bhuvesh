@@ -7,7 +7,6 @@ import {
   AnimatedScore,
   Card,
   DataVisualization,
-  SectionSeparator,
   Tabs,
   Tooltip,
 } from '@/components/ui';
@@ -324,142 +323,230 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
       )}
 
       {/* Main Grid Layout */}
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8'>
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8'>
         {/* Main Content - Left 2/3 */}
-        <div className='lg:col-span-2 space-y-4 lg:space-y-6'>
-          {/* Enhanced ATS Score Display */}
-          <Card className='p-6' delay={0.2}>
-            <div className='text-center'>
-              <h3 className='text-xl font-bold mb-6 text-foreground'>
-                🎯 ATS Compatibility Score
-              </h3>
+        <div className='lg:col-span-2 space-y-6 lg:space-y-8'>
+          {/* ATS Score Section */}
+          <div className='relative'>
+            <div className='absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-2xl blur-xl'></div>
+            <Card
+              className='relative p-8 border-2 border-cyan-500/20 shadow-2xl'
+              delay={0.2}
+            >
+              <div className='text-center'>
+                <div className='inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-4'>
+                  <span className='text-2xl'>🎯</span>
+                </div>
+                <h3 className='text-2xl font-bold mb-6 text-foreground'>
+                  ATS Compatibility Score
+                </h3>
 
-              {/* Animated Score Display */}
-              <AnimatedScore
-                score={result.atsScore}
-                size='xl'
-                showGrade={true}
-                className='mb-6'
-              />
+                {/* Animated Score Display */}
+                <AnimatedScore
+                  score={result.atsScore}
+                  size='xl'
+                  showGrade={true}
+                  className='mb-6'
+                />
 
-              <p className='text-muted-foreground mt-4 max-w-md mx-auto'>
-                {result.atsScore >= 80 &&
-                  '🎉 Excellent! Your resume is highly ATS-compatible and ready to impress recruiters.'}
-                {result.atsScore >= 60 &&
-                  result.atsScore < 80 &&
-                  '👍 Good! Your resume has solid ATS compatibility with room for strategic improvements.'}
-                {result.atsScore < 60 &&
-                  result.atsScore >= 0 &&
-                  '🔧 Your resume needs targeted improvements for better ATS compatibility and visibility.'}
-              </p>
+                <div className='max-w-md mx-auto p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700'>
+                  <p className='text-muted-foreground'>
+                    {result.atsScore >= 80 &&
+                      '🎉 Excellent! Your resume is highly ATS-compatible and ready to impress recruiters.'}
+                    {result.atsScore >= 60 &&
+                      result.atsScore < 80 &&
+                      '👍 Good! Your resume has solid ATS compatibility with room for strategic improvements.'}
+                    {result.atsScore < 60 &&
+                      result.atsScore >= 0 &&
+                      '🔧 Your resume needs targeted improvements for better ATS compatibility and visibility.'}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Section Divider */}
+          <div className='relative flex items-center justify-center'>
+            <div className='absolute inset-0 flex items-center'>
+              <div className='w-full border-t border-gradient-to-r from-transparent via-cyan-500/30 to-transparent'></div>
             </div>
-          </Card>
+            <div className='relative bg-background px-6'>
+              <div className='flex items-center space-x-2 text-cyan-400'>
+                <div className='w-2 h-2 bg-cyan-400 rounded-full'></div>
+                <div className='w-2 h-2 bg-cyan-400 rounded-full'></div>
+                <div className='w-2 h-2 bg-cyan-400 rounded-full'></div>
+              </div>
+            </div>
+          </div>
 
-          <SectionSeparator variant='gradient' spacing='xl' color='primary' />
+          {/* Analysis Results Section */}
+          <div className='relative'>
+            <div className='absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-2xl blur-xl'></div>
+            <motion.div
+              className='relative'
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+            >
+              {/* Section Header */}
+              <div className='text-center mb-8'>
+                <div className='inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-4'>
+                  <span className='text-xl'>📊</span>
+                </div>
+                <h2 className='text-2xl font-bold text-foreground mb-2'>
+                  Detailed Analysis Results
+                </h2>
+                <p className='text-muted-foreground max-w-2xl mx-auto'>
+                  Comprehensive breakdown of your resume&apos;s ATS
+                  compatibility, extracted content, and improvement
+                  recommendations
+                </p>
+              </div>
 
-          {/* Main Results Tabs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-          >
-            <Tabs
-              items={[
-                {
-                  id: 'summary',
-                  label: 'Overview',
-                  icon: '📋',
-                  content: <SummaryDisplay result={result} />,
-                },
-                {
-                  id: 'parsed',
-                  label: 'Extracted Content',
-                  icon: '📄',
-                  badge: Object.keys(result.structured_experience || {}).length,
-                  content: <TabbedParsedDataDisplay result={result} />,
-                },
-                {
-                  id: 'analysis',
-                  label: 'ATS Analysis',
-                  icon: '📊',
-                  badge: result.atsScore,
-                  content: <DetailedAnalyticsDisplay result={result} />,
-                },
-                {
-                  id: 'improvement',
-                  label: 'Improvement Plan',
-                  icon: '📈',
-                  content: (
-                    <div className='space-y-6'>
-                      {!improvementPlan && (
-                        <div className='text-center'>
-                          <button
-                            onClick={fetchImprovementPlan}
-                            disabled={loadingImprovements}
-                            className='px-8 py-3 text-lg bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg'
-                          >
-                            {loadingImprovements ? (
-                              <span className='flex items-center gap-2'>
-                                <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
-                                Generating Plan...
-                              </span>
-                            ) : (
-                              <span className='flex items-center gap-2'>
-                                📈 Get Detailed Improvement Plan
-                              </span>
-                            )}
-                          </button>
+              <Card className='p-6 border-2 border-purple-500/20 shadow-xl max-h-[80vh] overflow-hidden'>
+                <Tabs
+                  items={[
+                    {
+                      id: 'summary',
+                      label: 'Quick Overview',
+                      icon: '📋',
+                      content: (
+                        <div className='max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
+                          <SummaryDisplay result={result} />
                         </div>
-                      )}
+                      ),
+                    },
+                    {
+                      id: 'parsed',
+                      label: 'Resume Content',
+                      icon: '📄',
+                      badge: Object.keys(result.structured_experience || {})
+                        .length,
+                      content: (
+                        <div className='max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
+                          <TabbedParsedDataDisplay result={result} />
+                        </div>
+                      ),
+                    },
+                    {
+                      id: 'analysis',
+                      label: 'ATS Analysis',
+                      icon: '🔍',
+                      badge: result.atsScore,
+                      content: (
+                        <div className='max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
+                          <DetailedAnalyticsDisplay result={result} />
+                        </div>
+                      ),
+                    },
+                    {
+                      id: 'improvement',
+                      label: 'Action Plan',
+                      icon: '📈',
+                      content: (
+                        <div className='max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
+                          <div className='space-y-6'>
+                            {!improvementPlan && (
+                              <div className='text-center py-8'>
+                                <div className='inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full mb-4'>
+                                  <span className='text-2xl'>🚀</span>
+                                </div>
+                                <h3 className='text-xl font-bold text-foreground mb-2'>
+                                  Generate Your Improvement Plan
+                                </h3>
+                                <p className='text-muted-foreground mb-6 max-w-md mx-auto'>
+                                  Get personalized recommendations to boost your
+                                  ATS score and improve your resume&apos;s
+                                  effectiveness
+                                </p>
+                                <button
+                                  onClick={fetchImprovementPlan}
+                                  disabled={loadingImprovements}
+                                  className='px-8 py-4 text-lg bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-all duration-300 transform hover:scale-105 shadow-lg'
+                                >
+                                  {loadingImprovements ? (
+                                    <span className='flex items-center gap-2'>
+                                      <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
+                                      Generating Plan...
+                                    </span>
+                                  ) : (
+                                    <span className='flex items-center gap-2'>
+                                      📈 Get Detailed Improvement Plan
+                                    </span>
+                                  )}
+                                </button>
+                              </div>
+                            )}
 
-                      {improvementPlan && (
-                        <TabbedImprovementPlan
-                          improvements={improvementPlan.improvements}
-                          summary={improvementPlan.summary}
-                          quick_wins={improvementPlan.quick_wins}
-                          currentScore={result.atsScore}
-                        />
-                      )}
-                    </div>
-                  ),
-                },
-              ]}
-              defaultActiveTab='parsed'
-              variant='underline'
-              className='w-full'
-            />
-          </motion.div>
+                            {improvementPlan && (
+                              <TabbedImprovementPlan
+                                improvements={improvementPlan.improvements}
+                                summary={improvementPlan.summary}
+                                quick_wins={improvementPlan.quick_wins}
+                                currentScore={result.atsScore}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      ),
+                    },
+                  ]}
+                  defaultActiveTab='parsed'
+                  variant='underline'
+                  className='w-full'
+                />
+              </Card>
+            </motion.div>
+          </div>
         </div>
 
         {/* Analysis & Metrics Sidebar - Right 1/3 */}
-        <div className='space-y-4 lg:space-y-6'>
-          {/* Hover Popup: Analysis Grades */}
+        <div className='space-y-6 lg:space-y-8 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
+          {/* Sidebar Header */}
+          <div className='text-center'>
+            <div className='inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-3'>
+              <span className='text-xl'>📈</span>
+            </div>
+            <h3 className='text-lg font-bold text-foreground mb-1'>
+              Quick Insights
+            </h3>
+            <p className='text-sm text-muted-foreground'>
+              Key metrics at a glance
+            </p>
+          </div>
+
+          {/* Analysis Grades Card */}
           {result.ats_compatibility && (
             <div className='group relative'>
-              <Card className='p-6 cursor-pointer hover:shadow-lg transition-all duration-300 hover-lift hover-glow click-bounce'>
+              <Card className='p-6 cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 border-cyan-500/20 hover:border-cyan-500/40 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
                 <div className='text-center'>
-                  <div className='text-4xl mb-2'>📊</div>
-                  <h3 className='text-lg font-bold text-foreground mb-2'>
+                  <div className='inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-3'>
+                    <span className='text-xl'>📊</span>
+                  </div>
+                  <h3 className='text-lg font-bold text-foreground mb-3 sticky top-0 bg-background/80 backdrop-blur-sm pb-2'>
                     Analysis Grades
                   </h3>
-                  <div className='text-center p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg border border-cyan-200 dark:border-cyan-700'>
-                    <p className='text-sm text-cyan-600 dark:text-cyan-400 mb-1'>
+                  <div className='text-center p-4 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl border border-cyan-200 dark:border-cyan-700'>
+                    <p className='text-sm text-cyan-600 dark:text-cyan-400 mb-2 font-medium'>
                       ATS Score
                     </p>
-                    <p className='text-xl font-bold text-cyan-600 dark:text-cyan-400'>
+                    <p className='text-2xl font-bold text-cyan-600 dark:text-cyan-400'>
                       {getScoreGrade(result.atsScore)}
                     </p>
+                    <p className='text-xs text-slate-500 dark:text-slate-400 mt-1'>
+                      {result.atsScore}/100
+                    </p>
                   </div>
-                  <p className='text-xs text-slate-500 dark:text-slate-400 mt-2'>
-                    Hover to see details
+                  <p className='text-xs text-slate-500 dark:text-slate-400 mt-3'>
+                    Hover for detailed breakdown
                   </p>
                 </div>
               </Card>
 
               {/* Hover Popup */}
-              <div className='absolute bottom-full left-1/2 transform -translate-x-1/2 mb-4 w-80 opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none z-50 animate-slide-in-up'>
+              <div className='absolute bottom-full left-1/2 transform -translate-x-1/2 mb-4 w-80 opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none z-50 animate-slide-in-up max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
                 <Card className='p-6 shadow-2xl border-2 border-cyan-200 dark:border-cyan-700 bg-white dark:bg-slate-800'>
-                  <h3 className='text-lg font-bold mb-4 text-foreground'>
+                  <h3 className='text-lg font-bold mb-4 text-foreground sticky top-0 bg-background/80 backdrop-blur-sm pb-2'>
                     📊 Analysis Grades
                   </h3>
                   <div className='space-y-4'>
@@ -493,87 +580,49 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             </div>
           )}
 
-          {/* Flip Card: Key Metrics */}
-          <div className='group relative h-48 perspective-1000 hover:z-10'>
-            <div className='relative w-full h-full transition-transform duration-700 transform-gpu group-hover:rotate-y-180 transform-style-preserve-3d'>
-              {/* Front of card */}
-              <div className='absolute inset-0 w-full h-full backface-hidden'>
-                <Card className='p-6 h-full flex flex-col justify-center items-center cursor-pointer'>
-                  <div className='text-center'>
-                    <div className='text-4xl mb-2'>📋</div>
-                    <h3 className='text-lg font-bold text-foreground mb-2'>
-                      Key Metrics
-                    </h3>
-                    <div className='grid grid-cols-3 gap-2 text-center'>
-                      <div className='p-2 bg-cyan-50 dark:bg-cyan-900/20 rounded border border-cyan-200 dark:border-cyan-700'>
-                        <p className='text-xs text-cyan-600 dark:text-cyan-400'>
-                          Job Type
-                        </p>
-                        <p className='text-sm font-bold text-cyan-600 dark:text-cyan-400'>
-                          {result.jobType?.split(' (')[0]?.substring(0, 8) ||
-                            'Unknown'}
-                          ...
-                        </p>
-                      </div>
-                      <div className='p-2 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-700'>
-                        <p className='text-xs text-green-600 dark:text-green-400'>
-                          Matches
-                        </p>
-                        <p className='text-sm font-bold text-green-600 dark:text-green-400'>
-                          {result.keywordMatches.length}
-                        </p>
-                      </div>
-                      <div className='p-2 bg-red-50 dark:bg-red-900/20 rounded border border-red-200 dark:border-red-700'>
-                        <p className='text-xs text-red-600 dark:text-red-400'>
-                          Missing
-                        </p>
-                        <p className='text-sm font-bold text-red-600 dark:text-red-400'>
-                          {result.missingKeywords.length}
-                        </p>
-                      </div>
-                    </div>
-                    <p className='text-xs text-slate-500 dark:text-slate-400 mt-2'>
-                      Hover to see details
+          {/* Key Metrics Card */}
+          <div className='group relative'>
+            <Card className='p-6 cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 border-green-500/20 hover:border-green-500/40 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
+              <div className='text-center'>
+                <div className='inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mb-3'>
+                  <span className='text-xl'>📋</span>
+                </div>
+                <h3 className='text-lg font-bold text-foreground mb-4 sticky top-0 bg-background/80 backdrop-blur-sm pb-2'>
+                  Key Metrics
+                </h3>
+                <div className='grid grid-cols-1 gap-3'>
+                  <div className='p-3 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-lg border border-cyan-200 dark:border-cyan-700'>
+                    <p className='text-xs text-cyan-600 dark:text-cyan-400 mb-1 font-medium'>
+                      🎯 Job Type
+                    </p>
+                    <p className='text-sm font-bold text-cyan-600 dark:text-cyan-400 break-words'>
+                      {result.jobType?.split(' (')[0] || 'Unknown'}
                     </p>
                   </div>
-                </Card>
-              </div>
-
-              {/* Back of card */}
-              <div className='absolute inset-0 w-full h-full backface-hidden rotate-y-180'>
-                <Card className='p-6 h-full'>
-                  <h3 className='text-lg font-bold mb-4 text-foreground'>
-                    📋 Key Metrics
-                  </h3>
-                  <div className='space-y-3'>
-                    <div className='text-center p-3 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-lg border border-cyan-200 dark:border-cyan-700'>
-                      <p className='text-sm text-cyan-600 dark:text-cyan-400 mb-1'>
-                        🎯 Job Type
-                      </p>
-                      <p className='text-sm font-semibold text-cyan-600 dark:text-cyan-400'>
-                        {result.jobType}
-                      </p>
-                    </div>
-                    <div className='text-center p-3 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-700'>
-                      <p className='text-sm text-green-600 dark:text-green-400 mb-1'>
+                  <div className='grid grid-cols-2 gap-2'>
+                    <div className='p-3 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-700'>
+                      <p className='text-xs text-green-600 dark:text-green-400 mb-1 font-medium'>
                         ✅ Matches
                       </p>
-                      <p className='text-sm font-semibold text-green-600 dark:text-green-400'>
+                      <p className='text-lg font-bold text-green-600 dark:text-green-400'>
                         {result.keywordMatches.length}
                       </p>
                     </div>
-                    <div className='text-center p-3 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 rounded-lg border border-red-200 dark:border-red-700'>
-                      <p className='text-sm text-red-600 dark:text-red-400 mb-1'>
+                    <div className='p-3 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 rounded-lg border border-red-200 dark:border-red-700'>
+                      <p className='text-xs text-red-600 dark:text-red-400 mb-1 font-medium'>
                         ❌ Missing
                       </p>
-                      <p className='text-sm font-semibold text-red-600 dark:text-red-400'>
+                      <p className='text-lg font-bold text-red-600 dark:text-red-400'>
                         {result.missingKeywords.length}
                       </p>
                     </div>
                   </div>
-                </Card>
+                </div>
+                <p className='text-xs text-slate-500 dark:text-slate-400 mt-3'>
+                  Hover for detailed breakdown
+                </p>
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* Original Key Metrics - keeping for reference */}
@@ -724,8 +773,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
 
                 {/* Back of card */}
                 <div className='absolute inset-0 w-full h-full backface-hidden rotate-y-180'>
-                  <Card className='p-6 h-full overflow-y-auto'>
-                    <h3 className='text-lg font-bold mb-4 text-foreground'>
+                  <Card className='p-6 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
+                    <h3 className='text-lg font-bold mb-4 text-foreground sticky top-0 bg-background/80 backdrop-blur-sm pb-2'>
                       🎯 Match Details
                     </h3>
                     <div className='space-y-3'>
@@ -734,7 +783,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
                           <p className='text-sm text-cyan-600 dark:text-cyan-400 mb-1'>
                             🎯 Match Category
                           </p>
-                          <p className='text-sm font-semibold text-cyan-600 dark:text-cyan-400'>
+                          <p className='text-sm font-semibold text-cyan-600 dark:text-cyan-400 break-words'>
                             {result.match_category}
                           </p>
                         </div>

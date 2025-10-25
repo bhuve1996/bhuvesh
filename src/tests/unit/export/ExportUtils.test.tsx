@@ -9,7 +9,7 @@ import {
 import { useResumeStore } from '@/store/resumeStore';
 
 // Mock dependencies
-jest.mock('html-docx-js', () => ({
+jest.mock('html-docx-js/dist/html-docx', () => ({
   default: {
     asBlob: jest.fn(
       () =>
@@ -32,7 +32,15 @@ const mockPrintWindow = {
 };
 
 Object.defineProperty(window, 'open', {
-  value: jest.fn(() => mockPrintWindow),
+  value: jest.fn(() => {
+    // Simulate async loading
+    setTimeout(() => {
+      if (mockPrintWindow.onload) {
+        mockPrintWindow.onload();
+      }
+    }, 0);
+    return mockPrintWindow;
+  }),
   writable: true,
 });
 
@@ -389,7 +397,7 @@ describe('Unified Export Utils', () => {
       await exportToDOCXUnified(options);
 
       // Verify that html-docx-js was called
-      const { default: htmlDocx } = await import('html-docx-js');
+      const { default: htmlDocx } = await import('html-docx-js/dist/html-docx');
       expect(htmlDocx.asBlob).toHaveBeenCalled();
     });
   });

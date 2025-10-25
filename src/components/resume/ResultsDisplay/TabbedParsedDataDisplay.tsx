@@ -21,45 +21,68 @@ export const TabbedParsedDataDisplay: React.FC<
   // Contact Information Component
   const ContactInfo = () => (
     <motion.div variants={itemVariants} initial='hidden' animate='visible'>
-      <Card className='p-6'>
-        <h3 className='text-xl font-bold mb-4 text-blue-400'>
-          📞 Contact Information
-        </h3>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-          <div>
-            <p className='text-slate-500 dark:text-slate-300'>
-              <span className='text-blue-400 font-medium'>Name:</span>{' '}
-              {result.structured_experience?.contact_info?.full_name}
-            </p>
-            <p className='text-slate-500 dark:text-slate-300'>
-              <span className='text-blue-400 font-medium'>Email:</span>{' '}
-              {result.structured_experience?.contact_info?.email}
-            </p>
-            <p className='text-slate-500 dark:text-slate-300'>
-              <span className='text-blue-400 font-medium'>Phone:</span>{' '}
-              {result.structured_experience?.contact_info?.phone}
-            </p>
+      <div className='space-y-6'>
+        <div className='text-center'>
+          <div className='inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mb-3'>
+            <span className='text-xl'>📞</span>
           </div>
-          <div>
-            <p className='text-slate-500 dark:text-slate-300'>
-              <span className='text-blue-400 font-medium'>Location:</span>{' '}
-              {result.structured_experience?.contact_info?.location}
-            </p>
-            {result.structured_experience?.contact_info?.linkedin && (
-              <p className='text-slate-500 dark:text-slate-300'>
-                <span className='text-blue-400 font-medium'>LinkedIn:</span>{' '}
-                {result.structured_experience.contact_info.linkedin}
-              </p>
-            )}
-            {result.structured_experience?.contact_info?.github && (
-              <p className='text-slate-500 dark:text-slate-300'>
-                <span className='text-blue-400 font-medium'>GitHub:</span>{' '}
-                {result.structured_experience.contact_info.github}
-              </p>
-            )}
-          </div>
+          <h3 className='text-xl font-bold text-foreground mb-2'>
+            Contact Information
+          </h3>
+          <p className='text-sm text-muted-foreground'>
+            Your personal and professional contact details
+          </p>
         </div>
-      </Card>
+
+        <Card className='p-6 border-2 border-blue-500/20 shadow-lg'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <div className='space-y-4'>
+              <div className='p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-700'>
+                <p className='text-slate-700 dark:text-slate-300'>
+                  <span className='text-blue-400 font-medium'>Name:</span>{' '}
+                  {result.structured_experience?.contact_info?.full_name}
+                </p>
+              </div>
+              <div className='p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-700'>
+                <p className='text-slate-700 dark:text-slate-300'>
+                  <span className='text-blue-400 font-medium'>Email:</span>{' '}
+                  {result.structured_experience?.contact_info?.email}
+                </p>
+              </div>
+              <div className='p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-700'>
+                <p className='text-slate-700 dark:text-slate-300'>
+                  <span className='text-blue-400 font-medium'>Phone:</span>{' '}
+                  {result.structured_experience?.contact_info?.phone}
+                </p>
+              </div>
+            </div>
+            <div className='space-y-4'>
+              <div className='p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-700'>
+                <p className='text-slate-700 dark:text-slate-300'>
+                  <span className='text-blue-400 font-medium'>Location:</span>{' '}
+                  {result.structured_experience?.contact_info?.location}
+                </p>
+              </div>
+              {result.structured_experience?.contact_info?.linkedin && (
+                <div className='p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-700'>
+                  <p className='text-slate-700 dark:text-slate-300'>
+                    <span className='text-blue-400 font-medium'>LinkedIn:</span>{' '}
+                    {result.structured_experience.contact_info.linkedin}
+                  </p>
+                </div>
+              )}
+              {result.structured_experience?.contact_info?.github && (
+                <div className='p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-700'>
+                  <p className='text-slate-700 dark:text-slate-300'>
+                    <span className='text-blue-400 font-medium'>GitHub:</span>{' '}
+                    {result.structured_experience.contact_info.github}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+      </div>
     </motion.div>
   );
 
@@ -545,13 +568,33 @@ export const TabbedParsedDataDisplay: React.FC<
   });
 
   return (
-    <div className='space-y-6'>
-      <Tabs
-        items={tabItems}
-        defaultActiveTab={tabItems[0]?.id || 'contact'}
-        variant='pills'
-        className='w-full'
-      />
+    <div className='space-y-8'>
+      {/* Section Header */}
+      <div className='text-center'>
+        <div className='inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mb-3'>
+          <span className='text-xl'>📄</span>
+        </div>
+        <h3 className='text-xl font-bold text-foreground mb-2'>
+          Extracted Resume Content
+        </h3>
+        <p className='text-sm text-muted-foreground max-w-2xl mx-auto'>
+          All the information we found in your resume, organized by category for
+          easy review and editing
+        </p>
+      </div>
+
+      {/* Content Tabs */}
+      <div className='relative'>
+        <div className='absolute inset-0 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-2xl blur-xl'></div>
+        <div className='relative'>
+          <Tabs
+            items={tabItems}
+            defaultActiveTab={tabItems[0]?.id || 'contact'}
+            variant='pills'
+            className='w-full'
+          />
+        </div>
+      </div>
     </div>
   );
 };

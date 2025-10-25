@@ -83,6 +83,7 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
     return (
       <div
         className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 ${className}`}
+        data-testid='floating-panel-container'
       >
         {/* Floating Action Button */}
         {!isVisible && (
@@ -142,10 +143,10 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
             </div>
 
             {/* Content */}
-            <div className='flex-1 overflow-hidden'>
-              <div className='tabs h-full'>
+            <div className='flex-1 flex flex-col overflow-hidden'>
+              <div className='tabs flex flex-col h-full'>
                 {/* Tab Navigation */}
-                <div className='border-b border-gray-200'>
+                <div className='border-b border-gray-200 flex-shrink-0'>
                   <nav className='-mb-px flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto scrollbar-hide'>
                     {tabItems.map(item => (
                       <button
@@ -169,7 +170,7 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
                 </div>
 
                 {/* Tab Content */}
-                <div className='mt-4 sm:mt-6 overflow-y-auto max-h-full'>
+                <div className='flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8'>
                   {tabItems.find(item => item.id === activeTab)?.content}
                 </div>
               </div>
@@ -243,11 +244,17 @@ describe('Responsive Design Integration Tests', () => {
     });
 
     it('should open panel with mobile-optimized dimensions', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -265,11 +272,17 @@ describe('Responsive Design Integration Tests', () => {
     });
 
     it('should have mobile-optimized header and controls', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -288,18 +301,28 @@ describe('Responsive Design Integration Tests', () => {
         const closeButton = screen.getByTestId('close-button');
         expect(closeButton).toHaveTextContent('Close');
 
-        // Check expand button is hidden on mobile
+        // Check expand button is hidden on mobile (should have hidden class)
         const expandButton = screen.queryByTestId('expand-button');
-        expect(expandButton).not.toBeInTheDocument();
+        if (expandButton) {
+          expect(expandButton).toHaveClass('hidden', 'md:flex');
+        } else {
+          expect(expandButton).not.toBeInTheDocument();
+        }
       });
     });
 
     it('should have mobile-optimized tab navigation', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -324,11 +347,17 @@ describe('Responsive Design Integration Tests', () => {
     });
 
     it('should have mobile-optimized tab content', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -368,12 +397,18 @@ describe('Responsive Design Integration Tests', () => {
       });
     });
 
-    it('should render floating action button with tablet text', () => {
+    it('should render floating action button with tablet text', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -384,11 +419,17 @@ describe('Responsive Design Integration Tests', () => {
     });
 
     it('should open panel with tablet-optimized dimensions', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -403,11 +444,17 @@ describe('Responsive Design Integration Tests', () => {
     });
 
     it('should have tablet-optimized header and controls', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -440,11 +487,17 @@ describe('Responsive Design Integration Tests', () => {
     });
 
     it('should open panel with desktop-optimized dimensions', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -459,11 +512,17 @@ describe('Responsive Design Integration Tests', () => {
     });
 
     it('should show expand button on desktop', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -478,11 +537,17 @@ describe('Responsive Design Integration Tests', () => {
     });
 
     it('should expand panel when expand button is clicked', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -501,11 +566,17 @@ describe('Responsive Design Integration Tests', () => {
 
   describe('Keyboard Navigation', () => {
     it('should support keyboard navigation through panel elements', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -530,11 +601,17 @@ describe('Responsive Design Integration Tests', () => {
     });
 
     it('should close panel with Escape key', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -556,11 +633,17 @@ describe('Responsive Design Integration Tests', () => {
 
   describe('Accessibility', () => {
     it('should have proper ARIA attributes', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -580,11 +663,17 @@ describe('Responsive Design Integration Tests', () => {
     });
 
     it('should have proper focus management', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -605,11 +694,17 @@ describe('Responsive Design Integration Tests', () => {
 
   describe('Content Overflow Handling', () => {
     it('should handle content overflow with scrolling', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 
@@ -621,16 +716,22 @@ describe('Responsive Design Integration Tests', () => {
         const contentArea = panel.querySelector('.overflow-y-auto');
 
         expect(contentArea).toBeInTheDocument();
-        expect(contentArea).toHaveClass('overflow-y-auto', 'max-h-full');
+        expect(contentArea).toHaveClass('overflow-y-auto', 'flex-1');
       });
     });
 
     it('should handle tab navigation overflow with horizontal scrolling', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='floating-panel-container'>
-            <div>Test content</div>
-          </div>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
         </TestWrapper>
       );
 

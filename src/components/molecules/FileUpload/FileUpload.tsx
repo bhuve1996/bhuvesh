@@ -36,12 +36,16 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
         return `File size exceeds ${Math.round(maxSize / (1024 * 1024))}MB limit`;
       }
 
-      // Check file type
-      if (validation?.allowedTypes) {
-        const fileExtension = file.name.split('.').pop()?.toLowerCase();
-        if (!validation.allowedTypes.includes(fileExtension || '')) {
-          return `File type .${fileExtension} is not allowed`;
-        }
+      // Check file type - default validation for common resume formats
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      const allowedExtensions = validation?.allowedTypes || [
+        'pdf',
+        'docx',
+        'doc',
+        'txt',
+      ];
+      if (!allowedExtensions.includes(fileExtension || '')) {
+        return `File type .${fileExtension} is not allowed`;
       }
 
       // Custom validation
@@ -166,7 +170,14 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
   };
 
   return (
-    <div className={`file-upload ${className}`} {...props}>
+    <div
+      className={`file-upload ${className} ${dragActive ? 'border-cyan-500' : ''}`}
+      onDragEnter={handleDrag}
+      onDragLeave={handleDrag}
+      onDragOver={handleDrag}
+      onDrop={handleDrop}
+      {...props}
+    >
       {/* Upload Area */}
       <div
         className={`
@@ -175,10 +186,6 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           ${loading ? 'pointer-events-none' : ''}
         `}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
         onClick={() =>
           !disabled &&
           !loading &&

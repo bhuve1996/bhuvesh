@@ -200,6 +200,7 @@ export const buttonVariants = {
       'bg-neutral-600 hover:bg-neutral-700 text-neutral-100 shadow-lg hover:shadow-neutral-500/25 focus:ring-neutral-500',
   },
   sizes: {
+    xs: 'px-1 py-0.5 text-sm',
     sm: 'px-3 py-2 text-sm',
     md: 'px-6 py-3 text-base',
     lg: 'px-8 py-4 text-lg',

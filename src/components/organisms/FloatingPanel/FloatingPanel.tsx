@@ -20,6 +20,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
   template,
   onTemplateChange,
   className = '',
+  ...props
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -116,6 +117,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
         'fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50',
         className
       )}
+      {...props}
     >
       {/* Floating Action Button */}
       <AnimatePresence>
@@ -125,7 +127,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className='relative'
+            className='relative group'
           >
             <Button
               onClick={togglePanel}
@@ -135,6 +137,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
               aria-label='Open resume tools panel'
               aria-expanded={isVisible}
               aria-haspopup='dialog'
+              data-testid='floating-action-button'
               icon={
                 <svg
                   className='w-5 h-5 sm:w-6 sm:h-6'
@@ -156,7 +159,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
               <span className='sm:hidden'>Tools</span>
             </Button>
 
-            <div className='absolute bottom-full right-0 mb-2 px-3 py-2 bg-neutral-900 text-white text-xs sm:text-sm rounded-lg whitespace-nowrap hidden sm:block'>
+            <div className='absolute bottom-full right-0 mb-2 px-3 py-2 bg-neutral-900 text-white text-xs sm:text-sm rounded-lg whitespace-nowrap hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
               Access ATS analysis, AI improvements, and more
               <div className='absolute top-full right-4 border-4 border-transparent border-t-neutral-900'></div>
             </div>
@@ -261,10 +264,10 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                       </svg>
                     }
                   >
-                    {isExpanded ? 'Collapse' : 'Expand'}
+                    Close
                   </Button>
                   {/* Tooltip */}
-                  <div className='absolute bottom-full right-0 mb-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
+                  <div className='absolute bottom-full right-0 mb-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10'>
                     Close panel
                     <div className='absolute top-full right-4 border-4 border-transparent border-t-neutral-900'></div>
                   </div>
@@ -273,12 +276,17 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
             </div>
 
             {/* Content */}
-            <div className='flex-1 overflow-hidden'>
+            <div
+              className={cn(
+                'panel-content flex-1 flex flex-col overflow-hidden',
+                isExpanded ? 'w-96' : 'w-80'
+              )}
+            >
               <Tabs
                 items={tabItems}
                 defaultActiveTab={activeTab}
                 onTabChange={tabId => setActiveTab(tabId as PanelTab)}
-                className='h-full'
+                className='flex-1 flex flex-col'
               />
             </div>
           </motion.div>

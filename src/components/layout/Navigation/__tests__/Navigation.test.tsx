@@ -71,11 +71,14 @@ describe('Navigation Component', () => {
     render(<Navigation {...defaultProps} />);
 
     // Check that desktop navigation links are present
-    const aboutLink = screen.getByRole('link', { name: /about/i });
-    expect(aboutLink).toBeInTheDocument();
+    const aboutLinks = screen.getAllByRole('link', { name: /about/i });
+    expect(aboutLinks.length).toBeGreaterThan(0);
 
-    const projectsLink = screen.getByRole('link', { name: /projects/i });
-    expect(projectsLink).toBeInTheDocument();
+    // Check for Resume Builder link instead of Projects (which is commented out)
+    const resumeBuilderLinks = screen.getAllByRole('link', {
+      name: /resume builder/i,
+    });
+    expect(resumeBuilderLinks.length).toBeGreaterThan(0);
   });
 
   it('renders navigation items with proper roles', () => {
@@ -85,8 +88,8 @@ describe('Navigation Component', () => {
     expect(links.length).toBeGreaterThan(0);
 
     // Check that navigation links have proper attributes
-    const aboutLink = screen.getByRole('link', { name: /about/i });
-    expect(aboutLink).toHaveAttribute('tabIndex', '0');
+    const aboutLinks = screen.getAllByRole('link', { name: /about/i });
+    expect(aboutLinks[0]).toHaveAttribute('tabIndex', '0');
   });
 
   it('highlights active section', () => {
@@ -98,8 +101,8 @@ describe('Navigation Component', () => {
     expect(nav).toBeInTheDocument();
 
     // Verify navigation links are present
-    const aboutLink = screen.getByRole('link', { name: /about/i });
-    expect(aboutLink).toBeInTheDocument();
+    const aboutLinks = screen.getAllByRole('link', { name: /about/i });
+    expect(aboutLinks.length).toBeGreaterThan(0);
   });
 
   it('handles section clicks', () => {
@@ -191,18 +194,18 @@ describe('Navigation Component', () => {
     expect(links.length).toBeGreaterThan(0);
 
     // Test focus on the first navigation link
-    const aboutLink = screen.getByRole('link', { name: /about/i });
+    const aboutLinks = screen.getAllByRole('link', { name: /about/i });
     act(() => {
-      aboutLink.focus();
+      aboutLinks[0].focus();
     });
-    expect(aboutLink).toHaveFocus();
+    expect(aboutLinks[0]).toHaveFocus();
   });
 
   it('renders theme toggle', () => {
     render(<Navigation {...defaultProps} />);
 
-    const themeToggle = screen.getByLabelText(/switch to.*mode/i);
-    expect(themeToggle).toBeInTheDocument();
+    const themeToggles = screen.getAllByLabelText(/switch to.*mode/i);
+    expect(themeToggles.length).toBeGreaterThan(0);
   });
 
   it('has proper ARIA labels and descriptions', () => {
@@ -267,11 +270,14 @@ describe('Navigation Component', () => {
     expect(nav).toBeInTheDocument();
 
     // Check that navigation links are present
-    const aboutLink = screen.getByRole('link', { name: /about/i });
-    expect(aboutLink).toBeInTheDocument();
+    const aboutLinks = screen.getAllByRole('link', { name: /about/i });
+    expect(aboutLinks.length).toBeGreaterThan(0);
 
-    const projectsLink = screen.getByRole('link', { name: /projects/i });
-    expect(projectsLink).toBeInTheDocument();
+    // Check for Resume Builder link instead of Projects (which is commented out)
+    const resumeBuilderLinks = screen.getAllByRole('link', {
+      name: /resume builder/i,
+    });
+    expect(resumeBuilderLinks.length).toBeGreaterThan(0);
   });
 
   it('handles focus trap in mobile menu', async () => {

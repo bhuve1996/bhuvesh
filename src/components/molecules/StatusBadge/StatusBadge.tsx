@@ -10,6 +10,7 @@ interface StatusBadgeProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   variant?: 'solid' | 'outline' | 'soft';
+  [key: string]: unknown; // Allow data-testid and other props
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({
@@ -19,6 +20,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   size = 'md',
   className = '',
   variant = 'soft',
+  ...props
 }) => {
   const statusConfig = {
     success: {
@@ -75,7 +77,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
         );
 
   return (
-    <span className={classes} {...accessibleProps}>
+    <span className={classes} {...accessibleProps} {...props}>
       {icon && (
         <span className={iconSizeConfig[size]} aria-hidden='true'>
           {icon}

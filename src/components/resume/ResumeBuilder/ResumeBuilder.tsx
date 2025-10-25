@@ -244,7 +244,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       <div>
                         <label
                           htmlFor='full-name'
-                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                          className='block text-xs sm:text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
                         >
                           Full Name <span className='text-red-500'>*</span>
                         </label>
@@ -258,14 +258,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               fullName: e.target.value,
                             })
                           }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                          className='w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200 text-sm sm:text-base'
                           placeholder='John Smith'
                         />
                       </div>
                       <div>
                         <label
                           htmlFor='email'
-                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                          className='block text-xs sm:text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
                         >
                           Email <span className='text-red-500'>*</span>
                         </label>
@@ -279,14 +279,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               email: e.target.value,
                             })
                           }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                          className='w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200 text-sm sm:text-base'
                           placeholder='john.smith@email.com'
                         />
                       </div>
                       <div>
                         <label
                           htmlFor='phone'
-                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                          className='block text-xs sm:text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
                         >
                           Phone <span className='text-red-500'>*</span>
                         </label>
@@ -300,14 +300,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               phone: e.target.value,
                             })
                           }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                          className='w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200 text-sm sm:text-base'
                           placeholder='(555) 123-4567'
                         />
                       </div>
                       <div>
                         <label
                           htmlFor='location'
-                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                          className='block text-xs sm:text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
                         >
                           Location <span className='text-red-500'>*</span>
                         </label>
@@ -321,14 +321,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               location: e.target.value,
                             })
                           }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                          className='w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200 text-sm sm:text-base'
                           placeholder='San Francisco, CA'
                         />
                       </div>
                       <div>
                         <label
                           htmlFor='linkedin'
-                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                          className='block text-xs sm:text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
                         >
                           LinkedIn
                         </label>
@@ -342,14 +342,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               linkedin: e.target.value,
                             })
                           }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                          className='w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200 text-sm sm:text-base'
                           placeholder='linkedin.com/in/johnsmith'
                         />
                       </div>
                       <div>
                         <label
                           htmlFor='github'
-                          className='block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                          className='block text-xs sm:text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
                         >
                           GitHub
                         </label>
@@ -363,7 +363,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               github: e.target.value,
                             })
                           }
-                          className='w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                          className='w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200 text-sm sm:text-base'
                           placeholder='github.com/johnsmith'
                         />
                       </div>
@@ -946,7 +946,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               };
                               handleDataUpdate('certifications', newCerts);
                             }}
-                            className='flex-1 px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                            className='flex-1 px-3 py-2 sm:px-4 sm:py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200 text-sm sm:text-base'
                             placeholder='AWS Certified Solutions Architect'
                           />
                           <Button
@@ -1028,7 +1028,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                                   newAchievements
                                 );
                               }}
-                              className='flex-1 px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200'
+                              className='flex-1 px-3 py-2 sm:px-4 sm:py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200 text-sm sm:text-base'
                               placeholder='Led team of 5 developers to deliver project 2 weeks early'
                             />
                             <Button

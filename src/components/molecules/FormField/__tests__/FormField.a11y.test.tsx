@@ -87,7 +87,7 @@ describe('FormField Accessibility', () => {
     expect(input).toHaveAttribute('aria-invalid', 'true');
     expect(input).toHaveAttribute('aria-describedby');
     expect(errorMessage).toHaveAttribute('role', 'alert');
-    expect(errorMessage).toHaveAttribute('aria-live', 'polite');
+    expect(errorMessage).toHaveAttribute('aria-live', 'assertive');
 
     const results = await axe(container);
     expect(results).toHaveNoViolations();

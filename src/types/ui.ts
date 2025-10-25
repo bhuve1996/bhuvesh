@@ -1,6 +1,6 @@
 // UI Component Types
 export interface ButtonProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?:
     | 'primary'
     | 'secondary'
@@ -10,7 +10,7 @@ export interface ButtonProps {
     | 'success'
     | 'warning'
     | 'default';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   disabled?: boolean;
   loading?: boolean;
   fullWidth?: boolean;

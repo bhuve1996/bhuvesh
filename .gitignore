@@ -191,4 +191,8 @@ logs/
 *.tmp
 *.temp
 
+# Cypress
+cypress/screenshots/
+cypress/videos/
+
 /src/generated/prisma

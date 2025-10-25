@@ -1,5 +1,10 @@
 // Custom commands for accessibility testing
 
+// Command to simulate tab key press
+Cypress.Commands.add('tab', { prevSubject: 'element' }, subject => {
+  return cy.wrap(subject).trigger('keydown', { key: 'Tab' });
+});
+
 // Command to test keyboard navigation
 Cypress.Commands.add('testKeyboardNavigation', selector => {
   cy.get(selector).focus();

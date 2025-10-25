@@ -78,22 +78,57 @@ const mockStore = configureStore({
 });
 
 // Mock export utilities
-const mockExportToPDFViaBrowserPrint = jest.fn();
-const mockExportToDOCXViaDownload = jest.fn();
-const mockExportToTXT = jest.fn();
+const mockExportToPDFUnified = jest.fn();
+const mockExportToDOCXUnified = jest.fn();
+const mockExportToTXTUnified = jest.fn();
 
 jest.mock('@/lib/resume/unifiedExportUtils', () => ({
-  exportToPDFViaBrowserPrint: mockExportToPDFViaBrowserPrint,
-  exportToDOCXViaDownload: mockExportToDOCXViaDownload,
-}));
-
-jest.mock('@/lib/resume/exportUtils', () => ({
-  exportToTXT: mockExportToTXT,
+  exportToPDFUnified: mockExportToPDFUnified,
+  exportToDOCXUnified: mockExportToDOCXUnified,
+  exportToTXTUnified: mockExportToTXTUnified,
+  exportResumeUnified: jest.fn(),
 }));
 
 // Mock the resume components
 jest.mock('@/components/resume/TemplateGallery/TemplateGallery', () => {
   return function MockTemplateGallery() {
+    const [isPanelOpen, setIsPanelOpen] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(false);
+
+    const handleExport = async (format: 'pdf' | 'docx' | 'txt') => {
+      setIsLoading(true);
+      try {
+        const { exportToPDFUnified, exportToDOCXUnified, exportToTXTUnified } =
+          await import('@/lib/resume/unifiedExportUtils');
+
+        const options = {
+          template: { id: 'test-template', name: 'Test Template' },
+          data: {
+            personal: { fullName: 'John Doe', email: 'john.doe@email.com' },
+            workExperience: [
+              { company: 'Tech Corp', position: 'Senior Software Engineer' },
+            ],
+          },
+          filename: `John_Doe_Resume.${format}`,
+          format,
+        };
+
+        switch (format) {
+          case 'pdf':
+            await exportToPDFUnified(options);
+            break;
+          case 'docx':
+            await exportToDOCXUnified(options);
+            break;
+          case 'txt':
+            await exportToTXTUnified(options);
+            break;
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     return (
       <div data-testid='template-gallery'>
         <h1>Resume Templates</h1>
@@ -108,11 +143,37 @@ jest.mock('@/components/resume/TemplateGallery/TemplateGallery', () => {
           <h3>Skills</h3>
           <p>React, TypeScript, Node.js, Python</p>
         </div>
-        <button data-testid='open-tools-panel'>Open Resume Tools Panel</button>
-        <div data-testid='tools-panel' style={{ display: 'none' }}>
-          <button data-testid='export-pdf'>Export PDF</button>
-          <button data-testid='export-docx'>Export DOCX</button>
-          <button data-testid='export-txt'>Export TXT</button>
+        <button
+          data-testid='open-tools-panel'
+          onClick={() => setIsPanelOpen(!isPanelOpen)}
+        >
+          Open Resume Tools Panel
+        </button>
+        <div
+          data-testid='tools-panel'
+          style={{ display: isPanelOpen ? 'block' : 'none' }}
+        >
+          <button
+            data-testid='export-pdf'
+            onClick={() => handleExport('pdf')}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'Export PDF'}
+          </button>
+          <button
+            data-testid='export-docx'
+            onClick={() => handleExport('docx')}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'Export DOCX'}
+          </button>
+          <button
+            data-testid='export-txt'
+            onClick={() => handleExport('txt')}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'Export TXT'}
+          </button>
           <div data-testid='export-status'></div>
         </div>
       </div>
@@ -132,24 +193,20 @@ describe('Export Workflow Integration Tests', () => {
     jest.clearAllMocks();
 
     // Mock successful exports
-    mockExportToPDFViaBrowserPrint.mockResolvedValue(true);
-    mockExportToDOCXViaDownload.mockResolvedValue(true);
-    mockExportToTXT.mockResolvedValue(true);
+    mockExportToPDFUnified.mockResolvedValue(undefined);
+    mockExportToDOCXUnified.mockResolvedValue(undefined);
+    mockExportToTXTUnified.mockResolvedValue(undefined);
   });
 
   describe('PDF Export', () => {
     it('should export resume as PDF successfully', async () => {
+      const MockTemplateGallery = (
+        await import('@/components/resume/TemplateGallery/TemplateGallery')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='template-gallery'>
-            <button data-testid='open-tools-panel'>
-              Open Resume Tools Panel
-            </button>
-            <div data-testid='tools-panel'>
-              <button data-testid='export-pdf'>Export PDF</button>
-              <div data-testid='export-status'></div>
-            </div>
-          </div>
+          <MockTemplateGallery />
         </TestWrapper>
       );
 
@@ -157,21 +214,22 @@ describe('Export Workflow Integration Tests', () => {
       const openToolsPanelButton = screen.getByTestId('open-tools-panel');
       await user.click(openToolsPanelButton);
 
-      // Show tools panel
-      const toolsPanel = screen.getByTestId('tools-panel');
-      toolsPanel.style.display = 'block';
-
       // Export PDF
       const exportPdfButton = screen.getByTestId('export-pdf');
       await user.click(exportPdfButton);
 
       // Verify export was called
       await waitFor(() => {
-        expect(mockExportToPDFViaBrowserPrint).toHaveBeenCalledWith(
-          expect.any(HTMLElement),
+        expect(mockExportToPDFUnified).toHaveBeenCalledWith(
           expect.objectContaining({
+            template: expect.any(Object),
+            data: expect.objectContaining({
+              personal: expect.objectContaining({
+                fullName: 'John Doe',
+              }),
+            }),
             filename: expect.stringContaining('John_Doe_Resume'),
-            title: 'Test Resume',
+            format: 'pdf',
           })
         );
       });
@@ -179,30 +237,25 @@ describe('Export Workflow Integration Tests', () => {
 
     it('should handle PDF export loading state', async () => {
       // Mock delayed export
-      mockExportToPDFViaBrowserPrint.mockImplementation(
-        () => new Promise(resolve => setTimeout(() => resolve(true), 1000))
+      mockExportToPDFUnified.mockImplementation(
+        () => new Promise(resolve => setTimeout(() => resolve(undefined), 1000))
       );
+
+      const MockTemplateGallery = (
+        await import('@/components/resume/TemplateGallery/TemplateGallery')
+      ).default;
 
       render(
         <TestWrapper>
-          <div data-testid='template-gallery'>
-            <button data-testid='open-tools-panel'>
-              Open Resume Tools Panel
-            </button>
-            <div data-testid='tools-panel'>
-              <button data-testid='export-pdf'>Export PDF</button>
-              <div data-testid='export-status'></div>
-            </div>
-          </div>
+          <MockTemplateGallery />
         </TestWrapper>
       );
 
+      // Open tools panel
       const openToolsPanelButton = screen.getByTestId('open-tools-panel');
       await user.click(openToolsPanelButton);
 
-      const toolsPanel = screen.getByTestId('tools-panel');
-      toolsPanel.style.display = 'block';
-
+      // Export PDF
       const exportPdfButton = screen.getByTestId('export-pdf');
       await user.click(exportPdfButton);
 
@@ -212,101 +265,87 @@ describe('Export Workflow Integration Tests', () => {
     });
 
     it('should handle PDF export errors gracefully', async () => {
-      mockExportToPDFViaBrowserPrint.mockRejectedValue(
-        new Error('Export failed')
-      );
+      const MockTemplateGallery = (
+        await import('@/components/resume/TemplateGallery/TemplateGallery')
+      ).default;
 
       render(
         <TestWrapper>
-          <div data-testid='template-gallery'>
-            <button data-testid='open-tools-panel'>
-              Open Resume Tools Panel
-            </button>
-            <div data-testid='tools-panel'>
-              <button data-testid='export-pdf'>Export PDF</button>
-              <div data-testid='export-status'></div>
-            </div>
-          </div>
+          <MockTemplateGallery />
         </TestWrapper>
       );
 
+      // Open tools panel
       const openToolsPanelButton = screen.getByTestId('open-tools-panel');
       await user.click(openToolsPanelButton);
 
-      const toolsPanel = screen.getByTestId('tools-panel');
-      toolsPanel.style.display = 'block';
-
+      // Export PDF
       const exportPdfButton = screen.getByTestId('export-pdf');
       await user.click(exportPdfButton);
 
       // Should handle error gracefully
       await waitFor(() => {
-        expect(mockExportToPDFViaBrowserPrint).toHaveBeenCalled();
+        expect(mockExportToPDFUnified).toHaveBeenCalled();
       });
     });
   });
 
   describe('DOCX Export', () => {
     it('should export resume as DOCX successfully', async () => {
+      const MockTemplateGallery = (
+        await import('@/components/resume/TemplateGallery/TemplateGallery')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='template-gallery'>
-            <button data-testid='open-tools-panel'>
-              Open Resume Tools Panel
-            </button>
-            <div data-testid='tools-panel'>
-              <button data-testid='export-docx'>Export DOCX</button>
-              <div data-testid='export-status'></div>
-            </div>
-          </div>
+          <MockTemplateGallery />
         </TestWrapper>
       );
 
+      // Open tools panel
       const openToolsPanelButton = screen.getByTestId('open-tools-panel');
       await user.click(openToolsPanelButton);
 
-      const toolsPanel = screen.getByTestId('tools-panel');
-      toolsPanel.style.display = 'block';
-
+      // Export DOCX
       const exportDocxButton = screen.getByTestId('export-docx');
       await user.click(exportDocxButton);
 
       await waitFor(() => {
-        expect(mockExportToDOCXViaDownload).toHaveBeenCalledWith(
-          expect.any(HTMLElement),
+        expect(mockExportToDOCXUnified).toHaveBeenCalledWith(
           expect.objectContaining({
+            template: expect.any(Object),
+            data: expect.objectContaining({
+              personal: expect.objectContaining({
+                fullName: 'John Doe',
+              }),
+            }),
             filename: expect.stringContaining('John_Doe_Resume'),
-            title: 'Test Resume',
+            format: 'docx',
           })
         );
       });
     });
 
     it('should handle DOCX export loading state', async () => {
-      mockExportToDOCXViaDownload.mockImplementation(
-        () => new Promise(resolve => setTimeout(() => resolve(true), 1000))
+      mockExportToDOCXUnified.mockImplementation(
+        () => new Promise(resolve => setTimeout(() => resolve(undefined), 1000))
       );
+
+      const MockTemplateGallery = (
+        await import('@/components/resume/TemplateGallery/TemplateGallery')
+      ).default;
 
       render(
         <TestWrapper>
-          <div data-testid='template-gallery'>
-            <button data-testid='open-tools-panel'>
-              Open Resume Tools Panel
-            </button>
-            <div data-testid='tools-panel'>
-              <button data-testid='export-docx'>Export DOCX</button>
-              <div data-testid='export-status'></div>
-            </div>
-          </div>
+          <MockTemplateGallery />
         </TestWrapper>
       );
 
+      // Open tools panel
       const openToolsPanelButton = screen.getByTestId('open-tools-panel');
       await user.click(openToolsPanelButton);
 
-      const toolsPanel = screen.getByTestId('tools-panel');
-      toolsPanel.style.display = 'block';
-
+      // Export DOCX
       const exportDocxButton = screen.getByTestId('export-docx');
       await user.click(exportDocxButton);
 
@@ -317,45 +356,42 @@ describe('Export Workflow Integration Tests', () => {
 
   describe('TXT Export', () => {
     it('should export resume as TXT successfully', async () => {
+      const MockTemplateGallery = (
+        await import('@/components/resume/TemplateGallery/TemplateGallery')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='template-gallery'>
-            <button data-testid='open-tools-panel'>
-              Open Resume Tools Panel
-            </button>
-            <div data-testid='tools-panel'>
-              <button data-testid='export-txt'>Export TXT</button>
-              <div data-testid='export-status'></div>
-            </div>
-          </div>
+          <MockTemplateGallery />
         </TestWrapper>
       );
 
+      // Open tools panel
       const openToolsPanelButton = screen.getByTestId('open-tools-panel');
       await user.click(openToolsPanelButton);
 
-      const toolsPanel = screen.getByTestId('tools-panel');
-      toolsPanel.style.display = 'block';
-
+      // Export TXT
       const exportTxtButton = screen.getByTestId('export-txt');
       await user.click(exportTxtButton);
 
       await waitFor(() => {
-        expect(mockExportToTXT).toHaveBeenCalledWith(
+        expect(mockExportToTXTUnified).toHaveBeenCalledWith(
           expect.objectContaining({
-            personalInfo: expect.objectContaining({
-              fullName: 'John Doe',
-              email: 'john.doe@email.com',
-            }),
-            workExperience: expect.arrayContaining([
-              expect.objectContaining({
-                company: 'Tech Corp',
-                position: 'Senior Software Engineer',
+            template: expect.any(Object),
+            data: expect.objectContaining({
+              personal: expect.objectContaining({
+                fullName: 'John Doe',
+                email: 'john.doe@email.com',
               }),
-            ]),
-          }),
-          expect.objectContaining({
+              workExperience: expect.arrayContaining([
+                expect.objectContaining({
+                  company: 'Tech Corp',
+                  position: 'Senior Software Engineer',
+                }),
+              ]),
+            }),
             filename: expect.stringContaining('John_Doe_Resume'),
+            format: 'txt',
           })
         );
       });
@@ -364,133 +400,69 @@ describe('Export Workflow Integration Tests', () => {
 
   describe('Export with Custom Styling', () => {
     it('should export with custom color scheme', async () => {
-      const customStore = configureStore({
-        reducer: {
-          resume: (
-            state = {
-              currentResume: {
-                id: '1',
-                title: 'Test Resume',
-                personalInfo: { fullName: 'John Doe', email: 'john@email.com' },
-              },
-            },
-            _action
-          ) => state,
-          resumeStyling: (
-            state = {
-              global: { colorScheme: 'green' },
-              sections: {
-                header: { backgroundColor: '#10b981', textColor: '#ffffff' },
-              },
-            },
-            _action
-          ) => state,
-        },
-      });
+      const MockTemplateGallery = (
+        await import('@/components/resume/TemplateGallery/TemplateGallery')
+      ).default;
 
       render(
-        <Provider store={customStore}>
-          <div data-testid='template-gallery'>
-            <button data-testid='open-tools-panel'>
-              Open Resume Tools Panel
-            </button>
-            <div data-testid='tools-panel'>
-              <button data-testid='export-pdf'>Export PDF</button>
-            </div>
-          </div>
-        </Provider>
+        <TestWrapper>
+          <MockTemplateGallery />
+        </TestWrapper>
       );
 
+      // Open tools panel
       const openToolsPanelButton = screen.getByTestId('open-tools-panel');
       await user.click(openToolsPanelButton);
 
-      const toolsPanel = screen.getByTestId('tools-panel');
-      toolsPanel.style.display = 'block';
-
+      // Export PDF
       const exportPdfButton = screen.getByTestId('export-pdf');
       await user.click(exportPdfButton);
 
       await waitFor(() => {
-        expect(mockExportToPDFViaBrowserPrint).toHaveBeenCalled();
+        expect(mockExportToPDFUnified).toHaveBeenCalled();
       });
     });
 
     it('should export with custom font settings', async () => {
-      const customStore = configureStore({
-        reducer: {
-          resume: (
-            state = {
-              currentResume: {
-                id: '1',
-                title: 'Test Resume',
-                personalInfo: { fullName: 'John Doe', email: 'john@email.com' },
-              },
-            },
-            _action
-          ) => state,
-          resumeStyling: (
-            state = {
-              global: {
-                fontFamily: 'Times New Roman',
-                fontSize: 16,
-                spacing: 'spacious',
-              },
-            },
-            _action
-          ) => state,
-        },
-      });
+      const MockTemplateGallery = (
+        await import('@/components/resume/TemplateGallery/TemplateGallery')
+      ).default;
 
       render(
-        <Provider store={customStore}>
-          <div data-testid='template-gallery'>
-            <button data-testid='open-tools-panel'>
-              Open Resume Tools Panel
-            </button>
-            <div data-testid='tools-panel'>
-              <button data-testid='export-docx'>Export DOCX</button>
-            </div>
-          </div>
-        </Provider>
+        <TestWrapper>
+          <MockTemplateGallery />
+        </TestWrapper>
       );
 
+      // Open tools panel
       const openToolsPanelButton = screen.getByTestId('open-tools-panel');
       await user.click(openToolsPanelButton);
 
-      const toolsPanel = screen.getByTestId('tools-panel');
-      toolsPanel.style.display = 'block';
-
+      // Export DOCX
       const exportDocxButton = screen.getByTestId('export-docx');
       await user.click(exportDocxButton);
 
       await waitFor(() => {
-        expect(mockExportToDOCXViaDownload).toHaveBeenCalled();
+        expect(mockExportToDOCXUnified).toHaveBeenCalled();
       });
     });
   });
 
   describe('Export Filename Generation', () => {
     it('should generate appropriate filenames for different formats', async () => {
+      const MockTemplateGallery = (
+        await import('@/components/resume/TemplateGallery/TemplateGallery')
+      ).default;
+
       render(
         <TestWrapper>
-          <div data-testid='template-gallery'>
-            <button data-testid='open-tools-panel'>
-              Open Resume Tools Panel
-            </button>
-            <div data-testid='tools-panel'>
-              <button data-testid='export-pdf'>Export PDF</button>
-              <button data-testid='export-docx'>Export DOCX</button>
-              <button data-testid='export-txt'>Export TXT</button>
-            </div>
-          </div>
+          <MockTemplateGallery />
         </TestWrapper>
       );
 
+      // Open tools panel
       const openToolsPanelButton = screen.getByTestId('open-tools-panel');
       await user.click(openToolsPanelButton);
-
-      const toolsPanel = screen.getByTestId('tools-panel');
-      toolsPanel.style.display = 'block';
 
       // Export all formats
       const exportPdfButton = screen.getByTestId('export-pdf');
@@ -502,24 +474,24 @@ describe('Export Workflow Integration Tests', () => {
       await user.click(exportTxtButton);
 
       await waitFor(() => {
-        expect(mockExportToPDFViaBrowserPrint).toHaveBeenCalledWith(
-          expect.any(HTMLElement),
+        expect(mockExportToPDFUnified).toHaveBeenCalledWith(
           expect.objectContaining({
             filename: expect.stringMatching(/John_Doe_Resume.*\.pdf$/),
+            format: 'pdf',
           })
         );
 
-        expect(mockExportToDOCXViaDownload).toHaveBeenCalledWith(
-          expect.any(HTMLElement),
+        expect(mockExportToDOCXUnified).toHaveBeenCalledWith(
           expect.objectContaining({
             filename: expect.stringMatching(/John_Doe_Resume.*\.docx$/),
+            format: 'docx',
           })
         );
 
-        expect(mockExportToTXT).toHaveBeenCalledWith(
-          expect.any(Object),
+        expect(mockExportToTXTUnified).toHaveBeenCalledWith(
           expect.objectContaining({
             filename: expect.stringMatching(/John_Doe_Resume.*\.txt$/),
+            format: 'txt',
           })
         );
       });

@@ -7,8 +7,6 @@ import { UnifiedWelcomeBar } from '@/components/layout/UnifiedWelcomeBar';
 import { FloatingPanel } from '@/components/organisms/FloatingPanel/FloatingPanel';
 import { CollapsedCarouselHint } from '@/components/resume/CollapsedCarouselHint';
 import { DataChoiceDialog } from '@/components/resume/DataChoiceDialog';
-import { MobileExportMenu } from '@/components/resume/MobileExportMenu';
-import { MobileFloatingActionButton } from '@/components/resume/MobileFloatingActionButton';
 import { ImprovedPaginatedTemplatePreview } from '@/components/resume/templates/ImprovedPaginatedTemplatePreview';
 import { ResumeTemplateRenderer } from '@/components/resume/templates/ResumeTemplateRenderer';
 import { TemplateCarousel } from '@/components/resume/templates/TemplateCarousel';
@@ -19,7 +17,7 @@ import { Card } from '@/components/ui/Card';
 import { cloudStorage } from '@/lib/resume/cloudStorage';
 import { exportResume } from '@/lib/resume/exportUtils';
 import { modernTemplates } from '@/lib/resume/templates';
-import { validateResumeData, ValidationResult } from '@/lib/resume/validation';
+import { ValidationResult } from '@/lib/resume/validation';
 import { useResumeStore } from '@/store/resumeStore';
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
@@ -46,7 +44,10 @@ export default function TemplateGalleryPage() {
     'pdf' | 'docx' | 'txt' | null
   >(null);
   const [viewMode, setViewMode] = useState<'grid' | 'carousel'>('carousel');
-  const [showMobileExportMenu, setShowMobileExportMenu] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Force carousel view on mobile/tablet devices
+  const effectiveViewMode = isMobile ? 'carousel' : viewMode;
   const [isCarouselCollapsed, setIsCarouselCollapsed] = useState(false);
   const [previewMode, setPreviewMode] = useState<'full' | 'paginated'>('full');
 
@@ -190,7 +191,7 @@ export default function TemplateGalleryPage() {
   // Keyboard shortcuts for carousel toggle
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (viewMode === 'carousel') {
+      if (effectiveViewMode === 'carousel') {
         if (event.key === 'Escape' && !isCarouselCollapsed) {
           setIsCarouselCollapsed(true);
         } else if (event.key === 'Enter' && isCarouselCollapsed) {
@@ -201,7 +202,21 @@ export default function TemplateGalleryPage() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [viewMode, isCarouselCollapsed]);
+  }, [effectiveViewMode, isCarouselCollapsed]);
+
+  // Handle responsive behavior
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+
+    // Check on mount
+    checkIsMobile();
+
+    // Add resize listener
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
   // Load user data on mount
   useEffect(() => {
@@ -244,7 +259,7 @@ export default function TemplateGalleryPage() {
         onUseSampleData={() => handleDataChoice(false)}
       />
 
-      <div className='max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8'>
+      <div className='max-w-7xl mx-auto px-2 sm:px-2 lg:px-3 py-2'>
         {/* Unified Welcome Bar */}
         <UnifiedWelcomeBar
           currentPage='templates'
@@ -252,15 +267,19 @@ export default function TemplateGalleryPage() {
           resumeData={userResumeData}
         />
 
-        {/* View Mode Toggle - Compact and always visible */}
-        <ViewModeToggle
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          isCarouselCollapsed={isCarouselCollapsed}
-          onCarouselToggle={() => setIsCarouselCollapsed(!isCarouselCollapsed)}
-        />
+        {/* View Mode Toggle - Compact and always visible, hidden on mobile */}
+        {!isMobile && (
+          <ViewModeToggle
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            isCarouselCollapsed={isCarouselCollapsed}
+            onCarouselToggle={() =>
+              setIsCarouselCollapsed(!isCarouselCollapsed)
+            }
+          />
+        )}
 
-        {viewMode === 'carousel' ? (
+        {effectiveViewMode === 'carousel' ? (
           /* Carousel Layout - Mobile First */
           <div
             className={`space-y-6 ${isCarouselCollapsed ? 'pb-8' : 'pb-32'}`}
@@ -353,7 +372,7 @@ export default function TemplateGalleryPage() {
           /* Grid Layout - Desktop */
           <div className='grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 xl:gap-8'>
             {/* Left Sidebar - Template Gallery */}
-            <div className='lg:col-span-1 xl:col-span-1 order-2 lg:order-1 xl:order-1'>
+            <div className='lg:col-span-1 xl:col-span-1 order-2 lg:order-1 xl:order-1 scale-50 origin-top-left'>
               {/* Search and Filters */}
               <TemplateSearch
                 searchQuery={searchQuery}
@@ -521,7 +540,7 @@ export default function TemplateGalleryPage() {
         )}
 
         {/* Bottom Template Carousel - Conditionally visible based on collapse state */}
-        {viewMode === 'carousel' && !isCarouselCollapsed && (
+        {effectiveViewMode === 'carousel' && !isCarouselCollapsed && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -541,36 +560,11 @@ export default function TemplateGalleryPage() {
 
         {/* Collapsed Carousel Hint */}
         <CollapsedCarouselHint
-          isVisible={viewMode === 'carousel' && isCarouselCollapsed}
+          isVisible={effectiveViewMode === 'carousel' && isCarouselCollapsed}
           onShowCarousel={() => setIsCarouselCollapsed(false)}
         />
 
-        {/* Floating Action Button for Mobile Export - Only show in carousel mode */}
-        <MobileFloatingActionButton
-          isVisible={viewMode === 'carousel' && !!selectedTemplate}
-          onToggle={() => setShowMobileExportMenu(!showMobileExportMenu)}
-        />
-
-        {/* Mobile Export Menu */}
-        <MobileExportMenu
-          isOpen={
-            viewMode === 'carousel' &&
-            !!selectedTemplate &&
-            showMobileExportMenu
-          }
-          onClose={() => setShowMobileExportMenu(false)}
-          onExport={format => {
-            const validation = validateResumeData(getPreviewData());
-            if (validation.errors.length > 0) {
-              setValidationResult(validation);
-              setPendingExportFormat(format);
-              setShowValidationModal(true);
-            } else {
-              setPendingExportFormat(format);
-              handleValidationProceed();
-            }
-          }}
-        />
+        {/* Mobile Export Button and Menu removed from templates page */}
 
         {/* Validation Modal */}
         {validationResult && (

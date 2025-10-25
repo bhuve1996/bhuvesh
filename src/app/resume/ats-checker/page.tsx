@@ -407,7 +407,7 @@ export default function ATSCheckerPage() {
   return (
     <div className='min-h-screen bg-background text-foreground'>
       <Section id='ats-checker' className='py-8 sm:py-12 lg:py-20'>
-        <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <div className='max-w-6xl mx-auto px-2 sm:px-4 lg:px-6'>
           {/* Unified Welcome Bar */}
           <UnifiedWelcomeBar
             currentPage='ats-checker'
@@ -428,7 +428,7 @@ export default function ATSCheckerPage() {
               <div className='flex space-x-1 bg-muted/50 p-1 rounded-lg w-full max-w-md mx-auto overflow-x-auto scrollbar-hide'>
                 <button
                   onClick={() => setActiveTab('upload')}
-                  className={`px-6 py-3 rounded-md font-medium transition-all flex-shrink-0 ${
+                  className={`px-3 py-2 text-sm sm:px-6 sm:py-3 sm:text-base rounded-md font-medium transition-all flex-shrink-0 ${
                     activeTab === 'upload'
                       ? 'bg-primary-500 text-primary-foreground shadow-lg'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -438,7 +438,7 @@ export default function ATSCheckerPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('results')}
-                  className={`px-6 py-3 rounded-md font-medium transition-all flex-shrink-0 ${
+                  className={`px-3 py-2 text-sm sm:px-6 sm:py-3 sm:text-base rounded-md font-medium transition-all flex-shrink-0 ${
                     activeTab === 'results'
                       ? 'bg-primary-500 text-primary-foreground shadow-lg'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
