@@ -37,7 +37,7 @@ export const ANIMATION_DELAYS = {
 export const COMMON_CLASSES = {
   // Layout
   container: 'max-w-7xl mx-auto px-6',
-  section: 'py-20 px-6',
+  section: 'py-10 px-6',
   sectionTitle: 'text-4xl md:text-5xl font-bold mb-6 gradient-text',
   sectionSubtitle: 'text-xl text-neutral-300 max-w-3xl mx-auto',
 

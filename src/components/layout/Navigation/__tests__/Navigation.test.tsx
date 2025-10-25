@@ -8,10 +8,21 @@ import {
 } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
+import { TourProvider } from '@/contexts/TourContext';
+
 import { Navigation } from '../Navigation';
 
 // Extend Jest matchers
 expect.extend(toHaveNoViolations);
+
+// Helper function to render Navigation with TourProvider
+const renderNavigationWithProvider = (props: Record<string, unknown>) => {
+  return render(
+    <TourProvider>
+      <Navigation {...props} />
+    </TourProvider>
+  );
+};
 
 // Mock Next.js Image component
 jest.mock('next/image', () => ({
@@ -59,7 +70,7 @@ describe('Navigation Component', () => {
   });
 
   it('renders navigation with logo', () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     expect(screen.getByRole('navigation')).toBeInTheDocument();
     expect(screen.getByLabelText('Main navigation')).toBeInTheDocument();
@@ -68,7 +79,7 @@ describe('Navigation Component', () => {
   });
 
   it('renders desktop navigation menu', () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     // Check that desktop navigation links are present
     const aboutLinks = screen.getAllByRole('link', { name: /about/i });
@@ -82,7 +93,7 @@ describe('Navigation Component', () => {
   });
 
   it('renders navigation items with proper roles', () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     const links = screen.getAllByRole('link');
     expect(links.length).toBeGreaterThan(0);
@@ -93,7 +104,7 @@ describe('Navigation Component', () => {
   });
 
   it('highlights active section', () => {
-    render(<Navigation {...defaultProps} activeSection='about' />);
+    renderNavigationWithProvider({ ...defaultProps, activeSection: 'about' });
 
     // Since the current NAV_ITEMS don't have hash links,
     // we just verify the component renders without errors
@@ -107,7 +118,7 @@ describe('Navigation Component', () => {
 
   it('handles section clicks', () => {
     const onSectionClick = jest.fn();
-    render(<Navigation {...defaultProps} onSectionClick={onSectionClick} />);
+    renderNavigationWithProvider({ ...defaultProps, onSectionClick });
 
     // Since the current NAV_ITEMS don't have hash links,
     // we just verify the component renders and onSectionClick is available
@@ -119,7 +130,7 @@ describe('Navigation Component', () => {
   });
 
   it('renders mobile menu button', () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     const mobileButton = screen.getByLabelText('Toggle mobile menu');
     expect(mobileButton).toBeInTheDocument();
@@ -128,7 +139,7 @@ describe('Navigation Component', () => {
   });
 
   it('toggles mobile menu', async () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     const mobileButton = screen.getByLabelText('Toggle mobile menu');
 
@@ -146,7 +157,7 @@ describe('Navigation Component', () => {
   });
 
   it('closes mobile menu when item is clicked', async () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     const mobileButton = screen.getByLabelText('Toggle mobile menu');
     fireEvent.click(mobileButton);
@@ -169,7 +180,7 @@ describe('Navigation Component', () => {
   });
 
   it('supports keyboard navigation', async () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     const mobileButton = screen.getByLabelText('Toggle mobile menu');
     mobileButton.focus();
@@ -188,7 +199,7 @@ describe('Navigation Component', () => {
   });
 
   it('has proper focus management', () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     const links = screen.getAllByRole('link');
     expect(links.length).toBeGreaterThan(0);
@@ -202,14 +213,14 @@ describe('Navigation Component', () => {
   });
 
   it('renders theme toggle', () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     const themeToggles = screen.getAllByLabelText(/switch to.*mode/i);
     expect(themeToggles.length).toBeGreaterThan(0);
   });
 
   it('has proper ARIA labels and descriptions', () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     expect(screen.getByRole('navigation')).toHaveAttribute(
       'aria-label',
@@ -220,13 +231,13 @@ describe('Navigation Component', () => {
   });
 
   it('should not have accessibility violations', async () => {
-    const { container } = render(<Navigation {...defaultProps} />);
+    const { container } = renderNavigationWithProvider(defaultProps);
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
 
   it('should not have accessibility violations with mobile menu open', async () => {
-    const { container } = render(<Navigation {...defaultProps} />);
+    const { container } = renderNavigationWithProvider(defaultProps);
 
     const mobileButton = screen.getByLabelText('Toggle mobile menu');
     fireEvent.click(mobileButton);
@@ -240,7 +251,7 @@ describe('Navigation Component', () => {
   });
 
   it('handles window resize for responsive behavior', () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     // Mock window.innerWidth
     Object.defineProperty(window, 'innerWidth', {
@@ -257,14 +268,14 @@ describe('Navigation Component', () => {
   });
 
   it('supports custom className', () => {
-    render(<Navigation {...defaultProps} className='custom-nav' />);
+    renderNavigationWithProvider({ ...defaultProps, className: 'custom-nav' });
 
     const nav = screen.getByRole('navigation');
     expect(nav).toHaveClass('custom-nav');
   });
 
   it('renders with proper semantic structure', () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     const nav = screen.getByRole('navigation');
     expect(nav).toBeInTheDocument();
@@ -281,7 +292,7 @@ describe('Navigation Component', () => {
   });
 
   it('handles focus trap in mobile menu', async () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     const mobileButton = screen.getByLabelText('Toggle mobile menu');
     fireEvent.click(mobileButton);
@@ -302,7 +313,7 @@ describe('Navigation Component', () => {
   });
 
   it('maintains focus when switching between desktop and mobile', () => {
-    render(<Navigation {...defaultProps} />);
+    renderNavigationWithProvider(defaultProps);
 
     const desktopLinks = screen.getAllByRole('link');
     const desktopLink = desktopLinks[0];

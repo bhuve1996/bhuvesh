@@ -15,14 +15,6 @@ jest.mock('../tabs/ATSAnalysisTab', () => ({
   ),
 }));
 
-jest.mock('../tabs/AIContentTab', () => ({
-  AIContentTab: ({ data }: { data: ResumeData }) => (
-    <div data-testid='ai-content-tab'>
-      AI Content for {data.personal?.fullName}
-    </div>
-  ),
-}));
-
 jest.mock('../tabs/TemplateCustomizerTab', () => ({
   TemplateCustomizerTab: ({ template }: { template: ResumeTemplate }) => (
     <div data-testid='template-customizer-tab'>Template: {template.name}</div>
@@ -90,9 +82,9 @@ describe('FloatingPanel Component', () => {
   it('renders floating action button initially', () => {
     render(<FloatingPanel {...defaultProps} />);
 
-    expect(screen.getByText('Quick Actions')).toBeInTheDocument();
+    expect(screen.getByText('Resume Builder')).toBeInTheDocument();
     expect(
-      screen.getByText(/access ats analysis, ai improvements, and more/i)
+      screen.getByText(/build, customize, and export your resume with professional tools/i)
     ).toBeInTheDocument();
   });
 
@@ -100,12 +92,11 @@ describe('FloatingPanel Component', () => {
     const user = userEvent.setup();
     render(<FloatingPanel {...defaultProps} />);
 
-    const floatingButton = screen.getByText('Quick Actions');
+    const floatingButton = screen.getByText('Resume Builder');
     await user.click(floatingButton);
 
     expect(screen.getByText('Resume Tools')).toBeInTheDocument();
     expect(screen.getByText('ATS Analysis')).toBeInTheDocument();
-    expect(screen.getByText('AI Content')).toBeInTheDocument();
     expect(screen.getByText('Customize')).toBeInTheDocument();
     expect(screen.getByText('Validate')).toBeInTheDocument();
     expect(screen.getByText('Export')).toBeInTheDocument();
@@ -116,7 +107,7 @@ describe('FloatingPanel Component', () => {
     render(<FloatingPanel {...defaultProps} />);
 
     // Open panel
-    const floatingButton = screen.getByText('Quick Actions');
+    const floatingButton = screen.getByText('Resume Builder');
     await user.click(floatingButton);
 
     // Close panel
@@ -125,7 +116,7 @@ describe('FloatingPanel Component', () => {
 
     // Panel should be hidden, floating button should be visible
     expect(screen.queryByText('Resume Tools')).not.toBeInTheDocument();
-    expect(screen.getByText('Quick Actions')).toBeInTheDocument();
+    expect(screen.getByText('Resume Builder')).toBeInTheDocument();
   });
 
   it('toggles expanded state when expand button is clicked', async () => {
@@ -133,7 +124,7 @@ describe('FloatingPanel Component', () => {
     render(<FloatingPanel {...defaultProps} />);
 
     // Open panel
-    const floatingButton = screen.getByText('Quick Actions');
+    const floatingButton = screen.getByText('Resume Builder');
     await user.click(floatingButton);
 
     // Get the panel container (the dialog element)
@@ -152,7 +143,7 @@ describe('FloatingPanel Component', () => {
     render(<FloatingPanel {...defaultProps} />);
 
     // Open panel
-    const floatingButton = screen.getByText('Quick Actions');
+    const floatingButton = screen.getByText('Resume Builder');
     await user.click(floatingButton);
 
     // Default tab should be Export
@@ -162,11 +153,6 @@ describe('FloatingPanel Component', () => {
     const atsTab = screen.getByText('ATS Analysis');
     await user.click(atsTab);
     expect(screen.getByText(/ATS Analysis for.*John Doe/)).toBeInTheDocument();
-
-    // Switch to AI Content tab
-    const aiContentTab = screen.getByText('AI Content');
-    await user.click(aiContentTab);
-    expect(screen.getByText('AI Content')).toBeInTheDocument();
 
     // Switch to Customize tab
     const customizeTab = screen.getByText('Customize');
@@ -191,7 +177,7 @@ describe('FloatingPanel Component', () => {
     render(<FloatingPanel {...defaultProps} />);
 
     // Open panel
-    const floatingButton = screen.getByText('Quick Actions');
+    const floatingButton = screen.getByText('Resume Builder');
     await user.click(floatingButton);
 
     // Check Export tab (default active tab) - the content shows "Export John Doe - Professional Template"
@@ -203,11 +189,6 @@ describe('FloatingPanel Component', () => {
     const atsTab = screen.getByText('ATS Analysis');
     await user.click(atsTab);
     expect(screen.getByText(/ATS Analysis for.*John Doe/)).toBeInTheDocument();
-
-    // Switch to AI Content tab
-    const aiContentTab = screen.getByText('AI Content');
-    await user.click(aiContentTab);
-    expect(screen.getByText('AI Content')).toBeInTheDocument();
 
     // Switch to Template Customizer tab
     const customizeTab = screen.getByText('Customize');
@@ -227,7 +208,7 @@ describe('FloatingPanel Component', () => {
     render(<FloatingPanel {...defaultProps} />);
 
     // Open panel
-    const floatingButton = screen.getByText('Quick Actions');
+    const floatingButton = screen.getByText('Resume Builder');
     await user.click(floatingButton);
 
     // The tab components should receive the onResumeDataUpdate callback
@@ -240,7 +221,7 @@ describe('FloatingPanel Component', () => {
     render(<FloatingPanel {...defaultProps} />);
 
     // Open panel
-    const floatingButton = screen.getByText('Quick Actions');
+    const floatingButton = screen.getByText('Resume Builder');
     await user.click(floatingButton);
 
     // Switch to Customize tab
@@ -256,7 +237,7 @@ describe('FloatingPanel Component', () => {
 
     // The className is applied to the outer container
     const container = screen
-      .getByText('Quick Actions')
+      .getByText('Resume Builder')
       .closest('div')?.parentElement;
     expect(container).toHaveClass('custom-class');
   });
@@ -267,16 +248,16 @@ describe('FloatingPanel Component', () => {
 
     // Tooltip should be visible initially
     expect(
-      screen.getByText(/access ats analysis, ai improvements, and more/i)
+      screen.getByText(/build, customize, and export your resume with professional tools/i)
     ).toBeInTheDocument();
 
     // Open panel
-    const floatingButton = screen.getByText('Quick Actions');
+    const floatingButton = screen.getByText('Resume Builder');
     await user.click(floatingButton);
 
     // Tooltip should be hidden
     expect(
-      screen.queryByText(/access ats analysis, ai improvements, and more/i)
+      screen.queryByText(/build, customize, and export your resume with professional tools/i)
     ).not.toBeInTheDocument();
   });
 
@@ -285,7 +266,7 @@ describe('FloatingPanel Component', () => {
     render(<FloatingPanel {...defaultProps} />);
 
     // Open panel
-    const floatingButton = screen.getByText('Quick Actions');
+    const floatingButton = screen.getByText('Resume Builder');
     await user.click(floatingButton);
 
     // Tab navigation should work - focus should be on the close button first
@@ -301,7 +282,7 @@ describe('FloatingPanel Component', () => {
     render(<FloatingPanel {...defaultProps} />);
 
     // Open panel
-    const floatingButton = screen.getByText('Quick Actions');
+    const floatingButton = screen.getByText('Resume Builder');
     await user.click(floatingButton);
 
     // The panel div has the ARIA attributes

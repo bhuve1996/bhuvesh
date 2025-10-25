@@ -33,7 +33,7 @@ export const MobileExportMenu: React.FC<MobileExportMenuProps> = ({
           </h3>
           <Tooltip
             content='Export your resume as a PDF document'
-            position='left'
+            position='top'
             delay={200}
           >
             <Button
@@ -62,7 +62,7 @@ export const MobileExportMenu: React.FC<MobileExportMenuProps> = ({
           </Tooltip>
           <Tooltip
             content='Export your resume as a Word document'
-            position='left'
+            position='top'
             delay={200}
           >
             <Button
@@ -91,7 +91,7 @@ export const MobileExportMenu: React.FC<MobileExportMenuProps> = ({
           </Tooltip>
           <Tooltip
             content='Export your resume as a text file'
-            position='left'
+            position='top'
             delay={200}
           >
             <Button

@@ -20,4 +20,5 @@ export { Tabs } from './Tabs';
 export { ThemeToggle } from './ThemeToggle';
 export { Toast } from './Toast';
 export { Tooltip } from './Tooltip';
+export { Tour, TourManager, TourTrigger, UniversalTourTrigger } from './Tour';
 export { VisualSeparator } from './VisualSeparator';

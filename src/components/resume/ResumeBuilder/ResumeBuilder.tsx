@@ -9,16 +9,17 @@ import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { ItemCard } from '@/components/ui/ItemCard';
 import { ResumeInput } from '@/components/ui/ResumeInput';
 import { RichTextInput } from '@/components/ui/RichTextInput';
+import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import { validateResumeData, ValidationResult } from '@/lib/resume/validation';
 import { useResumeStore } from '@/store/resumeStore';
 import { ResumeData } from '@/types/resume';
 
-import { AIAssistant } from '../AIAssistant';
 import { DOCXExporter } from '../DOCXExporter';
 import { FloatingActions } from '../FloatingActions/FloatingActions';
 import { PDFExporter } from '../PDFExporter';
 import { RichTextEditor } from '../RichTextEditor';
 import { SectionValidation } from '../SectionValidation/SectionValidation';
+import { UnifiedAIContentImprover } from '../UnifiedAIContentImprover';
 import { ValidationModal } from '../ValidationModal';
 
 interface ResumeBuilderProps {
@@ -367,19 +368,48 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           placeholder='github.com/johnsmith'
                         />
                       </div>
-                    </div>
-                    <div className='mt-4'>
-                      <AIAssistant
-                        onSuggestion={_suggestion => {
-                          // AI can suggest improvements for personal information
-                          // console.log(
-                          //   'AI suggestion for personal info:',
-                          //   suggestion
-                          // );
-                        }}
-                        context={`Personal information for ${currentResumeData.personal.fullName || 'resume'}`}
-                        type='personal'
-                      />
+                      <div>
+                        <label
+                          htmlFor='portfolio'
+                          className='block text-xs sm:text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                        >
+                          Portfolio
+                        </label>
+                        <input
+                          id='portfolio'
+                          type='url'
+                          value={currentResumeData.personal.portfolio || ''}
+                          onChange={e =>
+                            handleDataUpdate('personal', {
+                              ...currentResumeData.personal,
+                              portfolio: e.target.value,
+                            })
+                          }
+                          className='w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200 text-sm sm:text-base'
+                          placeholder='yourportfolio.com'
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor='job-title'
+                          className='block text-xs sm:text-sm font-semibold text-foreground mb-2 uppercase tracking-wide'
+                        >
+                          Current Job Title
+                        </label>
+                        <input
+                          id='job-title'
+                          type='text'
+                          value={currentResumeData.personal.jobTitle || ''}
+                          onChange={e =>
+                            handleDataUpdate('personal', {
+                              ...currentResumeData.personal,
+                              jobTitle: e.target.value,
+                            })
+                          }
+                          className='w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-background text-foreground font-medium transition-all duration-200 text-sm sm:text-base'
+                          placeholder='Software Engineer'
+                        />
+                      </div>
                     </div>
                   </CollapsibleSection>
                 </Card>
@@ -403,19 +433,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       placeholder='Write a brief summary of your professional background and key strengths...'
                       maxLength={500}
                     />
-                    <div className='mt-4'>
-                      <AIAssistant
-                        onSuggestion={suggestion =>
-                          handleDataUpdate('summary', suggestion)
-                        }
-                        context={
-                          currentResumeData.personal.fullName
-                            ? `Professional summary for ${currentResumeData.personal.fullName}`
-                            : ''
-                        }
-                        type='summary'
-                      />
-                    </div>
                   </CollapsibleSection>
                 </Card>
 
@@ -544,13 +561,15 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       onClick={() => {
                         const newJob = {
                           id: `job-${Date.now()}`,
-                          title: '',
+                          position: '',
                           company: '',
                           location: '',
-                          period: '',
+                          startDate: '',
+                          endDate: '',
+                          current: false,
                           description: '',
                           achievements: [],
-                          technologies: [],
+                          keyTechnologies: [],
                         };
                         handleDataUpdate('experience', [
                           ...currentResumeData.experience,
@@ -624,6 +643,22 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               placeholder='Stanford University'
                             />
                           </FormField>
+                          <FormField label='Field of Study' required>
+                            <ResumeInput
+                              value={edu.field}
+                              onChange={value => {
+                                const newEducation = [
+                                  ...currentResumeData.education,
+                                ];
+                                newEducation[index] = {
+                                  ...edu,
+                                  field: value,
+                                };
+                                handleDataUpdate('education', newEducation);
+                              }}
+                              placeholder='Computer Science'
+                            />
+                          </FormField>
                           <FormField label='Location'>
                             <ResumeInput
                               value={edu.location}
@@ -681,11 +716,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         const newEducation = {
                           id: `edu-${Date.now()}`,
                           degree: '',
-                          school: '',
+                          institution: '',
+                          field: '',
                           location: '',
-                          period: '',
+                          startDate: '',
+                          endDate: '',
+                          current: false,
                           gpa: '',
-                          relevant_courses: [],
+                          honors: [],
                         };
                         handleDataUpdate('education', [
                           ...currentResumeData.education,
@@ -696,19 +734,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     >
                       ➕ Add Education
                     </Button>
-                    <div className='mt-4'>
-                      <AIAssistant
-                        onSuggestion={_suggestion => {
-                          // AI can suggest education improvements
-                          // console.log(
-                          //   'AI suggestion for education:',
-                          //   suggestion
-                          // );
-                        }}
-                        context={`Education section for ${currentResumeData.personal.fullName || 'resume'}`}
-                        type='education'
-                      />
-                    </div>
                   </CollapsibleSection>
                 </Card>
 
@@ -755,7 +780,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                               placeholder='E-commerce Platform'
                             />
                           </FormField>
-                          <FormField label='Project Link (Optional)'>
+                          <FormField label='Project URL (Optional)'>
                             <ResumeInput
                               type='url'
                               value={project.url || ''}
@@ -769,7 +794,56 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                                 };
                                 handleDataUpdate('projects', newProjects);
                               }}
+                              placeholder='https://yourproject.com'
+                            />
+                          </FormField>
+                          <FormField label='GitHub Repository (Optional)'>
+                            <ResumeInput
+                              type='url'
+                              value={project.github || ''}
+                              onChange={value => {
+                                const newProjects = [
+                                  ...(currentResumeData.projects || []),
+                                ];
+                                newProjects[index] = {
+                                  ...project,
+                                  github: value,
+                                };
+                                handleDataUpdate('projects', newProjects);
+                              }}
                               placeholder='https://github.com/username/project'
+                            />
+                          </FormField>
+                          <FormField label='Start Date'>
+                            <ResumeInput
+                              value={project.startDate || ''}
+                              onChange={value => {
+                                const newProjects = [
+                                  ...(currentResumeData.projects || []),
+                                ];
+                                newProjects[index] = {
+                                  ...project,
+                                  startDate: value,
+                                };
+                                handleDataUpdate('projects', newProjects);
+                              }}
+                              placeholder='Jan 2023'
+                            />
+                          </FormField>
+                          <FormField label='End Date (Optional)'>
+                            <ResumeInput
+                              value={project.endDate || ''}
+                              onChange={value => {
+                                const newProjects = [
+                                  ...(currentResumeData.projects || []),
+                                ];
+                                newProjects[index] = {
+                                  ...project,
+                                  endDate: value,
+                                };
+                                handleDataUpdate('projects', newProjects);
+                              }}
+                              placeholder='Dec 2023 or Present'
                             />
                           </FormField>
                         </div>
@@ -824,7 +898,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                           name: '',
                           description: '',
                           technologies: [],
-                          link: '',
+                          url: '',
+                          github: '',
+                          startDate: '',
+                          endDate: '',
                         };
                         handleDataUpdate('projects', [
                           ...(currentResumeData.projects || []),
@@ -846,7 +923,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     color='cyan'
                     count={
                       currentResumeData.skills.technical.length +
-                      currentResumeData.skills.soft.length
+                      currentResumeData.skills.business.length +
+                      currentResumeData.skills.soft.length +
+                      currentResumeData.skills.languages.length +
+                      currentResumeData.skills.certifications.length
                     }
                     countLabel='skills'
                     isExpanded={expandedSections.skills || false}
@@ -877,6 +957,24 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       />
                     </FormField>
                     <FormField
+                      label='Business Skills'
+                      helperText='Separate skills with commas'
+                    >
+                      <ResumeInput
+                        value={currentResumeData.skills.business.join(', ')}
+                        onChange={value =>
+                          handleDataUpdate('skills', {
+                            ...currentResumeData.skills,
+                            business: value
+                              .split(',')
+                              .map(s => capitalizeFirstLetter(s.trim()))
+                              .filter(s => s),
+                          })
+                        }
+                        placeholder='Project Management, Sales, Marketing, Finance...'
+                      />
+                    </FormField>
+                    <FormField
                       label='Soft Skills'
                       helperText='Separate skills with commas'
                     >
@@ -894,19 +992,44 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         placeholder='Leadership, Communication, Problem Solving...'
                       />
                     </FormField>
-                    <div className='mt-4'>
-                      <AIAssistant
-                        onSuggestion={_suggestion => {
-                          // AI can suggest skills improvements
-                          // console.log(
-                          //   'AI suggestion for skills:',
-                          //   suggestion
-                          // );
-                        }}
-                        context={`Skills section for ${currentResumeData.personal.fullName || 'resume'}`}
-                        type='skills'
+                    <FormField
+                      label='Languages'
+                      helperText='Separate languages with commas'
+                    >
+                      <ResumeInput
+                        value={currentResumeData.skills.languages.join(', ')}
+                        onChange={value =>
+                          handleDataUpdate('skills', {
+                            ...currentResumeData.skills,
+                            languages: value
+                              .split(',')
+                              .map(s => capitalizeFirstLetter(s.trim()))
+                              .filter(s => s),
+                          })
+                        }
+                        placeholder='English (Native), Spanish (Fluent), French (Intermediate)...'
                       />
-                    </div>
+                    </FormField>
+                    <FormField
+                      label='Certifications'
+                      helperText='Separate certifications with commas'
+                    >
+                      <ResumeInput
+                        value={currentResumeData.skills.certifications.join(
+                          ', '
+                        )}
+                        onChange={value =>
+                          handleDataUpdate('skills', {
+                            ...currentResumeData.skills,
+                            certifications: value
+                              .split(',')
+                              .map(s => capitalizeFirstLetter(s.trim()))
+                              .filter(s => s),
+                          })
+                        }
+                        placeholder='AWS Certified, PMP, Google Analytics...'
+                      />
+                    </FormField>
                   </CollapsibleSection>
                 </Card>
 
@@ -976,19 +1099,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       >
                         + Add Certification
                       </Button>
-                    </div>
-                    <div className='mt-4'>
-                      <AIAssistant
-                        onSuggestion={_suggestion => {
-                          // AI can suggest certifications improvements
-                          // console.log(
-                          //   'AI suggestion for certifications:',
-                          //   suggestion
-                          // );
-                        }}
-                        context={`Certifications section for ${currentResumeData.personal.fullName || 'resume'}`}
-                        type='certifications'
-                      />
                     </div>
                   </CollapsibleSection>
                 </Card>
@@ -1063,21 +1173,11 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                         + Add Achievement
                       </Button>
                     </div>
-                    <div className='mt-4'>
-                      <AIAssistant
-                        onSuggestion={_suggestion => {
-                          // AI can suggest achievements improvements
-                          // console.log(
-                          //   'AI suggestion for achievements:',
-                          //   suggestion
-                          // );
-                        }}
-                        context={`Achievements section for ${currentResumeData.personal.fullName || 'resume'}`}
-                        type='achievements'
-                      />
-                    </div>
                   </CollapsibleSection>
                 </Card>
+
+                {/* Bottom spacing to prevent touching footer */}
+                <div className='h-8'></div>
               </div>
             </div>
           </div>
@@ -1128,6 +1228,12 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     {currentResumeData.personal.github && (
                       <p>GitHub: {currentResumeData.personal.github}</p>
                     )}
+                    {currentResumeData.personal.portfolio && (
+                      <p>Portfolio: {currentResumeData.personal.portfolio}</p>
+                    )}
+                    {currentResumeData.personal.jobTitle && (
+                      <p>Current Role: {currentResumeData.personal.jobTitle}</p>
+                    )}
                   </div>
                 </div>
 
@@ -1153,6 +1259,18 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                   </div>
                 )}
 
+                {/* Business Skills */}
+                {currentResumeData.skills.business.length > 0 && (
+                  <div className='mb-6'>
+                    <h2 className='text-lg font-semibold text-gray-900 mb-2'>
+                      Business Skills
+                    </h2>
+                    <p className='text-gray-700'>
+                      {currentResumeData.skills.business.join(', ')}
+                    </p>
+                  </div>
+                )}
+
                 {/* Soft Skills */}
                 {currentResumeData.skills.soft.length > 0 && (
                   <div className='mb-6'>
@@ -1164,6 +1282,43 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     </p>
                   </div>
                 )}
+
+                {/* Languages */}
+                {currentResumeData.skills.languages.length > 0 && (
+                  <div className='mb-6'>
+                    <h2 className='text-lg font-semibold text-gray-900 mb-2'>
+                      Languages
+                    </h2>
+                    <p className='text-gray-700'>
+                      {currentResumeData.skills.languages.join(', ')}
+                    </p>
+                  </div>
+                )}
+
+                {/* Certifications */}
+                {currentResumeData.skills.certifications.length > 0 && (
+                  <div className='mb-6'>
+                    <h2 className='text-lg font-semibold text-gray-900 mb-2'>
+                      Certifications
+                    </h2>
+                    <p className='text-gray-700'>
+                      {currentResumeData.skills.certifications.join(', ')}
+                    </p>
+                  </div>
+                )}
+
+                {/* Hobbies */}
+                {currentResumeData.hobbies &&
+                  currentResumeData.hobbies.length > 0 && (
+                    <div className='mb-6'>
+                      <h2 className='text-lg font-semibold text-gray-900 mb-2'>
+                        Hobbies & Interests
+                      </h2>
+                      <p className='text-gray-700'>
+                        {currentResumeData.hobbies.join(', ')}
+                      </p>
+                    </div>
+                  )}
               </div>
             </Card>
 
@@ -1189,27 +1344,33 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
             <div className='mt-8 text-center'>
               <h3 className='text-lg font-semibold mb-4'>Export Options</h3>
               <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
-                <Button
-                  onClick={() => {
-                    setCurrentStep('builder');
-                  }}
-                  className='bg-purple-500 hover:bg-purple-600'
+                <Tooltip
+                  content='Ready to Improve Your Resume? Take action based on your ATS analysis results to boost your score.'
+                  position='top'
+                  delay={200}
                 >
-                  <svg
-                    className='w-4 h-4 mr-2'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
+                  <Button
+                    onClick={() => {
+                      setCurrentStep('builder');
+                    }}
+                    className='bg-purple-500 hover:bg-purple-600'
                   >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
-                    />
-                  </svg>
-                  Check ATS Score
-                </Button>
+                    <svg
+                      className='w-4 h-4 mr-2'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
+                      />
+                    </svg>
+                    Check ATS Score
+                  </Button>
+                </Tooltip>
                 <div className='flex gap-2'>
                   <PDFExporter
                     resumeData={currentResumeData}
@@ -1247,6 +1408,15 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
       {/* Floating Actions */}
       {currentStep === 'builder' && (
         <FloatingActions resumeData={currentResumeData} onSave={handleSave} />
+      )}
+
+      {/* Floating AI Content Improver */}
+      {currentStep === 'builder' && (
+        <UnifiedAIContentImprover
+          resumeData={currentResumeData}
+          onContentUpdate={setResumeData}
+          className='fixed bottom-20 right-4 z-40'
+        />
       )}
 
       {/* Validation Modal */}

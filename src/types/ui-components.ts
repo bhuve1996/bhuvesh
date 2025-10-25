@@ -52,12 +52,6 @@ export interface ATSAnalysisResult {
 }
 
 // AI Components
-export interface AIContentImproverProps {
-  content: string;
-  onImprove: (improvedContent: string) => void;
-  isLoading?: boolean;
-  className?: string;
-}
 
 export interface AIAssistantProps {
   onSendMessage: (message: string) => void;

@@ -70,7 +70,7 @@ export const ExportTab: React.FC<ExportTabProps> = ({
   ];
 
   return (
-    <div className='h-full overflow-y-auto'>
+    <div className='h-full overflow-y-auto' data-tour='export-tab'>
       <div className='text-center'>
         <h4 className='text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2'>
           Export Resume

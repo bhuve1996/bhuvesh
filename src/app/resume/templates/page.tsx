@@ -196,11 +196,13 @@ export default function TemplateGalleryPage() {
 
       <div className='max-w-7xl mx-auto px-2 sm:px-2 lg:px-3 py-2'>
         {/* Unified Welcome Bar */}
-        <UnifiedWelcomeBar
-          currentPage='templates'
-          analysisResult={null}
-          resumeData={userResumeData}
-        />
+        <div data-tour='welcome'>
+          <UnifiedWelcomeBar
+            currentPage='templates'
+            analysisResult={null}
+            resumeData={userResumeData}
+          />
+        </div>
 
         {/* View Mode Toggle - Compact and always visible, hidden on mobile */}
         {!isMobile && (
@@ -218,6 +220,7 @@ export default function TemplateGalleryPage() {
           /* Carousel Layout - Mobile First */
           <div
             className={`space-y-6 ${isCarouselCollapsed ? 'pb-8' : 'pb-32'}`}
+            data-tour='template-selection'
           >
             {/* Main Content - Template Preview */}
             <div className='max-w-5xl mx-auto bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-4 sm:p-6 backdrop-blur-sm'>
@@ -277,7 +280,7 @@ export default function TemplateGalleryPage() {
                   </div>
                 </div>
               ) : (
-                <div className='text-center py-12'>
+                <div className='text-center py-6'>
                   <div className='w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center'>
                     <svg
                       className='w-8 h-8 text-slate-400'
@@ -307,7 +310,10 @@ export default function TemplateGalleryPage() {
           /* Grid Layout - Desktop */
           <div className='grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-6 gap-4 lg:gap-6 xl:gap-8'>
             {/* Left Sidebar - Template Gallery */}
-            <div className='lg:col-span-1 xl:col-span-1 order-2 lg:order-1 xl:order-1'>
+            <div
+              className='lg:col-span-1 xl:col-span-1 order-2 lg:order-1 xl:order-1'
+              data-tour='template-selection'
+            >
               {/* Search and Filters */}
               <TemplateSearch
                 searchQuery={searchQuery}
@@ -516,11 +522,13 @@ export default function TemplateGalleryPage() {
 
       {/* Unified Floating Panel - All tools in one place */}
       {selectedTemplate && (
-        <FloatingPanel
-          resumeData={previewData}
-          template={customizedTemplate || selectedTemplate}
-          onTemplateChange={handleTemplateChange}
-        />
+        <div data-tour='completion'>
+          <FloatingPanel
+            resumeData={previewData}
+            template={customizedTemplate || selectedTemplate}
+            onTemplateChange={handleTemplateChange}
+          />
+        </div>
       )}
     </div>
   );

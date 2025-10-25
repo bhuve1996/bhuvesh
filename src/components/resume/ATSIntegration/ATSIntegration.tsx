@@ -170,7 +170,7 @@ export const ATSIntegration: React.FC<ATSIntegrationProps> = ({
   if (backendStatus === 'checking') {
     return (
       <Card className='p-6'>
-        <div className='flex items-center justify-center py-8'>
+        <div className='flex items-center justify-center py-4'>
           <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400'></div>
           <span className='ml-2 text-gray-600'>Checking ATS service...</span>
         </div>
@@ -181,7 +181,7 @@ export const ATSIntegration: React.FC<ATSIntegrationProps> = ({
   if (backendStatus === 'offline') {
     return (
       <Card className='p-6'>
-        <div className='text-center py-8'>
+        <div className='text-center py-4'>
           <div className='w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center'>
             <svg
               className='w-8 h-8 text-red-600'

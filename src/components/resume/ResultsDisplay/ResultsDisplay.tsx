@@ -1,21 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 
-import {
-  AnimatedScore,
-  Card,
-  DataVisualization,
-  Tabs,
-  Tooltip,
-} from '@/components/ui';
-import { useResumeNavigation } from '@/contexts/ResumeNavigationContext';
-import { mapATSToResumeData } from '@/lib/utils/atsToResumeMapper';
-import { useResumeActions } from '@/store/resumeStore';
-import type { AnalysisResult, ImprovementItem } from '@/types';
-
-import { TabbedImprovementPlan } from '../ImprovementPlan/TabbedImprovementPlan';
+import { AnimatedScore, Card, DataVisualization, Tabs } from '@/components/ui';
+import type { AnalysisResult } from '@/types';
 
 import { DetailedAnalyticsDisplay } from './DetailedAnalyticsDisplay';
 import { SummaryDisplay } from './SummaryDisplay';
@@ -27,90 +16,7 @@ interface ResultsDisplayProps {
 }
 
 export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
-  // const router = useRouter();
-  const { setResumeData, setAnalysisResult } = useResumeActions();
-  const { navigateToResumeBuilder, navigateToTemplates } =
-    useResumeNavigation();
-  const [improvementPlan, setImprovementPlan] = useState<{
-    improvements: ImprovementItem[];
-    summary: {
-      total_improvements: number;
-      high_priority: number;
-      estimated_impact: number;
-      estimated_time: string;
-    };
-    quick_wins: ImprovementItem[];
-  } | null>(null);
-  const [loadingImprovements, setLoadingImprovements] = useState(false);
   const [showJobDescription, setShowJobDescription] = useState(false);
-
-  const convertToResumeData = useCallback(() => {
-    // Use the unified mapper to convert ATS data to Resume Builder format
-    if (!result.extraction_details) return null;
-    return mapATSToResumeData(
-      result.extraction_details,
-      result.structured_experience
-    );
-  }, [result.extraction_details, result.structured_experience]);
-
-  const handleEditInBuilder = useCallback(() => {
-    const resumeData = convertToResumeData();
-
-    if (resumeData) {
-      try {
-        // Store in global state
-        setResumeData(resumeData);
-        setAnalysisResult(result);
-
-        // Navigate to resume builder
-        navigateToResumeBuilder();
-      } catch {
-        // console.error('Error storing resume data:', error);
-        // Still navigate even if storage fails
-        navigateToResumeBuilder();
-      }
-    } else {
-      // If conversion fails, still navigate to builder with empty data
-      navigateToResumeBuilder();
-    }
-  }, [
-    convertToResumeData,
-    result,
-    setResumeData,
-    setAnalysisResult,
-    navigateToResumeBuilder,
-  ]);
-
-  const fetchImprovementPlan = useCallback(async () => {
-    if (!result.extraction_details) return;
-
-    setLoadingImprovements(true);
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const response = await fetch(`${apiUrl}/api/upload/improvement-plan`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          analysis_result: result,
-          extracted_data: result.extraction_details,
-          job_description: null,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setImprovementPlan(data.data);
-        }
-      }
-    } catch {
-      // Silently fail - improvement plan is optional
-    } finally {
-      setLoadingImprovements(false);
-    }
-  }, [result]);
 
   const getScoreGrade = (score: number) => {
     if (score >= 90) return 'A+';
@@ -123,177 +29,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
 
   return (
     <div className='space-y-6'>
-      {/* Header */}
-      <div className='text-center'>
-        <h2 className='text-3xl font-bold mb-2 text-foreground'>
-          Analysis Complete
-        </h2>
-        <p className='text-muted-foreground'>
-          Detected job type:{' '}
-          <span className='text-primary-600 dark:text-primary-400 font-medium'>
-            {result.jobType}
-          </span>
-        </p>
-
-        {/* Resume Improvement Actions */}
-        {result.extraction_details && (
-          <div className='mt-8 space-y-4'>
-            <div className='text-center'>
-              <h3 className='text-xl font-semibold text-foreground mb-2'>
-                Ready to Improve Your Resume?
-              </h3>
-              <p className='text-muted-foreground mb-6'>
-                Take action based on your ATS analysis results
-              </p>
-            </div>
-
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto'>
-              {/* Primary Action - Edit in Resume Builder */}
-              <Tooltip
-                content='Open resume builder with your parsed data pre-filled'
-                position='top'
-                delay={300}
-              >
-                <button
-                  onClick={handleEditInBuilder}
-                  className='group relative overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl'
-                >
-                  <div className='absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
-                  <div className='relative flex items-center justify-center space-x-3'>
-                    <svg
-                      className='w-6 h-6'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
-                      />
-                    </svg>
-                    <div className='text-left'>
-                      <div className='text-lg font-bold'>
-                        Edit in Resume Builder
-                      </div>
-                      <div className='text-sm opacity-90'>
-                        Pre-filled with your data
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              </Tooltip>
-
-              {/* Secondary Action - View Templates */}
-              <Tooltip
-                content='Browse resume templates with your data'
-                position='top'
-                delay={300}
-              >
-                <button
-                  onClick={() => {
-                    // Store analysis result and navigate to templates
-                    setAnalysisResult(result);
-                    navigateToTemplates();
-                  }}
-                  className='group relative overflow-hidden bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl'
-                >
-                  <div className='absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
-                  <div className='relative flex items-center justify-center space-x-3'>
-                    <svg
-                      className='w-6 h-6'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z'
-                      />
-                    </svg>
-                    <div className='text-left'>
-                      <div className='text-lg font-bold'>View Templates</div>
-                      <div className='text-sm opacity-90'>Choose a design</div>
-                    </div>
-                  </div>
-                </button>
-              </Tooltip>
-            </div>
-
-            {/* Additional Options */}
-            <div className='flex flex-wrap justify-center gap-3 mt-6'>
-              <button
-                onClick={handleEditInBuilder}
-                className='inline-flex items-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors duration-200 text-sm'
-              >
-                <svg
-                  className='w-4 h-4 mr-2'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.824-2.709M15 6.291A7.962 7.962 0 0012 5c-2.34 0-4.29 1.009-5.824 2.709'
-                  />
-                </svg>
-                Improve Content
-              </button>
-              <button
-                onClick={handleEditInBuilder}
-                className='inline-flex items-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors duration-200 text-sm'
-              >
-                <svg
-                  className='w-4 h-4 mr-2'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4'
-                  />
-                </svg>
-                Optimize for ATS
-              </button>
-              <button
-                onClick={handleEditInBuilder}
-                className='inline-flex items-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors duration-200 text-sm'
-              >
-                <svg
-                  className='w-4 h-4 mr-2'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12'
-                  />
-                </svg>
-                Export Resume
-              </button>
-            </div>
-
-            <div className='text-center mt-4'>
-              <p className='text-sm text-slate-500 dark:text-slate-400'>
-                ✨ Your resume data will be automatically loaded into the
-                builder
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
       {/* AI-Generated Job Description - Hidden by default with toggle */}
       {result.job_description && (
         <Card className='p-6'>
@@ -326,45 +61,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8'>
         {/* Main Content - Left 2/3 */}
         <div className='lg:col-span-2 space-y-6 lg:space-y-8'>
-          {/* ATS Score Section */}
-          <div className='relative'>
-            <div className='absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-2xl blur-xl'></div>
-            <Card
-              className='relative p-8 border-2 border-cyan-500/20 shadow-2xl'
-              delay={0.2}
-            >
-              <div className='text-center'>
-                <div className='inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-4'>
-                  <span className='text-2xl'>🎯</span>
-                </div>
-                <h3 className='text-2xl font-bold mb-6 text-foreground'>
-                  ATS Compatibility Score
-                </h3>
-
-                {/* Animated Score Display */}
-                <AnimatedScore
-                  score={result.atsScore}
-                  size='xl'
-                  showGrade={true}
-                  className='mb-6'
-                />
-
-                <div className='max-w-md mx-auto p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700'>
-                  <p className='text-muted-foreground'>
-                    {result.atsScore >= 80 &&
-                      '🎉 Excellent! Your resume is highly ATS-compatible and ready to impress recruiters.'}
-                    {result.atsScore >= 60 &&
-                      result.atsScore < 80 &&
-                      '👍 Good! Your resume has solid ATS compatibility with room for strategic improvements.'}
-                    {result.atsScore < 60 &&
-                      result.atsScore >= 0 &&
-                      '🔧 Your resume needs targeted improvements for better ATS compatibility and visibility.'}
-                  </p>
-                </div>
-              </div>
-            </Card>
-          </div>
-
           {/* Section Divider */}
           <div className='relative flex items-center justify-center'>
             <div className='absolute inset-0 flex items-center'>
@@ -439,57 +135,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
                         </div>
                       ),
                     },
-                    {
-                      id: 'improvement',
-                      label: 'Action Plan',
-                      icon: '📈',
-                      content: (
-                        <div className='max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
-                          <div className='space-y-6'>
-                            {!improvementPlan && (
-                              <div className='text-center py-8'>
-                                <div className='inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full mb-4'>
-                                  <span className='text-2xl'>🚀</span>
-                                </div>
-                                <h3 className='text-xl font-bold text-foreground mb-2'>
-                                  Generate Your Improvement Plan
-                                </h3>
-                                <p className='text-muted-foreground mb-6 max-w-md mx-auto'>
-                                  Get personalized recommendations to boost your
-                                  ATS score and improve your resume&apos;s
-                                  effectiveness
-                                </p>
-                                <button
-                                  onClick={fetchImprovementPlan}
-                                  disabled={loadingImprovements}
-                                  className='px-8 py-4 text-lg bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-all duration-300 transform hover:scale-105 shadow-lg'
-                                >
-                                  {loadingImprovements ? (
-                                    <span className='flex items-center gap-2'>
-                                      <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
-                                      Generating Plan...
-                                    </span>
-                                  ) : (
-                                    <span className='flex items-center gap-2'>
-                                      📈 Get Detailed Improvement Plan
-                                    </span>
-                                  )}
-                                </button>
-                              </div>
-                            )}
-
-                            {improvementPlan && (
-                              <TabbedImprovementPlan
-                                improvements={improvementPlan.improvements}
-                                summary={improvementPlan.summary}
-                                quick_wins={improvementPlan.quick_wins}
-                                currentScore={result.atsScore}
-                              />
-                            )}
-                          </div>
-                        </div>
-                      ),
-                    },
                   ]}
                   defaultActiveTab='parsed'
                   variant='underline'
@@ -502,6 +147,56 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
 
         {/* Analysis & Metrics Sidebar - Right 1/3 */}
         <div className='space-y-6 lg:space-y-8 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
+          {/* ATS Score Section */}
+          <div className='relative'>
+            <div className='absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-2xl blur-xl'></div>
+            <Card
+              className='relative p-6 border-2 border-cyan-500/20 shadow-2xl'
+              delay={0.2}
+            >
+              <div className='text-center'>
+                {/* Analysis Complete Header */}
+                <h2 className='text-2xl font-bold mb-2 text-foreground'>
+                  Analysis Complete
+                </h2>
+                <p className='text-muted-foreground mb-4 text-sm'>
+                  Detected job type:{' '}
+                  <span className='text-primary-600 dark:text-primary-400 font-medium'>
+                    {result.jobType}
+                  </span>
+                </p>
+
+                <div className='inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-3'>
+                  <span className='text-xl'>🎯</span>
+                </div>
+                <h3 className='text-lg font-bold mb-4 text-foreground'>
+                  ATS Compatibility Score
+                </h3>
+
+                {/* Animated Score Display */}
+                <AnimatedScore
+                  score={result.atsScore}
+                  size='lg'
+                  showGrade={true}
+                  className='mb-4'
+                />
+
+                <div className='max-w-sm mx-auto p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700'>
+                  <p className='text-muted-foreground text-sm'>
+                    {result.atsScore >= 80 &&
+                      '🎉 Excellent! Your resume is highly ATS-compatible and ready to impress recruiters.'}
+                    {result.atsScore >= 60 &&
+                      result.atsScore < 80 &&
+                      '👍 Good! Your resume has solid ATS compatibility with room for strategic improvements.'}
+                    {result.atsScore < 60 &&
+                      result.atsScore >= 0 &&
+                      '🔧 Your resume needs targeted improvements for better ATS compatibility and visibility.'}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+
           {/* Sidebar Header */}
           <div className='text-center'>
             <div className='inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-3'>

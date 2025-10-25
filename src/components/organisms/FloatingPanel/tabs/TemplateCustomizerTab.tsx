@@ -1227,7 +1227,10 @@ export const TemplateCustomizerTab: React.FC<TemplateCustomizerTabProps> = ({
   };
 
   return (
-    <div className='h-full overflow-y-auto scrollbar-thin'>
+    <div
+      className='h-full overflow-y-auto scrollbar-thin'
+      data-tour='customize-tab'
+    >
       <div className='text-center mb-6'>
         <h4 className='text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2'>
           Template Customization

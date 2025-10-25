@@ -272,7 +272,9 @@ export const ModernExportButtons: React.FC<ModernExportButtonsProps> = ({
   ];
 
   return (
-    <div className={`fixed bottom-6 right-6 z-50 ${className}`}>
+    <div
+      className={`fixed bottom-20 right-8 sm:bottom-24 sm:right-12 z-50 ${className}`}
+    >
       {/* Main floating button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}

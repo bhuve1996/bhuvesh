@@ -6,8 +6,8 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 
 import { UserProfile } from '@/components/auth';
+import { Tooltip, UniversalTourTrigger } from '@/components/ui';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import { COMMON_CLASSES, NAV_ITEMS } from '@/lib/constants';
 import type { NavigationProps } from '@/types';
 import { NavItem } from '@/types';
@@ -85,6 +85,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             className='hidden lg:flex items-center space-x-1 h-full flex-nowrap'
+            data-tour='navigation'
           >
             {navItems.map((item, index) => (
               <motion.div
@@ -145,6 +146,31 @@ export const Navigation: React.FC<NavigationProps> = ({
             >
               <UserProfile />
               <ThemeToggle size='sm' />
+              {/* Universal Tour Trigger - Shows appropriate tour for current page */}
+              <Tooltip
+                content='Take a guided tour of this page'
+                position='bottom'
+                delay={200}
+              >
+                <UniversalTourTrigger
+                  variant='icon'
+                  className='p-2 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
+                >
+                  <svg
+                    className='w-4 h-4'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                    />
+                  </svg>
+                </UniversalTourTrigger>
+              </Tooltip>
             </motion.div>
           </motion.div>
 

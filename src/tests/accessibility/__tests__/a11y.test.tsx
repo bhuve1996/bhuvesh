@@ -5,9 +5,19 @@ import { Button } from '@/components/atoms/Button/Button';
 import { Navigation } from '@/components/layout/Navigation';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { TourProvider } from '@/contexts/TourContext';
 
 // Extend Jest matchers
 expect.extend(toHaveNoViolations);
+
+// Helper function to render Navigation with TourProvider
+const renderNavigationWithProvider = (props: Record<string, unknown>) => {
+  return render(
+    <TourProvider>
+      <Navigation {...props} />
+    </TourProvider>
+  );
+};
 
 describe('Accessibility Tests', () => {
   describe('Button Component Accessibility', () => {
@@ -69,17 +79,19 @@ describe('Accessibility Tests', () => {
 
   describe('Navigation Component Accessibility', () => {
     it('should not have accessibility violations', async () => {
-      const { container } = render(
-        <Navigation activeSection='home' onSectionClick={jest.fn()} />
-      );
+      const { container } = renderNavigationWithProvider({
+        activeSection: 'home',
+        onSectionClick: jest.fn(),
+      });
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
 
     it('should have proper navigation structure', () => {
-      const { container } = render(
-        <Navigation activeSection='home' onSectionClick={jest.fn()} />
-      );
+      const { container } = renderNavigationWithProvider({
+        activeSection: 'home',
+        onSectionClick: jest.fn(),
+      });
 
       const nav = container.querySelector('nav');
       const links = container.querySelectorAll('a');
@@ -90,9 +102,10 @@ describe('Accessibility Tests', () => {
     });
 
     it('should have proper mobile menu accessibility', () => {
-      const { container } = render(
-        <Navigation activeSection='home' onSectionClick={jest.fn()} />
-      );
+      const { container } = renderNavigationWithProvider({
+        activeSection: 'home',
+        onSectionClick: jest.fn(),
+      });
 
       const mobileButton = container.querySelector(
         '[aria-label="Toggle mobile menu"]'
@@ -164,9 +177,10 @@ describe('Accessibility Tests', () => {
 
   describe('Focus Management Tests', () => {
     it('should maintain focus order in navigation', () => {
-      const { container } = render(
-        <Navigation activeSection='home' onSectionClick={jest.fn()} />
-      );
+      const { container } = renderNavigationWithProvider({
+        activeSection: 'home',
+        onSectionClick: jest.fn(),
+      });
 
       const menuItems = container.querySelectorAll('[role="menuitem"]');
       menuItems.forEach(item => {
@@ -188,9 +202,10 @@ describe('Accessibility Tests', () => {
 
   describe('Screen Reader Tests', () => {
     it('should have proper labels for screen readers', () => {
-      const { container } = render(
-        <Navigation activeSection='home' onSectionClick={jest.fn()} />
-      );
+      const { container } = renderNavigationWithProvider({
+        activeSection: 'home',
+        onSectionClick: jest.fn(),
+      });
 
       const nav = container.querySelector('nav');
       const logo = container.querySelector('img');
@@ -204,9 +219,10 @@ describe('Accessibility Tests', () => {
     });
 
     it('should have proper ARIA states', () => {
-      const { container } = render(
-        <Navigation activeSection='about' onSectionClick={jest.fn()} />
-      );
+      const { container } = renderNavigationWithProvider({
+        activeSection: 'about',
+        onSectionClick: jest.fn(),
+      });
 
       // Since our navigation doesn't use hash links, we just verify the component renders
       const nav = container.querySelector('nav');

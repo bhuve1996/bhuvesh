@@ -1,7 +1,7 @@
 // Panel and Tab Types
 // Consolidated from component-specific types
 
-export type PanelTab = 'ats' | 'ai' | 'customize' | 'validate' | 'export';
+export type PanelTab = 'ats' | 'customize' | 'validate' | 'export';
 
 export interface FloatingPanelProps {
   resumeData: import('./resume').ResumeData;
@@ -18,8 +18,6 @@ export interface BaseTabProps {
 
 // Specific tab props interfaces
 export type ValidationTabProps = BaseTabProps;
-
-export type AIContentTabProps = BaseTabProps;
 
 export type ATSAnalysisTabProps = BaseTabProps;
 

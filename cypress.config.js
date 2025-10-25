@@ -12,8 +12,16 @@ export default defineConfig({
     defaultCommandTimeout: 10000,
     requestTimeout: 10000,
     responseTimeout: 10000,
-    setupNodeEvents(_on, _config) {
+    setupNodeEvents(on, _config) {
       // implement node event listeners here
+      on('before:browser:launch', (browser, launchOptions) => {
+        if (browser.name === 'chrome' && browser.isHeadless) {
+          launchOptions.args.push('--disable-gpu');
+          launchOptions.args.push('--no-sandbox');
+          launchOptions.args.push('--disable-dev-shm-usage');
+        }
+        return launchOptions;
+      });
     },
   },
   component: {

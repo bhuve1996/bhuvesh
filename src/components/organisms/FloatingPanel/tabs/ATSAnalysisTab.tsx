@@ -103,7 +103,7 @@ export const ATSAnalysisTab: React.FC<ATSAnalysisTabProps> = ({
   };
 
   return (
-    <div className='p-4 space-y-4 h-full overflow-y-auto'>
+    <div className='p-4 space-y-4 h-full overflow-y-auto' data-tour='ats-tab'>
       <div className='text-center'>
         <h4 className='text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2'>
           ATS Compatibility Analysis

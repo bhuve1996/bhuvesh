@@ -9,7 +9,6 @@ import { createFocusTrap, createKeyboardHandlers } from '@/lib/accessibility';
 import { cn } from '@/lib/design-tokens';
 import { FloatingPanelProps, PanelTab } from '@/types';
 
-import { AIContentTab } from './tabs/AIContentTab';
 import { ATSAnalysisTab } from './tabs/ATSAnalysisTab';
 import { ExportTab } from './tabs/ExportTab';
 import { TemplateCustomizerTab } from './tabs/TemplateCustomizerTab';
@@ -57,18 +56,23 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
   // Body scroll lock for mobile when panel is open
   useEffect(() => {
     if (isVisible) {
-      // Store current scroll position
-      const scrollY = window.scrollY;
+      // Check if we're on mobile (screen width < 768px)
+      const isMobile = window.innerWidth < 768;
 
-      // Prevent body scroll
-      document.body.style.overflow = 'hidden';
-      // Prevent scroll on touch devices
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      document.body.style.top = `-${scrollY}px`;
+      if (isMobile) {
+        // Store current scroll position
+        const scrollY = window.scrollY;
 
-      // Store scroll position for restoration
-      document.body.setAttribute('data-scroll-y', scrollY.toString());
+        // Prevent body scroll on mobile only
+        document.body.style.overflow = 'hidden';
+        // Prevent scroll on touch devices
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+        document.body.style.top = `-${scrollY}px`;
+
+        // Store scroll position for restoration
+        document.body.setAttribute('data-scroll-y', scrollY.toString());
+      }
     } else {
       // Restore body scroll
       const scrollY = document.body.getAttribute('data-scroll-y');
@@ -145,18 +149,6 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       content: <ATSAnalysisTab resumeData={resumeData} />,
     },
     {
-      id: 'ai',
-      label: 'AI Content',
-      content: (
-        <AIContentTab
-          data={resumeData}
-          onDataUpdate={_updatedData => {
-            // Handle data updates from AI analysis
-          }}
-        />
-      ),
-    },
-    {
       id: 'validate',
       label: 'Validate',
       content: <ValidationTab resumeData={resumeData} />,
@@ -166,7 +158,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
   return (
     <div
       className={cn(
-        'fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50',
+        'fixed bottom-20 right-8 sm:bottom-24 sm:right-12 z-50',
         className
       )}
       {...props}
@@ -186,7 +178,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
               variant='primary'
               size='lg'
               className='rounded-full shadow-lg hover:shadow-xl text-sm sm:text-base'
-              aria-label='Open resume tools panel'
+              aria-label='Open resume builder tools panel'
               aria-expanded={isVisible}
               aria-haspopup='dialog'
               data-testid='floating-action-button'
@@ -207,12 +199,12 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                 </svg>
               }
             >
-              <span className='hidden sm:inline'>Quick Actions</span>
-              <span className='sm:hidden'>Tools</span>
+              <span className='hidden sm:inline'>Resume Builder</span>
+              <span className='sm:hidden'>Builder</span>
             </Button>
 
             <div className='absolute bottom-full right-0 mb-2 px-3 py-2 bg-neutral-900 text-white text-xs sm:text-sm rounded-lg whitespace-nowrap hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
-              Access ATS analysis, AI improvements, and more
+              Build, customize, and export your resume with professional tools
               <div className='absolute top-full right-4 border-4 border-transparent border-t-neutral-900'></div>
             </div>
           </motion.div>
@@ -251,8 +243,8 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                 Resume Tools
               </h3>
               <p id='panel-description' className='sr-only'>
-                Panel containing resume analysis, AI improvements,
-                customization, validation, and export tools
+                Panel containing resume analysis, customization, validation, and
+                export tools
               </p>
               <div className='flex items-center gap-1 sm:gap-2'>
                 <div className='relative group hidden md:block'>

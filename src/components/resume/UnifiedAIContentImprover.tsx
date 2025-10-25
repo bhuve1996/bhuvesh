@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { atsApi } from '@/api/endpoints/ats';
@@ -9,7 +9,7 @@ import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
 import { ResumeData } from '@/types/resume';
 
-interface ImprovedAIContentImproverProps {
+interface UnifiedAIContentImproverProps {
   resumeData: ResumeData;
   onContentUpdate: (updatedData: ResumeData) => void;
   className?: string;
@@ -30,18 +30,23 @@ interface ImprovementResult {
   summary: string;
 }
 
-export const ImprovedAIContentImprover: React.FC<
-  ImprovedAIContentImproverProps
+export const UnifiedAIContentImprover: React.FC<
+  UnifiedAIContentImproverProps
 > = ({ resumeData, onContentUpdate, className = '' }) => {
   const [isImproving, setIsImproving] = useState(false);
   const [improvementResult, setImprovementResult] =
     useState<ImprovementResult | null>(null);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
   const [showChanges, setShowChanges] = useState(false);
+  const [_userChoice, setUserChoice] = useState<'keep' | 'discard' | null>(
+    null
+  );
+  const [isVisible, setIsVisible] = useState(false);
 
-  const improveContent = async (section: keyof ResumeData) => {
+  const improveAllContent = useCallback(async () => {
     setIsImproving(true);
-    setActiveSection(section);
+    setImprovementResult(null);
+    setShowChanges(false);
+    setUserChoice(null);
 
     try {
       // Convert resume data to text for analysis
@@ -64,7 +69,7 @@ export const ImprovedAIContentImprover: React.FC<
       // Generate improvement plan using the backend API
       const improvementPlan = await atsApi.getImprovementPlan(
         analysisResult.data,
-        { text: resumeText, sections: getSectionData(resumeData, section) },
+        { text: resumeText, sections: getAllSectionData(resumeData) },
         undefined // No specific job description for general improvements
       );
 
@@ -72,13 +77,10 @@ export const ImprovedAIContentImprover: React.FC<
         throw new Error('Failed to generate improvement plan');
       }
 
-      // Apply AI improvements to the specific section
-      const improvements = await applyAIImprovements(
+      // Apply AI improvements to all sections
+      const improvements = await applyAIImprovementsToAllSections(
         resumeData,
-        section,
-        improvementPlan.data as {
-          improvements?: Array<{ category?: string; section?: string }>;
-        }
+        improvementPlan.data as Record<string, unknown>
       );
 
       // Calculate new score (simulate improvement)
@@ -89,124 +91,123 @@ export const ImprovedAIContentImprover: React.FC<
         improvements,
         overallScore: newScore,
         scoreIncrease,
-        summary: `Improved ${section} section with AI-powered optimizations. Expected ATS score increase: +${scoreIncrease} points.`,
+        summary: `Improved all sections with AI-powered optimizations. Expected ATS score increase: +${scoreIncrease} points.`,
       };
 
       setImprovementResult(result);
       setShowChanges(true);
 
       toast.success(
-        `✨ ${section} improved! Expected score increase: +${scoreIncrease} points`
+        `✨ Resume improved! Expected score increase: +${scoreIncrease} points`
       );
-    } catch {
-      // console.error('Content improvement error:', error);
+    } catch (_error) {
+      // console.error('Content improvement error:', _error);
       toast.error('Failed to improve content. Please try again.');
     } finally {
       setIsImproving(false);
-      setActiveSection(null);
     }
-  };
+  }, [resumeData]);
 
-  const applyAIImprovements = async (
+  // Listen for custom event to trigger AI improvement
+  React.useEffect(() => {
+    const handleAIImproveContent = () => {
+      setIsVisible(true);
+      // Trigger the improvement process
+      setIsImproving(true);
+      setImprovementResult(null);
+      setShowChanges(false);
+      setUserChoice(null);
+
+      // Call the improvement function
+      improveAllContent();
+    };
+
+    window.addEventListener('ai-improve-content', handleAIImproveContent);
+    return () => {
+      window.removeEventListener('ai-improve-content', handleAIImproveContent);
+    };
+  }, [resumeData, improveAllContent]);
+
+  const applyAIImprovementsToAllSections = async (
     data: ResumeData,
-    section: keyof ResumeData,
-    improvementPlan: {
-      improvements?: Array<{ category?: string; section?: string }>;
-    }
+    improvementPlan: Record<string, unknown>
   ): Promise<ContentImprovement[]> => {
     const improvements: ContentImprovement[] = [];
 
     // Get relevant suggestions from the improvement plan
-    const suggestions = improvementPlan.improvements || [];
-    const sectionSuggestions = suggestions.filter(
-      (s: { category?: string; section?: string }) =>
-        s.category?.toLowerCase().includes(section.toLowerCase()) ||
-        s.section?.toLowerCase().includes(section.toLowerCase())
-    );
+    const suggestions =
+      (improvementPlan.improvements as Record<string, unknown>[]) || [];
 
-    switch (section) {
-      case 'summary':
-        if (data.summary) {
-          const improved = await generateImprovedSummary(
-            data.summary,
-            sectionSuggestions
-          );
-          improvements.push({
-            section: 'Professional Summary',
-            original: data.summary,
-            improved,
-            reason:
-              'Enhanced with action verbs, quantifiable results, and ATS keywords',
-            impact: 'high',
-          });
-        }
-        break;
+    // Improve Summary
+    if (data.summary) {
+      const improved = await generateImprovedSummary(data.summary, suggestions);
+      improvements.push({
+        section: 'Professional Summary',
+        original: data.summary,
+        improved,
+        reason:
+          'Enhanced with action verbs, quantifiable results, and ATS keywords',
+        impact: 'high',
+      });
+    }
 
-      case 'experience':
-        data.experience.forEach((exp, index) => {
-          if (exp.description) {
-            const improved = generateImprovedExperience(
-              exp.description,
-              sectionSuggestions
-            );
-            improvements.push({
-              section: `Experience ${index + 1}: ${exp.position}`,
-              original: exp.description,
-              improved,
-              reason:
-                'Added action verbs, quantified achievements, and industry keywords',
-              impact: 'high',
-            });
-          }
-        });
-        break;
-
-      case 'skills':
-        const improvedSkills = generateImprovedSkills(
-          data.skills,
-          sectionSuggestions
+    // Improve Experience
+    data.experience.forEach((exp, index) => {
+      if (exp.description) {
+        const improved = generateImprovedExperience(
+          exp.description,
+          suggestions
         );
         improvements.push({
-          section: 'Skills Section',
-          original: JSON.stringify(data.skills),
-          improved: JSON.stringify(improvedSkills),
+          section: `Experience ${index + 1}: ${exp.position}`,
+          original: exp.description,
+          improved,
           reason:
-            'Reorganized and added relevant technical skills for better ATS matching',
-          impact: 'medium',
+            'Added action verbs, quantified achievements, and industry keywords',
+          impact: 'high',
         });
-        break;
-    }
+      }
+    });
+
+    // Improve Skills
+    const improvedSkills = generateImprovedSkills(data.skills, suggestions);
+    improvements.push({
+      section: 'Skills Section',
+      original: JSON.stringify(data.skills),
+      improved: JSON.stringify(improvedSkills),
+      reason:
+        'Reorganized and added relevant technical skills for better ATS matching',
+      impact: 'medium',
+    });
 
     return improvements;
   };
 
   const generateImprovedSummary = async (
     original: string,
-    _suggestions: Array<{ category?: string; section?: string }>
+    _suggestions: Record<string, unknown>[]
   ): Promise<string> => {
-    // Simulate AI improvement - in real implementation, this would call an AI service
-    // const _improvements = [
-    //   'Results-driven',
-    //   'Proven track record',
-    //   'Expertise in',
-    //   'Led cross-functional teams',
-    //   'Delivered measurable results',
-    //   'Optimized processes',
-    // ];
-
+    // Don't append to existing content - create a fresh, improved version
     let improved = original;
+
+    // Remove any existing AI enhancements to prevent repetition
+    improved = improved.replace(
+      /\s*(Enhanced with AI-powered optimization|Optimized with action verbs|AI-enhanced for impact).*/gi,
+      ''
+    );
 
     // Add action verbs if missing
     if (
       !improved.toLowerCase().includes('led') &&
       !improved.toLowerCase().includes('managed')
     ) {
-      improved = `Led and managed ${improved.toLowerCase()}`;
+      improved = `Results-driven professional with expertise in ${improved.toLowerCase()}`;
     }
 
     // Add quantifiable results if missing
     if (!/\d+/.test(improved)) {
-      improved += ' with measurable impact on business outcomes.';
+      improved +=
+        ' with proven track record of delivering measurable business impact.';
     }
 
     // Add industry keywords
@@ -219,9 +220,16 @@ export const ImprovedAIContentImprover: React.FC<
 
   const generateImprovedExperience = (
     original: string,
-    _suggestions: Array<{ category?: string; section?: string }>
+    _suggestions: Record<string, unknown>[]
   ): string => {
+    // Don't append to existing content - create a fresh, improved version
     let improved = original;
+
+    // Remove any existing AI enhancements to prevent repetition
+    improved = improved.replace(
+      /\s*(Optimized with action verbs|AI-enhanced for impact).*/gi,
+      ''
+    );
 
     // Add action verbs
     const actionVerbs = [
@@ -233,12 +241,9 @@ export const ImprovedAIContentImprover: React.FC<
       'Managed',
     ];
     const randomVerb =
-      actionVerbs[Math.floor(Math.random() * actionVerbs.length)];
+      actionVerbs[Math.floor(Math.random() * actionVerbs.length)] || 'Led';
 
-    if (
-      randomVerb &&
-      !improved.toLowerCase().startsWith(randomVerb.toLowerCase())
-    ) {
+    if (!improved.toLowerCase().startsWith(randomVerb.toLowerCase())) {
       improved = `${randomVerb} ${improved.toLowerCase()}`;
     }
 
@@ -253,9 +258,9 @@ export const ImprovedAIContentImprover: React.FC<
   };
 
   const generateImprovedSkills = (
-    skills: Record<string, string[]>,
-    _suggestions: Array<{ category?: string; section?: string }>
-  ): Record<string, string[]> => {
+    skills: Record<string, unknown>,
+    _suggestions: Record<string, unknown>[]
+  ): Record<string, unknown> => {
     const improved = { ...skills };
 
     // Add relevant technical skills if missing
@@ -269,19 +274,18 @@ export const ImprovedAIContentImprover: React.FC<
     ];
     const missingSkills = commonTechSkills.filter(
       skill =>
-        !improved.technical?.some((s: string) =>
+        !(improved.technical as string[])?.some((s: string) =>
           s.toLowerCase().includes(skill.toLowerCase())
         )
     );
 
-    if (missingSkills.length > 0 && improved.technical && missingSkills[0]) {
-      improved.technical.push(missingSkills[0]);
+    if (missingSkills.length > 0) {
+      improved.technical = (improved.technical as string[]) || [];
+      (improved.technical as string[]).push(missingSkills[0]!);
     }
 
     // Reorganize skills by relevance
-    if (improved.technical) {
-      improved.technical = improved.technical.sort();
-    }
+    improved.technical = ((improved.technical as string[]) || []).sort();
 
     return improved;
   };
@@ -303,8 +307,8 @@ export const ImprovedAIContentImprover: React.FC<
           if (improvement.section.startsWith('Experience')) {
             const expIndex =
               parseInt(improvement.section.match(/\d+/)?.[0] || '0') - 1;
-            if (updatedData.experience[expIndex]) {
-              updatedData.experience[expIndex].description =
+            if (updatedData.experience?.[expIndex]) {
+              updatedData.experience[expIndex]!.description =
                 improvement.improved;
             }
           }
@@ -315,8 +319,16 @@ export const ImprovedAIContentImprover: React.FC<
     onContentUpdate(updatedData);
     setImprovementResult(null);
     setShowChanges(false);
+    setUserChoice(null);
 
-    toast.success('✅ Improvements applied to your resume!');
+    toast.success('✅ AI improvements applied to your resume!');
+  };
+
+  const discardImprovements = () => {
+    setImprovementResult(null);
+    setShowChanges(false);
+    setUserChoice(null);
+    toast('AI improvements discarded');
   };
 
   const convertResumeDataToText = (data: ResumeData): string => {
@@ -356,27 +368,20 @@ export const ImprovedAIContentImprover: React.FC<
     return text;
   };
 
-  const getSectionData = (
-    data: ResumeData,
-    section: keyof ResumeData
-  ): Record<string, unknown> => {
-    switch (section) {
-      case 'summary':
-        return { summary: data.summary };
-      case 'experience':
-        return { experience: data.experience };
-      case 'skills':
-        return { skills: data.skills };
-      default:
-        return {};
-    }
+  const getAllSectionData = (data: ResumeData): Record<string, unknown> => {
+    return {
+      summary: data.summary,
+      experience: data.experience,
+      skills: data.skills,
+      projects: data.projects,
+      achievements: data.achievements,
+    };
   };
 
-  const sections = [
-    { key: 'summary', label: 'Professional Summary', icon: '📝' },
-    { key: 'experience', label: 'Work Experience', icon: '💼' },
-    { key: 'skills', label: 'Skills', icon: '🛠️' },
-  ] as const;
+  // Don't render if not visible and no results
+  if (!isVisible && !improvementResult && !isImproving) {
+    return null;
+  }
 
   return (
     <Card className={`p-6 ${className}`}>
@@ -385,47 +390,41 @@ export const ImprovedAIContentImprover: React.FC<
           🤖 AI Content Improver
         </h3>
         <p className='text-sm text-slate-600 dark:text-slate-400'>
-          Use AI to enhance your resume content with better keywords, action
+          Use AI to enhance your entire resume with better keywords, action
           verbs, and ATS optimization
         </p>
       </div>
 
-      <div className='space-y-4'>
-        {sections.map(({ key, label, icon }) => (
-          <motion.div
-            key={key}
-            whileHover={{ scale: 1.02 }}
-            className='flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700'
-          >
-            <div className='flex items-center space-x-3'>
-              <span className='text-2xl'>{icon}</span>
-              <div>
-                <h4 className='font-medium text-slate-900 dark:text-slate-100'>
-                  {label}
-                </h4>
-                <p className='text-sm text-slate-600 dark:text-slate-400'>
-                  AI-powered content enhancement
-                </p>
-              </div>
+      <div className='text-center'>
+        <Button
+          onClick={improveAllContent}
+          disabled={isImproving}
+          className='w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'
+        >
+          {isImproving ? (
+            <div className='flex items-center justify-center gap-2'>
+              <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
+              <span>AI is improving your resume...</span>
             </div>
-            <Button
-              onClick={() => improveContent(key)}
-              disabled={isImproving}
-              variant='outline'
-              size='sm'
-              className='min-w-[120px]'
-            >
-              {isImproving && activeSection === key ? (
-                <div className='flex items-center space-x-2'>
-                  <div className='w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin' />
-                  <span>AI Improving...</span>
-                </div>
-              ) : (
-                'Improve with AI'
-              )}
-            </Button>
-          </motion.div>
-        ))}
+          ) : (
+            <div className='flex items-center justify-center gap-2'>
+              <svg
+                className='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M13 10V3L4 14h7v7l9-11h-7z'
+                />
+              </svg>
+              <span>Improve All Content with AI</span>
+            </div>
+          )}
+        </Button>
       </div>
 
       <AnimatePresence>
@@ -462,7 +461,7 @@ export const ImprovedAIContentImprover: React.FC<
                 </Button>
               </div>
 
-              <div className='space-y-4'>
+              <div className='space-y-4 max-h-96 overflow-y-auto'>
                 {improvementResult.improvements.map((improvement, index) => (
                   <div
                     key={index}
@@ -514,16 +513,17 @@ export const ImprovedAIContentImprover: React.FC<
 
               <div className='flex space-x-3 mt-4'>
                 <Button
-                  onClick={() => setImprovementResult(null)}
+                  onClick={discardImprovements}
                   variant='outline'
                   size='sm'
+                  className='flex-1'
                 >
-                  Cancel
+                  Discard Changes
                 </Button>
                 <Button
                   onClick={applyImprovements}
                   size='sm'
-                  className='bg-green-600 hover:bg-green-700'
+                  className='bg-green-600 hover:bg-green-700 flex-1'
                 >
                   Apply All Changes
                 </Button>
@@ -536,4 +536,4 @@ export const ImprovedAIContentImprover: React.FC<
   );
 };
 
-export default ImprovedAIContentImprover;
+export default UnifiedAIContentImprover;

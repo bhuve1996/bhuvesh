@@ -169,7 +169,7 @@
 
   /* Section styles */
   .section {
-    @apply py-20 px-6;
+    @apply py-10 px-6;
   }
 
   .section-title {

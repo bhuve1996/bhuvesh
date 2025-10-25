@@ -3,4 +3,7 @@
 /* Import loading animations */
 @import './loading-animations.css';
 
+/* Import tour styles */
+@import './tour.css';
+
 /* Additional custom styles can be added here */

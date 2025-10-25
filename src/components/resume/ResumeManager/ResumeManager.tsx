@@ -392,7 +392,7 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
           ))}
         </div>
       ) : (
-        <div className='text-center py-12'>
+        <div className='text-center py-6'>
           <div className='w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center'>
             <svg
               className='w-8 h-8 text-gray-400'

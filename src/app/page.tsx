@@ -73,7 +73,7 @@ export default function Home() {
         <main className='flex-1 min-h-screen pt-24 pb-20'>
           <div className='max-w-7xl mx-auto px-6'>
             {/* Header */}
-            <div className='text-center mb-16'>
+            <div className='text-center mb-16' data-tour='homepage-welcome'>
               <h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent'>
                 Welcome to My Portfolio
               </h1>
@@ -85,20 +85,35 @@ export default function Home() {
 
             {/* Flip Card Gallery */}
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto'>
-              {pageCards.map(card => (
-                <FlipCard
-                  key={card.title}
-                  title={card.title}
-                  description={card.description}
-                  href={card.href}
-                  gifSrc={card.gifSrc}
-                  gifAlt={card.gifAlt}
-                  iconName={card.iconName}
-                  gradientFrom={card.gradientFrom}
-                  gradientTo={card.gradientTo}
-                  delay={card.delay}
-                />
-              ))}
+              {pageCards.map(card => {
+                const tourAttribute =
+                  card.title === 'Resume Builder'
+                    ? 'resume-card'
+                    : card.title === 'My Projects'
+                      ? 'projects-card'
+                      : card.title === 'Get In Touch'
+                        ? 'contact-card'
+                        : undefined;
+
+                return (
+                  <div
+                    key={card.title}
+                    {...(tourAttribute && { 'data-tour': tourAttribute })}
+                  >
+                    <FlipCard
+                      title={card.title}
+                      description={card.description}
+                      href={card.href}
+                      gifSrc={card.gifSrc}
+                      gifAlt={card.gifAlt}
+                      iconName={card.iconName}
+                      gradientFrom={card.gradientFrom}
+                      gradientTo={card.gradientTo}
+                      delay={card.delay}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         </main>

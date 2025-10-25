@@ -226,6 +226,34 @@ export default function ATSCheckerPage() {
     toast.success('Ready for new analysis!');
   };
 
+  const handleEditInBuilder = () => {
+    if (analysisResult?.extraction_details?.categorized_resume) {
+      // Convert and save resume data
+      const extractedResumeData = convertCategorizedResumeToResumeData(
+        analysisResult.extraction_details.categorized_resume,
+        analysisResult.extraction_details.skills_found
+      );
+      setResumeData(extractedResumeData);
+      setExtractedDataBackup(extractedResumeData);
+    }
+    // Navigate to builder
+    window.location.href = '/resume/builder';
+  };
+
+  const handleViewTemplates = () => {
+    if (analysisResult?.extraction_details?.categorized_resume) {
+      // Convert and save resume data
+      const extractedResumeData = convertCategorizedResumeToResumeData(
+        analysisResult.extraction_details.categorized_resume,
+        analysisResult.extraction_details.skills_found
+      );
+      setResumeData(extractedResumeData);
+      setExtractedDataBackup(extractedResumeData);
+    }
+    // Navigate to templates
+    window.location.href = '/resume/templates';
+  };
+
   const analyzeResumeWithBackend = async (
     file: File,
     jobDescription: string
@@ -406,7 +434,7 @@ export default function ATSCheckerPage() {
 
   return (
     <div className='min-h-screen bg-background text-foreground'>
-      <Section id='ats-checker' className='py-8 sm:py-12 lg:py-20'>
+      <Section id='ats-checker' className='py-4 sm:py-6 lg:py-10'>
         <div className='max-w-6xl mx-auto px-2 sm:px-4 lg:px-6'>
           {/* Unified Welcome Bar */}
           <UnifiedWelcomeBar
@@ -420,6 +448,9 @@ export default function ATSCheckerPage() {
                 : null
             }
             resumeData={null}
+            showActionButtons={!!analysisResult}
+            onEditInBuilder={handleEditInBuilder}
+            onViewTemplates={handleViewTemplates}
           />
 
           {/* Tab Navigation - Show when we have results */}
@@ -477,17 +508,6 @@ export default function ATSCheckerPage() {
           {/* Results Tab */}
           {activeTab === 'results' && analysisResult && (
             <div className='space-y-6'>
-              {/* New Upload Button */}
-              <div className='text-center'>
-                <button
-                  onClick={handleNewUpload}
-                  className='px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background'
-                  aria-label='Analyze another resume'
-                >
-                  📄 Analyze Another Resume
-                </button>
-              </div>
-
               {/* Results Display */}
               <ResultsDisplay
                 result={analysisResult}

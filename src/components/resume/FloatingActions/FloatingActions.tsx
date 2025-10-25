@@ -51,7 +51,9 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
   };
 
   return (
-    <div className={`fixed bottom-6 right-6 z-50 ${className}`}>
+    <div
+      className={`fixed bottom-20 right-8 sm:bottom-24 sm:right-12 z-50 ${className}`}
+    >
       <AnimatePresence>
         {isExpanded && (
           <motion.div
@@ -69,7 +71,7 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
             >
               <Tooltip
                 content='Preview your resume with different templates'
-                position='left'
+                position='top'
                 delay={200}
               >
                 <Button
@@ -109,7 +111,7 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
             >
               <Tooltip
                 content='Scroll to top to continue editing your resume'
-                position='left'
+                position='top'
                 delay={200}
               >
                 <Button
@@ -144,7 +146,7 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
             >
               <Tooltip
                 content='Save your resume data to continue later'
-                position='left'
+                position='top'
                 delay={200}
               >
                 <Button
@@ -176,7 +178,7 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
       {/* Main Floating Action Button */}
       <Tooltip
         content={isExpanded ? 'Close actions menu' : 'Open actions menu'}
-        position='left'
+        position='top'
         delay={200}
       >
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

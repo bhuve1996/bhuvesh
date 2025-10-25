@@ -153,7 +153,7 @@ export const LiveATSScore: React.FC<LiveATSScoreProps> = ({
         </div>
 
         {isAnalyzing ? (
-          <div className='flex items-center justify-center py-8'>
+          <div className='flex items-center justify-center py-4'>
             <div className='w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin'></div>
             <span className='ml-2 text-slate-600 dark:text-slate-400'>
               Analyzing resume...

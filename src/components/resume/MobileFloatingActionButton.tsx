@@ -15,7 +15,7 @@ export const MobileFloatingActionButton: React.FC<
   if (!isVisible) return null;
 
   return (
-    <div className='fixed bottom-20 right-4 z-50 sm:hidden'>
+    <div className='fixed bottom-24 right-8 z-50 sm:hidden'>
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}

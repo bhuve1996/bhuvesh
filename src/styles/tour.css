@@ -1,0 +1,227 @@
+/* Tour Styles */
+
+.tour-overlay {
+  pointer-events: none;
+}
+
+.tour-highlight {
+  position: relative;
+  z-index: 10000 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.tour-highlight::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  animation: tour-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes tour-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* Tour tooltip animations */
+.tour-tooltip-enter {
+  opacity: 0;
+  transform: scale(0.8) translateY(20px);
+}
+
+.tour-tooltip-enter-active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  transition: all 0.3s ease-out;
+}
+
+.tour-tooltip-exit {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.tour-tooltip-exit-active {
+  opacity: 0;
+  transform: scale(0.8) translateY(20px);
+  transition: all 0.3s ease-in;
+}
+
+/* Tour step indicator */
+.tour-step-indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 10001;
+  backdrop-filter: blur(10px);
+}
+
+/* Tour skip button */
+.tour-skip-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 10001;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.tour-skip-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: translateY(-1px);
+}
+
+/* Tour progress bar */
+.tour-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(59, 130, 246, 0.2);
+  z-index: 10001;
+}
+
+.tour-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  transition: width 0.3s ease;
+}
+
+/* Tour spotlight effect */
+.tour-spotlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+    transparent 0px,
+    transparent 100px,
+    rgba(0, 0, 0, 0.7) 150px,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+  pointer-events: none;
+  z-index: 9997;
+}
+
+/* Tour arrow pointing to target */
+.tour-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+  z-index: 10000;
+}
+
+.tour-arrow-top {
+  border-bottom-color: white;
+  border-top: none;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: -1px;
+}
+
+.tour-arrow-bottom {
+  border-top-color: white;
+  border-bottom: none;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: -1px;
+}
+
+.tour-arrow-left {
+  border-right-color: white;
+  border-left: none;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: -1px;
+}
+
+.tour-arrow-right {
+  border-left-color: white;
+  border-right: none;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: -1px;
+}
+
+/* Dark mode tour styles */
+.dark .tour-highlight {
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.5) !important;
+}
+
+.dark .tour-highlight::before {
+  border-color: #60a5fa;
+}
+
+/* Responsive tour styles */
+@media (max-width: 768px) {
+  .tour-tooltip {
+    width: calc(100vw - 32px) !important;
+    max-width: 320px !important;
+    left: 16px !important;
+    right: 16px !important;
+  }
+
+  .tour-step-indicator,
+  .tour-skip-button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .tour-highlight::before {
+    animation: none;
+  }
+
+  .tour-tooltip-enter-active,
+  .tour-tooltip-exit-active {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .tour-highlight {
+    box-shadow: 0 0 0 4px #000 !important;
+  }
+
+  .tour-highlight::before {
+    border-color: #000;
+  }
+}

@@ -40,7 +40,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
 
       <div className={COMMON_CLASSES.container}>
         {/* Hero Content */}
-        <div className='text-center max-w-5xl mx-auto relative z-10 mb-20'>
+        <div
+          className='text-center max-w-5xl mx-auto relative z-10 mb-20'
+          data-tour='about-welcome'
+        >
           {/* Greeting */}
           <div className='mb-6 animate-fade-in'>
             <span className='inline-block px-4 py-2 bg-primary-500/10 border border-primary-500/20 rounded-full text-primary-400 text-sm font-medium backdrop-blur-sm'>
@@ -98,7 +101,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
           </div>
 
           {/* Stats */}
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto animate-slide-up delay-500'>
+          <div
+            className='grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto animate-slide-up delay-500'
+            data-tour='about-experience'
+          >
             <div className='text-center'>
               <div className='text-3xl font-bold text-primary-400 mb-2'>7+</div>
               <div className='text-muted-foreground text-sm'>
@@ -170,11 +176,13 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                     Skills & Technologies
                   </h3>
                 </div>
-                <TechStack
-                  technologies={skillsList}
-                  columns={3}
-                  variant='default'
-                />
+                <div data-tour='about-skills'>
+                  <TechStack
+                    technologies={skillsList}
+                    columns={3}
+                    variant='default'
+                  />
+                </div>
               </Card>
             </AnimatedSection>
           </div>

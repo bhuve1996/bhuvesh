@@ -128,6 +128,7 @@ export const ContactSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
             className='text-center mb-16'
+            data-tour='contact-welcome'
           >
             <h2
               className={`text-4xl md:text-5xl font-bold mb-6 ${
@@ -161,6 +162,7 @@ export const ContactSection: React.FC = () => {
                   ? 'bg-gradient-to-br from-white/80 via-slate-50/70 to-white/80 border-cyan-500/30 shadow-cyan-600/20'
                   : 'bg-gradient-to-br from-slate-800/40 via-slate-700/30 to-slate-800/40'
               }`}
+              data-tour='contact-form'
             >
               <h3
                 className={`text-2xl font-bold mb-6 ${
@@ -242,7 +244,7 @@ export const ContactSection: React.FC = () => {
             </Card>
 
             {/* Contact Information & Social Links */}
-            <div className='space-y-6'>
+            <div className='space-y-6' data-tour='contact-info'>
               <Card
                 className={`backdrop-blur-md border-cyan-400/20 shadow-2xl shadow-cyan-500/10 ${
                   theme === 'light'

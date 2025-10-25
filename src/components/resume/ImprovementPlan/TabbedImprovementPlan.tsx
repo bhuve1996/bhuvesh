@@ -146,7 +146,7 @@ export const TabbedImprovementPlan: React.FC<ImprovementPlanProps> = ({
             </div>
           </div>
         ) : (
-          <div className='text-center py-12'>
+          <div className='text-center py-6'>
             <div className='text-6xl mb-4'>⚡</div>
             <h3 className='text-xl font-bold text-slate-900 dark:text-white mb-2'>
               No Quick Wins Available

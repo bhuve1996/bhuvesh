@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 
 import { ValidationModal } from '@/components/resume/ValidationModal';
-import { Tooltip } from '@/components/ui/Tooltip';
+import { Tooltip, UniversalTourTrigger } from '@/components/ui';
 import {
+  ValidationResult,
   getValidationMessages,
   validateResumeData,
-  ValidationResult,
 } from '@/lib/resume/validation';
 import { useResumeStore } from '@/store/resumeStore';
 
@@ -19,6 +19,9 @@ interface UnifiedWelcomeBarProps {
   } | null;
   resumeData?: unknown;
   onBackToManager?: () => void;
+  onEditInBuilder?: () => void;
+  onViewTemplates?: () => void;
+  showActionButtons?: boolean;
 }
 
 export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
@@ -26,6 +29,9 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
   analysisResult,
   resumeData,
   onBackToManager,
+  onEditInBuilder,
+  onViewTemplates,
+  showActionButtons = false,
 }) => {
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [validationResult, setValidationResult] =
@@ -277,6 +283,30 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
                 </button>
               </Tooltip>
             )}
+
+            {/* Universal Tour Trigger Button - Shows appropriate tour for current page */}
+            <div className='relative inline-block'>
+              <Tooltip content='Take a guided tour' position='top'>
+                <UniversalTourTrigger
+                  variant='icon'
+                  className='flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2'
+                >
+                  <svg
+                    className='w-4 h-4'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                    />
+                  </svg>
+                </UniversalTourTrigger>
+              </Tooltip>
+            </div>
           </div>
         </div>
       )}
@@ -327,18 +357,141 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
         </div>
       )}
 
-      {/* Start New Analysis Button */}
-      <div className='text-center mt-4'>
-        <Tooltip content='Start a new ATS analysis' position='top'>
-          <button
-            onClick={() => (window.location.href = '/resume/ats-checker')}
-            className={`px-4 py-2 bg-gradient-to-r ${styling.gradient} hover:opacity-90 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-background text-sm`}
-            aria-label='Start new analysis'
-          >
-            🆕 Start New Analysis
-          </button>
-        </Tooltip>
+      {/* Action Buttons */}
+      <div className='text-center mt-4 flex flex-col sm:flex-row gap-3 justify-center items-center'>
+        {/* Show Start New Analysis button only on non-ATS checker pages */}
+        {currentPage !== 'ats-checker' && (
+          <Tooltip content='Start a new ATS analysis' position='top'>
+            <button
+              onClick={() => (window.location.href = '/resume/ats-checker')}
+              className={`px-4 py-2 bg-gradient-to-r ${styling.gradient} hover:opacity-90 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-background text-sm`}
+              aria-label='Start new analysis'
+            >
+              🆕 Start New Analysis
+            </button>
+          </Tooltip>
+        )}
+
+        {currentPage === 'builder' && (
+          <Tooltip content='Improve your resume content with AI' position='top'>
+            <button
+              onClick={() => {
+                // Trigger AI content improvement
+                const event = new CustomEvent('ai-improve-content', {
+                  detail: { source: 'unified-bar' },
+                });
+                window.dispatchEvent(event);
+              }}
+              className='px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2 focus:ring-offset-background text-sm relative overflow-hidden'
+              aria-label='AI content improvement'
+            >
+              <span className='relative z-10 flex items-center gap-2'>
+                <svg
+                  className='w-4 h-4'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M13 10V3L4 14h7v7l9-11h-7z'
+                  />
+                </svg>
+                🤖 AI Improve Content
+              </span>
+              {/* Pulsating effect */}
+              <div className='absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg animate-pulse opacity-20'></div>
+              <div className='absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg animate-ping opacity-30'></div>
+            </button>
+          </Tooltip>
+        )}
       </div>
+
+      {/* Resume Improvement Action Buttons - Show on ATS checker page when analysis is complete */}
+      {showActionButtons && onEditInBuilder && onViewTemplates && (
+        <div className='mt-6'>
+          <div className='text-center mb-4'>
+            <h3 className='text-lg font-semibold text-white mb-2'>
+              Ready to Improve Your Resume?
+            </h3>
+            <p className='text-white/90 text-sm'>
+              Take action based on your ATS analysis results
+            </p>
+          </div>
+
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto'>
+            {/* Edit in Resume Builder Button */}
+            <Tooltip
+              content='Open resume builder with your parsed data pre-filled'
+              position='top'
+            >
+              <button
+                onClick={onEditInBuilder}
+                className='group relative overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl'
+              >
+                <div className='absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
+                <div className='relative flex flex-col items-center justify-center space-y-1'>
+                  <svg
+                    className='w-5 h-5'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
+                    />
+                  </svg>
+                  <div className='text-center'>
+                    <div className='text-sm font-bold'>
+                      Edit in Resume Builder
+                    </div>
+                    <div className='text-xs opacity-90'>
+                      Pre-filled with your data
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </Tooltip>
+
+            {/* View Templates Button */}
+            <Tooltip
+              content='Browse resume templates with your data'
+              position='top'
+            >
+              <button
+                onClick={onViewTemplates}
+                className='group relative overflow-hidden bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl'
+              >
+                <div className='absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300'></div>
+                <div className='relative flex flex-col items-center justify-center space-y-1'>
+                  <svg
+                    className='w-5 h-5'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z'
+                    />
+                  </svg>
+                  <div className='text-center'>
+                    <div className='text-sm font-bold'>View Templates</div>
+                    <div className='text-xs opacity-90'>Choose a design</div>
+                  </div>
+                </div>
+              </button>
+            </Tooltip>
+          </div>
+        </div>
+      )}
 
       {/* Validation Modal */}
       {validationResult && (

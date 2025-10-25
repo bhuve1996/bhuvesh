@@ -241,6 +241,7 @@ const initialState = {
 //     linkedin: '',
 //     github: '',
 //     portfolio: '',
+//     jobTitle: '',
 //   },
 //   summary: '',
 //   experience: [],
@@ -462,6 +463,7 @@ export const useResumeStore = create<ResumeState>()(
               linkedin: '',
               github: '',
               portfolio: '',
+              jobTitle: '',
             },
             summary: '',
             experience: [],
@@ -475,6 +477,7 @@ export const useResumeStore = create<ResumeState>()(
             },
             projects: [],
             achievements: [],
+            hobbies: [],
           };
           set({
             resumeData: {
@@ -535,6 +538,7 @@ export const useResumeStore = create<ResumeState>()(
               linkedin: '',
               github: '',
               portfolio: '',
+              jobTitle: '',
             },
             summary: '',
             experience: [],
@@ -548,6 +552,7 @@ export const useResumeStore = create<ResumeState>()(
             },
             projects: [],
             achievements: [],
+            hobbies: [],
           };
           set({
             resumeData: {
@@ -606,6 +611,7 @@ export const useResumeStore = create<ResumeState>()(
               linkedin: '',
               github: '',
               portfolio: '',
+              jobTitle: '',
             },
             summary: '',
             experience: [],
@@ -619,6 +625,7 @@ export const useResumeStore = create<ResumeState>()(
             },
             projects: [],
             achievements: [],
+            hobbies: [],
           };
           set({
             resumeData: {

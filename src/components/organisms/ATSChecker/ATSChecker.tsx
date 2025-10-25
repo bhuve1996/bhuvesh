@@ -191,7 +191,7 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
           onNewUpload={handleNewUpload}
         />
       ) : (
-        <div className='text-center py-12'>
+        <div className='text-center py-6'>
           <p className='text-muted-foreground'>No analysis results available</p>
         </div>
       ),

@@ -172,12 +172,11 @@ describe('Component Integration Tests', () => {
       );
 
       // Open panel
-      const floatingButton = screen.getByText('Quick Actions');
+      const floatingButton = screen.getByText('Resume Builder');
       await user.click(floatingButton);
 
       // Test all tabs are accessible
       expect(screen.getByText('ATS Analysis')).toBeInTheDocument();
-      expect(screen.getByText('AI Content')).toBeInTheDocument();
       expect(screen.getByText('Customize')).toBeInTheDocument();
       expect(screen.getByText('Validate')).toBeInTheDocument();
       expect(screen.getAllByText('Export').length).toBeGreaterThan(0);
@@ -196,18 +195,18 @@ describe('Component Integration Tests', () => {
       );
 
       // Open panel
-      const floatingButton = screen.getByText('Quick Actions');
+      const floatingButton = screen.getByText('Resume Builder');
       await user.click(floatingButton);
 
       // Switch between tabs
-      const aiContentTab = screen.getByText('AI Content');
-      await user.click(aiContentTab);
-      expect(screen.getByText('AI Content')).toBeInTheDocument();
-
       const customizeTab = screen.getByText('Customize');
       await user.click(customizeTab);
-      // Just verify the customize tab is clickable and the panel is still open
       expect(screen.getByText('Customize')).toBeInTheDocument();
+
+      const validateTab = screen.getByText('Validate');
+      await user.click(validateTab);
+      // Just verify the validate tab is clickable and the panel is still open
+      expect(screen.getByText('Validate')).toBeInTheDocument();
     });
   });
 
