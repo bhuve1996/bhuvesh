@@ -29,6 +29,10 @@ export interface ResumeBuilderWorkExperience {
   description: string;
   achievements: string[];
   title?: string;
+  // AI-restructured content
+  keyTechnologies?: string[];
+  impactMetrics?: string[];
+  responsibilities?: string[];
 }
 
 export interface ResumeBuilderEducation {
@@ -53,6 +57,9 @@ export interface ResumeBuilderProject {
   github?: string;
   startDate: string;
   endDate?: string;
+  // AI-restructured content
+  keyFeatures?: string[];
+  impact?: string[];
 }
 
 // Resume Builder Data Structure using ATS types
@@ -65,6 +72,7 @@ export interface ResumeData {
     linkedin?: string;
     github?: string;
     portfolio?: string;
+    jobTitle?: string; // Current job title/position
   };
   summary?: string;
   experience: ResumeBuilderWorkExperience[];
@@ -183,6 +191,11 @@ export interface ResumeTemplate {
   fontFamily?: string;
   colorScheme?: string;
   spacing?: Record<string, unknown>;
+  sections?: Array<{
+    id: string;
+    visible: boolean;
+    order: number;
+  }>;
 }
 
 // Builder State Types

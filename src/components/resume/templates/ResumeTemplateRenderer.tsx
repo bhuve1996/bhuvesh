@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import { useResumeStore } from '@/store/resumeStore';
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
 // Helper function to determine if a color is light or dark
@@ -36,8 +37,48 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
   data,
   className = '',
 }) => {
+  // Get customizations from global state - this will cause re-render when state changes
+  const templateCustomizations = useResumeStore(
+    state => state.templateCustomizations
+  );
+
   const { layout } = template;
   const { colors, fonts, spacing } = layout;
+
+  // Apply customizations to the template
+  const customizedLayout = {
+    ...layout,
+    columns: templateCustomizations.layout.columns,
+    sidebar: templateCustomizations.layout.sidebar,
+    colors: {
+      ...colors,
+      primary: templateCustomizations.colors.primaryColor,
+      secondary: templateCustomizations.colors.secondaryColor,
+      accent: templateCustomizations.colors.accentColor,
+      text: templateCustomizations.colors.textColor,
+      background: templateCustomizations.colors.backgroundColor,
+    },
+    spacing: {
+      ...spacing,
+      lineHeight: templateCustomizations.typography.lineHeight,
+      sectionGap: templateCustomizations.spacing.sectionGap,
+      padding: templateCustomizations.spacing.padding,
+      margins: templateCustomizations.layout.margins,
+    },
+  };
+
+  const customizedFonts = {
+    ...fonts,
+    body: templateCustomizations.typography.fontFamily,
+    heading: templateCustomizations.typography.fontFamily,
+    size: {
+      ...fonts.size,
+      body: `${templateCustomizations.typography.fontSize}px`,
+      heading: `${templateCustomizations.typography.fontSize}px`,
+      subheading: `${templateCustomizations.typography.fontSize}px`,
+      small: `${templateCustomizations.typography.fontSize}px`,
+    },
+  };
 
   // Helper function to get section-specific styles from custom styles
   const getSectionStyle = (
@@ -54,168 +95,132 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
     return customStyles?.[sectionKey]?.[property] || fallback;
   };
 
-  const renderHeader = (sidebarBackground?: string) => (
-    <div
-      className='text-center mb-6 lg:mb-8'
-      style={{
-        color: getSectionStyle('header', 'color', colors.text),
-        backgroundColor: getSectionStyle(
-          'header',
-          'backgroundColor',
-          'transparent'
-        ),
-        padding: getSectionStyle('header', 'spacing', spacing.padding),
-      }}
-    >
-      <h1
-        className='font-bold mb-2 text-lg lg:text-2xl'
-        style={{
-          fontFamily: getSectionStyle('header', 'fontFamily', fonts.heading),
-          fontSize: getSectionStyle('header', 'fontSize', fonts.size.heading),
-          color: getContrastingTextColor(
-            sidebarBackground ||
-              getSectionStyle('header', 'backgroundColor', colors.background)
-          ),
-        }}
-      >
-        {data.personal.fullName}
-      </h1>
+  // Helper function to get customized colors
+  const getCustomizedColors = () => customizedLayout.colors;
+
+  // Helper function to get customized fonts
+  const getCustomizedFonts = () => customizedFonts;
+
+  // Helper function to get customized spacing
+  const getCustomizedSpacing = () => customizedLayout.spacing;
+
+  // Helper function to check if a section is visible
+  const isSectionVisible = (sectionId: string): boolean => {
+    const section = template.sections?.find(s => s.id === sectionId);
+    return section?.visible !== false; // Default to visible if not specified
+  };
+
+  const renderHeader = (sidebarBackground?: string) => {
+    if (!isSectionVisible('header')) return null;
+
+    return (
       <div
-        className='flex flex-col items-center gap-1 text-xs lg:text-sm'
+        className='text-center mb-6 lg:mb-8'
         style={{
-          color: getContrastingTextColor(
-            sidebarBackground ||
-              getSectionStyle('contact', 'backgroundColor', colors.background)
+          color: getSectionStyle(
+            'header',
+            'color',
+            customizedLayout.colors.text
           ),
           backgroundColor: getSectionStyle(
-            'contact',
+            'header',
             'backgroundColor',
             'transparent'
           ),
+          padding: getSectionStyle(
+            'header',
+            'spacing',
+            customizedLayout.spacing.padding
+          ),
         }}
       >
-        <a
-          href={`mailto:${data.personal.email}`}
-          className='hover:underline hover:text-blue-600 transition-colors'
+        <div className='mb-3 lg:mb-4'>
+          <h1
+            className='font-bold mb-1 text-2xl lg:text-3xl'
+            style={{
+              fontFamily: getSectionStyle(
+                'header',
+                'fontFamily',
+                customizedFonts.heading
+              ),
+              fontSize: getSectionStyle(
+                'header',
+                'fontSize',
+                customizedFonts.size.heading
+              ),
+              color: getContrastingTextColor(
+                sidebarBackground ||
+                  getSectionStyle(
+                    'header',
+                    'backgroundColor',
+                    customizedLayout.colors.background
+                  )
+              ),
+            }}
+          >
+            {data.personal.fullName}
+          </h1>
+          {/* Current Position */}
+          {(data.personal.jobTitle ||
+            (data.experience.length > 0 && data.experience[0]?.position)) && (
+            <h2
+              className='text-lg lg:text-xl font-semibold text-slate-600 dark:text-slate-300'
+              style={{
+                fontFamily: getSectionStyle(
+                  'header',
+                  'fontFamily',
+                  customizedFonts.heading
+                ),
+                fontSize: getSectionStyle(
+                  'header',
+                  'fontSize',
+                  customizedFonts.size.subheading
+                ),
+                color: getContrastingTextColor(
+                  sidebarBackground ||
+                    getSectionStyle(
+                      'header',
+                      'backgroundColor',
+                      customizedLayout.colors.background
+                    )
+                ),
+              }}
+            >
+              {data.personal.jobTitle ||
+                (data.experience.length > 0
+                  ? data.experience[0]?.position
+                  : '')}
+            </h2>
+          )}
+        </div>
+        {/* Contact Information - Responsive layout based on sidebar */}
+        <div
+          className={`${
+            sidebarBackground
+              ? 'grid grid-cols-1 sm:grid-cols-2 gap-1' // 2 columns in sidebar
+              : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2' // 3 columns in main layout
+          } text-xs lg:text-sm`}
           style={{
             color: getContrastingTextColor(
               sidebarBackground ||
-                getSectionStyle('contact', 'backgroundColor', colors.background)
+                getSectionStyle(
+                  'contact',
+                  'backgroundColor',
+                  customizedLayout.colors.background
+                )
+            ),
+            backgroundColor: getSectionStyle(
+              'contact',
+              'backgroundColor',
+              'transparent'
             ),
           }}
         >
-          {data.personal.email}
-        </a>
-        {data.personal.phone && (
-          <a
-            href={`tel:${data.personal.phone}`}
-            className='hover:underline hover:text-blue-600 transition-colors'
-            style={{
-              color: getContrastingTextColor(
-                sidebarBackground ||
-                  getSectionStyle(
-                    'contact',
-                    'backgroundColor',
-                    colors.background
-                  )
-              ),
-            }}
-          >
-            {data.personal.phone}
-          </a>
-        )}
-        {data.personal.location && (
-          <span
-            style={{
-              color: getContrastingTextColor(
-                sidebarBackground ||
-                  getSectionStyle(
-                    'contact',
-                    'backgroundColor',
-                    colors.background
-                  )
-              ),
-            }}
-          >
-            {data.personal.location}
-          </span>
-        )}
-        {data.personal.linkedin && (
-          <a
-            href={
-              data.personal.linkedin.startsWith('http')
-                ? data.personal.linkedin
-                : `https://linkedin.com/in/${data.personal.linkedin}`
-            }
-            target='_blank'
-            rel='noopener noreferrer'
-            className='hover:underline hover:text-blue-600 transition-colors'
-            style={{
-              color: getContrastingTextColor(
-                sidebarBackground ||
-                  getSectionStyle(
-                    'contact',
-                    'backgroundColor',
-                    colors.background
-                  )
-              ),
-            }}
-          >
-            {data.personal.linkedin.startsWith('http')
-              ? data.personal.linkedin
-              : `linkedin.com/in/${data.personal.linkedin}`}
-          </a>
-        )}
-        {data.personal.github && (
-          <a
-            href={
-              data.personal.github.startsWith('http')
-                ? data.personal.github
-                : `https://github.com/${data.personal.github}`
-            }
-            target='_blank'
-            rel='noopener noreferrer'
-            className='hover:underline hover:text-blue-600 transition-colors'
-            style={{
-              color: getContrastingTextColor(
-                sidebarBackground ||
-                  getSectionStyle(
-                    'contact',
-                    'backgroundColor',
-                    colors.background
-                  )
-              ),
-            }}
-          >
-            GitHub
-          </a>
-        )}
-        {data.personal.portfolio && (
-          <>
-            <span
-              className='mx-1'
-              style={{
-                color: getContrastingTextColor(
-                  sidebarBackground ||
-                    getSectionStyle(
-                      'contact',
-                      'backgroundColor',
-                      colors.background
-                    )
-                ),
-              }}
-            >
-              •
-            </span>
+          {/* Column 1: Email & Phone */}
+          <div className='flex flex-col gap-1'>
             <a
-              href={
-                data.personal.portfolio.startsWith('http')
-                  ? data.personal.portfolio
-                  : `https://${data.personal.portfolio}`
-              }
-              target='_blank'
-              rel='noopener noreferrer'
-              className='hover:underline hover:text-blue-600 transition-colors'
+              href={`mailto:${data.personal.email}`}
+              className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-1'
               style={{
                 color: getContrastingTextColor(
                   sidebarBackground ||
@@ -227,16 +232,137 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
                 ),
               }}
             >
-              Portfolio
+              <span className='text-xs'>📧</span>
+              {data.personal.email}
             </a>
-          </>
-        )}
+            {data.personal.phone && (
+              <a
+                href={`tel:${data.personal.phone}`}
+                className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-1'
+                style={{
+                  color: getContrastingTextColor(
+                    sidebarBackground ||
+                      getSectionStyle(
+                        'contact',
+                        'backgroundColor',
+                        colors.background
+                      )
+                  ),
+                }}
+              >
+                <span className='text-xs'>📱</span>
+                {data.personal.phone}
+              </a>
+            )}
+          </div>
+
+          {/* Column 2: Location & Portfolio */}
+          <div className='flex flex-col gap-1'>
+            {data.personal.location && (
+              <span
+                className='flex items-center gap-1'
+                style={{
+                  color: getContrastingTextColor(
+                    sidebarBackground ||
+                      getSectionStyle(
+                        'contact',
+                        'backgroundColor',
+                        colors.background
+                      )
+                  ),
+                }}
+              >
+                <span className='text-xs'>📍</span>
+                {data.personal.location}
+              </span>
+            )}
+            {data.personal.portfolio && (
+              <a
+                href={
+                  data.personal.portfolio.startsWith('http')
+                    ? data.personal.portfolio
+                    : `https://${data.personal.portfolio}`
+                }
+                target='_blank'
+                rel='noopener noreferrer'
+                className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-1'
+                style={{
+                  color: getContrastingTextColor(
+                    sidebarBackground ||
+                      getSectionStyle(
+                        'contact',
+                        'backgroundColor',
+                        colors.background
+                      )
+                  ),
+                }}
+              >
+                <span className='text-xs'>🌐</span>
+                Portfolio
+              </a>
+            )}
+          </div>
+
+          {/* Column 3: Social Links */}
+          <div className='flex flex-col gap-1'>
+            {data.personal.linkedin && (
+              <a
+                href={
+                  data.personal.linkedin.startsWith('http')
+                    ? data.personal.linkedin
+                    : `https://linkedin.com/in/${data.personal.linkedin}`
+                }
+                target='_blank'
+                rel='noopener noreferrer'
+                className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-1'
+                style={{
+                  color: getContrastingTextColor(
+                    sidebarBackground ||
+                      getSectionStyle(
+                        'contact',
+                        'backgroundColor',
+                        colors.background
+                      )
+                  ),
+                }}
+              >
+                <span className='text-xs'>💼</span>
+                LinkedIn
+              </a>
+            )}
+            {data.personal.github && (
+              <a
+                href={
+                  data.personal.github.startsWith('http')
+                    ? data.personal.github
+                    : `https://github.com/${data.personal.github}`
+                }
+                target='_blank'
+                rel='noopener noreferrer'
+                className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-1'
+                style={{
+                  color: getContrastingTextColor(
+                    sidebarBackground ||
+                      getSectionStyle(
+                        'contact',
+                        'backgroundColor',
+                        colors.background
+                      )
+                  ),
+                }}
+              >
+                <span className='text-xs'>💻</span>
+                GitHub
+              </a>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderSummary = () => {
-    if (!data.summary) return null;
+    if (!data.summary || !isSectionVisible('summary')) return null;
 
     return (
       <div
@@ -256,20 +382,24 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
             fontFamily: getSectionStyle(
               'headings',
               'fontFamily',
-              fonts.heading
+              customizedFonts.heading
             ),
             fontSize: getSectionStyle(
               'headings',
               'fontSize',
-              fonts.size.subheading
+              customizedFonts.size.subheading
             ),
-            color: getSectionStyle('headings', 'color', colors.primary),
+            color: getSectionStyle(
+              'headings',
+              'color',
+              customizedLayout.colors.primary
+            ),
             backgroundColor: getSectionStyle(
               'headings',
               'backgroundColor',
               'transparent'
             ),
-            borderColor: colors.accent,
+            borderColor: customizedLayout.colors.accent,
           }}
         >
           {layout.sections.find(s => s.type === 'summary')?.title ||
@@ -278,15 +408,27 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
         <p
           className='leading-relaxed text-sm lg:text-base'
           style={{
-            fontFamily: getSectionStyle('body', 'fontFamily', fonts.body),
-            fontSize: getSectionStyle('body', 'fontSize', fonts.size.body),
-            color: getSectionStyle('body', 'color', colors.text),
+            fontFamily: getSectionStyle(
+              'body',
+              'fontFamily',
+              customizedFonts.body
+            ),
+            fontSize: getSectionStyle(
+              'body',
+              'fontSize',
+              customizedFonts.size.body
+            ),
+            color: getSectionStyle(
+              'body',
+              'color',
+              customizedLayout.colors.text
+            ),
             backgroundColor: getSectionStyle(
               'body',
               'backgroundColor',
               'transparent'
             ),
-            lineHeight: spacing.lineHeight,
+            lineHeight: customizedLayout.spacing.lineHeight,
           }}
         >
           {data.summary}
@@ -295,307 +437,450 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
     );
   };
 
-  const renderExperience = () => (
-    <div className='mb-4 lg:mb-6'>
-      <h2
-        className='font-semibold mb-3 lg:mb-4 border-b-2 pb-1 text-sm lg:text-base'
-        style={{
-          fontFamily: fonts.heading,
-          fontSize: fonts.size.subheading,
-          color: colors.primary,
-          borderColor: colors.accent,
-        }}
-      >
-        {layout.sections.find(s => s.type === 'experience')?.title ||
-          'Professional Experience'}
-      </h2>
-      <div className='space-y-4'>
-        {data.experience.map(exp => (
-          <div
-            key={exp.id}
-            className='border-l-4 pl-4'
-            style={{ borderColor: colors.accent }}
-          >
-            <div className='flex flex-col md:flex-row md:justify-between md:items-start mb-2'>
-              <div>
-                <h3
-                  className='font-semibold'
+  const renderExperience = () => {
+    if (!isSectionVisible('experience')) return null;
+
+    const colors = getCustomizedColors();
+    const fonts = getCustomizedFonts();
+
+    return (
+      <div className='mb-4 lg:mb-6'>
+        <h2
+          className='font-semibold mb-3 lg:mb-4 border-b-2 pb-1 text-sm lg:text-base'
+          style={{
+            fontFamily: fonts.heading,
+            fontSize: fonts.size.subheading,
+            color: colors.primary,
+            borderColor: colors.accent,
+          }}
+        >
+          {layout.sections.find(s => s.type === 'experience')?.title ||
+            'Professional Experience'}
+        </h2>
+        <div className='space-y-6'>
+          {data.experience.map(exp => (
+            <div
+              key={exp.id}
+              className='bg-gradient-to-r from-slate-50 to-transparent dark:from-slate-800/50 dark:to-transparent rounded-lg p-4 border-l-4 hover:shadow-md transition-all duration-300'
+              style={{ borderColor: colors.accent }}
+            >
+              {/* Header Section */}
+              <div className='flex flex-col lg:flex-row lg:justify-between lg:items-start mb-3'>
+                <div className='flex-1'>
+                  <h3
+                    className='font-bold text-lg mb-1'
+                    style={{
+                      fontFamily: fonts.heading,
+                      fontSize: fonts.size.subheading,
+                      color: colors.text,
+                    }}
+                  >
+                    {exp.position}
+                  </h3>
+                  <div className='flex flex-col sm:flex-row sm:items-center sm:gap-2'>
+                    <p
+                      className='font-semibold text-base'
+                      style={{
+                        fontFamily: fonts.body,
+                        fontSize: fonts.size.body,
+                        color: colors.primary,
+                      }}
+                    >
+                      {exp.company}
+                    </p>
+                    {exp.location && (
+                      <>
+                        <span className='hidden sm:inline text-slate-400'>
+                          •
+                        </span>
+                        <span
+                          className='text-sm'
+                          style={{
+                            fontFamily: fonts.body,
+                            fontSize: fonts.size.small,
+                            color: colors.secondary,
+                          }}
+                        >
+                          {exp.location}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div
+                  className='mt-2 lg:mt-0 lg:ml-4 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-sm font-medium'
                   style={{
-                    fontFamily: fonts.heading,
+                    fontFamily: fonts.body,
+                    fontSize: fonts.size.small,
+                    color: colors.secondary,
+                  }}
+                >
+                  {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
+                </div>
+              </div>
+
+              {/* Description */}
+              {exp.description && (
+                <p
+                  className='mb-3 text-slate-700 dark:text-slate-300 leading-relaxed'
+                  style={{
+                    fontFamily: fonts.body,
                     fontSize: fonts.size.body,
                     color: colors.text,
                   }}
                 >
-                  {exp.position}
-                </h3>
-                <p
-                  className='font-medium'
-                  style={{
-                    fontFamily: fonts.body,
-                    fontSize: fonts.size.body,
-                    color: colors.primary,
-                  }}
-                >
-                  {exp.company}
+                  {exp.description}
                 </p>
-              </div>
-              <div
-                className='text-sm mt-1 md:mt-0'
-                style={{
-                  fontFamily: fonts.body,
-                  fontSize: fonts.size.small,
-                  color: colors.secondary,
-                }}
-              >
-                {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
-              </div>
-            </div>
-            <p
-              className='mb-2'
-              style={{
-                fontFamily: fonts.body,
-                fontSize: fonts.size.body,
-                color: colors.text,
-              }}
-            >
-              {exp.description}
-            </p>
-            {exp.achievements.length > 0 && (
-              <ul className='list-disc list-inside space-y-1'>
-                {exp.achievements.map((achievement, index) => (
-                  <li
-                    key={index}
+              )}
+
+              {/* AI-Restructured Content */}
+              {exp.achievements && exp.achievements.length > 0 && (
+                <div className='mt-3'>
+                  <h4
+                    className='text-sm font-semibold mb-2 text-slate-600 dark:text-slate-400'
                     style={{
-                      fontFamily: fonts.body,
-                      fontSize: fonts.size.body,
-                      color: colors.text,
+                      fontFamily: fonts.heading,
+                      fontSize: fonts.size.small,
+                      color: colors.secondary,
                     }}
                   >
-                    {achievement}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+                    Key Achievements:
+                  </h4>
+                  <ul className='space-y-2'>
+                    {exp.achievements.map((achievement, index) => (
+                      <li
+                        key={index}
+                        className='flex items-start gap-2'
+                        style={{
+                          fontFamily: fonts.body,
+                          fontSize: fonts.size.body,
+                          color: colors.text,
+                        }}
+                      >
+                        <span
+                          className='mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0'
+                          style={{ backgroundColor: colors.accent }}
+                        ></span>
+                        <span className='leading-relaxed'>{achievement}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-  const renderEducation = (sidebarBackground?: string) => (
-    <div className='mb-6'>
-      <h2
-        className='font-semibold mb-4 border-b-2 pb-1'
-        style={{
-          fontFamily: fonts.heading,
-          fontSize: fonts.size.subheading,
-          color: getContrastingTextColor(
-            sidebarBackground || colors.background
-          ),
-          borderColor: colors.accent,
-        }}
-      >
-        Education
-      </h2>
-      <div className='space-y-3'>
-        {data.education.map(edu => (
-          <div
-            key={edu.id}
-            className='border-l-4 pl-4'
-            style={{ borderColor: colors.accent }}
-          >
-            <div className='flex flex-col md:flex-row md:justify-between md:items-start'>
-              <div>
-                <h3
-                  className='font-semibold'
-                  style={{
-                    fontFamily: fonts.heading,
-                    fontSize: fonts.size.body,
-                    color: getContrastingTextColor(
-                      sidebarBackground || colors.background
-                    ),
-                  }}
-                >
-                  {edu.degree} in {edu.field}
-                </h3>
-                <p
-                  className='font-medium'
-                  style={{
-                    fontFamily: fonts.body,
-                    fontSize: fonts.size.body,
-                    color: getContrastingTextColor(
-                      sidebarBackground || colors.background
-                    ),
-                  }}
-                >
-                  {edu.institution}
-                </p>
-                {edu.gpa && (
-                  <p
-                    className='text-sm'
+              {/* Key Technologies */}
+              {exp.keyTechnologies && exp.keyTechnologies.length > 0 && (
+                <div className='mt-3'>
+                  <h4
+                    className='text-sm font-semibold mb-2 text-slate-600 dark:text-slate-400'
                     style={{
-                      fontFamily: fonts.body,
+                      fontFamily: fonts.heading,
                       fontSize: fonts.size.small,
+                      color: colors.secondary,
+                    }}
+                  >
+                    Technologies Used:
+                  </h4>
+                  <div className='flex flex-wrap gap-2'>
+                    {exp.keyTechnologies.map((tech, index) => (
+                      <span
+                        key={index}
+                        className='px-2 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                        style={{
+                          fontFamily: fonts.body,
+                          fontSize: fonts.size.small,
+                        }}
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Impact Metrics */}
+              {exp.impactMetrics && exp.impactMetrics.length > 0 && (
+                <div className='mt-3'>
+                  <h4
+                    className='text-sm font-semibold mb-2 text-slate-600 dark:text-slate-400'
+                    style={{
+                      fontFamily: fonts.heading,
+                      fontSize: fonts.size.small,
+                      color: colors.secondary,
+                    }}
+                  >
+                    Impact & Results:
+                  </h4>
+                  <ul className='space-y-1'>
+                    {exp.impactMetrics.map((metric, index) => (
+                      <li
+                        key={index}
+                        className='flex items-start gap-2 text-sm'
+                        style={{
+                          fontFamily: fonts.body,
+                          fontSize: fonts.size.small,
+                          color: colors.text,
+                        }}
+                      >
+                        <span className='text-green-600 dark:text-green-400'>
+                          ✓
+                        </span>
+                        <span className='leading-relaxed'>{metric}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderEducation = (sidebarBackground?: string) => {
+    if (!isSectionVisible('education')) return null;
+
+    const colors = getCustomizedColors();
+    const fonts = getCustomizedFonts();
+
+    return (
+      <div className='mb-6'>
+        <h2
+          className='font-semibold mb-4 border-b-2 pb-1'
+          style={{
+            fontFamily: fonts.heading,
+            fontSize: fonts.size.subheading,
+            color: getContrastingTextColor(
+              sidebarBackground || colors.background
+            ),
+            borderColor: colors.accent,
+          }}
+        >
+          Education
+        </h2>
+        <div className='space-y-3'>
+          {data.education.map(edu => (
+            <div
+              key={edu.id}
+              className='border-l-4 pl-4'
+              style={{ borderColor: colors.accent }}
+            >
+              <div className='flex flex-col md:flex-row md:justify-between md:items-start'>
+                <div>
+                  <h3
+                    className='font-semibold'
+                    style={{
+                      fontFamily: fonts.heading,
+                      fontSize: fonts.size.body,
                       color: getContrastingTextColor(
                         sidebarBackground || colors.background
                       ),
                     }}
                   >
-                    GPA: {edu.gpa}
+                    {edu.degree} in {edu.field}
+                  </h3>
+                  <p
+                    className='font-medium'
+                    style={{
+                      fontFamily: fonts.body,
+                      fontSize: fonts.size.body,
+                      color: getContrastingTextColor(
+                        sidebarBackground || colors.background
+                      ),
+                    }}
+                  >
+                    {edu.institution}
                   </p>
-                )}
-              </div>
-              <div
-                className='text-sm mt-1 md:mt-0 md:text-right'
-                style={{
-                  fontFamily: fonts.body,
-                  fontSize: fonts.size.small,
-                  color: getContrastingTextColor(
-                    sidebarBackground || colors.background
-                  ),
-                }}
-              >
-                {edu.startDate} - {edu.current ? 'Present' : edu.endDate}
+                  {edu.gpa && (
+                    <p
+                      className='text-sm'
+                      style={{
+                        fontFamily: fonts.body,
+                        fontSize: fonts.size.small,
+                        color: getContrastingTextColor(
+                          sidebarBackground || colors.background
+                        ),
+                      }}
+                    >
+                      GPA: {edu.gpa}
+                    </p>
+                  )}
+                </div>
+                <div
+                  className='text-sm mt-1 md:mt-0 md:text-right'
+                  style={{
+                    fontFamily: fonts.body,
+                    fontSize: fonts.size.small,
+                    color: getContrastingTextColor(
+                      sidebarBackground || colors.background
+                    ),
+                  }}
+                >
+                  {edu.startDate} - {edu.current ? 'Present' : edu.endDate}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
-  const renderSkills = (sidebarBackground?: string) => (
-    <div
-      className='mb-6'
-      style={{
-        backgroundColor: getSectionStyle(
-          'skills',
-          'backgroundColor',
-          'transparent'
-        ),
-        padding: getSectionStyle('skills', 'spacing', spacing.padding),
-      }}
-    >
-      <h2
-        className='font-semibold mb-4 border-b-2 pb-1'
+  const renderSkills = (sidebarBackground?: string) => {
+    if (!isSectionVisible('skills')) return null;
+
+    const colors = getCustomizedColors();
+    const fonts = getCustomizedFonts();
+    const spacing = getCustomizedSpacing();
+
+    return (
+      <div
+        className='mb-6'
         style={{
-          fontFamily: getSectionStyle('headings', 'fontFamily', fonts.heading),
-          fontSize: getSectionStyle(
-            'headings',
-            'fontSize',
-            fonts.size.subheading
-          ),
-          color: getContrastingTextColor(
-            sidebarBackground ||
-              getSectionStyle('headings', 'backgroundColor', colors.background)
-          ),
           backgroundColor: getSectionStyle(
-            'headings',
+            'skills',
             'backgroundColor',
             'transparent'
           ),
-          borderColor: colors.accent,
+          padding: getSectionStyle('skills', 'spacing', spacing.padding),
         }}
       >
-        Skills
-      </h2>
-      <div className='space-y-4'>
-        {data.skills.technical.length > 0 && (
-          <div>
-            <h3
-              className='font-medium mb-2'
-              style={{
-                fontFamily: getSectionStyle(
-                  'skills',
-                  'fontFamily',
-                  fonts.heading
-                ),
-                fontSize: getSectionStyle(
-                  'skills',
-                  'fontSize',
-                  fonts.size.body
-                ),
-                color: getContrastingTextColor(
-                  sidebarBackground || colors.background
-                ),
-              }}
-            >
-              Technical Skills
-            </h3>
-            <div className='flex flex-wrap gap-2'>
-              {data.skills.technical.map((skill, index) => (
-                <span
-                  key={index}
-                  className='px-3 py-1 rounded-full text-sm'
-                  style={{
-                    backgroundColor: getSectionStyle(
-                      'skillsTags',
-                      'backgroundColor',
-                      `${colors.accent}20`
-                    ),
-                    color: getContrastingTextColor(
-                      getSectionStyle(
+        <h2
+          className='font-semibold mb-4 border-b-2 pb-1'
+          style={{
+            fontFamily: getSectionStyle(
+              'headings',
+              'fontFamily',
+              fonts.heading
+            ),
+            fontSize: getSectionStyle(
+              'headings',
+              'fontSize',
+              fonts.size.subheading
+            ),
+            color: getContrastingTextColor(
+              sidebarBackground ||
+                getSectionStyle(
+                  'headings',
+                  'backgroundColor',
+                  colors.background
+                )
+            ),
+            backgroundColor: getSectionStyle(
+              'headings',
+              'backgroundColor',
+              'transparent'
+            ),
+            borderColor: colors.accent,
+          }}
+        >
+          Skills
+        </h2>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          {data.skills.technical.length > 0 && (
+            <div className='bg-gradient-to-br from-green-50 to-transparent dark:from-green-900/20 dark:to-transparent rounded-lg p-4'>
+              <h3
+                className='font-semibold mb-3 text-green-800 dark:text-green-200 flex items-center gap-2'
+                style={{
+                  fontFamily: getSectionStyle(
+                    'skills',
+                    'fontFamily',
+                    fonts.heading
+                  ),
+                  fontSize: getSectionStyle(
+                    'skills',
+                    'fontSize',
+                    fonts.size.body
+                  ),
+                }}
+              >
+                <span>💻</span>
+                Technical Skills
+              </h3>
+              <div className='flex flex-wrap gap-2'>
+                {data.skills.technical.map((skill, index) => (
+                  <span
+                    key={index}
+                    className='px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                    style={{
+                      fontFamily: getSectionStyle(
                         'skillsTags',
-                        'backgroundColor',
-                        `${colors.accent}20`
-                      )
-                    ),
-                    fontFamily: getSectionStyle(
-                      'skillsTags',
-                      'fontFamily',
-                      fonts.body
-                    ),
-                    fontSize: getSectionStyle(
-                      'skillsTags',
-                      'fontSize',
-                      fonts.size.small
-                    ),
-                  }}
-                >
-                  {skill.charAt(0).toUpperCase() + skill.slice(1)}
-                </span>
-              ))}
+                        'fontFamily',
+                        fonts.body
+                      ),
+                      fontSize: getSectionStyle(
+                        'skillsTags',
+                        'fontSize',
+                        fonts.size.small
+                      ),
+                    }}
+                  >
+                    {skill.charAt(0).toUpperCase() + skill.slice(1)}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-        {data.skills.business.length > 0 && (
-          <div>
-            <h3
-              className='font-medium mb-2'
-              style={{
-                fontFamily: fonts.heading,
-                fontSize: fonts.size.body,
-                color: getContrastingTextColor(
-                  sidebarBackground || colors.background
-                ),
-              }}
-            >
-              Business Skills
-            </h3>
-            <div className='flex flex-wrap gap-2'>
-              {data.skills.business.map((skill, index) => (
-                <span
-                  key={index}
-                  className='px-3 py-1 rounded-full text-sm'
-                  style={{
-                    backgroundColor: `${colors.primary}20`,
-                    color: getContrastingTextColor(`${colors.primary}20`),
-                    fontFamily: fonts.body,
-                    fontSize: fonts.size.small,
-                  }}
-                >
-                  {skill.charAt(0).toUpperCase() + skill.slice(1)}
-                </span>
-              ))}
+          )}
+          {data.skills.business.length > 0 && (
+            <div className='bg-gradient-to-br from-purple-50 to-transparent dark:from-purple-900/20 dark:to-transparent rounded-lg p-4'>
+              <h3
+                className='font-semibold mb-3 text-purple-800 dark:text-purple-200 flex items-center gap-2'
+                style={{
+                  fontFamily: getSectionStyle(
+                    'skills',
+                    'fontFamily',
+                    fonts.heading
+                  ),
+                  fontSize: getSectionStyle(
+                    'skills',
+                    'fontSize',
+                    fonts.size.body
+                  ),
+                }}
+              >
+                <span>💼</span>
+                Business Skills
+              </h3>
+              <div className='flex flex-wrap gap-2'>
+                {data.skills.business.map((skill, index) => (
+                  <span
+                    key={index}
+                    className='px-3 py-1 rounded-full text-sm font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200'
+                    style={{
+                      fontFamily: getSectionStyle(
+                        'skillsTags',
+                        'fontFamily',
+                        fonts.body
+                      ),
+                      fontSize: getSectionStyle(
+                        'skillsTags',
+                        'fontSize',
+                        fonts.size.small
+                      ),
+                    }}
+                  >
+                    {skill.charAt(0).toUpperCase() + skill.slice(1)}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderProjects = () => {
-    if (!data.projects || data.projects.length === 0) return null;
+    if (
+      !data.projects ||
+      data.projects.length === 0 ||
+      !isSectionVisible('projects')
+    )
+      return null;
+
+    const colors = getCustomizedColors();
+    const fonts = getCustomizedFonts();
 
     return (
       <div className='mb-6'>
@@ -610,20 +895,21 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
         >
           Projects
         </h2>
-        <div className='space-y-4'>
+        <div className='space-y-6'>
           {data.projects.map(project => (
             <div
               key={project.id}
-              className='border-l-4 pl-4'
+              className='bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-900/20 dark:to-transparent rounded-lg p-4 border-l-4 hover:shadow-md transition-all duration-300'
               style={{ borderColor: colors.accent }}
             >
-              <div className='flex flex-col md:flex-row md:justify-between md:items-start mb-2'>
-                <div>
+              {/* Header Section */}
+              <div className='flex flex-col lg:flex-row lg:justify-between lg:items-start mb-3'>
+                <div className='flex-1'>
                   <h3
-                    className='font-semibold'
+                    className='font-bold text-lg mb-1'
                     style={{
                       fontFamily: fonts.heading,
-                      fontSize: fonts.size.body,
+                      fontSize: fonts.size.subheading,
                       color: colors.text,
                     }}
                   >
@@ -632,19 +918,22 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
                   {project.url && (
                     <a
                       href={project.url}
-                      className='text-sm underline'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='inline-flex items-center gap-1 text-sm font-medium hover:underline'
                       style={{
                         fontFamily: fonts.body,
                         fontSize: fonts.size.small,
                         color: colors.accent,
                       }}
                     >
-                      {project.url}
+                      <span>🌐</span>
+                      View Project
                     </a>
                   )}
                 </div>
                 <div
-                  className='text-sm mt-1 md:mt-0'
+                  className='mt-2 lg:mt-0 lg:ml-4 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-sm font-medium'
                   style={{
                     fontFamily: fonts.body,
                     fontSize: fonts.size.small,
@@ -654,8 +943,10 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
                   {project.startDate} - {project.endDate || 'Present'}
                 </div>
               </div>
+
+              {/* Description */}
               <p
-                className='mb-2'
+                className='mb-4 text-slate-700 dark:text-slate-300 leading-relaxed'
                 style={{
                   fontFamily: fonts.body,
                   fontSize: fonts.size.body,
@@ -664,22 +955,102 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
               >
                 {project.description}
               </p>
+
+              {/* Key Features */}
+              {project.keyFeatures && project.keyFeatures.length > 0 && (
+                <div className='mt-3'>
+                  <h4
+                    className='text-sm font-semibold mb-2 text-slate-600 dark:text-slate-400'
+                    style={{
+                      fontFamily: fonts.heading,
+                      fontSize: fonts.size.small,
+                      color: colors.secondary,
+                    }}
+                  >
+                    Key Features:
+                  </h4>
+                  <ul className='space-y-1'>
+                    {project.keyFeatures.map((feature, index) => (
+                      <li
+                        key={index}
+                        className='flex items-start gap-2 text-sm'
+                        style={{
+                          fontFamily: fonts.body,
+                          fontSize: fonts.size.small,
+                          color: colors.text,
+                        }}
+                      >
+                        <span className='text-blue-600 dark:text-blue-400'>
+                          •
+                        </span>
+                        <span className='leading-relaxed'>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Technologies */}
               {project.technologies.length > 0 && (
-                <div className='flex flex-wrap gap-1'>
-                  {project.technologies.map((tech, index) => (
-                    <span
-                      key={index}
-                      className='px-2 py-1 rounded text-xs'
-                      style={{
-                        backgroundColor: `${colors.secondary}20`,
-                        color: colors.secondary,
-                        fontFamily: fonts.body,
-                        fontSize: fonts.size.small,
-                      }}
-                    >
-                      {tech}
-                    </span>
-                  ))}
+                <div className='mt-3'>
+                  <h4
+                    className='text-sm font-semibold mb-2 text-slate-600 dark:text-slate-400'
+                    style={{
+                      fontFamily: fonts.heading,
+                      fontSize: fonts.size.small,
+                      color: colors.secondary,
+                    }}
+                  >
+                    Technologies Used:
+                  </h4>
+                  <div className='flex flex-wrap gap-2'>
+                    {project.technologies.map((tech, index) => (
+                      <span
+                        key={index}
+                        className='px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
+                        style={{
+                          fontFamily: fonts.body,
+                          fontSize: fonts.size.small,
+                        }}
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Impact */}
+              {project.impact && project.impact.length > 0 && (
+                <div className='mt-3'>
+                  <h4
+                    className='text-sm font-semibold mb-2 text-slate-600 dark:text-slate-400'
+                    style={{
+                      fontFamily: fonts.heading,
+                      fontSize: fonts.size.small,
+                      color: colors.secondary,
+                    }}
+                  >
+                    Impact & Results:
+                  </h4>
+                  <ul className='space-y-1'>
+                    {project.impact.map((impact, index) => (
+                      <li
+                        key={index}
+                        className='flex items-start gap-2 text-sm'
+                        style={{
+                          fontFamily: fonts.body,
+                          fontSize: fonts.size.small,
+                          color: colors.text,
+                        }}
+                      >
+                        <span className='text-green-600 dark:text-green-400'>
+                          ✓
+                        </span>
+                        <span className='leading-relaxed'>{impact}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
@@ -690,7 +1061,15 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
   };
 
   const renderAchievements = () => {
-    if (!data.achievements || data.achievements.length === 0) return null;
+    if (
+      !data.achievements ||
+      data.achievements.length === 0 ||
+      !isSectionVisible('achievements')
+    )
+      return null;
+
+    const colors = getCustomizedColors();
+    const fonts = getCustomizedFonts();
 
     return (
       <div className='mb-6'>
@@ -727,30 +1106,38 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
     <div
       className={`resume-template ${className}`}
       style={{
-        backgroundColor: colors.background,
-        color: colors.text,
-        fontFamily: fonts.body,
-        fontSize: fonts.size.body,
-        lineHeight: spacing.lineHeight,
-        padding: spacing.padding,
+        backgroundColor: customizedLayout.colors.background,
+        color: customizedLayout.colors.text,
+        fontFamily: customizedFonts.body,
+        fontSize: customizedFonts.size.body,
+        lineHeight: customizedLayout.spacing.lineHeight,
+        padding: customizedLayout.spacing.padding,
         minHeight: '100vh',
         // margin removed - controlled by export functions
       }}
     >
-      {layout.columns === 2 && layout.sidebar ? (
+      {customizedLayout.columns === 2 && customizedLayout.sidebar ? (
         // Two-column layout with sidebar - responsive
         <div className='flex flex-col lg:flex-row gap-4 lg:gap-6'>
           {/* Sidebar */}
           <div
             className='w-full lg:w-1/3 p-4 lg:p-6 rounded-lg'
             style={{
-              backgroundColor: colors.sidebar || colors.primary,
-              color: colors.sidebarText || '#ffffff',
+              backgroundColor:
+                customizedLayout.colors.sidebar ||
+                customizedLayout.colors.primary,
+              color: customizedLayout.colors.sidebarText || '#ffffff',
             }}
           >
-            {renderHeader(colors.sidebar || colors.primary)}
-            {renderSkills(colors.sidebar || colors.primary)}
-            {renderEducation(colors.sidebar || colors.primary)}
+            {renderHeader(
+              customizedLayout.colors.sidebar || customizedLayout.colors.primary
+            )}
+            {renderSkills(
+              customizedLayout.colors.sidebar || customizedLayout.colors.primary
+            )}
+            {renderEducation(
+              customizedLayout.colors.sidebar || customizedLayout.colors.primary
+            )}
           </div>
 
           {/* Main Content */}

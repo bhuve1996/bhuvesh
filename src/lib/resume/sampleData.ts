@@ -10,6 +10,7 @@ export const sampleResumeData: ResumeData = {
     linkedin: 'linkedin.com/in/alexjohnson',
     github: 'github.com/alexjohnson',
     portfolio: 'alexjohnson.dev',
+    jobTitle: 'Senior Software Engineer',
   },
   summary:
     'Experienced software engineer with 5+ years of expertise in full-stack development, cloud architecture, and team leadership. Passionate about building scalable applications and mentoring junior developers. Proven track record of delivering high-quality software solutions that drive business growth.',

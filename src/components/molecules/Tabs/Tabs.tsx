@@ -71,7 +71,7 @@ export const Tabs: React.FC<TabsProps> = ({
     <div className={`tabs flex flex-col h-full ${className}`} {...props}>
       {/* Tab Navigation */}
       <div className='border-b border-gray-200 flex-shrink-0'>
-        <div className='px-4 sm:px-6 lg:px-8'>
+        <div className='px-2 sm:px-3 lg:px-4'>
           <div className='relative'>
             {/* Left scroll indicator */}
             {canScrollLeft && (
@@ -154,7 +154,7 @@ export const Tabs: React.FC<TabsProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className='flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8'>
+      <div className='flex-1 overflow-y-auto p-1.5 sm:p-2.5 lg:p-3 pb-6 min-h-0 max-h-full'>
         {items.find(item => item.id === activeTab)?.content}
       </div>
     </div>

@@ -19,7 +19,7 @@ export const Card: React.FC<EnhancedCardProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'bg-card/5 backdrop-blur-sm border border-primary-500/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden';
+    'bg-card/5 backdrop-blur-sm border border-primary-500/20 rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 relative overflow-hidden';
   const hoverClasses = hover
     ? 'hover:border-primary-500/40 hover:bg-card/10 transition-all duration-300 cursor-pointer'
     : '';

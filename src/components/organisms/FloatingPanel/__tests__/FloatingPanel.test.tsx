@@ -16,9 +16,9 @@ jest.mock('../tabs/ATSAnalysisTab', () => ({
 }));
 
 jest.mock('../tabs/AIContentTab', () => ({
-  AIContentTab: ({ resumeData }: { resumeData: ResumeData }) => (
+  AIContentTab: ({ data }: { data: ResumeData }) => (
     <div data-testid='ai-content-tab'>
-      AI Content for {resumeData.personal?.fullName}
+      AI Content for {data.personal?.fullName}
     </div>
   ),
 }));

@@ -43,7 +43,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
     setIsExpanded(false);
   };
 
-  // Focus management
+  // Focus management and body scroll lock
   useEffect(() => {
     if (isVisible && panelRef.current) {
       const firstFocusable = panelRef.current.querySelector(
@@ -52,6 +52,51 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       firstFocusable?.focus();
     }
     return undefined;
+  }, [isVisible]);
+
+  // Body scroll lock for mobile when panel is open
+  useEffect(() => {
+    if (isVisible) {
+      // Store current scroll position
+      const scrollY = window.scrollY;
+
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden';
+      // Prevent scroll on touch devices
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.top = `-${scrollY}px`;
+
+      // Store scroll position for restoration
+      document.body.setAttribute('data-scroll-y', scrollY.toString());
+    } else {
+      // Restore body scroll
+      const scrollY = document.body.getAttribute('data-scroll-y');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+      document.body.removeAttribute('data-scroll-y');
+
+      // Restore scroll position
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY, 10));
+      }
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      const scrollY = document.body.getAttribute('data-scroll-y');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+      document.body.removeAttribute('data-scroll-y');
+
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY, 10));
+      }
+    };
   }, [isVisible]);
 
   // Keyboard handlers
@@ -85,6 +130,16 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       ),
     },
     {
+      id: 'customize',
+      label: 'Customize',
+      content: (
+        <TemplateCustomizerTab
+          template={template}
+          onTemplateChange={onTemplateChange}
+        />
+      ),
+    },
+    {
       id: 'ats',
       label: 'ATS Analysis',
       content: <ATSAnalysisTab resumeData={resumeData} />,
@@ -92,15 +147,12 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
     {
       id: 'ai',
       label: 'AI Content',
-      content: <AIContentTab resumeData={resumeData} />,
-    },
-    {
-      id: 'customize',
-      label: 'Customize',
       content: (
-        <TemplateCustomizerTab
-          template={template}
-          onTemplateChange={onTemplateChange}
+        <AIContentTab
+          data={resumeData}
+          onDataUpdate={_updatedData => {
+            // Handle data updates from AI analysis
+          }}
         />
       ),
     },
@@ -177,7 +229,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
             exit={{ scale: 0.8, opacity: 0, y: 20 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className={cn(
-              'bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-700',
+              'bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden overflow-y-auto',
               // Mobile: Full width with margins, Tablet: Fixed width, Desktop: Responsive width
               'w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] max-w-sm sm:max-w-md md:max-w-lg',
               'sm:w-80 sm:h-96',
@@ -234,9 +286,9 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                     {isExpanded ? 'Collapse' : 'Expand'}
                   </Button>
                   {/* Tooltip */}
-                  <div className='absolute bottom-full right-0 mb-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
+                  <div className='absolute top-full right-0 mt-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
                     {isExpanded ? 'Collapse panel' : 'Expand panel'}
-                    <div className='absolute top-full right-4 border-4 border-transparent border-t-neutral-900'></div>
+                    <div className='absolute bottom-full right-4 border-4 border-transparent border-b-neutral-900'></div>
                   </div>
                 </div>
 
@@ -267,9 +319,9 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                     Close
                   </Button>
                   {/* Tooltip */}
-                  <div className='absolute bottom-full right-0 mb-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10'>
+                  <div className='absolute top-full right-0 mt-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10'>
                     Close panel
-                    <div className='absolute top-full right-4 border-4 border-transparent border-t-neutral-900'></div>
+                    <div className='absolute bottom-full right-4 border-4 border-transparent border-b-neutral-900'></div>
                   </div>
                 </div>
               </div>
@@ -278,15 +330,15 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
             {/* Content */}
             <div
               className={cn(
-                'panel-content flex-1 flex flex-col overflow-hidden',
-                isExpanded ? 'w-96' : 'w-80'
+                'panel-content flex-1 flex flex-col min-h-0',
+                'w-full h-full'
               )}
             >
               <Tabs
                 items={tabItems}
                 defaultActiveTab={activeTab}
                 onTabChange={tabId => setActiveTab(tabId as PanelTab)}
-                className='flex-1 flex flex-col'
+                className='flex-1 flex flex-col h-full'
               />
             </div>
           </motion.div>

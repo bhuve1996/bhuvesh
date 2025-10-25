@@ -14,8 +14,10 @@ import { TemplateSearch } from '@/components/resume/TemplateSearch';
 import { ValidationModal } from '@/components/resume/ValidationModal';
 import { ViewModeToggle } from '@/components/resume/ViewModeToggle';
 import { Card } from '@/components/ui/Card';
+import { useContentRestructuring } from '@/hooks/useContentRestructuring';
 import { cloudStorage } from '@/lib/resume/cloudStorage';
 import { exportResume } from '@/lib/resume/exportUtils';
+import { sampleResumeData } from '@/lib/resume/sampleData';
 import { modernTemplates } from '@/lib/resume/templates';
 import { ValidationResult } from '@/lib/resume/validation';
 import { useResumeStore } from '@/store/resumeStore';
@@ -36,6 +38,11 @@ export default function TemplateGalleryPage() {
   // Local state
   const [customizedTemplate, setCustomizedTemplate] =
     useState<ResumeTemplate | null>(null);
+
+  // Wrap setCustomizedTemplate with logging
+  const handleTemplateChange = (template: ResumeTemplate) => {
+    setCustomizedTemplate(template);
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [validationResult, setValidationResult] =
@@ -66,90 +73,18 @@ export default function TemplateGalleryPage() {
       return userResumeData;
     }
 
-    // Second priority: Sample data (fallback)
-    return {
-      personal: {
-        fullName: 'John Doe',
-        email: 'john.doe@email.com',
-        phone: '+1 (555) 123-4567',
-        location: 'San Francisco, CA',
-        linkedin: 'linkedin.com/in/johndoe',
-        github: 'github.com/johndoe',
-        portfolio: 'johndoe.dev',
-      },
-      summary:
-        'Experienced software engineer with 5+ years of experience in full-stack development. Passionate about creating scalable web applications and leading development teams.',
-      experience: [
-        {
-          id: '1',
-          company: 'Tech Corp',
-          position: 'Senior Software Engineer',
-          location: 'San Francisco, CA',
-          startDate: '2022-01',
-          endDate: 'present',
-          current: true,
-          description:
-            'Led development of microservices architecture serving 1M+ users. Implemented CI/CD pipelines reducing deployment time by 60%.',
-          achievements: [
-            'Reduced system latency by 40%',
-            'Mentored 3 junior developers',
-            'Implemented automated testing suite',
-          ],
-        },
-      ],
-      education: [
-        {
-          id: '1',
-          institution: 'University of California',
-          degree: 'Bachelor of Science in Computer Science',
-          field: 'Computer Science',
-          location: 'Berkeley, CA',
-          startDate: '2016-09',
-          endDate: '2020-05',
-          current: false,
-          gpa: '3.8',
-        },
-      ],
-      skills: {
-        technical: [
-          'JavaScript',
-          'TypeScript',
-          'React',
-          'Node.js',
-          'Python',
-          'AWS',
-        ],
-        business: [
-          'Project Management',
-          'Team Leadership',
-          'Agile Development',
-        ],
-        soft: ['Communication', 'Problem Solving', 'Critical Thinking'],
-        languages: ['English (Native)', 'Spanish (Conversational)'],
-        certifications: [
-          'AWS Certified Developer',
-          'Google Cloud Professional',
-        ],
-      },
-      projects: [
-        {
-          id: '1',
-          name: 'E-commerce Platform',
-          description:
-            'Full-stack e-commerce solution with React frontend and Node.js backend',
-          technologies: ['React', 'Node.js', 'MongoDB', 'Stripe API'],
-          url: 'https://example.com',
-          startDate: '2023-01',
-          endDate: '2023-06',
-        },
-      ],
-      achievements: [
-        'Led team of 5 developers in successful product launch',
-        'Reduced application load time by 50% through optimization',
-        'Implemented automated testing reducing bugs by 30%',
-      ],
-    };
+    // Second priority: Use the comprehensive sample data for better preview
+    return sampleResumeData;
   };
+
+  // Use content restructuring hook
+  const { restructuredData } = useContentRestructuring(getPreviewData(), {
+    autoRestructure: true,
+    enableAIAnalysis: true,
+  });
+
+  // Use restructured data if available, otherwise fall back to original
+  const previewData = restructuredData || getPreviewData();
 
   // Handle template selection
   const handleTemplateSelect = (template: ResumeTemplate) => {
@@ -165,7 +100,7 @@ export default function TemplateGalleryPage() {
       await exportResume(
         pendingExportFormat,
         customizedTemplate || selectedTemplate,
-        getPreviewData()
+        previewData
       );
     } catch {
       // Export failed
@@ -285,7 +220,7 @@ export default function TemplateGalleryPage() {
             className={`space-y-6 ${isCarouselCollapsed ? 'pb-8' : 'pb-32'}`}
           >
             {/* Main Content - Template Preview */}
-            <div className='max-w-5xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-4 sm:p-6'>
+            <div className='max-w-5xl mx-auto bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-4 sm:p-6 backdrop-blur-sm'>
               {selectedTemplate ? (
                 <div className='space-y-4'>
                   <div className='flex items-center justify-between'>
@@ -328,14 +263,14 @@ export default function TemplateGalleryPage() {
                     {previewMode === 'paginated' ? (
                       <ImprovedPaginatedTemplatePreview
                         template={customizedTemplate || selectedTemplate}
-                        data={getPreviewData()}
+                        data={previewData}
                         className='w-full'
                         maxHeight='600px'
                       />
                     ) : (
                       <ResumeTemplateRenderer
                         template={customizedTemplate || selectedTemplate}
-                        data={getPreviewData()}
+                        data={previewData}
                         className='w-full'
                       />
                     )}
@@ -370,9 +305,9 @@ export default function TemplateGalleryPage() {
           </div>
         ) : (
           /* Grid Layout - Desktop */
-          <div className='grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 xl:gap-8'>
+          <div className='grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-6 gap-4 lg:gap-6 xl:gap-8'>
             {/* Left Sidebar - Template Gallery */}
-            <div className='lg:col-span-1 xl:col-span-1 order-2 lg:order-1 xl:order-1 scale-50 origin-top-left'>
+            <div className='lg:col-span-1 xl:col-span-1 order-2 lg:order-1 xl:order-1'>
               {/* Search and Filters */}
               <TemplateSearch
                 searchQuery={searchQuery}
@@ -380,7 +315,7 @@ export default function TemplateGalleryPage() {
               />
 
               {/* Template Grid */}
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-1.5'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-1.5'>
                 <AnimatePresence>
                   {filteredTemplates.map((template, index) => (
                     <motion.div
@@ -490,7 +425,7 @@ export default function TemplateGalleryPage() {
             </div>
 
             {/* Main Content Area - Template Customizer + Preview */}
-            <div className='lg:col-span-2 xl:col-span-3 order-1 lg:order-2 xl:order-2'>
+            <div className='lg:col-span-4 xl:col-span-5 order-1 lg:order-2 xl:order-2'>
               {selectedTemplate ? (
                 <div className='space-y-6'>
                   {/* Live Preview */}
@@ -503,8 +438,9 @@ export default function TemplateGalleryPage() {
 
                     <div className='border border-slate-200 rounded-lg overflow-hidden'>
                       <ResumeTemplateRenderer
+                        key={customizedTemplate ? 'customized' : 'original'}
                         template={customizedTemplate || selectedTemplate}
-                        data={getPreviewData()}
+                        data={previewData}
                         className='w-full'
                       />
                     </div>
@@ -581,9 +517,9 @@ export default function TemplateGalleryPage() {
       {/* Unified Floating Panel - All tools in one place */}
       {selectedTemplate && (
         <FloatingPanel
-          resumeData={getPreviewData()}
+          resumeData={previewData}
           template={customizedTemplate || selectedTemplate}
-          onTemplateChange={setCustomizedTemplate}
+          onTemplateChange={handleTemplateChange}
         />
       )}
     </div>

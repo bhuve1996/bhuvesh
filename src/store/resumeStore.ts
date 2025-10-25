@@ -40,6 +40,68 @@ interface ResumeState {
     };
   };
 
+  // Template customization state
+  templateCustomizations: {
+    layout: {
+      columns: 1 | 2;
+      sidebar: boolean;
+      margins: string;
+    };
+    typography: {
+      fontFamily: string;
+      fontSize: string;
+      lineHeight: number;
+      letterSpacing: string;
+    };
+    colors: {
+      colorScheme: string;
+      primaryColor: string;
+      secondaryColor: string;
+      accentColor: string;
+      textColor: string;
+      backgroundColor: string;
+    };
+    spacing: {
+      sectionGap: string;
+      padding: string;
+    };
+    content: {
+      bulletStyle: string;
+      dateFormat: string;
+      showIcons: boolean;
+    };
+    sectionCustomizations: {
+      [sectionId: string]: {
+        visible?: boolean;
+        order?: number;
+        colors?: {
+          primary: string;
+          secondary: string;
+          accent: string;
+          text: string;
+          background: string;
+        };
+        typography?: {
+          fontFamily: string;
+          fontSize: string;
+          fontWeight: string;
+          lineHeight: number;
+          letterSpacing: string;
+        };
+        spacing?: {
+          marginTop: string;
+          marginBottom: string;
+          padding: string;
+        };
+        formatting?: {
+          bulletStyle: string;
+          dateFormat: string;
+          showIcons: boolean;
+        };
+      };
+    };
+  };
+
   // Actions
   setResumeData: (data: ResumeData) => void;
   setAnalysisResult: (result: AnalysisResult) => void;
@@ -62,6 +124,20 @@ interface ResumeState {
     sectionId: string
   ) => ResumeState['sectionColors'][string] | null;
   resetSectionColors: () => void;
+
+  // Template customization actions
+  setTemplateCustomizations: (
+    customizations: Partial<ResumeState['templateCustomizations']>
+  ) => void;
+  updateSectionCustomization: (
+    sectionId: string,
+    customization: Partial<
+      ResumeState['templateCustomizations']['sectionCustomizations'][string]
+    >
+  ) => void;
+  resetTemplateCustomizations: () => void;
+  saveCustomizationPreset: (name: string) => void;
+  loadCustomizationPreset: (name: string) => void;
 
   // Navigation helpers
   navigateToStep: (
@@ -122,6 +198,37 @@ const initialState = {
   useUserData: false,
   showDataChoice: false,
   sectionColors: {},
+  templateCustomizations: {
+    layout: {
+      columns: 1 as 1 | 2,
+      sidebar: false,
+      margins: '1in',
+    },
+    typography: {
+      fontFamily: 'Arial',
+      fontSize: '14',
+      lineHeight: 1.5,
+      letterSpacing: '0',
+    },
+    colors: {
+      colorScheme: 'blue',
+      primaryColor: '#3b82f6',
+      secondaryColor: '#64748b',
+      accentColor: '#06b6d4',
+      textColor: '#1f2937',
+      backgroundColor: '#ffffff',
+    },
+    spacing: {
+      sectionGap: '1rem',
+      padding: '1rem',
+    },
+    content: {
+      bulletStyle: 'disc',
+      dateFormat: 'MMM YYYY',
+      showIcons: true,
+    },
+    sectionCustomizations: {},
+  },
 };
 
 // Helper function to create default resume data
@@ -187,6 +294,56 @@ export const useResumeStore = create<ResumeState>()(
         return state.sectionColors[sectionId] || null;
       },
       resetSectionColors: () => set({ sectionColors: {} }),
+
+      // Template customization actions
+      setTemplateCustomizations: customizations =>
+        set(state => ({
+          templateCustomizations: {
+            ...state.templateCustomizations,
+            ...customizations,
+          },
+        })),
+
+      updateSectionCustomization: (sectionId, customization) =>
+        set(state => {
+          const currentSection =
+            state.templateCustomizations.sectionCustomizations[sectionId];
+          return {
+            templateCustomizations: {
+              ...state.templateCustomizations,
+              sectionCustomizations: {
+                ...state.templateCustomizations.sectionCustomizations,
+                [sectionId]: {
+                  ...currentSection,
+                  ...customization,
+                },
+              },
+            },
+          };
+        }),
+
+      resetTemplateCustomizations: () =>
+        set({
+          templateCustomizations: initialState.templateCustomizations,
+        }),
+
+      saveCustomizationPreset: name => {
+        const state = get();
+        const presets = JSON.parse(
+          localStorage.getItem('template-presets') || '{}'
+        );
+        presets[name] = state.templateCustomizations;
+        localStorage.setItem('template-presets', JSON.stringify(presets));
+      },
+
+      loadCustomizationPreset: name => {
+        const presets = JSON.parse(
+          localStorage.getItem('template-presets') || '{}'
+        );
+        if (presets[name]) {
+          set({ templateCustomizations: presets[name] });
+        }
+      },
 
       // Navigation helpers
       navigateToStep: (step, preserveData = true) => {
@@ -560,6 +717,7 @@ export const useResumeStore = create<ResumeState>()(
         useUserData: state.useUserData,
         currentStep: state.currentStep,
         sectionColors: state.sectionColors,
+        templateCustomizations: state.templateCustomizations,
       }),
     }
   )
@@ -617,6 +775,21 @@ export const useResumeActions = () => {
   const setSectionColors = useResumeStore(state => state.setSectionColors);
   const getSectionColors = useResumeStore(state => state.getSectionColors);
   const resetSectionColors = useResumeStore(state => state.resetSectionColors);
+  const setTemplateCustomizations = useResumeStore(
+    state => state.setTemplateCustomizations
+  );
+  const updateSectionCustomization = useResumeStore(
+    state => state.updateSectionCustomization
+  );
+  const resetTemplateCustomizations = useResumeStore(
+    state => state.resetTemplateCustomizations
+  );
+  const saveCustomizationPreset = useResumeStore(
+    state => state.saveCustomizationPreset
+  );
+  const loadCustomizationPreset = useResumeStore(
+    state => state.loadCustomizationPreset
+  );
 
   // Enhanced content management actions
   const updatePersonalInfo = useResumeStore(state => state.updatePersonalInfo);
@@ -655,6 +828,11 @@ export const useResumeActions = () => {
       setSectionColors,
       getSectionColors,
       resetSectionColors,
+      setTemplateCustomizations,
+      updateSectionCustomization,
+      resetTemplateCustomizations,
+      saveCustomizationPreset,
+      loadCustomizationPreset,
       // Enhanced content management
       updatePersonalInfo,
       updateSummary,
@@ -689,6 +867,11 @@ export const useResumeActions = () => {
       setSectionColors,
       getSectionColors,
       resetSectionColors,
+      setTemplateCustomizations,
+      updateSectionCustomization,
+      resetTemplateCustomizations,
+      saveCustomizationPreset,
+      loadCustomizationPreset,
       updatePersonalInfo,
       updateSummary,
       addExperience,
@@ -756,3 +939,42 @@ export const useSectionColors = (sectionId: string) => {
 
 export const useAllSectionColors = () =>
   useResumeStore(state => state.sectionColors);
+
+// Template customization selectors
+export const useTemplateCustomizations = () =>
+  useResumeStore(state => state.templateCustomizations);
+
+export const useTemplateCustomizationActions = () => {
+  const setTemplateCustomizations = useResumeStore(
+    state => state.setTemplateCustomizations
+  );
+  const updateSectionCustomization = useResumeStore(
+    state => state.updateSectionCustomization
+  );
+  const resetTemplateCustomizations = useResumeStore(
+    state => state.resetTemplateCustomizations
+  );
+  const saveCustomizationPreset = useResumeStore(
+    state => state.saveCustomizationPreset
+  );
+  const loadCustomizationPreset = useResumeStore(
+    state => state.loadCustomizationPreset
+  );
+
+  return useMemo(
+    () => ({
+      setTemplateCustomizations,
+      updateSectionCustomization,
+      resetTemplateCustomizations,
+      saveCustomizationPreset,
+      loadCustomizationPreset,
+    }),
+    [
+      setTemplateCustomizations,
+      updateSectionCustomization,
+      resetTemplateCustomizations,
+      saveCustomizationPreset,
+      loadCustomizationPreset,
+    ]
+  );
+};

@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { Button } from '@/components/atoms/Button/Button';
-import { StatusBadge } from '@/components/molecules/StatusBadge/StatusBadge';
 import { Card } from '@/components/ui/Card';
 import {
   exportToDOCX,
@@ -71,7 +70,7 @@ export const ExportTab: React.FC<ExportTabProps> = ({
   ];
 
   return (
-    <div className='p-3 sm:p-4 space-y-3 sm:space-y-4 h-full overflow-y-auto'>
+    <div className='h-full overflow-y-auto'>
       <div className='text-center'>
         <h4 className='text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2'>
           Export Resume
@@ -112,39 +111,6 @@ export const ExportTab: React.FC<ExportTabProps> = ({
           </Card>
         ))}
       </div>
-
-      {/* Export Tips */}
-      <Card className='p-3 sm:p-4 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm'>
-        <h5 className='font-medium text-sm sm:text-base text-neutral-900 dark:text-neutral-100 mb-2 sm:mb-3'>
-          Export Tips
-        </h5>
-        <ul className='space-y-2'>
-          <li className='flex items-start gap-2'>
-            <StatusBadge status='info' size='sm' icon='💡'>
-              <span className='hidden sm:inline'>Tip</span>
-            </StatusBadge>
-            <span className='text-xs sm:text-sm text-neutral-700 dark:text-neutral-300'>
-              Use PDF for most online applications
-            </span>
-          </li>
-          <li className='flex items-start gap-2'>
-            <StatusBadge status='info' size='sm' icon='💡'>
-              <span className='hidden sm:inline'>Tip</span>
-            </StatusBadge>
-            <span className='text-xs sm:text-sm text-neutral-700 dark:text-neutral-300'>
-              Use DOCX when you need to make edits
-            </span>
-          </li>
-          <li className='flex items-start gap-2'>
-            <StatusBadge status='info' size='sm' icon='💡'>
-              <span className='hidden sm:inline'>Tip</span>
-            </StatusBadge>
-            <span className='text-xs sm:text-sm text-neutral-700 dark:text-neutral-300'>
-              Use TXT for ATS systems that prefer plain text
-            </span>
-          </li>
-        </ul>
-      </Card>
     </div>
   );
 };
