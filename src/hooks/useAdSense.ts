@@ -84,8 +84,8 @@ export function useAdSense(): UseAdSenseReturn {
         });
       }
 
-        // eslint-disable-next-line no-console
-        console.log('Ad clicked:', { adSlot, adType });
+      // eslint-disable-next-line no-console
+      console.log('Ad clicked:', { adSlot, adType });
     }
   }, []);
 
@@ -100,8 +100,8 @@ export function useAdSense(): UseAdSenseReturn {
         });
       }
 
-        // eslint-disable-next-line no-console
-        console.log('Ad impression:', { adSlot, adType });
+      // eslint-disable-next-line no-console
+      console.log('Ad impression:', { adSlot, adType });
     }
   }, []);
 
