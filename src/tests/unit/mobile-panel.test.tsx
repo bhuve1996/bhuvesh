@@ -1,6 +1,7 @@
-import { FloatingPanel } from '@/components/organisms/FloatingPanel/FloatingPanel';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
+
+import { FloatingPanel } from '@/components/organisms/FloatingPanel/FloatingPanel';
 
 // Mock the draggable panel hook
 jest.mock('@/hooks/useDraggablePanel', () => ({
@@ -14,10 +15,20 @@ jest.mock('@/hooks/useDraggablePanel', () => ({
 
 // Mock the tabs component
 jest.mock('@/components/molecules/Tabs/Tabs', () => ({
-  Tabs: ({ items, defaultActiveTab, onTabChange, className }: any) => (
+  Tabs: ({
+    items,
+    defaultActiveTab,
+    onTabChange,
+    className,
+  }: {
+    items: Array<{ id: string; label: string; content: React.ReactNode }>;
+    defaultActiveTab: string;
+    onTabChange?: (tabId: string) => void;
+    className?: string;
+  }) => (
     <div className={className} data-testid='tabs-component'>
       <div className='tab-navigation'>
-        {items.map((item: any) => (
+        {items.map(item => (
           <button
             key={item.id}
             onClick={() => onTabChange?.(item.id)}
@@ -28,7 +39,7 @@ jest.mock('@/components/molecules/Tabs/Tabs', () => ({
         ))}
       </div>
       <div className='tab-content'>
-        {items.find((item: any) => item.id === defaultActiveTab)?.content}
+        {items.find(item => item.id === defaultActiveTab)?.content}
       </div>
     </div>
   ),

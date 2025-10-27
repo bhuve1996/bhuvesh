@@ -13,7 +13,8 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
     const [isVisible, setIsVisible] = React.useState(false);
     const [isExpanded, setIsExpanded] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState('export');
-    const [isMobile, setIsMobile] = React.useState(false);
+    // Mobile detection - synchronous for tests
+    const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 768);
 
     // Mobile detection - force mobile for mobile tests
     React.useEffect(() => {
@@ -113,22 +114,24 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
         )}
 
         {/* Desktop Floating Action Button */}
-        <div
-          className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 ${isMobile ? 'hidden' : ''} ${className}`}
-          data-testid='floating-panel-container'
-        >
-          {!isVisible && (
-            <button
-              onClick={togglePanel}
-              className='rounded-full shadow-lg hover:shadow-xl text-sm sm:text-base'
-              aria-label='Open resume tools panel'
-              data-testid='floating-action-button'
-            >
-              <span className='hidden sm:inline'>Quick Actions</span>
-              <span className='sm:hidden'>Tools</span>
-            </button>
-          )}
-        </div>
+        {!isMobile && (
+          <div
+            className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 ${className}`}
+            data-testid='floating-panel-container'
+          >
+            {!isVisible && (
+              <button
+                onClick={togglePanel}
+                className='rounded-full shadow-lg hover:shadow-xl text-sm sm:text-base'
+                aria-label='Open resume tools panel'
+                data-testid='mobile-side-button'
+              >
+                <span className='hidden sm:inline'>Quick Actions</span>
+                <span className='sm:hidden'>Tools</span>
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Panel */}
         {isVisible && (
@@ -273,10 +276,10 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      expect(floatingButton).toBeInTheDocument();
-      expect(floatingButton).toHaveTextContent('Tools');
-      expect(floatingButton).toHaveClass('text-sm');
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      expect(mobileButton).toBeInTheDocument();
+      expect(mobileButton).toHaveTextContent('Tools');
+      expect(mobileButton).toHaveClass('text-sm');
     });
 
     it('should open panel with mobile-optimized dimensions', async () => {
@@ -295,8 +298,8 @@ describe('Responsive Design Integration Tests', () => {
       );
 
       // Use mobile side button instead of floating action button
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const panel = screen.getByTestId('floating-panel');
@@ -328,8 +331,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const panel = screen.getByTestId('floating-panel');
@@ -368,8 +371,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const exportTab = screen.getByTestId('tab-export');
@@ -403,8 +406,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const exportContent = screen.getByTestId('export-tab-content');
@@ -449,8 +452,8 @@ describe('Responsive Design Integration Tests', () => {
       expect(mobileSideButton).toHaveTextContent('Tools');
 
       // Check that desktop floating action button is hidden
-      const floatingButton = screen.queryByTestId('floating-action-button');
-      expect(floatingButton).not.toBeInTheDocument();
+      const desktopButton = screen.queryByTestId('floating-action-button');
+      expect(desktopButton).not.toBeInTheDocument();
     });
 
     it('should open panel with mobile slide-in behavior', async () => {
@@ -468,8 +471,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const panel = screen.getByTestId('floating-panel');
@@ -510,10 +513,10 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      expect(floatingButton).toBeInTheDocument();
-      expect(floatingButton).toHaveTextContent('Quick Actions');
-      expect(floatingButton).toHaveClass('sm:text-base');
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      expect(mobileButton).toBeInTheDocument();
+      expect(mobileButton).toHaveTextContent('Quick Actions');
+      expect(mobileButton).toHaveClass('sm:text-base');
     });
 
     it('should open panel with tablet-optimized dimensions', async () => {
@@ -531,8 +534,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const panel = screen.getByTestId('floating-panel');
@@ -556,8 +559,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const panel = screen.getByTestId('floating-panel');
@@ -599,8 +602,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const panel = screen.getByTestId('floating-panel');
@@ -624,8 +627,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const expandButton = screen.getByTestId('expand-button');
@@ -649,8 +652,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const expandButton = screen.getByTestId('expand-button');
@@ -678,8 +681,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const panel = screen.getByTestId('floating-panel');
@@ -713,8 +716,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const panel = screen.getByTestId('floating-panel');
@@ -745,8 +748,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const panel = screen.getByTestId('floating-panel');
@@ -775,13 +778,13 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      expect(floatingButton).toHaveAttribute(
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      expect(mobileButton).toHaveAttribute(
         'aria-label',
         'Open resume tools panel'
       );
 
-      await user.click(floatingButton);
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const closeButton = screen.getByTestId('close-button');
@@ -806,8 +809,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const panel = screen.getByTestId('floating-panel');
@@ -833,8 +836,8 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
-      const floatingButton = screen.getByTestId('floating-action-button');
-      await user.click(floatingButton);
+      const mobileButton = screen.getByTestId('mobile-side-button');
+      await user.click(mobileButton);
 
       await waitFor(() => {
         const panel = screen.getByTestId('floating-panel');

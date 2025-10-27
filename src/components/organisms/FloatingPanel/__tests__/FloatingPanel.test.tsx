@@ -275,12 +275,12 @@ describe('FloatingPanel Component', () => {
     const floatingButton = screen.getByText('Resume Builder');
     await user.click(floatingButton);
 
-    // Tab navigation should work - focus should be on the close button first
+    // Tab navigation should work - focus should be on the expand button first (on desktop)
     await user.tab();
 
-    // The close button should be focused first
-    const closeButton = screen.getByRole('button', { name: /close/i });
-    expect(closeButton).toHaveFocus();
+    // The expand button should be focused first (it comes before close button in DOM order)
+    const expandButton = screen.getByRole('button', { name: /expand/i });
+    expect(expandButton).toHaveFocus();
   });
 
   it('renders with proper ARIA attributes', async () => {
