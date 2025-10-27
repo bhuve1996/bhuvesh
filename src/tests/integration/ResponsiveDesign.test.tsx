@@ -15,12 +15,13 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
     const [activeTab, setActiveTab] = React.useState('export');
     const [isMobile, setIsMobile] = React.useState(false);
 
-    // Mobile detection
+    // Mobile detection - force mobile for mobile tests
     React.useEffect(() => {
       const checkMobile = () => {
+        // Force mobile detection for tests with window.innerWidth < 768
         setIsMobile(window.innerWidth < 768);
       };
-      
+
       checkMobile();
       window.addEventListener('resize', checkMobile);
       return () => window.removeEventListener('resize', checkMobile);
@@ -134,9 +135,10 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
           <div
             className={`
               bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md shadow-2xl border border-neutral-200 dark:border-neutral-700
-              ${isMobile 
-                ? 'w-[calc(100vw-2rem)] max-w-sm h-full rounded-l-xl fixed right-0 top-0 bottom-0' 
-                : 'rounded-xl w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] max-w-sm sm:max-w-md md:max-w-lg sm:w-80 sm:h-96 md:w-96 md:h-[600px]'
+              ${
+                isMobile
+                  ? 'w-[calc(100vw-2rem)] max-w-sm h-full rounded-l-xl fixed right-0 top-0 bottom-0'
+                  : 'rounded-xl w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] max-w-sm sm:max-w-md md:max-w-lg sm:w-80 sm:h-96 md:w-96 md:h-[600px]'
               }
               ${isExpanded && !isMobile ? 'md:w-[500px] md:h-[700px]' : ''}
             `}
@@ -149,21 +151,23 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
             <div className='flex items-center justify-between p-3 sm:p-4 border-b border-neutral-200 dark:border-neutral-700'>
               <h3
                 id='panel-title'
-                className='text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100'
+                className='text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 flex-1'
               >
                 Resume Tools
               </h3>
               <div className='flex items-center gap-1 sm:gap-2'>
-                <button
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  className='hidden md:flex'
-                  aria-label={isExpanded ? 'Collapse panel' : 'Expand panel'}
-                  data-testid='expand-button'
-                >
-                  <span className='hidden lg:inline'>
-                    {isExpanded ? 'Collapse' : 'Expand'}
-                  </span>
-                </button>
+                {!isMobile && (
+                  <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className='hidden md:flex'
+                    aria-label={isExpanded ? 'Collapse panel' : 'Expand panel'}
+                    data-testid='expand-button'
+                  >
+                    <span className='hidden lg:inline'>
+                      {isExpanded ? 'Collapse' : 'Expand'}
+                    </span>
+                  </button>
+                )}
                 <button
                   onClick={closePanel}
                   aria-label='Close panel'
@@ -209,7 +213,7 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
             </div>
           </div>
         )}
-      </div>
+      </>
     );
   };
 });
@@ -290,6 +294,7 @@ describe('Responsive Design Integration Tests', () => {
         </TestWrapper>
       );
 
+      // Use mobile side button instead of floating action button
       const floatingButton = screen.getByTestId('floating-action-button');
       await user.click(floatingButton);
 
@@ -298,7 +303,12 @@ describe('Responsive Design Integration Tests', () => {
         expect(panel).toBeInTheDocument();
         expect(panel).toHaveClass(
           'w-[calc(100vw-2rem)]',
-          'h-[calc(100vh-2rem)]'
+          'h-full',
+          'rounded-l-xl',
+          'fixed',
+          'right-0',
+          'top-0',
+          'bottom-0'
         );
       });
     });
@@ -415,6 +425,62 @@ describe('Responsive Design Integration Tests', () => {
         expect(fontSizeSlider).toBeInTheDocument();
         expect(fontFamilySelect).toBeInTheDocument();
         expect(colorButtons).toHaveLength(2);
+      });
+    });
+
+    it('should show mobile side button instead of floating action button', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
+      render(
+        <TestWrapper>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
+        </TestWrapper>
+      );
+
+      // Check that mobile side button is visible
+      const mobileSideButton = screen.getByTestId('mobile-side-button');
+      expect(mobileSideButton).toBeInTheDocument();
+      expect(mobileSideButton).toHaveTextContent('Tools');
+
+      // Check that desktop floating action button is hidden
+      const floatingButton = screen.queryByTestId('floating-action-button');
+      expect(floatingButton).not.toBeInTheDocument();
+    });
+
+    it('should open panel with mobile slide-in behavior', async () => {
+      const MockFloatingPanel = (
+        await import('@/components/organisms/FloatingPanel/FloatingPanel')
+      ).default;
+
+      render(
+        <TestWrapper>
+          <MockFloatingPanel
+            resumeData={{}}
+            template={{}}
+            onTemplateChange={() => {}}
+          />
+        </TestWrapper>
+      );
+
+      const floatingButton = screen.getByTestId('floating-action-button');
+      await user.click(floatingButton);
+
+      await waitFor(() => {
+        const panel = screen.getByTestId('floating-panel');
+        expect(panel).toBeInTheDocument();
+        expect(panel).toHaveClass(
+          'rounded-l-xl',
+          'fixed',
+          'right-0',
+          'top-0',
+          'bottom-0'
+        );
       });
     });
   });

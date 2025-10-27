@@ -202,20 +202,20 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 100, opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
-            className='fixed right-4 top-1/2 -translate-y-1/2 z-50'
+            className='fixed right-8 bottom-20 z-50'
           >
             <Button
               onClick={togglePanel}
               variant='primary'
-              size='lg'
-              className='rounded-l-full rounded-r-none shadow-lg hover:shadow-xl text-sm px-4 py-3'
+              size='sm'
+              className='rounded-l-full rounded-r-none shadow-lg hover:shadow-xl text-xs px-3 py-2 min-w-0'
               aria-label='Open resume builder tools panel'
               aria-expanded={isVisible}
               aria-haspopup='dialog'
               data-testid='mobile-side-button'
               icon={
                 <svg
-                  className='w-5 h-5 mr-2'
+                  className='w-4 h-4 mr-1'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
@@ -354,6 +354,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
             aria-labelledby='panel-title'
             aria-describedby='panel-description'
             onKeyDown={handleKeyDown}
+            data-testid='floating-panel'
           >
             {/* Header */}
             <div className='flex items-center justify-between p-2 sm:p-3 border-b border-neutral-200 dark:border-neutral-700 flex-shrink-0 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md'>
