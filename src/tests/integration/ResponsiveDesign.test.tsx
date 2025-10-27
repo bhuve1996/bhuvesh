@@ -14,7 +14,9 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
     const [isExpanded, setIsExpanded] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState('export');
     // Mobile detection - synchronous for tests
-    const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 768);
+    const [isMobile, setIsMobile] = React.useState(
+      () => window.innerWidth < 768
+    );
 
     // Mobile detection - force mobile for mobile tests
     React.useEffect(() => {
