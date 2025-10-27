@@ -1188,7 +1188,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
           <div className='max-w-4xl mx-auto p-6'>
             <div className='mb-6'>
               <div className='flex items-center justify-between'>
-                <h2 className='text-2xl font-bold text-gray-900'>
+                <h2 className='text-2xl font-bold text-foreground'>
                   Resume Preview
                 </h2>
                 <div className='flex space-x-2'>
@@ -1204,14 +1204,14 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
             </div>
 
             {/* Resume Preview */}
-            <Card className='p-8 bg-white shadow-lg'>
+            <Card className='p-8 bg-card shadow-lg'>
               <div className='max-w-2xl mx-auto'>
                 {/* Header */}
                 <div className='text-center mb-6'>
-                  <h1 className='text-2xl font-bold text-gray-900 mb-2'>
+                  <h1 className='text-2xl font-bold text-card-foreground mb-2'>
                     {currentResumeData.personal.fullName || 'Your Name'}
                   </h1>
-                  <div className='text-sm text-gray-600 space-y-1'>
+                  <div className='text-sm text-muted-foreground space-y-1'>
                     <p>
                       {currentResumeData.personal.email ||
                         'your.email@example.com'}
@@ -1240,20 +1240,22 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 {/* Summary */}
                 {currentResumeData.summary && (
                   <div className='mb-6'>
-                    <h2 className='text-lg font-semibold text-gray-900 mb-2'>
+                    <h2 className='text-lg font-semibold text-card-foreground mb-2'>
                       Professional Summary
                     </h2>
-                    <p className='text-gray-700'>{currentResumeData.summary}</p>
+                    <p className='text-muted-foreground'>
+                      {currentResumeData.summary}
+                    </p>
                   </div>
                 )}
 
                 {/* Skills */}
                 {currentResumeData.skills.technical.length > 0 && (
                   <div className='mb-6'>
-                    <h2 className='text-lg font-semibold text-gray-900 mb-2'>
+                    <h2 className='text-lg font-semibold text-card-foreground mb-2'>
                       Technical Skills
                     </h2>
-                    <p className='text-gray-700'>
+                    <p className='text-muted-foreground'>
                       {currentResumeData.skills.technical.join(', ')}
                     </p>
                   </div>
@@ -1262,10 +1264,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 {/* Business Skills */}
                 {currentResumeData.skills.business.length > 0 && (
                   <div className='mb-6'>
-                    <h2 className='text-lg font-semibold text-gray-900 mb-2'>
+                    <h2 className='text-lg font-semibold text-card-foreground mb-2'>
                       Business Skills
                     </h2>
-                    <p className='text-gray-700'>
+                    <p className='text-muted-foreground'>
                       {currentResumeData.skills.business.join(', ')}
                     </p>
                   </div>
@@ -1274,10 +1276,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 {/* Soft Skills */}
                 {currentResumeData.skills.soft.length > 0 && (
                   <div className='mb-6'>
-                    <h2 className='text-lg font-semibold text-gray-900 mb-2'>
+                    <h2 className='text-lg font-semibold text-card-foreground mb-2'>
                       Soft Skills
                     </h2>
-                    <p className='text-gray-700'>
+                    <p className='text-muted-foreground'>
                       {currentResumeData.skills.soft.join(', ')}
                     </p>
                   </div>
@@ -1286,10 +1288,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 {/* Languages */}
                 {currentResumeData.skills.languages.length > 0 && (
                   <div className='mb-6'>
-                    <h2 className='text-lg font-semibold text-gray-900 mb-2'>
+                    <h2 className='text-lg font-semibold text-card-foreground mb-2'>
                       Languages
                     </h2>
-                    <p className='text-gray-700'>
+                    <p className='text-muted-foreground'>
                       {currentResumeData.skills.languages.join(', ')}
                     </p>
                   </div>
@@ -1298,10 +1300,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 {/* Certifications */}
                 {currentResumeData.skills.certifications.length > 0 && (
                   <div className='mb-6'>
-                    <h2 className='text-lg font-semibold text-gray-900 mb-2'>
+                    <h2 className='text-lg font-semibold text-card-foreground mb-2'>
                       Certifications
                     </h2>
-                    <p className='text-gray-700'>
+                    <p className='text-muted-foreground'>
                       {currentResumeData.skills.certifications.join(', ')}
                     </p>
                   </div>
@@ -1311,10 +1313,10 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                 {currentResumeData.hobbies &&
                   currentResumeData.hobbies.length > 0 && (
                     <div className='mb-6'>
-                      <h2 className='text-lg font-semibold text-gray-900 mb-2'>
+                      <h2 className='text-lg font-semibold text-card-foreground mb-2'>
                         Hobbies & Interests
                       </h2>
-                      <p className='text-gray-700'>
+                      <p className='text-muted-foreground'>
                         {currentResumeData.hobbies.join(', ')}
                       </p>
                     </div>
@@ -1401,7 +1403,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
   };
 
   return (
-    <div className='min-h-screen bg-gray-50'>
+    <div className='min-h-screen bg-background'>
       {/* Main Content */}
       {renderStepContent()}
 

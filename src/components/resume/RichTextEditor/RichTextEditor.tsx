@@ -98,9 +98,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   if (!isClient || !editor) {
     return (
-      <div className='border border-gray-300 rounded-lg p-4 min-h-[120px] bg-gray-50 animate-pulse'>
-        <div className='h-4 bg-gray-200 rounded w-1/4 mb-2'></div>
-        <div className='h-4 bg-gray-200 rounded w-3/4'></div>
+      <div className='border border-border rounded-lg p-4 min-h-[120px] bg-muted animate-pulse'>
+        <div className='h-4 bg-muted-foreground/20 rounded w-1/4 mb-2'></div>
+        <div className='h-4 bg-muted-foreground/20 rounded w-3/4'></div>
       </div>
     );
   }
@@ -109,15 +109,15 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const isOverLimit = currentLength > maxLength;
 
   return (
-    <div className='border border-gray-300 rounded-lg overflow-hidden'>
+    <div className='border border-border rounded-lg overflow-hidden bg-background'>
       {/* Toolbar */}
-      <div className='flex items-center gap-1 p-1 sm:p-2 bg-gray-50 border-b border-gray-200'>
+      <div className='flex items-center gap-1 p-1 sm:p-2 bg-muted border-b border-border'>
         <Button
           type='button'
           variant='outline'
           size='xs'
           onClick={toggleBold}
-          className={`h-6 w-6 sm:h-8 sm:w-8 p-0 ${editor.isActive('bold') ? 'bg-gray-200' : ''}`}
+          className={`h-6 w-6 sm:h-8 sm:w-8 p-0 ${editor.isActive('bold') ? 'bg-accent' : ''}`}
           title='Bold'
         >
           <svg
@@ -134,7 +134,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           variant='outline'
           size='xs'
           onClick={toggleItalic}
-          className={`h-6 w-6 sm:h-8 sm:w-8 p-0 ${editor.isActive('italic') ? 'bg-gray-200' : ''}`}
+          className={`h-6 w-6 sm:h-8 sm:w-8 p-0 ${editor.isActive('italic') ? 'bg-accent' : ''}`}
           title='Italic'
         >
           <svg
@@ -146,14 +146,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </svg>
         </Button>
 
-        <div className='w-px h-4 sm:h-6 bg-gray-300 mx-1'></div>
+        <div className='w-px h-4 sm:h-6 bg-border mx-1'></div>
 
         <Button
           type='button'
           variant='outline'
           size='xs'
           onClick={toggleBulletList}
-          className={`h-6 w-6 sm:h-8 sm:w-8 p-0 ${editor.isActive('bulletList') ? 'bg-gray-200' : ''}`}
+          className={`h-6 w-6 sm:h-8 sm:w-8 p-0 ${editor.isActive('bulletList') ? 'bg-accent' : ''}`}
           title='Bullet List'
         >
           <svg
@@ -170,7 +170,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           variant='outline'
           size='xs'
           onClick={toggleOrderedList}
-          className={`h-6 w-6 sm:h-8 sm:w-8 p-0 ${editor.isActive('orderedList') ? 'bg-gray-200' : ''}`}
+          className={`h-6 w-6 sm:h-8 sm:w-8 p-0 ${editor.isActive('orderedList') ? 'bg-accent' : ''}`}
           title='Numbered List'
         >
           <svg
@@ -182,7 +182,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </svg>
         </Button>
 
-        <div className='w-px h-4 sm:h-6 bg-gray-300 mx-1'></div>
+        <div className='w-px h-4 sm:h-6 bg-border mx-1'></div>
 
         <Button
           type='button'
@@ -224,10 +224,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         <div
           className={`text-xs px-1 py-0.5 sm:px-2 sm:py-1 rounded ${
             isOverLimit
-              ? 'text-red-600 bg-red-50'
+              ? 'text-destructive bg-destructive/10'
               : currentLength > maxLength * 0.8
-                ? 'text-yellow-600 bg-yellow-50'
-                : 'text-gray-500'
+                ? 'text-warning-600 bg-warning-50 dark:text-warning-400 dark:bg-warning-950/20'
+                : 'text-muted-foreground'
           }`}
         >
           {currentLength}/{maxLength}
@@ -242,7 +242,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       {/* Error message */}
       {isOverLimit && (
         <div className='px-2 sm:px-4 pb-2'>
-          <p className='text-xs text-red-600'>
+          <p className='text-xs text-destructive'>
             Character limit exceeded. Please shorten your text.
           </p>
         </div>

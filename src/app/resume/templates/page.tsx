@@ -185,7 +185,7 @@ export default function TemplateGalleryPage() {
   }, [userResumeData, setResumeData]);
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-50 to-blue-50'>
+    <div className='min-h-screen bg-gradient-to-br from-background to-muted'>
       {/* Data Choice Dialog */}
       <DataChoiceDialog
         isOpen={showDataChoice}
@@ -223,18 +223,18 @@ export default function TemplateGalleryPage() {
             data-tour='template-selection'
           >
             {/* Main Content - Template Preview */}
-            <div className='max-w-5xl mx-auto bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-4 sm:p-6 backdrop-blur-sm'>
+            <div className='max-w-5xl mx-auto bg-gradient-to-br from-card via-background to-muted dark:from-card dark:via-background dark:to-muted rounded-xl shadow-xl border border-border p-4 sm:p-6 backdrop-blur-sm'>
               {selectedTemplate ? (
                 <div className='space-y-4'>
                   <div className='flex items-center justify-between'>
-                    <h2 className='text-xl font-bold text-slate-900 dark:text-slate-100'>
+                    <h2 className='text-xl font-bold text-foreground'>
                       {selectedTemplate.name}
                     </h2>
                   </div>
 
                   {/* Preview Mode Toggle */}
                   <div className='flex items-center justify-between mb-4'>
-                    <h3 className='text-lg font-semibold text-slate-900'>
+                    <h3 className='text-lg font-semibold text-foreground'>
                       Preview
                     </h3>
                     <div className='flex items-center space-x-2'>
@@ -242,8 +242,8 @@ export default function TemplateGalleryPage() {
                         onClick={() => setPreviewMode('paginated')}
                         className={`px-3 py-1 text-sm rounded-md transition-colors ${
                           previewMode === 'paginated'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            ? 'bg-primary-500 text-primary-foreground'
+                            : 'bg-muted text-muted-foreground hover:bg-accent'
                         }`}
                       >
                         📄 Paginated
@@ -252,8 +252,8 @@ export default function TemplateGalleryPage() {
                         onClick={() => setPreviewMode('full')}
                         className={`px-3 py-1 text-sm rounded-md transition-colors ${
                           previewMode === 'full'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            ? 'bg-primary-500 text-primary-foreground'
+                            : 'bg-muted text-muted-foreground hover:bg-accent'
                         }`}
                       >
                         📋 Full View
@@ -262,7 +262,7 @@ export default function TemplateGalleryPage() {
                   </div>
 
                   {/* Template Preview */}
-                  <div className='border border-slate-200 rounded-lg overflow-hidden'>
+                  <div className='border border-border rounded-lg overflow-hidden'>
                     {previewMode === 'paginated' ? (
                       <ImprovedPaginatedTemplatePreview
                         template={customizedTemplate || selectedTemplate}
@@ -281,9 +281,9 @@ export default function TemplateGalleryPage() {
                 </div>
               ) : (
                 <div className='text-center py-6'>
-                  <div className='w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center'>
+                  <div className='w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center'>
                     <svg
-                      className='w-8 h-8 text-slate-400'
+                      className='w-8 h-8 text-muted-foreground'
                       fill='none'
                       stroke='currentColor'
                       viewBox='0 0 24 24'
@@ -296,10 +296,10 @@ export default function TemplateGalleryPage() {
                       />
                     </svg>
                   </div>
-                  <h3 className='text-lg font-semibold text-slate-900 mb-2'>
+                  <h3 className='text-lg font-semibold text-foreground mb-2'>
                     Select a Template
                   </h3>
-                  <p className='text-slate-600'>
+                  <p className='text-muted-foreground'>
                     Choose a template from the carousel below to get started
                   </p>
                 </div>
@@ -343,7 +343,7 @@ export default function TemplateGalleryPage() {
                         <div className='p-1.5'>
                           {/* Template Preview */}
                           <div
-                            className='aspect-square rounded-md mb-1 overflow-hidden shadow-sm border border-slate-200 relative group-hover:shadow-lg transition-all duration-300'
+                            className='aspect-square rounded-md mb-1 overflow-hidden shadow-sm border border-border relative group-hover:shadow-lg transition-all duration-300'
                             style={{
                               background: `linear-gradient(135deg, ${template.layout.colors.primary}20, ${template.layout.colors.accent}20)`,
                             }}
@@ -411,7 +411,7 @@ export default function TemplateGalleryPage() {
 
                           {/* Template Info */}
                           <div className='text-center'>
-                            <h3 className='font-bold text-xs text-slate-900 truncate'>
+                            <h3 className='font-bold text-xs text-foreground truncate'>
                               {template.name
                                 .split(' ')
                                 .map(word => word[0])
@@ -435,14 +435,14 @@ export default function TemplateGalleryPage() {
               {selectedTemplate ? (
                 <div className='space-y-6'>
                   {/* Live Preview */}
-                  <div className='bg-white rounded-xl shadow-sm border border-slate-200 p-6'>
+                  <div className='bg-card rounded-xl shadow-sm border border-border p-6'>
                     <div className='flex items-center justify-between mb-4'>
-                      <h2 className='text-xl font-bold text-slate-900'>
+                      <h2 className='text-xl font-bold text-foreground'>
                         {selectedTemplate.name}
                       </h2>
                     </div>
 
-                    <div className='border border-slate-200 rounded-lg overflow-hidden'>
+                    <div className='border border-border rounded-lg overflow-hidden'>
                       <ResumeTemplateRenderer
                         key={customizedTemplate ? 'customized' : 'original'}
                         template={customizedTemplate || selectedTemplate}
@@ -453,10 +453,10 @@ export default function TemplateGalleryPage() {
                   </div>
                 </div>
               ) : (
-                <div className='bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center'>
-                  <div className='w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center'>
+                <div className='bg-card rounded-xl shadow-sm border border-border p-12 text-center'>
+                  <div className='w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center'>
                     <svg
-                      className='w-8 h-8 text-slate-400'
+                      className='w-8 h-8 text-muted-foreground'
                       fill='none'
                       stroke='currentColor'
                       viewBox='0 0 24 24'
@@ -469,10 +469,10 @@ export default function TemplateGalleryPage() {
                       />
                     </svg>
                   </div>
-                  <h3 className='text-lg font-semibold text-slate-900 mb-2'>
+                  <h3 className='text-lg font-semibold text-foreground mb-2'>
                     Select a Template
                   </h3>
-                  <p className='text-slate-600 text-sm'>
+                  <p className='text-muted-foreground text-sm'>
                     Choose a template from the gallery to see the live preview.
                   </p>
                 </div>

@@ -20,7 +20,6 @@ export const TourTrigger: React.FC<TourTriggerProps> = ({
   size = 'md',
   className = '',
   children,
-  showIfCompleted = false,
 }) => {
   const { startTour, hasCompletedTour, getAvailableTours } = useTour();
 
@@ -34,10 +33,10 @@ export const TourTrigger: React.FC<TourTriggerProps> = ({
 
   const isCompleted = hasCompletedTour(tourId);
 
-  // Don't show if completed and showIfCompleted is false
-  if (isCompleted && !showIfCompleted) {
-    return null;
-  }
+  // Always show the button, but with different styling for completed tours
+  // if (isCompleted && !showIfCompleted) {
+  //   return null;
+  // }
 
   const handleStartTour = () => {
     startTour(tourId);
@@ -47,13 +46,17 @@ export const TourTrigger: React.FC<TourTriggerProps> = ({
     return (
       <button
         onClick={handleStartTour}
-        className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${className}`}
-        title={`Start ${tour.name} tour`}
-        aria-label={`Start ${tour.name} tour`}
+        className={`p-2 rounded-full transition-colors ${
+          isCompleted
+            ? 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
+            : 'hover:bg-muted text-foreground'
+        } ${className}`}
+        title={`${isCompleted ? 'Restart' : 'Start'} ${tour.name} tour`}
+        aria-label={`${isCompleted ? 'Restart' : 'Start'} ${tour.name} tour`}
       >
         {children || (
           <svg
-            className='w-5 h-5 text-gray-600 dark:text-gray-400'
+            className={`w-5 h-5 ${isCompleted ? 'text-muted-foreground' : 'text-foreground'}`}
             fill='none'
             stroke='currentColor'
             viewBox='0 0 24 24'
@@ -74,9 +77,13 @@ export const TourTrigger: React.FC<TourTriggerProps> = ({
     return (
       <button
         onClick={handleStartTour}
-        className={`text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline transition-colors ${className}`}
+        className={`underline transition-colors ${
+          isCompleted
+            ? 'text-muted-foreground hover:text-foreground'
+            : 'text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300'
+        } ${className}`}
       >
-        {children || `Start ${tour.name} tour`}
+        {children || `${isCompleted ? 'Restart' : 'Start'} ${tour.name} tour`}
       </button>
     );
   }
@@ -84,7 +91,7 @@ export const TourTrigger: React.FC<TourTriggerProps> = ({
   return (
     <Button
       onClick={handleStartTour}
-      variant='outline'
+      variant={isCompleted ? 'ghost' : 'outline'}
       size={size}
       className={className}
     >

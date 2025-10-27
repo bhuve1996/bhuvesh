@@ -16,12 +16,10 @@ export const SITE_CONFIG = {
 
 // Navigation Items
 export const NAV_ITEMS = [
-  { label: 'About', href: '/about', type: 'route' },
-  // { label: 'Projects', href: '/projects', type: 'route' }, // Commented out
+  { label: 'ATS Checker', href: '/resume/ats-checker', type: 'route' },
   { label: 'Resume Builder', href: '/resume/builder', type: 'route' },
   { label: 'Templates', href: '/resume/templates', type: 'route' },
-  { label: 'ATS Checker', href: '/resume/ats-checker', type: 'route' },
-  // { label: 'Blog', href: '/blog', type: 'route' }, // Commented out
+  { label: 'About', href: '/about', type: 'route' },
   { label: 'Contact', href: '/contact', type: 'route' },
 ] as const;
 

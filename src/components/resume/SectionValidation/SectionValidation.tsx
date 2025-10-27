@@ -23,7 +23,7 @@ export const SectionValidation: React.FC<SectionValidationProps> = ({
   }
 
   const getValidationColor = () => {
-    return 'text-red-600';
+    return 'text-destructive';
   };
 
   const getValidationIcon = () => {
