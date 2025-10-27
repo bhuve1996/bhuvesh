@@ -532,6 +532,7 @@ export default function TemplateGalleryPage() {
             onTemplateChange={handleTemplateChange}
             resumeElement={
               resumeElementRef.current?.querySelector('.resume-template') ||
+              document.querySelector('.resume-template') ||
               null
             }
           />

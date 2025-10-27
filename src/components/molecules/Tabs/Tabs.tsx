@@ -129,14 +129,14 @@ export const Tabs: React.FC<TabsProps> = ({
 
             <nav
               ref={navRef}
-              className='-mb-px flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto scrollbar-hide bg-slate-50/80 dark:bg-slate-800/50 border-b-2 border-slate-200 dark:border-slate-600 shadow-sm dark:shadow-slate-900/10 px-2 py-1 rounded-t-lg'
+              className='-mb-px flex space-x-1 sm:space-x-2 overflow-x-auto scrollbar-slim bg-slate-50/80 dark:bg-slate-800/50 border-b-2 border-slate-200 dark:border-slate-600 shadow-sm dark:shadow-slate-900/10 px-1 py-0.5 rounded-t-lg'
             >
               {items.map(item => (
                 <button
                   key={item.id}
                   onClick={() => handleTabChange(item.id)}
                   className={`
-                    py-2 px-3 border-b-2 font-medium text-xs sm:text-sm transition-all duration-300 whitespace-nowrap flex-shrink-0 rounded-t-md
+                    py-0.5 px-1.5 border-b-2 font-medium text-xs transition-all duration-300 whitespace-nowrap flex-shrink-0 rounded-t-md
                     ${
                       activeTab === item.id
                         ? 'border-cyan-500 text-cyan-600 dark:text-cyan-400 bg-white dark:bg-slate-700/50 shadow-sm'
@@ -154,7 +154,7 @@ export const Tabs: React.FC<TabsProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className='flex-1 overflow-y-auto p-1.5 sm:p-2.5 lg:p-3 pb-6 min-h-0 max-h-full'>
+      <div className='flex-1 overflow-y-auto p-1 sm:p-1.5 pb-4 min-h-0 max-h-full'>
         {items.find(item => item.id === activeTab)?.content}
       </div>
     </div>

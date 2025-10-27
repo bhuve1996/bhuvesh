@@ -339,7 +339,7 @@
 
 .scrollbar-thin::-webkit-scrollbar {
   width: 4px;
-  height: 4px;
+  height: 2px; /* Slimmer horizontal scrollbar */
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
@@ -347,21 +347,53 @@
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.5);
-  border-radius: 2px;
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 1px; /* Thinner border radius */
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.7);
+  background: rgba(148, 163, 184, 0.6);
 }
 
 /* Dark mode scrollbar */
 .dark .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.5);
+  background: rgba(100, 116, 139, 0.4);
 }
 
 .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.7);
+  background: rgba(100, 116, 139, 0.6);
+}
+
+/* Slim Scrollbar Utility - Even thinner for horizontal scrolls */
+.scrollbar-slim {
+  scrollbar-width: thin;
+}
+
+.scrollbar-slim::-webkit-scrollbar {
+  width: 4px;
+  height: 1px; /* Ultra-slim horizontal scrollbar */
+}
+
+.scrollbar-slim::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-slim::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 0.5px;
+}
+
+.scrollbar-slim::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Dark mode slim scrollbar */
+.dark .scrollbar-slim::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.3);
+}
+
+.dark .scrollbar-slim::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
 }
 
 /* Orbit Animation */
@@ -371,5 +403,19 @@
   }
   to {
     transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Print Styles - Hide page break indicators when printing */
+@media print {
+  .page-break-indicator-print-hidden {
+    display: none !important;
+  }
+
+  /* Also hide any other UI elements that shouldn't appear in print */
+  .floating-panel,
+  .page-breaks-tab,
+  .manual-spacing-control {
+    display: none !important;
   }
 }

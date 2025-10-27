@@ -127,10 +127,6 @@ export default function TestComponentsPage() {
     // Files uploaded: _files
   };
 
-  // const _handleResumeDataUpdate = (_updatedData: ResumeData) => {
-  //   // Resume data updated: _updatedData
-  // };
-
   const handleTemplateChange = (_template: ResumeTemplate) => {
     // Template changed: _template
   };
@@ -371,7 +367,6 @@ export default function TestComponentsPage() {
             data-testid='floating-panel'
             resumeData={mockResumeData}
             template={mockTemplate}
-            // onResumeDataUpdate={handleResumeDataUpdate}
             onTemplateChange={handleTemplateChange}
           />
         </section>

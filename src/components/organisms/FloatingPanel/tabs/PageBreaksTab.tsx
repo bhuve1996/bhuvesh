@@ -13,7 +13,19 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
 }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [pageBreaks, setPageBreaks] = useState(0);
+  const [showIndicators, setShowIndicators] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const toggleIndicators = useCallback(() => {
+    setShowIndicators(prev => !prev);
+
+    // Toggle visibility of all page break indicators
+    const indicators = document.querySelectorAll('.page-break-indicator');
+    indicators.forEach(indicator => {
+      const element = indicator as HTMLElement;
+      element.style.display = showIndicators ? 'none' : 'block';
+    });
+  }, [showIndicators]);
 
   const addManualSpacingControls = useCallback((sections: Element[]) => {
     const controlsContainer = document.getElementById(
@@ -32,7 +44,7 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
 
       const controlDiv = document.createElement('div');
       controlDiv.className =
-        'flex items-center justify-between gap-2 p-2 bg-white/50 dark:bg-gray-800/50 rounded border';
+        'flex items-center justify-between gap-2 p-2 bg-white/50 dark:bg-gray-800/50 rounded border page-break-indicator-print-hidden';
       controlDiv.innerHTML = `
         <span class="text-xs font-medium text-gray-700 dark:text-gray-300 truncate flex-1">${sectionTitle}</span>
         <div class="flex items-center gap-1">
@@ -120,8 +132,10 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
     const sections = resumeElement.querySelectorAll('.resume-section');
     const sectionsArray = Array.from(sections);
     const breakPositions: { y: number; pageNumber: number }[] = [];
-    const pageHeightPoints = 842 - 72;
-    const pixelsToPoints = 0.75;
+    // A4 page dimensions: 8.27" x 11.69" = 595 x 842 points
+    // Use more conservative parameters for better page detection
+    const pageHeightPoints = 842 - 18; // 824 points (0.25 inch margins)
+    const pixelsToPoints = 0.5; // More conservative conversion factor
 
     let cumulativeHeightPoints = 0;
     let currentPageNum = 1;
@@ -162,6 +176,14 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
         border-radius: 2px;
       `;
 
+      // Add print-specific class for hiding during print
+      indicator.classList.add('page-break-indicator-print-hidden');
+
+      // Set initial visibility based on showIndicators state
+      if (!showIndicators) {
+        indicator.style.display = 'none';
+      }
+
       const label = document.createElement('div');
       label.textContent = `Page ${breakPoint.pageNumber}`;
       label.style.cssText = `
@@ -178,6 +200,9 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
         z-index: 1001;
       `;
 
+      // Add print-specific class for hiding during print
+      label.classList.add('page-break-indicator-print-hidden');
+
       indicator.appendChild(label);
       resumeElement.appendChild(indicator);
     });
@@ -189,7 +214,7 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
 
     // Add manual spacing controls
     addManualSpacingControls(sectionsArray);
-  }, [resumeElement, addManualSpacingControls]);
+  }, [resumeElement, addManualSpacingControls, showIndicators]);
 
   const navigateToPage = (pageNumber: number) => {
     if (!resumeElement) return;
@@ -238,9 +263,30 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
         <h4 className='text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2'>
           📏 Page Break Controls
         </h4>
-        <p className='text-xs sm:text-sm text-neutral-600 dark:text-neutral-400'>
+        <p className='text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mb-3'>
           Visualize and adjust page breaks for optimal PDF layout
         </p>
+
+        {/* Toggle Button */}
+        <Button
+          onClick={toggleIndicators}
+          variant={showIndicators ? 'destructive' : 'default'}
+          size='sm'
+          className='w-full mb-4'
+          aria-label={
+            showIndicators
+              ? 'Hide page break indicators'
+              : 'Show page break indicators'
+          }
+          title={
+            showIndicators
+              ? 'Click to hide red page break lines and blue page number labels'
+              : 'Click to show red page break lines and blue page number labels'
+          }
+          aria-pressed={showIndicators}
+        >
+          {showIndicators ? '🙈 Hide Indicators' : '👁️ Show Indicators'}
+        </Button>
       </div>
 
       {/* Page Break Preview */}
@@ -250,7 +296,11 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
             <h5 className='font-medium text-sm text-blue-900 dark:text-blue-100'>
               📄 Page Break Preview
             </h5>
-            <div className='text-xs text-blue-700 dark:text-blue-300'>
+            <div
+              className='text-xs text-blue-700 dark:text-blue-300'
+              aria-label={`Resume has ${totalPages} pages with ${pageBreaks} page breaks`}
+              title={`Total pages: ${totalPages} | Page breaks: ${pageBreaks}`}
+            >
               Pages: {totalPages} | Breaks: {pageBreaks}
             </div>
           </div>
@@ -264,10 +314,16 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
                 variant='outline'
                 size='sm'
                 className='text-xs'
+                aria-label='Go to previous page'
+                title='Navigate to the previous page to view page break indicators'
               >
                 ← Previous
               </Button>
-              <span className='text-xs text-blue-700 dark:text-blue-300'>
+              <span
+                className='text-xs text-blue-700 dark:text-blue-300'
+                aria-label={`Currently viewing page ${currentPage} of ${totalPages} total pages`}
+                title={`Page ${currentPage} of ${totalPages} - Use Previous/Next buttons to navigate`}
+              >
                 Page {currentPage} of {totalPages}
               </span>
               <Button
@@ -276,6 +332,8 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
                 variant='outline'
                 size='sm'
                 className='text-xs'
+                aria-label='Go to next page'
+                title='Navigate to the next page to view page break indicators'
               >
                 Next →
               </Button>
@@ -298,7 +356,7 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
               Adjust section spacing (10px increments):
             </h6>
             <div
-              className='space-y-1 max-h-32 overflow-y-auto'
+              className='space-y-1 max-h-32 overflow-y-auto page-break-indicator-print-hidden'
               id='manual-spacing-controls'
             >
               {/* Controls will be added here by JavaScript */}

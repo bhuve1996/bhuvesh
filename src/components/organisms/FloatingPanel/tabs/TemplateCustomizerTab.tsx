@@ -1231,18 +1231,18 @@ export const TemplateCustomizerTab: React.FC<TemplateCustomizerTabProps> = ({
       className='h-full overflow-y-auto scrollbar-thin'
       data-tour='customize-tab'
     >
-      <div className='text-center mb-6'>
-        <h4 className='text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2'>
+      <div className='text-center mb-4'>
+        <h4 className='text-sm sm:text-base font-semibold text-neutral-900 dark:text-neutral-100 mb-1'>
           Template Customization
         </h4>
-        <p className='text-xs sm:text-sm text-neutral-600 dark:text-neutral-400'>
+        <p className='text-xs text-neutral-600 dark:text-neutral-400'>
           Customize every aspect of your resume template
         </p>
       </div>
 
       {/* Tab Navigation */}
-      <div className='mb-4'>
-        <div className='flex overflow-x-auto gap-1 scrollbar-thin'>
+      <div className='mb-3'>
+        <div className='flex overflow-x-auto gap-0.5 scrollbar-thin'>
           {tabs.map(tab => (
             <button
               key={tab.id}
@@ -1257,13 +1257,13 @@ export const TemplateCustomizerTab: React.FC<TemplateCustomizerTabProps> = ({
                     | 'content'
                 )
               }
-              className={`flex-shrink-0 px-1.5 py-1 text-xs font-medium rounded-lg whitespace-nowrap ${
+              className={`flex-shrink-0 px-1 py-0.5 text-xs font-medium rounded-md whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'bg-primary-500 text-white'
                   : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
               }`}
             >
-              <span className='mr-1'>{tab.icon}</span>
+              <span className='mr-0.5'>{tab.icon}</span>
               {tab.label}
             </button>
           ))}
@@ -1271,7 +1271,7 @@ export const TemplateCustomizerTab: React.FC<TemplateCustomizerTabProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className='space-y-3 sm:space-y-4'>{renderActiveTab()}</div>
+      <div className='space-y-2 sm:space-y-3'>{renderActiveTab()}</div>
     </div>
   );
 };
