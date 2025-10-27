@@ -144,6 +144,11 @@ export const Tabs: React.FC<TabsProps> = ({
                     }
                     cursor-pointer
                   `}
+                  {...Object.fromEntries(
+                    Object.entries(item).filter(([key]) =>
+                      key.startsWith('data-')
+                    )
+                  )}
                 >
                   {item.label}
                 </button>

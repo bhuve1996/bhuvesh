@@ -13,6 +13,18 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
     const [isVisible, setIsVisible] = React.useState(false);
     const [isExpanded, setIsExpanded] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState('export');
+    const [isMobile, setIsMobile] = React.useState(false);
+
+    // Mobile detection
+    React.useEffect(() => {
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const togglePanel = () => {
       setIsVisible(!isVisible);
@@ -81,32 +93,52 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
     ];
 
     return (
-      <div
-        className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 ${className}`}
-        data-testid='floating-panel-container'
-      >
-        {/* Floating Action Button */}
-        {!isVisible && (
-          <button
-            onClick={togglePanel}
-            className='rounded-full shadow-lg hover:shadow-xl text-sm sm:text-base'
-            aria-label='Open resume tools panel'
-            data-testid='floating-action-button'
+      <>
+        {/* Mobile Side Button */}
+        {isMobile && !isVisible && (
+          <div
+            className='fixed right-4 top-1/2 -translate-y-1/2 z-50'
+            data-testid='mobile-side-button-container'
           >
-            <span className='hidden sm:inline'>Quick Actions</span>
-            <span className='sm:hidden'>Tools</span>
-          </button>
+            <button
+              onClick={togglePanel}
+              className='rounded-l-full rounded-r-none shadow-lg hover:shadow-xl text-sm px-4 py-3'
+              aria-label='Open resume tools panel'
+              data-testid='mobile-side-button'
+            >
+              Tools
+            </button>
+          </div>
         )}
+
+        {/* Desktop Floating Action Button */}
+        <div
+          className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 ${isMobile ? 'hidden' : ''} ${className}`}
+          data-testid='floating-panel-container'
+        >
+          {!isVisible && (
+            <button
+              onClick={togglePanel}
+              className='rounded-full shadow-lg hover:shadow-xl text-sm sm:text-base'
+              aria-label='Open resume tools panel'
+              data-testid='floating-action-button'
+            >
+              <span className='hidden sm:inline'>Quick Actions</span>
+              <span className='sm:hidden'>Tools</span>
+            </button>
+          )}
+        </div>
 
         {/* Panel */}
         {isVisible && (
           <div
             className={`
-              bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-700
-              w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] max-w-sm sm:max-w-md md:max-w-lg
-              sm:w-80 sm:h-96
-              md:w-96 md:h-[600px]
-              ${isExpanded ? 'md:w-[500px] md:h-[700px]' : ''}
+              bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md shadow-2xl border border-neutral-200 dark:border-neutral-700
+              ${isMobile 
+                ? 'w-[calc(100vw-2rem)] max-w-sm h-full rounded-l-xl fixed right-0 top-0 bottom-0' 
+                : 'rounded-xl w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] max-w-sm sm:max-w-md md:max-w-lg sm:w-80 sm:h-96 md:w-96 md:h-[600px]'
+              }
+              ${isExpanded && !isMobile ? 'md:w-[500px] md:h-[700px]' : ''}
             `}
             role='dialog'
             aria-modal='true'

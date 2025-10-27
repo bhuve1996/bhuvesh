@@ -176,6 +176,8 @@ export interface TabItem {
   icon?: string;
   badge?: string | number;
   content: React.ReactNode;
+  'data-tour'?: string;
+  [key: string]: unknown; // Allow additional data attributes
 }
 
 export interface TabsProps {
