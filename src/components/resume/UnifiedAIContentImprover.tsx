@@ -42,6 +42,61 @@ export const UnifiedAIContentImprover: React.FC<
   );
   const [isVisible, setIsVisible] = useState(false);
 
+  const applyAIImprovementsToAllSections = React.useCallback(async (
+    data: ResumeData,
+    improvementPlan: Record<string, unknown>
+  ): Promise<ContentImprovement[]> => {
+    const improvements: ContentImprovement[] = [];
+
+    // Get relevant suggestions from the improvement plan
+    const suggestions =
+      (improvementPlan.improvements as Record<string, unknown>[]) || [];
+
+    // Improve Summary
+    if (data.summary) {
+      const improved = await generateImprovedSummary(data.summary, suggestions);
+      improvements.push({
+        section: 'Professional Summary',
+        original: data.summary,
+        improved,
+        reason:
+          'Enhanced with action verbs, quantifiable results, and ATS keywords',
+        impact: 'high',
+      });
+    }
+
+    // Improve Experience
+    data.experience.forEach((exp, index) => {
+      if (exp.description) {
+        const improved = generateImprovedExperience(
+          exp.description,
+          suggestions
+        );
+        improvements.push({
+          section: `Experience ${index + 1}: ${exp.position}`,
+          original: exp.description,
+          improved,
+          reason:
+            'Added action verbs, quantified achievements, and industry keywords',
+          impact: 'high',
+        });
+      }
+    });
+
+    // Improve Skills
+    const improvedSkills = generateImprovedSkills(data.skills, suggestions);
+    improvements.push({
+      section: 'Skills Section',
+      original: JSON.stringify(data.skills),
+      improved: JSON.stringify(improvedSkills),
+      reason:
+        'Reorganized and added relevant technical skills for better ATS matching',
+      impact: 'medium',
+    });
+
+    return improvements;
+  }, []);
+
   const improveAllContent = useCallback(async () => {
     setIsImproving(true);
     setImprovementResult(null);
@@ -106,7 +161,7 @@ export const UnifiedAIContentImprover: React.FC<
     } finally {
       setIsImproving(false);
     }
-  }, [resumeData]);
+  }, [resumeData, applyAIImprovementsToAllSections]);
 
   // Listen for custom event to trigger AI improvement
   React.useEffect(() => {
@@ -127,61 +182,6 @@ export const UnifiedAIContentImprover: React.FC<
       window.removeEventListener('ai-improve-content', handleAIImproveContent);
     };
   }, [resumeData, improveAllContent]);
-
-  const applyAIImprovementsToAllSections = async (
-    data: ResumeData,
-    improvementPlan: Record<string, unknown>
-  ): Promise<ContentImprovement[]> => {
-    const improvements: ContentImprovement[] = [];
-
-    // Get relevant suggestions from the improvement plan
-    const suggestions =
-      (improvementPlan.improvements as Record<string, unknown>[]) || [];
-
-    // Improve Summary
-    if (data.summary) {
-      const improved = await generateImprovedSummary(data.summary, suggestions);
-      improvements.push({
-        section: 'Professional Summary',
-        original: data.summary,
-        improved,
-        reason:
-          'Enhanced with action verbs, quantifiable results, and ATS keywords',
-        impact: 'high',
-      });
-    }
-
-    // Improve Experience
-    data.experience.forEach((exp, index) => {
-      if (exp.description) {
-        const improved = generateImprovedExperience(
-          exp.description,
-          suggestions
-        );
-        improvements.push({
-          section: `Experience ${index + 1}: ${exp.position}`,
-          original: exp.description,
-          improved,
-          reason:
-            'Added action verbs, quantified achievements, and industry keywords',
-          impact: 'high',
-        });
-      }
-    });
-
-    // Improve Skills
-    const improvedSkills = generateImprovedSkills(data.skills, suggestions);
-    improvements.push({
-      section: 'Skills Section',
-      original: JSON.stringify(data.skills),
-      improved: JSON.stringify(improvedSkills),
-      reason:
-        'Reorganized and added relevant technical skills for better ATS matching',
-      impact: 'medium',
-    });
-
-    return improvements;
-  };
 
   const generateImprovedSummary = async (
     original: string,

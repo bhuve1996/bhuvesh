@@ -84,7 +84,9 @@ describe('FloatingPanel Component', () => {
 
     expect(screen.getByText('Resume Builder')).toBeInTheDocument();
     expect(
-      screen.getByText(/build, customize, and export your resume with professional tools/i)
+      screen.getByText(
+        /build, customize, and export your resume with professional tools/i
+      )
     ).toBeInTheDocument();
   });
 
@@ -248,7 +250,9 @@ describe('FloatingPanel Component', () => {
 
     // Tooltip should be visible initially
     expect(
-      screen.getByText(/build, customize, and export your resume with professional tools/i)
+      screen.getByText(
+        /build, customize, and export your resume with professional tools/i
+      )
     ).toBeInTheDocument();
 
     // Open panel
@@ -257,7 +261,9 @@ describe('FloatingPanel Component', () => {
 
     // Tooltip should be hidden
     expect(
-      screen.queryByText(/build, customize, and export your resume with professional tools/i)
+      screen.queryByText(
+        /build, customize, and export your resume with professional tools/i
+      )
     ).not.toBeInTheDocument();
   });
 

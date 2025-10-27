@@ -100,13 +100,25 @@ export const TourProvider: React.FC<TourProviderProps> = ({ children }) => {
     [tours]
   );
 
+  const completeTour = useCallback(() => {
+    if (currentTour) {
+      const newCompleted = new Set(completedTours);
+      newCompleted.add(currentTour.id);
+      setCompletedTours(newCompleted);
+      saveCompletedTours(newCompleted);
+    }
+    setIsActive(false);
+    setCurrentTour(null);
+    setCurrentStep(0);
+  }, [currentTour, completedTours]);
+
   const nextStep = useCallback(() => {
     if (currentTour && currentStep < currentTour.steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       completeTour();
     }
-  }, [currentTour, currentStep]);
+  }, [currentTour, currentStep, completeTour]);
 
   const previousStep = useCallback(() => {
     if (currentStep > 0) {
@@ -119,18 +131,6 @@ export const TourProvider: React.FC<TourProviderProps> = ({ children }) => {
     setCurrentTour(null);
     setCurrentStep(0);
   }, []);
-
-  const completeTour = useCallback(() => {
-    if (currentTour) {
-      const newCompleted = new Set(completedTours);
-      newCompleted.add(currentTour.id);
-      setCompletedTours(newCompleted);
-      saveCompletedTours(newCompleted);
-    }
-    setIsActive(false);
-    setCurrentTour(null);
-    setCurrentStep(0);
-  }, [currentTour, completedTours]);
 
   const registerTour = useCallback((tour: TourConfig) => {
     setTours(prev => new Map(prev).set(tour.id, tour));
