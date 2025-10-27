@@ -1242,7 +1242,7 @@ export const TemplateCustomizerTab: React.FC<TemplateCustomizerTabProps> = ({
 
       {/* Tab Navigation */}
       <div className='mb-3'>
-        <div className='flex overflow-x-auto gap-0.5 scrollbar-thin'>
+        <div className='flex overflow-x-auto gap-0.5 scrollbar-slim'>
           {tabs.map(tab => (
             <button
               key={tab.id}

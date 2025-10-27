@@ -95,6 +95,16 @@ export const TourManager: React.FC<TourManagerProps> = ({ children }) => {
           actionText: 'Check for any missing information or issues.',
         },
         {
+          id: 'page-breaks-tab',
+          target: '[data-tour="page-breaks-tab"]',
+          title: 'Page Break Controls',
+          content:
+            'Visualize and control page breaks for optimal PDF layout. Toggle indicators on/off, navigate between pages, and adjust spacing to ensure your resume fits perfectly.',
+          position: 'top',
+          actionText:
+            'Use the toggle button to show/hide page break indicators.',
+        },
+        {
           id: 'completion',
           target: '[data-tour="completion"]',
           title: "You're All Set!",

@@ -20,8 +20,8 @@ export const Tabs: React.FC<TabsProps> = ({
       case 'pills':
         return {
           container:
-            'bg-slate-100 dark:bg-slate-800/70 p-1 rounded-lg border border-slate-200 dark:border-slate-600 shadow-sm dark:shadow-slate-900/20',
-          tab: 'px-3 py-1.5 text-sm rounded-md font-medium transition-all duration-300',
+            'bg-slate-100 dark:bg-slate-800/70 p-0.5 rounded-lg border border-slate-200 dark:border-slate-600 shadow-sm dark:shadow-slate-900/20',
+          tab: 'px-2 py-1 text-xs rounded-md font-medium transition-all duration-300',
           activeTab: 'bg-cyan-500 text-white shadow-lg',
           inactiveTab:
             'text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700/70',
@@ -30,7 +30,7 @@ export const Tabs: React.FC<TabsProps> = ({
         return {
           container:
             'border-b-2 border-slate-200 dark:border-slate-600 bg-slate-50/50 dark:bg-slate-800/30 shadow-sm dark:shadow-slate-900/10',
-          tab: 'px-4 py-2 text-sm font-medium transition-all duration-300 relative',
+          tab: 'px-3 py-1.5 text-xs font-medium transition-all duration-300 relative',
           activeTab: 'text-cyan-600 dark:text-cyan-400',
           inactiveTab:
             'text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white',
@@ -53,7 +53,7 @@ export const Tabs: React.FC<TabsProps> = ({
     <div className={`w-full ${className}`}>
       {/* Tab Headers */}
       <div
-        className={`flex gap-1 overflow-x-auto scrollbar-hide ${variantClasses.container}`}
+        className={`flex gap-1 overflow-x-auto scrollbar-slim ${variantClasses.container}`}
       >
         {items.map(item => (
           <motion.button

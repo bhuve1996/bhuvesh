@@ -456,7 +456,7 @@ export default function ATSCheckerPage() {
           {/* Tab Navigation - Show when we have results */}
           {analysisResult && (
             <div className='mb-8'>
-              <div className='flex space-x-1 bg-muted/50 p-1 rounded-lg w-full max-w-md mx-auto overflow-x-auto scrollbar-hide'>
+              <div className='flex space-x-1 bg-muted/50 p-1 rounded-lg w-full max-w-md mx-auto overflow-x-auto scrollbar-slim'>
                 <button
                   onClick={() => setActiveTab('upload')}
                   className={`px-3 py-2 text-sm sm:px-6 sm:py-3 sm:text-base rounded-md font-medium transition-all flex-shrink-0 ${

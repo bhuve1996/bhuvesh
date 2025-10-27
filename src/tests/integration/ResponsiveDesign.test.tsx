@@ -146,8 +146,8 @@ jest.mock('@/components/organisms/FloatingPanel/FloatingPanel', () => {
             <div className='flex-1 flex flex-col overflow-hidden'>
               <div className='tabs flex flex-col h-full'>
                 {/* Tab Navigation */}
-                <div className='border-b border-gray-200 flex-shrink-0'>
-                  <nav className='-mb-px flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto scrollbar-hide'>
+                <div className='border-b border-gray-200 flex-shrink-0 py-1'>
+                  <nav className='-mb-px flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto scrollbar-slim'>
                     {tabItems.map(item => (
                       <button
                         key={item.id}
@@ -742,7 +742,7 @@ describe('Responsive Design Integration Tests', () => {
         const panel = screen.getByTestId('floating-panel');
         const tabNav = panel.querySelector('nav');
 
-        expect(tabNav).toHaveClass('overflow-x-auto', 'scrollbar-hide');
+        expect(tabNav).toHaveClass('overflow-x-auto', 'scrollbar-slim');
       });
     });
   });

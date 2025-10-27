@@ -13,7 +13,7 @@ export const PageBreaksTab: React.FC<PageBreaksTabProps> = ({
 }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [pageBreaks, setPageBreaks] = useState(0);
-  const [showIndicators, setShowIndicators] = useState(true);
+  const [showIndicators, setShowIndicators] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const toggleIndicators = useCallback(() => {

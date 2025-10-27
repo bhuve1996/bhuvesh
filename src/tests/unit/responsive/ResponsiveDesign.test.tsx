@@ -47,7 +47,7 @@ const ResponsiveTestComponent: React.FC = () => {
 
         {/* Responsive tabs */}
         <div className='border-b border-gray-200'>
-          <nav className='-mb-px flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto scrollbar-hide'>
+          <nav className='-mb-px flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto scrollbar-slim'>
             <button className='py-2 px-1 text-xs sm:text-sm whitespace-nowrap flex-shrink-0'>
               Export
             </button>
@@ -146,7 +146,7 @@ describe('Responsive Design Unit Tests', () => {
       expect(tabNav).toHaveClass(
         'space-x-2',
         'overflow-x-auto',
-        'scrollbar-hide'
+        'scrollbar-slim'
       );
 
       const exportTab = screen.getByText('Export');
@@ -257,7 +257,7 @@ describe('Responsive Design Unit Tests', () => {
       render(<ResponsiveTestComponent />);
 
       const tabNav = screen.getByText('Export').parentElement;
-      expect(tabNav).toHaveClass('overflow-x-auto', 'scrollbar-hide');
+      expect(tabNav).toHaveClass('overflow-x-auto', 'scrollbar-slim');
 
       const contentArea = screen
         .getByTestId('responsive-panel')

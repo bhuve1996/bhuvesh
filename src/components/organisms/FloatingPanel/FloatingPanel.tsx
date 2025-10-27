@@ -251,16 +251,20 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
               top: `${panelStyle.top}`,
               zIndex: 50,
               transform: isDragging ? 'scale(1.02)' : 'scale(1)',
-              transition: isDragging ? 'none' : 'transform 0.2s ease',
+              transition: isDragging
+                ? 'none'
+                : 'transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+              willChange: isDragging ? 'transform, left, top' : 'auto',
             }}
             className={cn(
-              'bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden flex flex-col',
+              'bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden flex flex-col',
               // Mobile: Full width with margins, Tablet: Fixed width, Desktop: Responsive width
               'w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] max-w-sm sm:max-w-md md:max-w-lg',
               'sm:w-80 sm:h-96',
               'md:w-96 md:h-[600px]',
               isExpanded && 'md:w-[500px] md:h-[700px]',
-              isDragging && 'shadow-3xl'
+              isDragging &&
+                'shadow-3xl ring-2 ring-cyan-500/20 dark:ring-cyan-400/20'
             )}
             role='dialog'
             aria-modal='true'
@@ -322,11 +326,11 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                     onClick={resetPosition}
                     variant='ghost'
                     size='sm'
-                    className='p-1.5'
+                    className='p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-200'
                     aria-label='Reset panel position'
                     icon={
                       <svg
-                        className='w-3.5 h-3.5'
+                        className='w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400'
                         fill='none'
                         stroke='currentColor'
                         viewBox='0 0 24 24'
@@ -342,9 +346,9 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                     }
                   />
                   {/* Tooltip */}
-                  <div className='absolute top-full right-0 mt-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
+                  <div className='absolute top-full right-0 mt-2 px-3 py-2 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
                     Reset panel position
-                    <div className='absolute bottom-full right-4 border-4 border-transparent border-b-neutral-900'></div>
+                    <div className='absolute bottom-full right-4 border-4 border-transparent border-b-neutral-900 dark:border-b-neutral-100'></div>
                   </div>
                 </div>
 
@@ -353,11 +357,11 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                     onClick={toggleExpanded}
                     variant='ghost'
                     size='sm'
-                    className='p-1.5'
+                    className='p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-200'
                     aria-label={isExpanded ? 'Collapse panel' : 'Expand panel'}
                     icon={
                       <svg
-                        className='w-3.5 h-3.5'
+                        className='w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400'
                         fill='none'
                         stroke='currentColor'
                         viewBox='0 0 24 24'
@@ -377,9 +381,9 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                     }
                   />
                   {/* Tooltip */}
-                  <div className='absolute top-full right-0 mt-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
+                  <div className='absolute top-full right-0 mt-2 px-3 py-2 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10'>
                     {isExpanded ? 'Collapse panel' : 'Expand panel'}
-                    <div className='absolute bottom-full right-4 border-4 border-transparent border-b-neutral-900'></div>
+                    <div className='absolute bottom-full right-4 border-4 border-transparent border-b-neutral-900 dark:border-b-neutral-100'></div>
                   </div>
                 </div>
 
@@ -388,11 +392,11 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                     onClick={closePanel}
                     variant='ghost'
                     size='sm'
-                    className='p-1.5'
+                    className='p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-200'
                     aria-label='Close panel'
                     icon={
                       <svg
-                        className='w-3.5 h-3.5'
+                        className='w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400'
                         fill='none'
                         stroke='currentColor'
                         viewBox='0 0 24 24'
@@ -408,9 +412,9 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
                     }
                   />
                   {/* Tooltip */}
-                  <div className='absolute top-full right-0 mt-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10'>
+                  <div className='absolute top-full right-0 mt-2 px-3 py-2 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10'>
                     Close panel
-                    <div className='absolute bottom-full right-4 border-4 border-transparent border-b-neutral-900'></div>
+                    <div className='absolute bottom-full right-4 border-4 border-transparent border-b-neutral-900 dark:border-b-neutral-100'></div>
                   </div>
                 </div>
               </div>

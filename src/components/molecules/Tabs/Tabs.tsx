@@ -70,7 +70,7 @@ export const Tabs: React.FC<TabsProps> = ({
   return (
     <div className={`tabs flex flex-col h-full ${className}`} {...props}>
       {/* Tab Navigation */}
-      <div className='border-b border-gray-200 flex-shrink-0'>
+      <div className='border-b border-gray-200 flex-shrink-0 py-1'>
         <div className='px-2 sm:px-3 lg:px-4'>
           <div className='relative'>
             {/* Left scroll indicator */}
@@ -81,7 +81,7 @@ export const Tabs: React.FC<TabsProps> = ({
                 aria-label='Scroll left to see more tabs'
               >
                 <svg
-                  className='w-4 h-4 text-gray-500'
+                  className='w-4 h-4 text-neutral-500 dark:text-neutral-400'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
@@ -104,7 +104,7 @@ export const Tabs: React.FC<TabsProps> = ({
                 aria-label='Scroll right to see more tabs'
               >
                 <svg
-                  className='w-4 h-4 text-gray-500'
+                  className='w-4 h-4 text-neutral-500 dark:text-neutral-400'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
@@ -129,18 +129,18 @@ export const Tabs: React.FC<TabsProps> = ({
 
             <nav
               ref={navRef}
-              className='-mb-px flex space-x-1 sm:space-x-2 overflow-x-auto scrollbar-slim bg-slate-50/80 dark:bg-slate-800/50 border-b-2 border-slate-200 dark:border-slate-600 shadow-sm dark:shadow-slate-900/10 px-1 py-0.5 rounded-t-lg'
+              className='-mb-px flex space-x-1 sm:space-x-2 overflow-x-auto scrollbar-slim bg-neutral-50/80 dark:bg-neutral-800/50 border-b-2 border-neutral-200 dark:border-neutral-600 shadow-sm dark:shadow-neutral-900/10 px-1 py-0.5 rounded-t-lg'
             >
               {items.map(item => (
                 <button
                   key={item.id}
                   onClick={() => handleTabChange(item.id)}
                   className={`
-                    py-0.5 px-1.5 border-b-2 font-medium text-xs transition-all duration-300 whitespace-nowrap flex-shrink-0 rounded-t-md
+                    py-1 px-1.5 border-b-2 font-medium text-xs transition-all duration-200 whitespace-nowrap flex-shrink-0 rounded-t-md
                     ${
                       activeTab === item.id
-                        ? 'border-cyan-500 text-cyan-600 dark:text-cyan-400 bg-white dark:bg-slate-700/50 shadow-sm'
-                        : 'border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700/30'
+                        ? 'border-cyan-500 text-cyan-600 dark:text-cyan-400 bg-white dark:bg-neutral-700/50 shadow-sm'
+                        : 'border-transparent text-neutral-600 dark:text-neutral-300 hover:text-neutral-800 dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700/30'
                     }
                     cursor-pointer
                   `}
