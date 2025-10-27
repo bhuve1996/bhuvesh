@@ -175,80 +175,64 @@ describe('Component System E2E Tests', () => {
 
   describe('FloatingPanel Component', () => {
     it('should show floating action button initially', () => {
-      cy.get('[data-testid="floating-panel"]').should('be.visible');
-      cy.get('[data-testid="floating-panel"]').should(
+      cy.get('[data-testid="floating-action-button"]').should('be.visible');
+      cy.get('[data-testid="floating-action-button"]').should(
         'contain',
-        'Quick Actions'
+        'Resume Builder'
       );
     });
 
     it('should open panel when clicked', () => {
-      cy.get('[data-testid="floating-panel"] button').first().click();
-      cy.get('[data-testid="floating-panel"]').should(
-        'contain',
-        'Resume Tools'
-      );
-      cy.get('[data-testid="floating-panel"]').should(
-        'contain',
-        'ATS Analysis'
-      );
+      cy.get('[data-testid="floating-action-button"]').click();
+      cy.get('[role="dialog"]').should('be.visible');
+      cy.get('[role="dialog"]').should('contain', 'Resume Tools');
+      cy.get('[role="dialog"]').should('contain', 'ATS Analysis');
     });
 
     it('should switch between tabs', () => {
-      cy.get('[data-testid="floating-panel"] button').first().click();
+      cy.get('[data-testid="floating-action-button"]').click();
 
-      cy.get('[data-testid="floating-panel"]').should(
-        'contain',
-        'ATS Analysis'
-      );
-      cy.get('[data-testid="floating-panel"]').contains('AI Content').click();
-      cy.get('[data-testid="floating-panel"]').should('contain', 'AI Content');
+      cy.get('[role="dialog"]').should('contain', 'ATS Analysis');
+      cy.get('[role="dialog"]').contains('Validate').click();
+      cy.get('[role="dialog"]').should('contain', 'Validate');
 
-      cy.get('[data-testid="floating-panel"]').contains('Customize').click();
-      cy.get('[data-testid="floating-panel"]').should('contain', 'Customize');
+      cy.get('[role="dialog"]').contains('Customize').click();
+      cy.get('[role="dialog"]').should('contain', 'Customize');
     });
 
     it('should expand and collapse', () => {
-      cy.get('[data-testid="floating-panel"] button').first().click();
+      cy.get('[data-testid="floating-action-button"]').click();
 
       // Check that panel content is visible
-      cy.get('[data-testid="floating-panel"] .panel-content').should(
-        'be.visible'
-      );
+      cy.get('[role="dialog"] .panel-content').should('be.visible');
 
       // Try to expand if expand button exists
-      cy.get('[data-testid="floating-panel"]').then($panel => {
-        if ($panel.find(':contains("Expand")').length > 0) {
-          cy.get('[data-testid="floating-panel"]').contains('Expand').click();
-          cy.get('[data-testid="floating-panel"] .panel-content').should(
-            'be.visible'
-          );
+      cy.get('[role="dialog"]').then($panel => {
+        if ($panel.find('[aria-label*="Expand"]').length > 0) {
+          cy.get('[role="dialog"] [aria-label*="Expand"]').click({
+            force: true,
+          });
+          cy.get('[role="dialog"] .panel-content').should('be.visible');
         }
       });
 
       // Try to collapse if collapse button exists
-      cy.get('[data-testid="floating-panel"]').then($panel => {
-        if ($panel.find(':contains("Collapse")').length > 0) {
-          cy.get('[data-testid="floating-panel"]').contains('Collapse').click();
-          cy.get('[data-testid="floating-panel"] .panel-content').should(
-            'be.visible'
-          );
+      cy.get('[role="dialog"]').then($panel => {
+        if ($panel.find('[aria-label*="Collapse"]').length > 0) {
+          cy.get('[role="dialog"] [aria-label*="Collapse"]').click({
+            force: true,
+          });
+          cy.get('[role="dialog"] .panel-content').should('be.visible');
         }
       });
     });
 
     it('should close panel', () => {
-      cy.get('[data-testid="floating-panel"] button').first().click();
-      cy.get('[data-testid="floating-panel"]').should(
-        'contain',
-        'Resume Tools'
-      );
+      cy.get('[data-testid="floating-action-button"]').click();
+      cy.get('[role="dialog"]').should('contain', 'Resume Tools');
 
-      cy.get('[data-testid="floating-panel"]').contains('Close').click();
-      cy.get('[data-testid="floating-panel"]').should(
-        'contain',
-        'Quick Actions'
-      );
+      cy.get('[role="dialog"]').contains('Close').click();
+      cy.get('[data-testid="floating-action-button"]').should('be.visible');
     });
   });
 
@@ -329,12 +313,8 @@ describe('Component System E2E Tests', () => {
       cy.get('[data-testid="error-field"] [role="alert"]').should('exist');
 
       // Panel accessibility
-      cy.get('[data-testid="floating-panel"] button').first().click();
-      cy.get('[data-testid="floating-panel"] .panel-content').should(
-        'have.attr',
-        'role',
-        'dialog'
-      );
+      cy.get('[data-testid="floating-action-button"]').click();
+      cy.get('[role="dialog"]').should('exist');
     });
 
     it('should support keyboard navigation', () => {
