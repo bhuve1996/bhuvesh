@@ -11,6 +11,7 @@ import { FloatingPanelProps, PanelTab } from '@/types';
 
 import { ATSAnalysisTab } from './tabs/ATSAnalysisTab';
 import { ExportTab } from './tabs/ExportTab';
+import { PageBreaksTab } from './tabs/PageBreaksTab';
 import { TemplateCustomizerTab } from './tabs/TemplateCustomizerTab';
 import { ValidationTab } from './tabs/ValidationTab';
 
@@ -18,6 +19,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
   resumeData,
   template,
   onTemplateChange,
+  resumeElement,
   className = '',
   ...props
 }) => {
@@ -130,6 +132,19 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
           resumeData={resumeData}
           template={template}
           onTemplateChange={onTemplateChange}
+          resumeElement={resumeElement || null}
+        />
+      ),
+    },
+    {
+      id: 'page-breaks',
+      label: 'Page Breaks',
+      content: (
+        <PageBreaksTab
+          resumeData={resumeData}
+          template={template}
+          onTemplateChange={onTemplateChange}
+          resumeElement={resumeElement || null}
         />
       ),
     },

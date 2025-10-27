@@ -538,7 +538,7 @@ export const generateSectionCSS = (
 };
 
 /**
- * Generate print-specific CSS
+ * Generate print-specific CSS with smart page break handling
  */
 export const generatePrintCSS = (styling: ResumeStylingState): string => {
   const css: string[] = [];
@@ -583,8 +583,102 @@ export const generatePrintCSS = (styling: ResumeStylingState): string => {
   css.push('    display: none !important;');
   css.push('  }');
 
+  // Smart page break controls
   css.push('  .page-break {');
   css.push('    page-break-before: always;');
+  css.push('  }');
+
+  css.push('  .page-break-after {');
+  css.push('    page-break-after: always;');
+  css.push('  }');
+
+  css.push('  .avoid-break {');
+  css.push('    page-break-inside: avoid;');
+  css.push('    break-inside: avoid;');
+  css.push('  }');
+
+  css.push('  .break-before {');
+  css.push('    page-break-before: always;');
+  css.push('    break-before: page;');
+  css.push('  }');
+
+  css.push('  .break-after {');
+  css.push('    page-break-after: always;');
+  css.push('    break-after: page;');
+  css.push('  }');
+
+  // Section-specific page break handling
+  css.push('  .resume-section {');
+  css.push('    page-break-inside: avoid;');
+  css.push('    break-inside: avoid;');
+  css.push('    margin-bottom: 0.2in;');
+  css.push('  }');
+
+  css.push('  .resume-section:last-child {');
+  css.push('    margin-bottom: 0;');
+  css.push('  }');
+
+  // Experience and education entries
+  css.push('  .experience-entry, .education-entry, .project-entry {');
+  css.push('    page-break-inside: avoid;');
+  css.push('    break-inside: avoid;');
+  css.push('    margin-bottom: 0.15in;');
+  css.push('  }');
+
+  // Skills and other list items
+  css.push('  .skills-list, .achievements-list {');
+  css.push('    page-break-inside: avoid;');
+  css.push('    break-inside: avoid;');
+  css.push('  }');
+
+  // Individual skill items
+  css.push('  .skill-item, .achievement-item {');
+  css.push('    page-break-inside: avoid;');
+  css.push('    break-inside: avoid;');
+  css.push('  }');
+
+  // Headers and titles
+  css.push('  .section-title, .entry-title {');
+  css.push('    page-break-after: avoid;');
+  css.push('    break-after: avoid;');
+  css.push('  }');
+
+  // Contact information
+  css.push('  .contact-info {');
+  css.push('    page-break-inside: avoid;');
+  css.push('    break-inside: avoid;');
+  css.push('  }');
+
+  // Summary/Objective section
+  css.push('  .summary-section, .objective-section {');
+  css.push('    page-break-inside: avoid;');
+  css.push('    break-inside: avoid;');
+  css.push('  }');
+
+  // Tables and lists
+  css.push('  table, ul, ol {');
+  css.push('    page-break-inside: avoid;');
+  css.push('    break-inside: avoid;');
+  css.push('  }');
+
+  // Images and graphics
+  css.push('  img, svg {');
+  css.push('    page-break-inside: avoid;');
+  css.push('    break-inside: avoid;');
+  css.push('    max-width: 100%;');
+  css.push('    height: auto;');
+  css.push('  }');
+
+  // Orphan and widow control
+  css.push('  p, li {');
+  css.push('    orphans: 2;');
+  css.push('    widows: 2;');
+  css.push('  }');
+
+  // Ensure minimum content on pages
+  css.push('  .resume-section:first-child {');
+  css.push('    page-break-before: avoid;');
+  css.push('    break-before: avoid;');
   css.push('  }');
 
   css.push('  @page {');

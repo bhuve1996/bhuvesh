@@ -16,7 +16,6 @@ import { ResumeData } from '@/types/resume';
 
 import { DOCXExporter } from '../DOCXExporter';
 import { FloatingActions } from '../FloatingActions/FloatingActions';
-import { PDFExporter } from '../PDFExporter';
 import { RichTextEditor } from '../RichTextEditor';
 import { SectionValidation } from '../SectionValidation/SectionValidation';
 import { UnifiedAIContentImprover } from '../UnifiedAIContentImprover';
@@ -25,13 +24,11 @@ import { ValidationModal } from '../ValidationModal';
 interface ResumeBuilderProps {
   initialData?: Partial<ResumeData> | undefined;
   onSave?: (data: ResumeData) => void;
-  onExport?: (data: ResumeData, format: 'pdf' | 'docx' | 'txt') => void;
 }
 
 export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
   initialData,
   onSave,
-  onExport,
 }) => {
   // Use global store for all data management
   const {
@@ -173,14 +170,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
     setShowValidationModal(true);
   };
 
-  const handleExport = (format: 'pdf' | 'docx' | 'txt') => {
-    // Validate resume data before exporting
-    const validation = validateResumeData(currentResumeData);
-    setValidationResult(validation);
-    setPendingAction({ type: 'export', format });
-    setShowValidationModal(true);
-  };
-
   const handleValidationProceed = () => {
     if (!pendingAction) return;
 
@@ -194,10 +183,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
           'resume-builder-data',
           JSON.stringify(currentResumeData)
         );
-      }
-    } else if (pendingAction.type === 'export' && pendingAction.format) {
-      if (onExport) {
-        onExport(currentResumeData, pendingAction.format);
       }
     }
 
@@ -1374,13 +1359,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                   </Button>
                 </Tooltip>
                 <div className='flex gap-2'>
-                  <PDFExporter
-                    resumeData={currentResumeData}
-                    template={null}
-                    onExport={() => {
-                      /* PDF exported */
-                    }}
-                  />
                   <DOCXExporter
                     resumeData={currentResumeData}
                     template={null}
@@ -1388,9 +1366,6 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                       /* DOCX exported */
                     }}
                   />
-                  <Button variant='outline' onClick={() => handleExport('txt')}>
-                    Export as TXT
-                  </Button>
                 </div>
               </div>
             </div>

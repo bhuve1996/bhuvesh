@@ -5,44 +5,39 @@ import toast from 'react-hot-toast';
 
 import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
-import {
-  exportToDOCX,
-  exportToPDFWithFallback,
-  exportToTXT,
-} from '@/lib/resume/exportUtils';
+import { exportToDOCX, exportToPDF } from '@/lib/resume/exportUtils';
+import type { PageBreakConfig } from '@/lib/resume/pageBreakUtils';
+import { DEFAULT_PAGE_BREAK_CONFIG } from '@/lib/resume/pageBreakUtils';
 import type { ExportTabProps } from '@/types';
 
 export const ExportTab: React.FC<ExportTabProps> = ({
   resumeData,
   template,
+  resumeElement: _resumeElement,
 }) => {
   const [isExporting, setIsExporting] = useState(false);
-  const [exportFormat, setExportFormat] = useState<'pdf' | 'docx' | 'txt'>(
-    'pdf'
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'docx'>('pdf');
+  const [pageBreakConfig, _setPageBreakConfig] = useState<PageBreakConfig>(
+    DEFAULT_PAGE_BREAK_CONFIG
   );
 
-  const handleExport = async (format: 'pdf' | 'docx' | 'txt') => {
+  const handleExport = async (format: 'pdf' | 'docx') => {
     setIsExporting(true);
     setExportFormat(format);
 
     try {
       switch (format) {
         case 'pdf':
-          await exportToPDFWithFallback(template, resumeData);
+          await exportToPDF(template, resumeData, undefined, pageBreakConfig);
           toast.success('Resume exported as PDF!');
           break;
         case 'docx':
-          await exportToDOCX(template, resumeData);
+          await exportToDOCX(template, resumeData, undefined, pageBreakConfig);
           toast.success('Resume exported as DOCX!');
-          break;
-        case 'txt':
-          await exportToTXT(template, resumeData);
-          toast.success('Resume exported as TXT!');
           break;
       }
     } catch {
       toast.error(`Failed to export as ${format.toUpperCase()}`);
-      // Export Error: error
     } finally {
       setIsExporting(false);
     }
@@ -60,12 +55,6 @@ export const ExportTab: React.FC<ExportTabProps> = ({
       label: 'DOCX',
       description: 'Editable Word document',
       icon: '📝',
-    },
-    {
-      format: 'txt' as const,
-      label: 'TXT',
-      description: 'Plain text format',
-      icon: '📃',
     },
   ];
 

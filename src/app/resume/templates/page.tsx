@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { UnifiedWelcomeBar } from '@/components/layout/UnifiedWelcomeBar';
 import { FloatingPanel } from '@/components/organisms/FloatingPanel/FloatingPanel';
@@ -38,6 +38,7 @@ export default function TemplateGalleryPage() {
   // Local state
   const [customizedTemplate, setCustomizedTemplate] =
     useState<ResumeTemplate | null>(null);
+  const resumeElementRef = useRef<HTMLDivElement>(null);
 
   // Wrap setCustomizedTemplate with logging
   const handleTemplateChange = (template: ResumeTemplate) => {
@@ -98,7 +99,7 @@ export default function TemplateGalleryPage() {
 
     try {
       await exportResume(
-        pendingExportFormat,
+        pendingExportFormat as 'pdf' | 'docx',
         customizedTemplate || selectedTemplate,
         previewData
       );
@@ -443,12 +444,14 @@ export default function TemplateGalleryPage() {
                     </div>
 
                     <div className='border border-border rounded-lg overflow-hidden'>
-                      <ResumeTemplateRenderer
-                        key={customizedTemplate ? 'customized' : 'original'}
-                        template={customizedTemplate || selectedTemplate}
-                        data={previewData}
-                        className='w-full'
-                      />
+                      <div ref={resumeElementRef}>
+                        <ResumeTemplateRenderer
+                          key={customizedTemplate ? 'customized' : 'original'}
+                          template={customizedTemplate || selectedTemplate}
+                          data={previewData}
+                          className='w-full'
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -527,6 +530,10 @@ export default function TemplateGalleryPage() {
             resumeData={previewData}
             template={customizedTemplate || selectedTemplate}
             onTemplateChange={handleTemplateChange}
+            resumeElement={
+              resumeElementRef.current?.querySelector('.resume-template') ||
+              null
+            }
           />
         </div>
       )}

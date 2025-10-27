@@ -56,8 +56,8 @@ jest.mock('@/components/resume/TemplateGallery/TemplateGallery', () => {
       setIsLoading(true);
       try {
         // Import the mocked functions
-        const { exportToPDFUnified, exportToDOCXUnified } = await import(
-          '@/lib/resume/unifiedExportUtils'
+        const { exportToPDF, exportToDOCX } = await import(
+          '@/lib/resume/exportUtils'
         );
 
         const options = {
@@ -73,9 +73,9 @@ jest.mock('@/components/resume/TemplateGallery/TemplateGallery', () => {
         };
 
         if (format === 'pdf') {
-          await exportToPDFUnified(options);
+          await exportToPDF(options.template, options.data, options.filename);
         } else {
-          await exportToDOCXUnified(options);
+          await exportToDOCX(options.template, options.data, options.filename);
         }
       } finally {
         setIsLoading(false);
@@ -131,10 +131,10 @@ jest.mock('@/components/resume/TemplateGallery/TemplateGallery', () => {
 const mockExportToPDFUnified = jest.fn().mockResolvedValue(undefined);
 const mockExportToDOCXUnified = jest.fn().mockResolvedValue(undefined);
 
-jest.mock('@/lib/resume/unifiedExportUtils', () => ({
-  exportToPDFUnified: mockExportToPDFUnified,
-  exportToDOCXUnified: mockExportToDOCXUnified,
-  exportResumeUnified: jest.fn(),
+jest.mock('@/lib/resume/exportUtils', () => ({
+  exportToPDF: mockExportToPDFUnified,
+  exportToDOCX: mockExportToDOCXUnified,
+  exportResume: jest.fn(),
 }));
 
 // Mock ATS API

@@ -1,66 +1,47 @@
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
+import type { PageBreakConfig } from './pageBreakUtils';
+import { DEFAULT_PAGE_BREAK_CONFIG } from './pageBreakUtils';
 import {
   exportToDOCXViaDownload,
   exportToPDFViaPrint,
 } from './printExportUtils';
-import { convertToUnifiedContent, renderToTXT } from './unifiedRenderer';
 
-// Note: Classic PDF export removed - using browser print method for 100% consistency
+// Simple export functions using only browser print methods
+export const exportToPDF = async (
+  template: ResumeTemplate,
+  data: ResumeData,
+  filename: string = 'resume.pdf',
+  pageBreakConfig: PageBreakConfig = DEFAULT_PAGE_BREAK_CONFIG
+) => {
+  await exportToPDFViaPrint({ template, data, filename, pageBreakConfig });
+};
 
-// Export to DOCX using browser print method (100% consistent with preview)
 export const exportToDOCX = async (
   template: ResumeTemplate,
   data: ResumeData,
-  filename: string = 'resume.docx'
+  filename: string = 'resume.docx',
+  pageBreakConfig: PageBreakConfig = DEFAULT_PAGE_BREAK_CONFIG
 ) => {
-  // Use print method for DOCX as well for 100% consistency with preview
-  await exportToDOCXViaDownload({ template, data, filename });
-};
-
-// Export to TXT using unified rendering system
-export const exportToTXT = (
-  _template: ResumeTemplate,
-  data: ResumeData,
-  filename: string = 'resume.txt'
-) => {
-  try {
-    // Use unified rendering system
-    const content = convertToUnifiedContent(data);
-    renderToTXT(content, filename);
-  } catch {
-    // // console.error('TXT export error:', error);
-    throw new Error('Failed to generate TXT');
-  }
-};
-
-// Export to PDF using browser print method (100% consistent with preview)
-export const exportToPDFWithFallback = async (
-  template: ResumeTemplate,
-  data: ResumeData,
-  filename: string = 'resume.pdf'
-) => {
-  // Use print method directly for 100% consistency with preview
-  await exportToPDFViaPrint({ template, data, filename });
+  await exportToDOCXViaDownload({ template, data, filename, pageBreakConfig });
 };
 
 // Main export function
 export const exportResume = async (
-  format: 'pdf' | 'docx' | 'txt',
+  format: 'pdf' | 'docx',
   template: ResumeTemplate,
   data: ResumeData,
-  filename?: string
+  filename?: string,
+  pageBreakConfig: PageBreakConfig = DEFAULT_PAGE_BREAK_CONFIG
 ) => {
   const defaultFilename = `resume_${template.name.toLowerCase().replace(/\s+/g, '_')}.${format}`;
   const finalFilename = filename || defaultFilename;
 
   switch (format) {
     case 'pdf':
-      return await exportToPDFWithFallback(template, data, finalFilename);
+      return await exportToPDF(template, data, finalFilename, pageBreakConfig);
     case 'docx':
-      return await exportToDOCX(template, data, finalFilename);
-    case 'txt':
-      return exportToTXT(template, data, finalFilename);
+      return await exportToDOCX(template, data, finalFilename, pageBreakConfig);
     default:
       throw new Error(`Unsupported format: ${format}`);
   }

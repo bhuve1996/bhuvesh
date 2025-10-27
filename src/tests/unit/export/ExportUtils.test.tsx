@@ -1,11 +1,10 @@
 // import { render, screen, fireEvent } from '@testing-library/react';
 
 import {
-  exportResumeUnified,
-  exportToDOCXUnified,
-  exportToPDFUnified,
-  exportToTXTUnified,
-} from '@/lib/resume/unifiedExportUtils';
+  exportResume,
+  exportToDOCX,
+  exportToPDF,
+} from '@/lib/resume/exportUtils';
 import { useResumeStore } from '@/store/resumeStore';
 
 // Mock dependencies
@@ -20,16 +19,18 @@ jest.mock('html-docx-js/dist/html-docx', () => ({
   },
 }));
 
-// Mock the unifiedExportUtils module to provide mock implementations
-jest.mock('@/lib/resume/unifiedExportUtils', () => {
-  const originalModule = jest.requireActual('@/lib/resume/unifiedExportUtils');
-
+// Mock the exportUtils module to provide mock implementations
+jest.mock('@/lib/resume/exportUtils', () => {
   return {
-    ...originalModule,
-    exportToPDFUnified: jest.fn().mockResolvedValue(undefined),
-    exportToDOCXUnified: jest.fn().mockResolvedValue(undefined),
-    exportToTXTUnified: jest.fn().mockResolvedValue(undefined),
-    exportResumeUnified: jest.fn().mockResolvedValue(undefined),
+    exportToPDF: jest.fn().mockResolvedValue(undefined),
+    exportToDOCX: jest.fn().mockResolvedValue(undefined),
+    exportResume: jest.fn().mockImplementation(async format => {
+      if (format === 'pdf' || format === 'docx') {
+        return undefined;
+      } else {
+        throw new Error(`Unsupported format: ${format}`);
+      }
+    }),
   };
 });
 
@@ -167,7 +168,7 @@ Object.defineProperty(document.body, 'removeChild', {
   writable: true,
 });
 
-describe('Unified Export Utils', () => {
+describe('Export Utils', () => {
   const mockResumeData = {
     personal: {
       fullName: 'John Doe',
@@ -273,10 +274,9 @@ describe('Unified Export Utils', () => {
     jest.clearAllMocks();
 
     // Reset mock implementations
-    (exportToPDFUnified as jest.Mock).mockResolvedValue(undefined);
-    (exportToDOCXUnified as jest.Mock).mockResolvedValue(undefined);
-    (exportToTXTUnified as jest.Mock).mockResolvedValue(undefined);
-    (exportResumeUnified as jest.Mock).mockResolvedValue(undefined);
+    (exportToPDF as jest.Mock).mockResolvedValue(undefined);
+    (exportToDOCX as jest.Mock).mockResolvedValue(undefined);
+    (exportResume as jest.Mock).mockResolvedValue(undefined);
 
     // Mock DOM elements
     const mockResumeElement = document.createElement('div');
@@ -314,160 +314,95 @@ describe('Unified Export Utils', () => {
 
   describe('PDF Export', () => {
     it('should export to PDF using browser print functionality', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.pdf',
-        format: 'pdf' as const,
-      };
+      await exportToPDF(mockTemplate, mockResumeData, 'test-resume.pdf');
 
-      await exportToPDFUnified(options);
-
-      expect(exportToPDFUnified).toHaveBeenCalledWith(options);
+      expect(exportToPDF).toHaveBeenCalledWith(
+        mockTemplate,
+        mockResumeData,
+        'test-resume.pdf'
+      );
     });
 
     it('should handle missing resume element gracefully', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.pdf',
-        format: 'pdf' as const,
-      };
-
-      await exportToPDFUnified(options);
-      expect(exportToPDFUnified).toHaveBeenCalledWith(options);
-    });
-
-    it('should handle popup blocking', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.pdf',
-        format: 'pdf' as const,
-      };
-
-      await exportToPDFUnified(options);
-      expect(exportToPDFUnified).toHaveBeenCalledWith(options);
-    });
-
-    it('should apply consistent styling to exported content', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.pdf',
-        format: 'pdf' as const,
-      };
-
-      await exportToPDFUnified(options);
-      expect(exportToPDFUnified).toHaveBeenCalledWith(options);
+      await exportToPDF(mockTemplate, mockResumeData, 'test-resume.pdf');
+      expect(exportToPDF).toHaveBeenCalledWith(
+        mockTemplate,
+        mockResumeData,
+        'test-resume.pdf'
+      );
     });
   });
 
   describe('DOCX Export', () => {
     it('should export to DOCX using HTML-to-DOCX conversion', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.docx',
-        format: 'docx' as const,
-      };
+      await exportToDOCX(mockTemplate, mockResumeData, 'test-resume.docx');
 
-      await exportToDOCXUnified(options);
-      expect(exportToDOCXUnified).toHaveBeenCalledWith(options);
+      expect(exportToDOCX).toHaveBeenCalledWith(
+        mockTemplate,
+        mockResumeData,
+        'test-resume.docx'
+      );
     });
 
     it('should handle missing resume element gracefully', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.docx',
-        format: 'docx' as const,
-      };
-
-      await exportToDOCXUnified(options);
-      expect(exportToDOCXUnified).toHaveBeenCalledWith(options);
-    });
-
-    it('should create proper HTML content for DOCX conversion', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.docx',
-        format: 'docx' as const,
-      };
-
-      await exportToDOCXUnified(options);
-      expect(exportToDOCXUnified).toHaveBeenCalledWith(options);
-    });
-  });
-
-  describe('TXT Export', () => {
-    it('should export to TXT with clean formatting', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.txt',
-        format: 'txt' as const,
-      };
-
-      await exportToTXTUnified(options);
-      expect(exportToTXTUnified).toHaveBeenCalledWith(options);
-    });
-
-    it('should handle missing resume element gracefully', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.txt',
-        format: 'txt' as const,
-      };
-
-      await exportToTXTUnified(options);
-      expect(exportToTXTUnified).toHaveBeenCalledWith(options);
-    });
-
-    it('should clean up text formatting', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.txt',
-        format: 'txt' as const,
-      };
-
-      await exportToTXTUnified(options);
-      expect(exportToTXTUnified).toHaveBeenCalledWith(options);
+      await exportToDOCX(mockTemplate, mockResumeData, 'test-resume.docx');
+      expect(exportToDOCX).toHaveBeenCalledWith(
+        mockTemplate,
+        mockResumeData,
+        'test-resume.docx'
+      );
     });
   });
 
   describe('Unified Export Function', () => {
     it('should route to correct export method based on format', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume',
-        format: 'pdf' as const,
-      };
+      // Test PDF export
+      await expect(
+        exportResume('pdf', mockTemplate, mockResumeData, 'test-resume')
+      ).resolves.not.toThrow();
+      expect(exportResume).toHaveBeenCalledWith(
+        'pdf',
+        mockTemplate,
+        mockResumeData,
+        'test-resume'
+      );
 
-      // Test that the function doesn't throw for supported formats
-      await expect(exportResumeUnified(options)).resolves.not.toThrow();
-
-      options.format = 'docx';
-      await expect(exportResumeUnified(options)).resolves.not.toThrow();
-
-      options.format = 'txt';
-      await expect(exportResumeUnified(options)).resolves.not.toThrow();
+      // Test DOCX export
+      await expect(
+        exportResume('docx', mockTemplate, mockResumeData, 'test-resume')
+      ).resolves.not.toThrow();
+      expect(exportResume).toHaveBeenCalledWith(
+        'docx',
+        mockTemplate,
+        mockResumeData,
+        'test-resume'
+      );
     });
 
     it('should throw error for unsupported format', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume',
-        format: 'unsupported' as 'pdf' | 'docx' | 'txt',
-      };
+      // Create a spy on exportResume to test the error case
+      const exportResumeSpy = jest.spyOn(
+        await import('@/lib/resume/exportUtils'),
+        'exportResume'
+      );
+      exportResumeSpy.mockImplementation(async format => {
+        if (format === 'pdf' || format === 'docx') {
+          return undefined;
+        } else {
+          throw new Error(`Unsupported format: ${format}`);
+        }
+      });
 
-      await exportResumeUnified(options);
-      expect(exportResumeUnified).toHaveBeenCalledWith(options);
+      await expect(
+        exportResume(
+          'unsupported' as 'pdf' | 'docx',
+          mockTemplate,
+          mockResumeData,
+          'test-resume'
+        )
+      ).rejects.toThrow('Unsupported format: unsupported');
+
+      exportResumeSpy.mockRestore();
     });
   });
 
@@ -516,15 +451,10 @@ describe('Unified Export Utils', () => {
 
   describe('Error Handling', () => {
     it('should handle HTML-to-DOCX conversion errors', async () => {
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.docx',
-        format: 'docx' as const,
-      };
-
       // Test that the function handles errors gracefully
-      await expect(exportToDOCXUnified(options)).resolves.not.toThrow();
+      await expect(
+        exportToDOCX(mockTemplate, mockResumeData, 'test-resume.docx')
+      ).resolves.not.toThrow();
     });
 
     it('should handle blob creation errors', async () => {
@@ -534,15 +464,12 @@ describe('Unified Export Utils', () => {
         throw new Error('Blob creation failed');
       });
 
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.txt',
-        format: 'txt' as const,
-      };
-
-      await exportToTXTUnified(options);
-      expect(exportToTXTUnified).toHaveBeenCalledWith(options);
+      await exportToDOCX(mockTemplate, mockResumeData, 'test-resume.docx');
+      expect(exportToDOCX).toHaveBeenCalledWith(
+        mockTemplate,
+        mockResumeData,
+        'test-resume.docx'
+      );
 
       // Restore original Blob
       global.Blob = originalBlob;
@@ -558,15 +485,12 @@ describe('Unified Export Utils', () => {
       mockElement.innerHTML = '<h1 aria-level="1">John Doe</h1>';
       document.querySelector = jest.fn(() => mockElement);
 
-      const options = {
-        template: mockTemplate,
-        data: mockResumeData,
-        filename: 'test-resume.pdf',
-        format: 'pdf' as const,
-      };
-
-      await exportToPDFUnified(options);
-      expect(exportToPDFUnified).toHaveBeenCalledWith(options);
+      await exportToPDF(mockTemplate, mockResumeData, 'test-resume.pdf');
+      expect(exportToPDF).toHaveBeenCalledWith(
+        mockTemplate,
+        mockResumeData,
+        'test-resume.pdf'
+      );
     });
   });
 });

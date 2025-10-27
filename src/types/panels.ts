@@ -1,12 +1,18 @@
 // Panel and Tab Types
 // Consolidated from component-specific types
 
-export type PanelTab = 'ats' | 'customize' | 'validate' | 'export';
+export type PanelTab =
+  | 'ats'
+  | 'customize'
+  | 'validate'
+  | 'export'
+  | 'page-breaks';
 
 export interface FloatingPanelProps {
   resumeData: import('./resume').ResumeData;
   template: import('./resume').ResumeTemplate;
   onTemplateChange: (template: import('./resume').ResumeTemplate) => void;
+  resumeElement?: HTMLElement | null;
   className?: string;
 }
 
@@ -24,6 +30,13 @@ export type ATSAnalysisTabProps = BaseTabProps;
 export interface ExportTabProps extends BaseTabProps {
   template: import('./resume').ResumeTemplate;
   onTemplateChange: (template: import('./resume').ResumeTemplate) => void;
+  resumeElement?: HTMLElement | null;
+}
+
+export interface PageBreaksTabProps extends BaseTabProps {
+  template: import('./resume').ResumeTemplate;
+  onTemplateChange: (template: import('./resume').ResumeTemplate) => void;
+  resumeElement?: HTMLElement | null;
 }
 
 export interface TemplateCustomizerTabProps extends BaseTabProps {

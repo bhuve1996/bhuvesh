@@ -1,5 +1,11 @@
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
+import {
+  DEFAULT_PAGE_BREAK_CONFIG,
+  prepareResumeForPDF,
+  type PageBreakConfig,
+} from './pageBreakUtils';
+
 /**
  * Generate HTML content from resume data when DOM element is not available
  */
@@ -233,6 +239,7 @@ export interface PrintExportOptions {
   template: ResumeTemplate;
   data: ResumeData;
   filename?: string;
+  pageBreakConfig?: PageBreakConfig;
 }
 
 /**
@@ -241,7 +248,11 @@ export interface PrintExportOptions {
 export const exportToPDFViaPrint = async (
   options: PrintExportOptions
 ): Promise<void> => {
-  const { data, template } = options;
+  const {
+    data,
+    template,
+    pageBreakConfig = DEFAULT_PAGE_BREAK_CONFIG,
+  } = options;
 
   try {
     // console.log('Starting print PDF export with:', { template: template.name });
@@ -296,7 +307,13 @@ export const exportToPDFViaPrint = async (
     if (resumeElement) {
       // Use the existing DOM element
       const clonedElement = resumeElement.cloneNode(true) as HTMLElement;
-      resumeHTML = clonedElement.outerHTML;
+
+      // Apply smart page breaks and optimization
+      const pdfOptimizedElement = prepareResumeForPDF(
+        clonedElement,
+        pageBreakConfig
+      );
+      resumeHTML = pdfOptimizedElement.outerHTML;
       // console.log('Using existing DOM element for export');
     } else {
       // Generate HTML from data as fallback
@@ -497,7 +514,13 @@ export const exportToPDFViaPrint = async (
 export const exportToDOCXViaDownload = async (
   options: PrintExportOptions
 ): Promise<void> => {
-  const { data, filename = 'resume.docx' } = options;
+  const {
+    data,
+    filename = 'resume.docx',
+    pageBreakConfig: _pageBreakConfig = DEFAULT_PAGE_BREAK_CONFIG,
+  } = options;
+
+  // Note: _pageBreakConfig is available for future DOCX page break implementation
 
   try {
     // Dynamic import to avoid SSR issues

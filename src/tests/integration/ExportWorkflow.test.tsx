@@ -78,15 +78,13 @@ const mockStore = configureStore({
 });
 
 // Mock export utilities
-const mockExportToPDFUnified = jest.fn();
-const mockExportToDOCXUnified = jest.fn();
-const mockExportToTXTUnified = jest.fn();
+const mockExportToPDF = jest.fn();
+const mockExportToDOCX = jest.fn();
 
-jest.mock('@/lib/resume/unifiedExportUtils', () => ({
-  exportToPDFUnified: mockExportToPDFUnified,
-  exportToDOCXUnified: mockExportToDOCXUnified,
-  exportToTXTUnified: mockExportToTXTUnified,
-  exportResumeUnified: jest.fn(),
+jest.mock('@/lib/resume/exportUtils', () => ({
+  exportToPDF: mockExportToPDF,
+  exportToDOCX: mockExportToDOCX,
+  exportResume: jest.fn(),
 }));
 
 // Mock the resume components
@@ -98,8 +96,9 @@ jest.mock('@/components/resume/TemplateGallery/TemplateGallery', () => {
     const handleExport = async (format: 'pdf' | 'docx' | 'txt') => {
       setIsLoading(true);
       try {
-        const { exportToPDFUnified, exportToDOCXUnified, exportToTXTUnified } =
-          await import('@/lib/resume/unifiedExportUtils');
+        const { exportToPDF, exportToDOCX } = await import(
+          '@/lib/resume/exportUtils'
+        );
 
         const options = {
           template: { id: 'test-template', name: 'Test Template' },
@@ -115,13 +114,17 @@ jest.mock('@/components/resume/TemplateGallery/TemplateGallery', () => {
 
         switch (format) {
           case 'pdf':
-            await exportToPDFUnified(options);
+            await exportToPDF(options.template, options.data, options.filename);
             break;
           case 'docx':
-            await exportToDOCXUnified(options);
+            await exportToDOCX(
+              options.template,
+              options.data,
+              options.filename
+            );
             break;
           case 'txt':
-            await exportToTXTUnified(options);
+            // TXT export not available in new system
             break;
         }
       } finally {
@@ -193,9 +196,8 @@ describe('Export Workflow Integration Tests', () => {
     jest.clearAllMocks();
 
     // Mock successful exports
-    mockExportToPDFUnified.mockResolvedValue(undefined);
-    mockExportToDOCXUnified.mockResolvedValue(undefined);
-    mockExportToTXTUnified.mockResolvedValue(undefined);
+    mockExportToPDF.mockResolvedValue(undefined);
+    mockExportToDOCX.mockResolvedValue(undefined);
   });
 
   describe('PDF Export', () => {
@@ -220,24 +222,21 @@ describe('Export Workflow Integration Tests', () => {
 
       // Verify export was called
       await waitFor(() => {
-        expect(mockExportToPDFUnified).toHaveBeenCalledWith(
+        expect(mockExportToPDF).toHaveBeenCalledWith(
+          expect.any(Object), // template
           expect.objectContaining({
-            template: expect.any(Object),
-            data: expect.objectContaining({
-              personal: expect.objectContaining({
-                fullName: 'John Doe',
-              }),
+            personal: expect.objectContaining({
+              fullName: 'John Doe',
             }),
-            filename: expect.stringContaining('John_Doe_Resume'),
-            format: 'pdf',
-          })
+          }), // data
+          expect.stringContaining('John_Doe_Resume') // filename
         );
       });
     });
 
     it('should handle PDF export loading state', async () => {
       // Mock delayed export
-      mockExportToPDFUnified.mockImplementation(
+      mockExportToPDF.mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve(undefined), 1000))
       );
 
@@ -285,7 +284,7 @@ describe('Export Workflow Integration Tests', () => {
 
       // Should handle error gracefully
       await waitFor(() => {
-        expect(mockExportToPDFUnified).toHaveBeenCalled();
+        expect(mockExportToPDF).toHaveBeenCalled();
       });
     });
   });
@@ -311,23 +310,20 @@ describe('Export Workflow Integration Tests', () => {
       await user.click(exportDocxButton);
 
       await waitFor(() => {
-        expect(mockExportToDOCXUnified).toHaveBeenCalledWith(
+        expect(mockExportToDOCX).toHaveBeenCalledWith(
+          expect.any(Object), // template
           expect.objectContaining({
-            template: expect.any(Object),
-            data: expect.objectContaining({
-              personal: expect.objectContaining({
-                fullName: 'John Doe',
-              }),
+            personal: expect.objectContaining({
+              fullName: 'John Doe',
             }),
-            filename: expect.stringContaining('John_Doe_Resume'),
-            format: 'docx',
-          })
+          }), // data
+          expect.stringContaining('John_Doe_Resume') // filename
         );
       });
     });
 
     it('should handle DOCX export loading state', async () => {
-      mockExportToDOCXUnified.mockImplementation(
+      mockExportToDOCX.mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve(undefined), 1000))
       );
 
@@ -354,50 +350,6 @@ describe('Export Workflow Integration Tests', () => {
     });
   });
 
-  describe('TXT Export', () => {
-    it('should export resume as TXT successfully', async () => {
-      const MockTemplateGallery = (
-        await import('@/components/resume/TemplateGallery/TemplateGallery')
-      ).default;
-
-      render(
-        <TestWrapper>
-          <MockTemplateGallery />
-        </TestWrapper>
-      );
-
-      // Open tools panel
-      const openToolsPanelButton = screen.getByTestId('open-tools-panel');
-      await user.click(openToolsPanelButton);
-
-      // Export TXT
-      const exportTxtButton = screen.getByTestId('export-txt');
-      await user.click(exportTxtButton);
-
-      await waitFor(() => {
-        expect(mockExportToTXTUnified).toHaveBeenCalledWith(
-          expect.objectContaining({
-            template: expect.any(Object),
-            data: expect.objectContaining({
-              personal: expect.objectContaining({
-                fullName: 'John Doe',
-                email: 'john.doe@email.com',
-              }),
-              workExperience: expect.arrayContaining([
-                expect.objectContaining({
-                  company: 'Tech Corp',
-                  position: 'Senior Software Engineer',
-                }),
-              ]),
-            }),
-            filename: expect.stringContaining('John_Doe_Resume'),
-            format: 'txt',
-          })
-        );
-      });
-    });
-  });
-
   describe('Export with Custom Styling', () => {
     it('should export with custom color scheme', async () => {
       const MockTemplateGallery = (
@@ -419,7 +371,7 @@ describe('Export Workflow Integration Tests', () => {
       await user.click(exportPdfButton);
 
       await waitFor(() => {
-        expect(mockExportToPDFUnified).toHaveBeenCalled();
+        expect(mockExportToPDF).toHaveBeenCalled();
       });
     });
 
@@ -443,7 +395,7 @@ describe('Export Workflow Integration Tests', () => {
       await user.click(exportDocxButton);
 
       await waitFor(() => {
-        expect(mockExportToDOCXUnified).toHaveBeenCalled();
+        expect(mockExportToDOCX).toHaveBeenCalled();
       });
     });
   });
@@ -467,32 +419,21 @@ describe('Export Workflow Integration Tests', () => {
       // Export all formats
       const exportPdfButton = screen.getByTestId('export-pdf');
       const exportDocxButton = screen.getByTestId('export-docx');
-      const exportTxtButton = screen.getByTestId('export-txt');
 
       await user.click(exportPdfButton);
       await user.click(exportDocxButton);
-      await user.click(exportTxtButton);
 
       await waitFor(() => {
-        expect(mockExportToPDFUnified).toHaveBeenCalledWith(
-          expect.objectContaining({
-            filename: expect.stringMatching(/John_Doe_Resume.*\.pdf$/),
-            format: 'pdf',
-          })
+        expect(mockExportToPDF).toHaveBeenCalledWith(
+          expect.any(Object), // template
+          expect.any(Object), // data
+          expect.stringMatching(/John_Doe_Resume.*\.pdf$/) // filename
         );
 
-        expect(mockExportToDOCXUnified).toHaveBeenCalledWith(
-          expect.objectContaining({
-            filename: expect.stringMatching(/John_Doe_Resume.*\.docx$/),
-            format: 'docx',
-          })
-        );
-
-        expect(mockExportToTXTUnified).toHaveBeenCalledWith(
-          expect.objectContaining({
-            filename: expect.stringMatching(/John_Doe_Resume.*\.txt$/),
-            format: 'txt',
-          })
+        expect(mockExportToDOCX).toHaveBeenCalledWith(
+          expect.any(Object), // template
+          expect.any(Object), // data
+          expect.stringMatching(/John_Doe_Resume.*\.docx$/) // filename
         );
       });
     });
@@ -519,12 +460,6 @@ describe('Export Workflow Integration Tests', () => {
               >
                 Export DOCX
               </button>
-              <button
-                data-testid='export-txt'
-                aria-label='Export resume as TXT'
-              >
-                Export TXT
-              </button>
             </div>
           </div>
         </TestWrapper>
@@ -535,7 +470,6 @@ describe('Export Workflow Integration Tests', () => {
       expect(
         screen.getByLabelText('Export resume as DOCX')
       ).toBeInTheDocument();
-      expect(screen.getByLabelText('Export resume as TXT')).toBeInTheDocument();
     });
 
     it('should support keyboard navigation for export buttons', async () => {
@@ -548,7 +482,6 @@ describe('Export Workflow Integration Tests', () => {
             <div data-testid='tools-panel'>
               <button data-testid='export-pdf'>Export PDF</button>
               <button data-testid='export-docx'>Export DOCX</button>
-              <button data-testid='export-txt'>Export TXT</button>
             </div>
           </div>
         </TestWrapper>
@@ -562,7 +495,6 @@ describe('Export Workflow Integration Tests', () => {
 
       const exportPdfButton = screen.getByTestId('export-pdf');
       const exportDocxButton = screen.getByTestId('export-docx');
-      const exportTxtButton = screen.getByTestId('export-txt');
 
       // Test tab navigation
       exportPdfButton.focus();
@@ -570,9 +502,6 @@ describe('Export Workflow Integration Tests', () => {
 
       await user.tab();
       expect(exportDocxButton).toHaveFocus();
-
-      await user.tab();
-      expect(exportTxtButton).toHaveFocus();
     });
   });
 });

@@ -37,12 +37,6 @@ export default function ResumeBuilderPage() {
     }
   };
 
-  const handleExport = (_data: ResumeData, format: 'pdf' | 'docx' | 'txt') => {
-    // Exporting resume
-    // Here you would implement the actual export functionality
-    alert(`Exporting resume as ${format.toUpperCase()}...`);
-  };
-
   const handleBackToATSChecker = () => {
     window.location.href = '/resume/ats-checker';
   };
@@ -79,11 +73,7 @@ export default function ResumeBuilderPage() {
           onBackToManager={handleBackToATSChecker}
         />
 
-        <ResumeBuilder
-          initialData={getInitialData()}
-          onSave={handleSave}
-          onExport={handleExport}
-        />
+        <ResumeBuilder initialData={getInitialData()} onSave={handleSave} />
       </div>
     </div>
   );
