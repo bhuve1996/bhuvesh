@@ -136,7 +136,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
                       ),
                     },
                   ]}
-                  defaultActiveTab='parsed'
+                  defaultActiveTab='summary'
                   variant='underline'
                   className='w-full'
                 />

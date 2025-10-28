@@ -1,7 +1,7 @@
 'use client';
 
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { Card } from '@/components/ui/Card';
 import { useResumeStore } from '@/store/resumeStore';
@@ -48,40 +48,70 @@ export const TemplateCustomizerTab: React.FC<TemplateCustomizerTabProps> = ({
   template,
   onTemplateChange,
 }) => {
-  const { setSectionColors, setTemplateCustomizations } = useResumeStore();
+  const {
+    setSectionColors,
+    setTemplateCustomizations,
+    templateCustomizations,
+  } = useResumeStore();
 
   const [activeTab, setActiveTab] = useState<
     'layout' | 'sections' | 'typography' | 'colors' | 'spacing' | 'content'
   >('layout');
+
+  // Initialize customizations from global state instead of template props
   const [customizations, setCustomizations] = useState({
-    // Layout
-    columns: template.layout?.columns || 1,
-    sidebar: template.layout?.sidebar || false,
-    margins: template.layout?.spacing?.margins || '1in',
+    // Layout - use global state as source of truth
+    columns: templateCustomizations.layout.columns,
+    sidebar: templateCustomizations.layout.sidebar,
+    margins: templateCustomizations.layout.margins,
 
-    // Global Typography
-    fontFamily: template.fontFamily || 'Arial',
-    fontSize: template.fontSize || '14',
-    lineHeight: template.layout?.spacing?.lineHeight || 1.5,
-    letterSpacing: '0',
+    // Global Typography - use global state as source of truth
+    fontFamily: templateCustomizations.typography.fontFamily,
+    fontSize: templateCustomizations.typography.fontSize,
+    lineHeight: templateCustomizations.typography.lineHeight,
+    letterSpacing: templateCustomizations.typography.letterSpacing,
 
-    // Global Colors
-    colorScheme: template.colorScheme || 'blue',
-    primaryColor: template.layout?.colors?.primary || '#3b82f6',
-    secondaryColor: template.layout?.colors?.secondary || '#64748b',
-    accentColor: template.layout?.colors?.accent || '#06b6d4',
-    textColor: template.layout?.colors?.text || '#1f2937',
-    backgroundColor: template.layout?.colors?.background || '#ffffff',
+    // Global Colors - use global state as source of truth
+    colorScheme: templateCustomizations.colors.colorScheme,
+    primaryColor: templateCustomizations.colors.primaryColor,
+    secondaryColor: templateCustomizations.colors.secondaryColor,
+    accentColor: templateCustomizations.colors.accentColor,
+    textColor: templateCustomizations.colors.textColor,
+    backgroundColor: templateCustomizations.colors.backgroundColor,
 
-    // Global Spacing
-    sectionGap: template.layout?.spacing?.sectionGap || '1rem',
-    padding: template.layout?.spacing?.padding || '1rem',
+    // Global Spacing - use global state as source of truth
+    sectionGap: templateCustomizations.spacing.sectionGap,
+    padding: templateCustomizations.spacing.padding,
 
-    // Content Formatting
-    bulletStyle: 'disc',
-    dateFormat: 'MMM YYYY',
-    showIcons: true,
+    // Content Formatting - use global state as source of truth
+    bulletStyle: templateCustomizations.content.bulletStyle,
+    dateFormat: templateCustomizations.content.dateFormat,
+    showIcons: templateCustomizations.content.showIcons,
   });
+
+  // Sync local state with global state changes
+  useEffect(() => {
+    setCustomizations({
+      columns: templateCustomizations.layout.columns,
+      sidebar: templateCustomizations.layout.sidebar,
+      margins: templateCustomizations.layout.margins,
+      fontFamily: templateCustomizations.typography.fontFamily,
+      fontSize: templateCustomizations.typography.fontSize,
+      lineHeight: templateCustomizations.typography.lineHeight,
+      letterSpacing: templateCustomizations.typography.letterSpacing,
+      colorScheme: templateCustomizations.colors.colorScheme,
+      primaryColor: templateCustomizations.colors.primaryColor,
+      secondaryColor: templateCustomizations.colors.secondaryColor,
+      accentColor: templateCustomizations.colors.accentColor,
+      textColor: templateCustomizations.colors.textColor,
+      backgroundColor: templateCustomizations.colors.backgroundColor,
+      sectionGap: templateCustomizations.spacing.sectionGap,
+      padding: templateCustomizations.spacing.padding,
+      bulletStyle: templateCustomizations.content.bulletStyle,
+      dateFormat: templateCustomizations.content.dateFormat,
+      showIcons: templateCustomizations.content.showIcons,
+    });
+  }, [templateCustomizations]);
 
   const [sectionCustomizations, setSectionCustomizations] = useState<
     SectionCustomization[]

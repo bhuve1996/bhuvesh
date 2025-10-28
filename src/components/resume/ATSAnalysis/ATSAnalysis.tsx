@@ -122,8 +122,10 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
             </h3>
             <p className='text-muted-foreground mb-6'>
               Your resume{' '}
-              <span className='text-cyan-400 font-medium'>{file.name}</span> is
-              ready for analysis.
+              <span className='text-cyan-400 font-medium'>
+                {file?.name || 'resume'}
+              </span>{' '}
+              is ready for analysis.
             </p>
 
             {/* Job Description Toggle */}

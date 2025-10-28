@@ -94,31 +94,84 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
 
   // Initialize with ATS data - only run once when initialData changes
   useEffect(() => {
-    if (initialData && !resumeData) {
-      // Only update if we don't already have resume data
-      setResumeData({
-        personal: {
-          fullName: initialData.personal?.fullName || '',
-          email: initialData.personal?.email || '',
-          phone: initialData.personal?.phone || '',
-          location: initialData.personal?.location || '',
-          linkedin: initialData.personal?.linkedin || '',
-          github: initialData.personal?.github || '',
-          portfolio: initialData.personal?.portfolio || '',
-        },
-        summary: initialData.summary || '',
-        experience: initialData.experience || [],
-        education: initialData.education || [],
-        skills: {
-          technical: initialData.skills?.technical || [],
-          business: initialData.skills?.business || [],
-          soft: initialData.skills?.soft || [],
-          languages: initialData.skills?.languages || [],
-          certifications: initialData.skills?.certifications || [],
-        },
-        projects: initialData.projects || [],
-        achievements: initialData.achievements || [],
-      });
+    if (initialData) {
+      // Update if we have new initialData with experience or education
+      const hasNewData =
+        (initialData.experience?.length || 0) > 0 ||
+        (initialData.education?.length || 0) > 0;
+      const hasExistingData =
+        (resumeData?.experience?.length || 0) > 0 ||
+        (resumeData?.education?.length || 0) > 0;
+
+      // Update if we don't have resume data OR if we have new data from ATS analysis
+      if (!resumeData || (hasNewData && !hasExistingData)) {
+        console.log('📝 Updating resume data from initialData:', initialData);
+        setResumeData({
+          personal: {
+            fullName: initialData.personal?.fullName || '',
+            email: initialData.personal?.email || '',
+            phone: initialData.personal?.phone || '',
+            location: initialData.personal?.location || '',
+            linkedin: initialData.personal?.linkedin || '',
+            github: initialData.personal?.github || '',
+            portfolio: initialData.personal?.portfolio || '',
+          },
+          summary: initialData.summary || '',
+          experience: initialData.experience || [],
+          education: initialData.education || [],
+          skills: {
+            technical: initialData.skills?.technical || [],
+            business: initialData.skills?.business || [],
+            soft: initialData.skills?.soft || [],
+            languages: initialData.skills?.languages || [],
+            certifications: initialData.skills?.certifications || [],
+          },
+          projects: initialData.projects || [],
+          achievements: initialData.achievements || [],
+        });
+      }
+    }
+  }, [initialData, resumeData, setResumeData]);
+
+  // Additional useEffect to handle store updates
+  useEffect(() => {
+    if (initialData && resumeData) {
+      // Check if initialData has more complete data than current resumeData
+      const initialHasMoreData =
+        (initialData.experience?.length || 0) >
+          (resumeData.experience?.length || 0) ||
+        (initialData.education?.length || 0) >
+          (resumeData.education?.length || 0) ||
+        (initialData.summary?.length || 0) > (resumeData.summary?.length || 0);
+
+      if (initialHasMoreData) {
+        console.log(
+          '🔄 Updating resume data with more complete data from store'
+        );
+        setResumeData({
+          personal: {
+            fullName: initialData.personal?.fullName || '',
+            email: initialData.personal?.email || '',
+            phone: initialData.personal?.phone || '',
+            location: initialData.personal?.location || '',
+            linkedin: initialData.personal?.linkedin || '',
+            github: initialData.personal?.github || '',
+            portfolio: initialData.personal?.portfolio || '',
+          },
+          summary: initialData.summary || '',
+          experience: initialData.experience || [],
+          education: initialData.education || [],
+          skills: {
+            technical: initialData.skills?.technical || [],
+            business: initialData.skills?.business || [],
+            soft: initialData.skills?.soft || [],
+            languages: initialData.skills?.languages || [],
+            certifications: initialData.skills?.certifications || [],
+          },
+          projects: initialData.projects || [],
+          achievements: initialData.achievements || [],
+        });
+      }
     }
   }, [initialData, resumeData, setResumeData]); // Include all dependencies
 
@@ -411,6 +464,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
                     onToggle={() => toggleSection('summary')}
                   >
                     <RichTextEditor
+                      key={`summary-${currentResumeData.summary?.length || 0}`}
                       id='professional-summary'
                       aria-label='Professional Summary'
                       content={currentResumeData.summary || ''}

@@ -136,7 +136,9 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
       >
         <div className='mb-3 lg:mb-4'>
           <h1
-            className='font-bold mb-1 text-2xl lg:text-3xl'
+            className={`font-bold mb-1 ${
+              sidebarBackground ? 'text-xl lg:text-2xl' : 'text-2xl lg:text-3xl'
+            }`}
             style={{
               fontFamily: getSectionStyle(
                 'header',
@@ -146,7 +148,7 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
               fontSize: getSectionStyle(
                 'header',
                 'fontSize',
-                customizedFonts.size.heading
+                sidebarBackground ? '18px' : customizedFonts.size.heading
               ),
               color: getContrastingTextColor(
                 sidebarBackground ||
@@ -164,7 +166,11 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
           {(data.personal.jobTitle ||
             (data.experience.length > 0 && data.experience[0]?.position)) && (
             <h2
-              className='text-lg lg:text-xl font-semibold text-slate-600 dark:text-slate-300'
+              className={`font-semibold ${
+                sidebarBackground
+                  ? 'text-base lg:text-lg'
+                  : 'text-lg lg:text-xl'
+              } text-slate-600 dark:text-slate-300`}
               style={{
                 fontFamily: getSectionStyle(
                   'header',
@@ -174,7 +180,7 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
                 fontSize: getSectionStyle(
                   'header',
                   'fontSize',
-                  customizedFonts.size.subheading
+                  sidebarBackground ? '16px' : customizedFonts.size.subheading
                 ),
                 color: getContrastingTextColor(
                   sidebarBackground ||
@@ -193,13 +199,13 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
             </h2>
           )}
         </div>
-        {/* Contact Information - Responsive layout based on sidebar */}
+        {/* Contact Information - Single column layout for sidebar */}
         <div
           className={`${
             sidebarBackground
-              ? 'grid grid-cols-1 sm:grid-cols-2 gap-1' // 2 columns in sidebar
+              ? 'flex flex-col gap-2' // Single column in sidebar
               : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2' // 3 columns in main layout
-          } text-xs lg:text-sm`}
+          } text-sm`}
           style={{
             color: getContrastingTextColor(
               sidebarBackground ||
@@ -216,11 +222,30 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
             ),
           }}
         >
-          {/* Column 1: Email & Phone */}
-          <div className='flex flex-col gap-1'>
+          {/* Email */}
+          <a
+            href={`mailto:${data.personal.email}`}
+            className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-2'
+            style={{
+              color: getContrastingTextColor(
+                sidebarBackground ||
+                  getSectionStyle(
+                    'contact',
+                    'backgroundColor',
+                    colors.background
+                  )
+              ),
+            }}
+          >
+            <span className='text-sm'>📧</span>
+            <span className='break-all'>{data.personal.email}</span>
+          </a>
+
+          {/* Phone */}
+          {data.personal.phone && (
             <a
-              href={`mailto:${data.personal.email}`}
-              className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-1'
+              href={`tel:${data.personal.phone}`}
+              className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-2'
               style={{
                 color: getContrastingTextColor(
                   sidebarBackground ||
@@ -232,130 +257,111 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
                 ),
               }}
             >
-              <span className='text-xs'>📧</span>
-              {data.personal.email}
+              <span className='text-sm'>📱</span>
+              <span className='break-all'>{data.personal.phone}</span>
             </a>
-            {data.personal.phone && (
-              <a
-                href={`tel:${data.personal.phone}`}
-                className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-1'
-                style={{
-                  color: getContrastingTextColor(
-                    sidebarBackground ||
-                      getSectionStyle(
-                        'contact',
-                        'backgroundColor',
-                        colors.background
-                      )
-                  ),
-                }}
-              >
-                <span className='text-xs'>📱</span>
-                {data.personal.phone}
-              </a>
-            )}
-          </div>
+          )}
 
-          {/* Column 2: Location & Portfolio */}
-          <div className='flex flex-col gap-1'>
-            {data.personal.location && (
-              <span
-                className='flex items-center gap-1'
-                style={{
-                  color: getContrastingTextColor(
-                    sidebarBackground ||
-                      getSectionStyle(
-                        'contact',
-                        'backgroundColor',
-                        colors.background
-                      )
-                  ),
-                }}
-              >
-                <span className='text-xs'>📍</span>
-                {data.personal.location}
-              </span>
-            )}
-            {data.personal.portfolio && (
-              <a
-                href={
-                  data.personal.portfolio.startsWith('http')
-                    ? data.personal.portfolio
-                    : `https://${data.personal.portfolio}`
-                }
-                target='_blank'
-                rel='noopener noreferrer'
-                className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-1'
-                style={{
-                  color: getContrastingTextColor(
-                    sidebarBackground ||
-                      getSectionStyle(
-                        'contact',
-                        'backgroundColor',
-                        colors.background
-                      )
-                  ),
-                }}
-              >
-                <span className='text-xs'>🌐</span>
-                Portfolio
-              </a>
-            )}
-          </div>
+          {/* Location */}
+          {data.personal.location && (
+            <span
+              className='flex items-center gap-2'
+              style={{
+                color: getContrastingTextColor(
+                  sidebarBackground ||
+                    getSectionStyle(
+                      'contact',
+                      'backgroundColor',
+                      colors.background
+                    )
+                ),
+              }}
+            >
+              <span className='text-sm'>📍</span>
+              <span className='break-words'>{data.personal.location}</span>
+            </span>
+          )}
 
-          {/* Column 3: Social Links */}
-          <div className='flex flex-col gap-1'>
-            {data.personal.linkedin && (
-              <a
-                href={
-                  data.personal.linkedin.startsWith('http')
-                    ? data.personal.linkedin
-                    : `https://linkedin.com/in/${data.personal.linkedin}`
-                }
-                target='_blank'
-                rel='noopener noreferrer'
-                className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-1'
-                style={{
-                  color: getContrastingTextColor(
-                    sidebarBackground ||
-                      getSectionStyle(
-                        'contact',
-                        'backgroundColor',
-                        colors.background
-                      )
-                  ),
-                }}
-              >
-                <span className='text-xs'>💼</span>
-                LinkedIn
-              </a>
-            )}
-            {data.personal.github && (
-              <a
-                href={
-                  data.personal.github.startsWith('http')
-                    ? data.personal.github
-                    : `https://github.com/${data.personal.github}`
-                }
-                target='_blank'
-                rel='noopener noreferrer'
-                className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-1'
-                style={{
-                  color: getContrastingTextColor(
-                    sidebarBackground ||
-                      getSectionStyle(
-                        'contact',
-                        'backgroundColor',
-                        colors.background
-                      )
-                  ),
-                }}
-              >
-                <span className='text-xs'>💻</span>
-                GitHub
-              </a>
-            )}
-          </div>
+          {/* Portfolio */}
+          {data.personal.portfolio && (
+            <a
+              href={
+                data.personal.portfolio.startsWith('http')
+                  ? data.personal.portfolio
+                  : `https://${data.personal.portfolio}`
+              }
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-2'
+              style={{
+                color: getContrastingTextColor(
+                  sidebarBackground ||
+                    getSectionStyle(
+                      'contact',
+                      'backgroundColor',
+                      colors.background
+                    )
+                ),
+              }}
+            >
+              <span className='text-sm'>🌐</span>
+              <span className='break-all'>Portfolio</span>
+            </a>
+          )}
+
+          {/* LinkedIn */}
+          {data.personal.linkedin && (
+            <a
+              href={
+                data.personal.linkedin.startsWith('http')
+                  ? data.personal.linkedin
+                  : `https://linkedin.com/in/${data.personal.linkedin}`
+              }
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-2'
+              style={{
+                color: getContrastingTextColor(
+                  sidebarBackground ||
+                    getSectionStyle(
+                      'contact',
+                      'backgroundColor',
+                      colors.background
+                    )
+                ),
+              }}
+            >
+              <span className='text-sm'>💼</span>
+              <span className='break-all'>LinkedIn</span>
+            </a>
+          )}
+
+          {/* GitHub */}
+          {data.personal.github && (
+            <a
+              href={
+                data.personal.github.startsWith('http')
+                  ? data.personal.github
+                  : `https://github.com/${data.personal.github}`
+              }
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:underline hover:text-blue-600 transition-colors flex items-center gap-2'
+              style={{
+                color: getContrastingTextColor(
+                  sidebarBackground ||
+                    getSectionStyle(
+                      'contact',
+                      'backgroundColor',
+                      colors.background
+                    )
+                ),
+              }}
+            >
+              <span className='text-sm'>💻</span>
+              <span className='break-all'>GitHub</span>
+            </a>
+          )}
         </div>
       </div>
     );
@@ -708,7 +714,7 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
                   )}
                 </div>
                 <div
-                  className='text-sm mt-1 md:mt-0 md:text-right'
+                  className={`text-sm mt-1 ${sidebarBackground ? 'text-left' : 'md:mt-0 md:text-right'}`}
                   style={{
                     fontFamily: fonts.body,
                     fontSize: fonts.size.small,
@@ -717,7 +723,13 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
                     ),
                   }}
                 >
-                  {edu.startDate} - {edu.current ? 'Present' : edu.endDate}
+                  {edu.startDate && edu.endDate
+                    ? `${edu.startDate} - ${edu.current ? 'Present' : edu.endDate}`
+                    : edu.startDate
+                      ? edu.startDate
+                      : edu.endDate
+                        ? edu.endDate
+                        : ''}
                 </div>
               </div>
             </div>
@@ -777,11 +789,15 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
         >
           Skills
         </h2>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        <div
+          className={`${sidebarBackground ? 'space-y-4' : 'grid grid-cols-1 md:grid-cols-2 gap-6'}`}
+        >
           {data.skills.technical.length > 0 && (
-            <div className='bg-gradient-to-br from-green-50 to-transparent dark:from-green-900/20 dark:to-transparent rounded-lg p-4'>
+            <div
+              className={`${sidebarBackground ? 'bg-transparent' : 'bg-gradient-to-br from-green-50 to-transparent dark:from-green-900/20 dark:to-transparent rounded-lg p-4'}`}
+            >
               <h3
-                className='font-semibold mb-3 text-green-800 dark:text-green-200 flex items-center gap-2'
+                className={`font-semibold mb-3 ${sidebarBackground ? 'text-white' : 'text-green-800 dark:text-green-200'} flex items-center gap-2`}
                 style={{
                   fontFamily: getSectionStyle(
                     'skills',
@@ -802,7 +818,11 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
                 {data.skills.technical.map((skill, index) => (
                   <span
                     key={index}
-                    className='px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      sidebarBackground
+                        ? 'bg-white/20 text-white'
+                        : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                    }`}
                     style={{
                       fontFamily: getSectionStyle(
                         'skillsTags',
@@ -823,9 +843,11 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
             </div>
           )}
           {data.skills.business.length > 0 && (
-            <div className='bg-gradient-to-br from-purple-50 to-transparent dark:from-purple-900/20 dark:to-transparent rounded-lg p-4'>
+            <div
+              className={`${sidebarBackground ? 'bg-transparent' : 'bg-gradient-to-br from-purple-50 to-transparent dark:from-purple-900/20 dark:to-transparent rounded-lg p-4'}`}
+            >
               <h3
-                className='font-semibold mb-3 text-purple-800 dark:text-purple-200 flex items-center gap-2'
+                className={`font-semibold mb-3 ${sidebarBackground ? 'text-white' : 'text-purple-800 dark:text-purple-200'} flex items-center gap-2`}
                 style={{
                   fontFamily: getSectionStyle(
                     'skills',
@@ -846,7 +868,11 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
                 {data.skills.business.map((skill, index) => (
                   <span
                     key={index}
-                    className='px-3 py-1 rounded-full text-sm font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200'
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      sidebarBackground
+                        ? 'bg-white/20 text-white'
+                        : 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200'
+                    }`}
                     style={{
                       fontFamily: getSectionStyle(
                         'skillsTags',
@@ -1118,15 +1144,16 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
     >
       {customizedLayout.columns === 2 && customizedLayout.sidebar ? (
         // Two-column layout with sidebar - responsive
-        <div className='flex flex-col lg:flex-row gap-4 lg:gap-6'>
+        <div className='flex flex-col lg:flex-row gap-6 lg:gap-8'>
           {/* Sidebar */}
           <div
-            className='w-full lg:w-1/3 p-4 lg:p-6 rounded-lg'
+            className='w-full lg:w-2/5 p-6 lg:p-8 rounded-lg space-y-6'
             style={{
               backgroundColor:
                 customizedLayout.colors.sidebar ||
                 customizedLayout.colors.primary,
               color: customizedLayout.colors.sidebarText || '#ffffff',
+              minHeight: 'fit-content',
             }}
           >
             {renderHeader(
@@ -1141,7 +1168,7 @@ export const ResumeTemplateRenderer: React.FC<ResumeTemplateRendererProps> = ({
           </div>
 
           {/* Main Content */}
-          <div className='flex-1 space-y-4 lg:space-y-6'>
+          <div className='flex-1 space-y-6 lg:space-y-8 pl-0 lg:pl-4'>
             {renderSummary()}
             {renderExperience()}
             {renderProjects()}

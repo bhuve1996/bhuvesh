@@ -104,6 +104,41 @@ export async function parseResume(file: File) {
 }
 
 /**
+ * Upload and parse resume file - returns ResumeData directly
+ * This eliminates the need for frontend conversion functions
+ */
+export async function uploadFile(file: File): Promise<{
+  success: boolean;
+  data: any; // ResumeData format
+  message: string;
+}> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/upload/parse-to-resume-data`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Upload failed');
+    }
+
+    return response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Failed to upload and parse resume');
+  }
+}
+
+/**
  * Get supported file formats
  */
 export async function getSupportedFormats() {
@@ -119,3 +154,12 @@ export async function getSupportedFormats() {
     };
   }
 }
+
+// Export all functions as atsApi object
+export const atsApi = {
+  checkBackendHealth,
+  analyzeResumeWithJobDescription,
+  parseResume,
+  uploadFile,
+  getSupportedFormats,
+};

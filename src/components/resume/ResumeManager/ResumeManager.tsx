@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { atsApi } from '@/api/endpoints/ats';
 import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
+import { atsApi } from '@/lib/ats/api';
 import { CloudResume, cloudStorage } from '@/lib/resume/cloudStorage';
-import { ResumeData } from '@/types/resume';
+import { ResumeDataUtils } from '@/types/resume';
 
 interface ResumeManagerProps {
   onResumeSelect: (resume: CloudResume) => void;
@@ -105,36 +105,18 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
     setIsUploading(true);
 
     try {
-      // Use the existing ATS API to upload and parse the file
-      await atsApi.uploadFile(file);
+      // Use the new ATS API to upload and parse the file
+      const result = await atsApi.uploadFile(file);
 
-      // Create a new resume from the uploaded file data
-      const resumeName = file.name.replace(/\.[^/.]+$/, ''); // Remove file extension
-
-      // Create a basic ResumeData structure from the backend response
-      const resumeData: ResumeData = {
-        personal: {
-          fullName: resumeName,
-          email: '',
-          phone: '',
-          location: '',
-          linkedin: '',
-          github: '',
-          portfolio: '',
-        },
-        summary: '',
-        experience: [],
-        education: [],
-        skills: {
-          technical: [],
-          business: [],
-          soft: [],
-          languages: [],
-          certifications: [],
-        },
-        projects: [],
-        achievements: [],
-      };
+      if (result.success && result.data) {
+        // Clean the data using ResumeDataUtils
+        const cleanedData = ResumeDataUtils.cleanResumeData(result.data);
+        
+        // Use the parsed name or fallback to filename
+        const resumeName = cleanedData.personal.fullName || file.name.replace(/\.[^/.]+$/, '');
+        
+        // Use the cleaned ResumeData from the backend
+        const resumeData = cleanedData;
 
       const newResumeId = cloudStorage.saveResume(
         resumeName,

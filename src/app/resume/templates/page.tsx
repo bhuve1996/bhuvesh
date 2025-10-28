@@ -31,6 +31,7 @@ export default function TemplateGalleryPage() {
     setUseUserData,
     setResumeData,
     setSelectedTemplate,
+    setTemplateCustomizations,
     showDataChoice,
     setShowDataChoice,
   } = useResumeStore();
@@ -87,10 +88,82 @@ export default function TemplateGalleryPage() {
   // Use restructured data if available, otherwise fall back to original
   const previewData = restructuredData || getPreviewData();
 
+  // Initialize template customizations when a template is already selected
+  useEffect(() => {
+    if (selectedTemplate) {
+      setTemplateCustomizations({
+        layout: {
+          columns: selectedTemplate.layout?.columns || 1,
+          sidebar: selectedTemplate.layout?.sidebar || false,
+          margins: selectedTemplate.layout?.spacing?.margins || '1in',
+        },
+        typography: {
+          fontFamily: selectedTemplate.fontFamily || 'Arial',
+          fontSize: selectedTemplate.fontSize || '14',
+          lineHeight: selectedTemplate.layout?.spacing?.lineHeight || 1.5,
+          letterSpacing: '0',
+        },
+        colors: {
+          colorScheme: selectedTemplate.colorScheme || 'blue',
+          primaryColor: selectedTemplate.layout?.colors?.primary || '#3b82f6',
+          secondaryColor:
+            selectedTemplate.layout?.colors?.secondary || '#64748b',
+          accentColor: selectedTemplate.layout?.colors?.accent || '#06b6d4',
+          textColor: selectedTemplate.layout?.colors?.text || '#1f2937',
+          backgroundColor:
+            selectedTemplate.layout?.colors?.background || '#ffffff',
+        },
+        spacing: {
+          sectionGap: selectedTemplate.layout?.spacing?.sectionGap || '1rem',
+          padding: selectedTemplate.layout?.spacing?.padding || '1rem',
+        },
+        content: {
+          bulletStyle: 'disc',
+          dateFormat: 'MMM YYYY',
+          showIcons: true,
+        },
+        sectionCustomizations: {},
+      });
+    }
+  }, [selectedTemplate, setTemplateCustomizations]);
+
   // Handle template selection
   const handleTemplateSelect = (template: ResumeTemplate) => {
     setSelectedTemplate(template);
     setCustomizedTemplate(null);
+
+    // Initialize template customizations with template's default values
+    setTemplateCustomizations({
+      layout: {
+        columns: template.layout?.columns || 1,
+        sidebar: template.layout?.sidebar || false,
+        margins: template.layout?.spacing?.margins || '1in',
+      },
+      typography: {
+        fontFamily: template.fontFamily || 'Arial',
+        fontSize: template.fontSize || '14',
+        lineHeight: template.layout?.spacing?.lineHeight || 1.5,
+        letterSpacing: '0',
+      },
+      colors: {
+        colorScheme: template.colorScheme || 'blue',
+        primaryColor: template.layout?.colors?.primary || '#3b82f6',
+        secondaryColor: template.layout?.colors?.secondary || '#64748b',
+        accentColor: template.layout?.colors?.accent || '#06b6d4',
+        textColor: template.layout?.colors?.text || '#1f2937',
+        backgroundColor: template.layout?.colors?.background || '#ffffff',
+      },
+      spacing: {
+        sectionGap: template.layout?.spacing?.sectionGap || '1rem',
+        padding: template.layout?.spacing?.padding || '1rem',
+      },
+      content: {
+        bulletStyle: 'disc',
+        dateFormat: 'MMM YYYY',
+        showIcons: true,
+      },
+      sectionCustomizations: {},
+    });
   };
 
   // Handle validation modal actions

@@ -90,6 +90,320 @@ export interface ResumeData {
   hobbies?: string[];
 }
 
+// ============================================================================
+// DATA CLEANING UTILITIES
+// ============================================================================
+// These utilities ensure consistent data cleaning across the application
+
+export class ResumeDataUtils {
+  // Clean name extraction (remove prefixes like "Hi, Hello, I'm")
+  static cleanName(name: string): string {
+    if (!name) return '';
+
+    const cleaned = name
+      .replace(/^(hi,?\s*|hello,?\s*|i'?m\s*|i am\s*)/i, '') // Remove prefixes
+      .replace(/[.!?]+$/, '') // Remove trailing punctuation
+      .trim();
+
+    return cleaned || name; // Fallback to original if cleaning results in empty string
+  }
+
+  // Clean portfolio URL (filter out invalid URLs like "gmail.com")
+  static cleanPortfolio(portfolio: string): string {
+    if (!portfolio) return '';
+
+    const invalidPatterns = [
+      /^gmail\.com$/i,
+      /^@/i, // Email addresses starting with @
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i, // Email addresses
+      /^www\.$/i,
+      /^http:\/\/$/i,
+      /^https:\/\/$/i,
+    ];
+
+    if (invalidPatterns.some(pattern => pattern.test(portfolio))) {
+      return '';
+    }
+
+    return portfolio;
+  }
+
+  // Capitalize first letter of skills
+  static capitalizeSkills(skills: string[]): string[] {
+    return skills.map(skill => {
+      if (!skill) return '';
+      return skill.charAt(0).toUpperCase() + skill.slice(1).toLowerCase();
+    });
+  }
+
+  // Capitalize first letter of a single skill
+  static capitalizeSkill(skill: string): string {
+    if (!skill) return '';
+    return skill.charAt(0).toUpperCase() + skill.slice(1).toLowerCase();
+  }
+
+  // Clean and capitalize all skills in a skills object
+  static cleanSkills(skills: {
+    technical: string[];
+    business: string[];
+    soft: string[];
+    languages: string[];
+    certifications: string[];
+  }): {
+    technical: string[];
+    business: string[];
+    soft: string[];
+    languages: string[];
+    certifications: string[];
+  } {
+    return {
+      technical: this.capitalizeSkills(skills.technical || []),
+      business: this.capitalizeSkills(skills.business || []),
+      soft: this.capitalizeSkills(skills.soft || []),
+      languages: this.capitalizeSkills(skills.languages || []),
+      certifications: this.capitalizeSkills(skills.certifications || []),
+    };
+  }
+
+  // Extract current job title from work experience
+  static getCurrentJobTitle(experience: ResumeBuilderWorkExperience[]): string {
+    if (!experience || experience.length === 0) return '';
+
+    // Find current job first
+    const currentJob = experience.find(exp => exp.current === true);
+    if (currentJob) {
+      return currentJob.position || '';
+    }
+
+    // Fallback to most recent job
+    const mostRecentJob = experience[0];
+    return mostRecentJob?.position || '';
+  }
+
+  // Clean phone number
+  static cleanPhone(phone: string): string {
+    if (!phone) return '';
+    // Remove all non-digit characters except + at the beginning
+    return phone.replace(/[^\d+]/g, '').trim();
+  }
+
+  // Clean email
+  static cleanEmail(email: string): string {
+    if (!email) return '';
+    return email.toLowerCase().trim();
+  }
+
+  // Clean location
+  static cleanLocation(location: string): string {
+    if (!location) return '';
+    return location.trim();
+  }
+
+  // Clean LinkedIn URL
+  static cleanLinkedIn(linkedin: string): string {
+    if (!linkedin) return '';
+    // Ensure it's a proper LinkedIn URL
+    if (
+      linkedin.startsWith('linkedin.com') ||
+      linkedin.startsWith('www.linkedin.com')
+    ) {
+      return `https://${linkedin}`;
+    }
+    return linkedin;
+  }
+
+  // Clean GitHub URL
+  static cleanGitHub(github: string): string {
+    if (!github) return '';
+    // Ensure it's a proper GitHub URL
+    if (
+      github.startsWith('github.com') ||
+      github.startsWith('www.github.com')
+    ) {
+      return `https://${github}`;
+    }
+    return github;
+  }
+
+  // Clean project URL
+  static cleanProjectUrl(url: string): string {
+    if (!url) return '';
+    // Ensure it has a protocol
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return `https://${url}`;
+    }
+    return url;
+  }
+
+  // Clean and validate entire personal info object
+  static cleanPersonalInfo(
+    personal: Partial<ResumeData['personal']>
+  ): ResumeData['personal'] {
+    return {
+      fullName: this.cleanName(personal.fullName || ''),
+      email: this.cleanEmail(personal.email || ''),
+      phone: this.cleanPhone(personal.phone || ''),
+      location: this.cleanLocation(personal.location || ''),
+      linkedin: this.cleanLinkedIn(personal.linkedin || ''),
+      github: this.cleanGitHub(personal.github || ''),
+      portfolio: this.cleanPortfolio(personal.portfolio || ''),
+      jobTitle: personal.jobTitle || '',
+    };
+  }
+
+  // Clean work experience
+  static cleanWorkExperience(
+    experience: Partial<ResumeBuilderWorkExperience>
+  ): ResumeBuilderWorkExperience {
+    return {
+      id: experience.id || this.generateId('exp'),
+      company: experience.company || '',
+      position: experience.position || '',
+      location: this.cleanLocation(experience.location || ''),
+      startDate: experience.startDate || '',
+      endDate: experience.endDate || '',
+      current: experience.current || false,
+      description: experience.description || '',
+      achievements: experience.achievements || [],
+      technologies: experience.technologies || [],
+      title: experience.title || '',
+      keyTechnologies: experience.keyTechnologies || [],
+      impactMetrics: experience.impactMetrics || [],
+      responsibilities: experience.responsibilities || [],
+    };
+  }
+
+  // Clean education
+  static cleanEducation(
+    education: Partial<ResumeBuilderEducation>
+  ): ResumeBuilderEducation {
+    return {
+      id: education.id || this.generateId('edu'),
+      institution: education.institution || '',
+      degree: education.degree || '',
+      field: education.field || '',
+      location: this.cleanLocation(education.location || ''),
+      startDate: education.startDate || '',
+      endDate: education.endDate || '',
+      current: education.current || false,
+      gpa: education.gpa || '',
+      honors: education.honors || [],
+    };
+  }
+
+  // Clean project
+  static cleanProject(
+    project: Partial<ResumeBuilderProject>
+  ): ResumeBuilderProject {
+    return {
+      id: project.id || this.generateId('proj'),
+      name: project.name || '',
+      description: project.description || '',
+      technologies: project.technologies || [],
+      url: this.cleanProjectUrl(project.url || ''),
+      github: this.cleanGitHub(project.github || ''),
+      startDate: project.startDate || '',
+      endDate: project.endDate || '',
+      keyFeatures: project.keyFeatures || [],
+      impact: project.impact || [],
+    };
+  }
+
+  // Clean entire ResumeData object
+  static cleanResumeData(data: Partial<ResumeData>): ResumeData {
+    return {
+      personal: this.cleanPersonalInfo(data.personal || {}),
+      summary: data.summary || '',
+      experience: (data.experience || []).map(exp =>
+        this.cleanWorkExperience(exp)
+      ),
+      education: (data.education || []).map(edu => this.cleanEducation(edu)),
+      skills: this.cleanSkills(
+        data.skills || {
+          technical: [],
+          business: [],
+          soft: [],
+          languages: [],
+          certifications: [],
+        }
+      ),
+      projects: (data.projects || []).map(proj => this.cleanProject(proj)),
+      achievements: data.achievements || [],
+      certifications: data.certifications || [],
+      hobbies: data.hobbies || [],
+    };
+  }
+
+  // Generate unique ID
+  static generateId(prefix: string): string {
+    return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  // Create empty resume data
+  static createEmptyResumeData(): ResumeData {
+    return {
+      personal: {
+        fullName: '',
+        email: '',
+        phone: '',
+        location: '',
+        linkedin: '',
+        github: '',
+        portfolio: '',
+        jobTitle: '',
+      },
+      summary: '',
+      experience: [],
+      education: [],
+      skills: {
+        technical: [],
+        business: [],
+        soft: [],
+        languages: [],
+        certifications: [],
+      },
+      projects: [],
+      achievements: [],
+      hobbies: [],
+    };
+  }
+
+  // Validate resume data
+  static validateResumeData(data: Partial<ResumeData>): boolean {
+    if (!data.personal?.fullName) return false;
+    if (!data.personal?.email) return false;
+    return true;
+  }
+
+  // Get resume statistics
+  static getResumeStats(data: ResumeData): {
+    wordCount: number;
+    experienceCount: number;
+    educationCount: number;
+    projectCount: number;
+    skillCount: number;
+  } {
+    const wordCount =
+      (data.summary || '').split(' ').length +
+      data.experience.reduce(
+        (acc, exp) => acc + exp.description.split(' ').length,
+        0
+      ) +
+      data.projects.reduce(
+        (acc, proj) => acc + proj.description.split(' ').length,
+        0
+      );
+
+    return {
+      wordCount,
+      experienceCount: data.experience.length,
+      educationCount: data.education.length,
+      projectCount: data.projects.length,
+      skillCount: Object.values(data.skills).flat().length,
+    };
+  }
+}
+
 // ATS Analysis Result Types
 export interface AnalysisResult {
   jobType: string;
