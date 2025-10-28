@@ -1,7 +1,5 @@
-// Utility function to merge Tailwind classes
-export function cn(...inputs: (string | undefined | null | boolean)[]): string {
-  return inputs.filter(Boolean).join(' ').trim();
-}
+// Re-export cn from the dedicated file
+export { cn } from './cn';
 
 // Local storage utilities with error handling
 export const storage = {
@@ -46,3 +44,10 @@ export function getAnimationDelay(
 ): string {
   return `${index * baseDelay}ms`;
 }
+
+// Re-export all utility modules for easy access
+export * from './apiUtils';
+export * from './componentUtils';
+export * from './dataCleaningUtils';
+export * from './errorHandling';
+export * from './themeUtils';

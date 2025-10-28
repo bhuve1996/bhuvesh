@@ -9,6 +9,7 @@ import {
   checkBackendHealth,
   type ATSAnalysisResult,
 } from '@/lib/ats/api';
+import { ERROR_MESSAGES, formatErrorForUser } from '@/lib/utils/errorHandling';
 import { ResumeData } from '@/types/resume';
 
 interface ATSIntegrationProps {
@@ -58,13 +59,14 @@ export const ATSIntegration: React.FC<ATSIntegrationProps> = ({
         resumeFile,
         jobDescription
       );
-      setAnalysisResult(result.data);
+      setAnalysisResult(result.data || null);
 
-      if (onAnalysisComplete) {
+      if (onAnalysisComplete && result.data) {
         onAnalysisComplete(result.data);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Analysis failed');
+      const errorMessage = formatErrorForUser(err, ERROR_MESSAGES.ANALYSIS);
+      setError(errorMessage);
     } finally {
       setIsAnalyzing(false);
     }

@@ -223,6 +223,15 @@ async def parse_resume_to_resume_data(file: UploadFile = File(...)) -> dict[str,
 
         # Parse the file
         parsed_content = file_parser.parse_file(file_content, file.filename)
+        
+        # Debug logging for parsed_content
+        print(f"DEBUG: parsed_content type: {type(parsed_content)}")
+        print(f"DEBUG: parsed_content keys: {parsed_content.keys() if isinstance(parsed_content, dict) else 'Not a dict'}")
+        
+        # Ensure parsed_content is a dictionary
+        if not isinstance(parsed_content, dict):
+            print(f"ERROR: parsed_content is not a dict, it's: {type(parsed_content)}")
+            parsed_content = {"text": str(parsed_content) if parsed_content else ""}
 
         # Extract structured experience data
         ats_analyzer = get_ats_analyzer()
@@ -246,7 +255,20 @@ async def parse_resume_to_resume_data(file: UploadFile = File(...)) -> dict[str,
         print(f"DEBUG: structured_experience keys: {structured_experience.keys() if isinstance(structured_experience, dict) else 'Not a dict'}")
         
         # Convert to ResumeData format
-        resume_data = convert_to_resume_data(parsed_content, structured_experience)
+        try:
+            # Test basic access first
+            print(f"Testing parsed_content access...")
+            test_text = parsed_content.get("text", "") if isinstance(parsed_content, dict) else ""
+            print(f"Successfully accessed text: {len(test_text)} characters")
+            
+            resume_data = convert_to_resume_data(parsed_content, structured_experience)
+        except Exception as e:
+            print(f"ERROR in convert_to_resume_data: {e}")
+            print(f"parsed_content type: {type(parsed_content)}")
+            print(f"parsed_content value: {parsed_content}")
+            print(f"structured_experience type: {type(structured_experience)}")
+            print(f"structured_experience value: {structured_experience}")
+            raise HTTPException(status_code=500, detail=f"Error converting to ResumeData: {e!s}")
 
         return {
             "success": True,
@@ -272,8 +294,10 @@ def convert_to_resume_data(parsed_content: dict, structured_experience: dict) ->
     
     # Ensure we have valid dictionaries
     if not isinstance(parsed_content, dict):
-        parsed_content = {}
+        print(f"WARNING: parsed_content is not a dict in convert_to_resume_data: {type(parsed_content)}")
+        parsed_content = {"text": str(parsed_content) if parsed_content else ""}
     if not isinstance(structured_experience, dict):
+        print(f"WARNING: structured_experience is not a dict in convert_to_resume_data: {type(structured_experience)}")
         structured_experience = {}
     
     # Helper function to clean name (matches frontend ResumeDataUtils.cleanName)
@@ -366,7 +390,7 @@ def convert_to_resume_data(parsed_content: dict, structured_experience: dict) ->
     }
     
     # Use structured experience if available, otherwise fallback to parsed content
-    if structured_experience and structured_experience.get("contact_info"):
+    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("contact_info"):
         contact_info = structured_experience["contact_info"]
         personal.update({
             "fullName": clean_name(contact_info.get("full_name", "")),
@@ -379,7 +403,7 @@ def convert_to_resume_data(parsed_content: dict, structured_experience: dict) ->
         })
     
     # Extract current job title from work experience
-    if structured_experience and structured_experience.get("work_experience"):
+    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("work_experience"):
         work_exp = structured_experience["work_experience"]
         if work_exp:
             # Find current job first
@@ -391,14 +415,14 @@ def convert_to_resume_data(parsed_content: dict, structured_experience: dict) ->
     
     # Extract summary
     summary = ""
-    if structured_experience and structured_experience.get("summary"):
+    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("summary"):
         summary = structured_experience["summary"]
-    elif parsed_content.get("summary_profile"):
+    elif isinstance(parsed_content, dict) and parsed_content.get("summary_profile"):
         summary = parsed_content["summary_profile"]
     
     # Extract work experience
     experience = []
-    if structured_experience and structured_experience.get("work_experience"):
+    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("work_experience"):
         for exp in structured_experience["work_experience"]:
             if exp.get("positions"):
                 for pos in exp["positions"]:
@@ -417,7 +441,7 @@ def convert_to_resume_data(parsed_content: dict, structured_experience: dict) ->
     
     # Extract education
     education = []
-    if structured_experience and structured_experience.get("education"):
+    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("education"):
         for edu in structured_experience["education"]:
             education.append({
                 "id": generate_id("edu"),
@@ -441,7 +465,7 @@ def convert_to_resume_data(parsed_content: dict, structured_experience: dict) ->
         "certifications": [],
     }
     
-    if structured_experience and structured_experience.get("skills"):
+    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("skills"):
         skills_data = structured_experience["skills"]
         skills.update({
             "technical": capitalize_skills(skills_data.get("technical_programming", []) + 
@@ -454,7 +478,7 @@ def convert_to_resume_data(parsed_content: dict, structured_experience: dict) ->
     
     # Extract projects
     projects = []
-    if structured_experience and structured_experience.get("projects"):
+    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("projects"):
         for proj in structured_experience["projects"]:
             projects.append({
                 "id": generate_id("proj"),
@@ -472,7 +496,7 @@ def convert_to_resume_data(parsed_content: dict, structured_experience: dict) ->
     achievements = []
     hobbies = []
     
-    if structured_experience:
+    if structured_experience and isinstance(structured_experience, dict):
         achievements = structured_experience.get("achievements", [])
         hobbies = structured_experience.get("hobbies_interests", [])
     

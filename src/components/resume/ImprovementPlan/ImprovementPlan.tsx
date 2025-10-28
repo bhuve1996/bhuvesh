@@ -1,16 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 
 import { Icons } from '@/components/ui/SVG';
+import { useThemeStyles } from '@/hooks/useThemeStyles';
 import type { ImprovementItem, ImprovementPlanProps } from '@/types';
 
-export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
+export const ImprovementPlan = memo<ImprovementPlanProps>(({
   improvements,
   summary,
   quick_wins,
   currentScore,
 }) => {
+  const { getThemeClasses: _getThemeClasses } = useThemeStyles();
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -61,20 +63,6 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
     other: '📋',
   };
 
-  const categoryColors = {
-    ats: 'from-red-100 to-pink-100 dark:from-red-500/20 dark:to-pink-500/20 border-red-300 dark:border-red-500/30',
-    keyword:
-      'from-blue-100 to-cyan-100 dark:from-blue-500/20 dark:to-cyan-500/20 border-blue-300 dark:border-blue-500/30',
-    formatting:
-      'from-green-100 to-emerald-100 dark:from-green-500/20 dark:to-emerald-500/20 border-green-300 dark:border-green-500/30',
-    content:
-      'from-purple-100 to-violet-100 dark:from-purple-500/20 dark:to-violet-500/20 border-purple-300 dark:border-purple-500/30',
-    structure:
-      'from-orange-100 to-amber-100 dark:from-orange-500/20 dark:to-amber-500/20 border-orange-300 dark:border-orange-500/30',
-    other:
-      'from-slate-100 to-gray-100 dark:from-gray-500/20 dark:to-slate-500/20 border-slate-300 dark:border-gray-500/30',
-  };
-
   const categoryLabels = {
     ats: 'ATS Compatibility',
     keyword: 'Keyword Optimization',
@@ -84,30 +72,42 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
     other: 'Other',
   };
 
+  const categoryColors = {
+    ats: 'from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20',
+    keyword: 'from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20',
+    formatting: 'from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20',
+    content: 'from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20',
+    experience: 'from-cyan-50 to-cyan-100 dark:from-cyan-900/20 dark:to-cyan-800/20',
+    skills: 'from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-800/20',
+    education: 'from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20',
+    structure: 'from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20',
+    other: 'from-slate-50 to-slate-100 dark:from-slate-900/20 dark:to-slate-800/20',
+  };
+
   return (
     <div className='space-y-8'>
       {/* Header with Score Projection */}
-      <div className='bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-500/10 dark:to-blue-500/10 border border-cyan-300 dark:border-cyan-400/30 rounded-xl p-6'>
+      <div className='bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-primary-500/10 dark:to-secondary-500/10 border border-primary-300 dark:border-primary-400/30 rounded-xl p-6'>
         <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
           <div>
-            <h2 className='text-2xl font-bold text-slate-900 dark:text-white mb-2'>
+            <h2 className='text-2xl font-bold text-foreground mb-2'>
               📈 Improvement Plan
             </h2>
-            <p className='text-slate-600 dark:text-gray-300'>
+            <p className='text-muted-foreground'>
               Complete these{' '}
               {summary?.total_improvements || improvements.length} improvements
               to boost your ATS score
             </p>
           </div>
           <div className='text-right'>
-            <div className='text-3xl md:text-4xl font-bold text-cyan-600 dark:text-cyan-400'>
+            <div className='text-3xl md:text-4xl font-bold text-primary-600 dark:text-primary-400'>
               {currentScore}
-              <span className='text-slate-500 dark:text-gray-400 mx-2'>→</span>
+              <span className='text-muted-foreground mx-2'>→</span>
               <span className='text-green-600 dark:text-green-400'>
                 {projectedScore}
               </span>
             </div>
-            <div className='text-sm text-slate-500 dark:text-gray-400 mt-1'>
+            <div className='text-sm text-muted-foreground mt-1'>
               Current → Potential Score
             </div>
           </div>
@@ -115,16 +115,16 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
 
         {/* Progress Bar */}
         <div className='mt-6'>
-          <div className='flex justify-between text-sm text-slate-600 dark:text-gray-300 mb-2'>
+          <div className='flex justify-between text-sm text-muted-foreground mb-2'>
             <span>
               Progress: {completed.size} /{' '}
               {summary?.total_improvements || improvements.length}
             </span>
             <span>+{completedImpact} points so far</span>
           </div>
-          <div className='w-full bg-slate-200 dark:bg-gray-700 rounded-full h-3'>
+          <div className='w-full bg-muted rounded-full h-3'>
             <div
-              className='bg-gradient-to-r from-cyan-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 h-3 rounded-full transition-all duration-500'
+              className='bg-gradient-to-r from-primary-500 to-secondary-600 dark:from-primary-400 dark:to-secondary-500 h-3 rounded-full transition-all duration-500'
               style={{
                 width: `${(completed.size / (summary?.total_improvements || improvements.length)) * 100}%`,
               }}
@@ -135,11 +135,11 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
 
       {/* Quick Wins Section */}
       {quick_wins && quick_wins.length > 0 && (
-        <div className='bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-300 dark:border-yellow-500/30 rounded-xl p-6'>
-          <h3 className='text-xl font-bold text-yellow-700 dark:text-yellow-400 mb-4'>
+        <div className='bg-warning-50 dark:bg-warning-500/10 border border-warning-300 dark:border-warning-500/30 rounded-xl p-6'>
+          <h3 className='text-xl font-bold text-warning-700 dark:text-warning-400 mb-4'>
             ⚡ Quick Wins - Start Here!
           </h3>
-          <p className='text-slate-600 dark:text-gray-300 mb-4'>
+          <p className='text-muted-foreground mb-4'>
             These {quick_wins.length} improvements will give you the biggest
             score boost with the least effort:
           </p>
@@ -147,17 +147,17 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
             {quick_wins.map(item => (
               <div
                 key={item.id}
-                className='flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 gap-3'
+                className='flex flex-col sm:flex-row items-start sm:items-center justify-between bg-muted/50 rounded-lg p-4 gap-3'
               >
                 <div className='flex items-start gap-3 flex-1'>
                   <span className='text-2xl flex-shrink-0'>
                     {categoryIcons[item.category]}
                   </span>
                   <div className='flex-1 min-w-0'>
-                    <div className='font-semibold text-slate-900 dark:text-white break-words'>
+                    <div className='font-semibold text-foreground break-words'>
                       {item.title}
                     </div>
-                    <div className='text-sm text-slate-600 dark:text-gray-400 break-words'>
+                    <div className='text-sm text-muted-foreground break-words'>
                       {item.description}
                     </div>
                   </div>
@@ -266,7 +266,9 @@ export const ImprovementPlan: React.FC<ImprovementPlanProps> = ({
       </div>
     </div>
   );
-};
+});
+
+ImprovementPlan.displayName = 'ImprovementPlan';
 
 // Separate component for individual improvement card
 interface ImprovementCardProps {

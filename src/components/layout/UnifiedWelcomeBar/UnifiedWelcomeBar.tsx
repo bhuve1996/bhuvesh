@@ -52,8 +52,8 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
           description:
             'Get your resume analyzed for ATS compatibility across all job profiles. Receive detailed feedback and optimization suggestions.',
           showWelcome: false,
-          showTemplates: false,
-          showBuilder: false,
+          showTemplates: !!(resumeData || globalResumeData),
+          showBuilder: !!(resumeData || globalResumeData),
           showNavigation: false,
         };
       case 'builder':
@@ -358,13 +358,13 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
       )}
 
       {/* Action Buttons */}
-      <div className='text-center mt-4 flex flex-col sm:flex-row gap-3 justify-center items-center'>
+      <div className='text-center mt-3 sm:mt-4 flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center px-4 sm:px-0'>
         {/* Show Start New Analysis button only on non-ATS checker pages */}
         {currentPage !== 'ats-checker' && (
           <Tooltip content='Start a new ATS analysis' position='top'>
             <button
               onClick={() => (window.location.href = '/resume/ats-checker')}
-              className={`px-4 py-2 bg-gradient-to-r ${styling.gradient} hover:opacity-90 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-background text-sm`}
+              className={`px-3 sm:px-4 py-2 bg-gradient-to-r ${styling.gradient} hover:opacity-90 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-background text-xs sm:text-sm w-full sm:w-auto`}
               aria-label='Start new analysis'
             >
               🆕 Start New Analysis
@@ -382,12 +382,12 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
                 });
                 window.dispatchEvent(event);
               }}
-              className='px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2 focus:ring-offset-background text-sm relative overflow-hidden'
+              className='px-3 sm:px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2 focus:ring-offset-background text-xs sm:text-sm relative overflow-hidden w-full sm:w-auto'
               aria-label='AI content improvement'
             >
-              <span className='relative z-10 flex items-center gap-2'>
+              <span className='relative z-10 flex items-center justify-center gap-1 sm:gap-2'>
                 <svg
-                  className='w-4 h-4'
+                  className='w-3 h-3 sm:w-4 sm:h-4'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
@@ -399,7 +399,8 @@ export const UnifiedWelcomeBar: React.FC<UnifiedWelcomeBarProps> = ({
                     d='M13 10V3L4 14h7v7l9-11h-7z'
                   />
                 </svg>
-                🤖 AI Improve Content
+                <span className='hidden sm:inline'>🤖 AI Improve Content</span>
+                <span className='sm:hidden'>🤖 AI Improve</span>
               </span>
               {/* Pulsating effect */}
               <div className='absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg animate-pulse opacity-20'></div>

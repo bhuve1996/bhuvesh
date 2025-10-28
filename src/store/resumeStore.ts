@@ -20,6 +20,8 @@ interface ResumeState {
   // UI state
   isLoading: boolean;
   error: string | null;
+  uploadedFile: File | null;
+  activeTab: 'upload' | 'analysis';
 
   // Navigation state
   currentStep: 'ats-checker' | 'resume-builder' | 'templates' | 'preview';
@@ -114,6 +116,8 @@ interface ResumeState {
   setShowDataChoice: (show: boolean) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  setUploadedFile: (file: File | null) => void;
+  setActiveTab: (tab: 'upload' | 'analysis') => void;
 
   // Section color actions
   setSectionColors: (
@@ -193,6 +197,8 @@ const initialState = {
   customizedTemplate: null,
   isLoading: false,
   error: null,
+  uploadedFile: null,
+  activeTab: 'upload' as const,
   currentStep: 'ats-checker' as const,
   previousStep: null,
   useUserData: false,
@@ -281,6 +287,8 @@ export const useResumeStore = create<ResumeState>()(
       setShowDataChoice: show => set({ showDataChoice: show }),
       setLoading: loading => set({ isLoading: loading }),
       setError: error => set({ error }),
+      setUploadedFile: file => set({ uploadedFile: file }),
+      setActiveTab: tab => set({ activeTab: tab }),
 
       // Section color actions
       setSectionColors: (sectionId, colors) =>
@@ -385,13 +393,30 @@ export const useResumeStore = create<ResumeState>()(
       },
 
       // Data management
-      clearAllData: () => set(initialState),
-      clearAnalysisData: () =>
+      clearAllData: () => {
+        // Clear localStorage manually to ensure persistence is cleared
+        localStorage.removeItem('resume-store');
+        set(initialState);
+      },
+      clearAnalysisData: () => {
+        // Clear localStorage manually to ensure persistence is cleared
+        localStorage.removeItem('resume-store');
         set({
+          resumeData: null,
           analysisResult: null,
+          extractedDataBackup: null,
           selectedTemplate: null,
           customizedTemplate: null,
-        }),
+          isLoading: false,
+          error: null,
+          uploadedFile: null,
+          activeTab: 'upload',
+          useUserData: false,
+          showDataChoice: false,
+          sectionColors: {},
+          templateCustomizations: initialState.templateCustomizations,
+        });
+      },
       clearTemplateData: () =>
         set({
           selectedTemplate: null,
@@ -725,6 +750,7 @@ export const useResumeStore = create<ResumeState>()(
         currentStep: state.currentStep,
         sectionColors: state.sectionColors,
         templateCustomizations: state.templateCustomizations,
+        // Note: uploadedFile and activeTab are not persisted (UI state only)
       }),
     }
   )
@@ -773,6 +799,8 @@ export const useResumeActions = () => {
   const setShowDataChoice = useResumeStore(state => state.setShowDataChoice);
   const setLoading = useResumeStore(state => state.setLoading);
   const setError = useResumeStore(state => state.setError);
+  const setUploadedFile = useResumeStore(state => state.setUploadedFile);
+  const setActiveTab = useResumeStore(state => state.setActiveTab);
   const clearAllData = useResumeStore(state => state.clearAllData);
   const clearAnalysisData = useResumeStore(state => state.clearAnalysisData);
   const clearTemplateData = useResumeStore(state => state.clearTemplateData);
@@ -828,6 +856,8 @@ export const useResumeActions = () => {
       setShowDataChoice,
       setLoading,
       setError,
+      setUploadedFile,
+      setActiveTab,
       clearAllData,
       clearAnalysisData,
       clearTemplateData,
@@ -867,6 +897,8 @@ export const useResumeActions = () => {
       setShowDataChoice,
       setLoading,
       setError,
+      setUploadedFile,
+      setActiveTab,
       clearAllData,
       clearAnalysisData,
       clearTemplateData,

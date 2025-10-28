@@ -6,7 +6,8 @@ import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
 import { atsApi } from '@/lib/ats/api';
 import { CloudResume, cloudStorage } from '@/lib/resume/cloudStorage';
-import { ResumeDataUtils } from '@/types/resume';
+import { ERROR_MESSAGES, formatErrorForUser } from '@/lib/utils/errorHandling';
+import { ResumeData, ResumeDataUtils } from '@/types/resume';
 
 interface ResumeManagerProps {
   onResumeSelect: (resume: CloudResume) => void;
@@ -109,8 +110,36 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
       const result = await atsApi.uploadFile(file);
 
       if (result.success && result.data) {
+        // Create basic ResumeData from parsed content
+        const basicResumeData: ResumeData = {
+          personal: {
+            fullName: '',
+            email: '',
+            phone: '',
+            location: '',
+            linkedin: '',
+            github: '',
+            portfolio: '',
+            jobTitle: '',
+          },
+          summary: result.data.text || '',
+          experience: [],
+          education: [],
+          skills: {
+            technical: [],
+            business: [],
+            soft: [],
+            languages: [],
+            certifications: [],
+          },
+          projects: [],
+          achievements: [],
+          certifications: [],
+          hobbies: [],
+        };
+
         // Clean the data using ResumeDataUtils
-        const cleanedData = ResumeDataUtils.cleanResumeData(result.data);
+        const cleanedData = ResumeDataUtils.cleanResumeData(basicResumeData);
 
         // Use the parsed name or fallback to filename
         const resumeName =
@@ -134,9 +163,9 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
           onResumeSelect(newResume);
         }
       }
-    } catch {
-      // console.error('Upload error:', error);
-      alert('Failed to upload and process resume. Please try again.');
+    } catch (error) {
+      const errorMessage = formatErrorForUser(error, ERROR_MESSAGES.UPLOAD);
+      alert(errorMessage);
     } finally {
       setIsUploading(false);
       // Reset the file input

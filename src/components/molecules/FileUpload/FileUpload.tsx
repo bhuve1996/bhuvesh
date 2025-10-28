@@ -1,10 +1,12 @@
 import React, { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 
+import { useTheme } from '@/contexts/ThemeContext';
+import { formatFileSize, getFileIcon } from '@/lib/utils/componentUtils';
+import { getThemeClasses } from '@/lib/utils/themeUtils';
 import type { FileUploadComponentProps } from '@/types';
 
 import { Alert } from '../../atoms/Alert/Alert';
-import { Button } from '../../atoms/Button/Button';
 import { Progress } from '../../atoms/Progress/Progress';
 
 export const FileUpload: React.FC<FileUploadComponentProps> = ({
@@ -13,7 +15,6 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
   maxSize = 10 * 1024 * 1024, // 10MB
   maxFiles = 1,
   onFileUpload,
-  onUpload,
   onError,
   loading = false,
   disabled = false,
@@ -24,9 +25,10 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
   showToast = true,
   ...props
 }) => {
+  const { theme } = useTheme();
   const [dragActive, setDragActive] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadProgress] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
 
   const validateFile = useCallback(
@@ -134,40 +136,12 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
     [handleFiles]
   );
 
-  const handleUpload = useCallback(() => {
-    if (selectedFiles.length > 0 && onUpload) {
-      setUploadProgress(0);
-      onUpload(selectedFiles);
-    }
-  }, [selectedFiles, onUpload]);
-
   const removeFile = useCallback((index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
     setErrors([]);
   }, []);
 
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-  };
-
-  const getFileIcon = (file: File): string => {
-    const extension = file.name.split('.').pop()?.toLowerCase();
-    switch (extension) {
-      case 'pdf':
-        return '📄';
-      case 'docx':
-      case 'doc':
-        return '📝';
-      case 'txt':
-        return '📃';
-      default:
-        return '📁';
-    }
-  };
+  // Using centralized utilities for file operations
 
   return (
     <div
@@ -181,8 +155,16 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
       {/* Upload Area */}
       <div
         className={`
-          relative border-2 border-dashed rounded-lg p-8 text-center transition-colors
-          ${dragActive ? 'border-cyan-500 bg-cyan-50' : 'border-gray-300 hover:border-gray-400'}
+          relative border-2 border-dashed rounded-lg p-4 sm:p-6 md:p-8 text-center transition-colors
+          ${
+            dragActive
+              ? theme === 'dark'
+                ? 'border-cyan-400 bg-cyan-900/20'
+                : 'border-cyan-500 bg-cyan-50'
+              : theme === 'dark'
+                ? 'border-gray-600 hover:border-gray-500'
+                : 'border-gray-300 hover:border-gray-400'
+          }
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           ${loading ? 'pointer-events-none' : ''}
         `}
@@ -206,17 +188,27 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
           Upload resume file
         </label>
 
-        <div className='space-y-4'>
-          <div className='text-4xl'>📁</div>
+        <div className='space-y-3 sm:space-y-4'>
+          <div className='text-3xl sm:text-4xl'>📁</div>
           <div>
-            <p className='text-lg font-medium text-gray-900'>
+            <p
+              className={`text-base sm:text-lg font-medium ${getThemeClasses(theme).text.primary}`}
+            >
               {dragAndDrop
                 ? 'Drag and drop your files here'
                 : 'Choose files to upload'}
             </p>
-            <p className='text-sm text-gray-500 mt-1'>or click to browse</p>
+            <p
+              className={`text-xs sm:text-sm mt-1 ${getThemeClasses(theme).text.muted}`}
+            >
+              or click to browse
+            </p>
           </div>
-          <div className='text-xs text-gray-400'>
+          <div
+            className={`text-xs ${
+              theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+            }`}
+          >
             <p>Supports: {accept}</p>
             <p>Max size: {formatFileSize(maxSize)}</p>
             {maxFiles > 1 && <p>Max files: {maxFiles}</p>}
@@ -224,10 +216,26 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
         </div>
 
         {loading && (
-          <div className='absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg'>
+          <div
+            className={`absolute inset-0 flex items-center justify-center rounded-lg ${
+              theme === 'dark'
+                ? 'bg-slate-900 bg-opacity-90'
+                : 'bg-white bg-opacity-75'
+            }`}
+          >
             <div className='text-center'>
-              <div className='w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-2'></div>
-              <p className='text-sm text-gray-600'>Uploading...</p>
+              <div
+                className={`w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto mb-2 ${
+                  theme === 'dark' ? 'border-cyan-400' : 'border-cyan-500'
+                }`}
+              ></div>
+              <p
+                className={`text-sm ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                }`}
+              >
+                Uploading...
+              </p>
             </div>
           </div>
         )}
@@ -254,26 +262,46 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
       {/* File Preview */}
       {preview && selectedFiles.length > 0 && (
         <div className='mt-4 space-y-2'>
-          <h4 className='text-sm font-medium text-gray-900'>Selected Files:</h4>
+          <h4
+            className={`text-sm font-medium ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}
+          >
+            Selected Files:
+          </h4>
           {selectedFiles.map((file, index) => (
             <div
               key={index}
-              className='flex items-center justify-between p-3 bg-gray-50 rounded-lg'
+              className={`flex items-center justify-between p-3 rounded-lg ${
+                theme === 'dark' ? 'bg-slate-800' : 'bg-gray-50'
+              }`}
             >
               <div className='flex items-center space-x-3'>
-                <span className='text-2xl'>{getFileIcon(file)}</span>
+                <span className='text-2xl'>{getFileIcon(file.name)}</span>
                 <div>
-                  <p className='text-sm font-medium text-gray-900'>
+                  <p
+                    className={`text-sm font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}
+                  >
                     {file.name}
                   </p>
-                  <p className='text-xs text-gray-500'>
+                  <p
+                    className={`text-xs ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}
+                  >
                     {formatFileSize(file.size)}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => removeFile(index)}
-                className='text-red-500 hover:text-red-700 text-sm'
+                className={`text-sm ${
+                  theme === 'dark'
+                    ? 'text-red-400 hover:text-red-300'
+                    : 'text-red-500 hover:text-red-700'
+                }`}
                 disabled={loading}
               >
                 Remove
@@ -283,20 +311,7 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
         </div>
       )}
 
-      {/* Upload Button */}
-      {selectedFiles.length > 0 && !loading && (
-        <div className='mt-4'>
-          <Button
-            onClick={handleUpload}
-            variant='primary'
-            fullWidth
-            disabled={disabled || errors.length > 0}
-          >
-            Upload {selectedFiles.length} file
-            {selectedFiles.length > 1 ? 's' : ''}
-          </Button>
-        </div>
-      )}
+      {/* Upload Button - Removed for immediate processing */}
     </div>
   );
 };

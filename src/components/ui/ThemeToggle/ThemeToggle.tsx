@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+
+import { useTheme } from '@/contexts/ThemeContext';
 
 import { Tooltip } from '../Tooltip/Tooltip';
 
@@ -13,39 +15,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   className = '',
   size = 'md',
 }) => {
-  const [theme, setTheme] = useState<'dark' | 'light'>('light');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    // Get theme from localStorage or system preference
-    const storedTheme = localStorage.getItem('bhuvesh-theme') as
-      | 'dark'
-      | 'light';
-    const initialTheme = storedTheme || 'light'; // Default to light theme
-    setTheme(initialTheme);
-
-    // Apply theme to document
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(initialTheme);
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    localStorage.setItem('bhuvesh-theme', newTheme);
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(newTheme);
-  };
-
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return (
-      <div
-        className={`${size === 'sm' ? 'w-8 h-8' : size === 'md' ? 'w-10 h-10' : 'w-12 h-12'} rounded-lg bg-muted animate-pulse`}
-      />
-    );
-  }
+  const { theme, toggleTheme } = useTheme();
 
   const sizeClasses = {
     sm: 'w-8 h-8',

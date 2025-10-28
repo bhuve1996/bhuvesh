@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import { Button } from '@/components/atoms/Button/Button';
 import { AnimatedProgress, Card } from '@/components/ui';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { AnalysisProgress } from '@/hooks/useAnalysisProgress';
 
 interface ATSAnalysisProps {
@@ -19,6 +20,7 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
   error: _error,
   progress,
 }) => {
+  const { theme } = useTheme();
   const [jobDescription, setJobDescription] = useState('');
   const [showJDInput, setShowJDInput] = useState(false);
   const [hasStartedAnalysis, setHasStartedAnalysis] = useState(false);
@@ -66,7 +68,13 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
               <div className='mb-4'>
                 <div
                   className={`text-2xl font-bold mb-2 ${
-                    progress.isAnalyzing ? 'text-cyan-400' : 'text-green-400'
+                    progress.isAnalyzing
+                      ? theme === 'dark'
+                        ? 'text-cyan-400'
+                        : 'text-cyan-600'
+                      : theme === 'dark'
+                        ? 'text-green-400'
+                        : 'text-green-600'
                   }`}
                 >
                   {progress.isAnalyzing
@@ -77,12 +85,20 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
                     : 100}
                   %
                 </div>
-                <div className='w-full bg-muted rounded-full h-3'>
+                <div
+                  className={`w-full rounded-full h-3 ${
+                    theme === 'dark' ? 'bg-slate-700' : 'bg-gray-200'
+                  }`}
+                >
                   <div
                     className={`h-3 rounded-full transition-all duration-500 ease-out ${
                       progress.isAnalyzing
-                        ? 'bg-gradient-to-r from-cyan-400 to-blue-500'
-                        : 'bg-gradient-to-r from-green-400 to-emerald-500'
+                        ? theme === 'dark'
+                          ? 'bg-gradient-to-r from-cyan-400 to-blue-500'
+                          : 'bg-gradient-to-r from-cyan-500 to-blue-600'
+                        : theme === 'dark'
+                          ? 'bg-gradient-to-r from-green-400 to-emerald-500'
+                          : 'bg-gradient-to-r from-green-500 to-emerald-600'
                     }`}
                     style={{
                       width: `${
@@ -100,8 +116,18 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
 
             {/* Error Display */}
             {progress.error && (
-              <div className='mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg'>
-                <p className='text-red-400'>{progress.error}</p>
+              <div
+                className={`mb-4 p-4 rounded-lg ${
+                  theme === 'dark'
+                    ? 'bg-red-900/20 border border-red-800'
+                    : 'bg-red-500/10 border border-red-500/20'
+                }`}
+              >
+                <p
+                  className={theme === 'dark' ? 'text-red-300' : 'text-red-600'}
+                >
+                  {progress.error}
+                </p>
               </div>
             )}
           </div>
@@ -122,7 +148,11 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
             </h3>
             <p className='text-muted-foreground mb-6'>
               Your resume{' '}
-              <span className='text-cyan-400 font-medium'>
+              <span
+                className={`font-medium ${
+                  theme === 'dark' ? 'text-cyan-400' : 'text-cyan-600'
+                }`}
+              >
                 {file?.name || 'resume'}
               </span>{' '}
               is ready for analysis.
@@ -156,7 +186,7 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
                 <textarea
                   value={jobDescription}
                   onChange={e => setJobDescription(e.target.value)}
-                  rows={8}
+                  rows={6}
                   placeholder='Paste the job description here...
 
 Example:
@@ -168,7 +198,11 @@ Requirements:
 - Experience with React, Node.js, and modern web frameworks
 - Knowledge of SQL databases
 - Experience with AWS, Docker, Kubernetes'
-                  className='w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none'
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg resize-none focus:outline-none focus:ring-2 focus:border-transparent text-sm sm:text-base ${
+                    theme === 'dark'
+                      ? 'bg-slate-800 border border-slate-600 text-white placeholder-gray-400 focus:ring-cyan-500'
+                      : 'bg-background border border-border text-foreground placeholder-muted-foreground focus:ring-primary-500'
+                  }`}
                 />
                 <p className='text-xs text-muted-foreground mt-1'>
                   {jobDescription.length} characters (minimum 50 recommended)
@@ -177,8 +211,20 @@ Requirements:
             )}
 
             {_error && (
-              <div className='mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg'>
-                <p className='text-destructive'>{_error}</p>
+              <div
+                className={`mb-6 p-4 rounded-lg ${
+                  theme === 'dark'
+                    ? 'bg-red-900/20 border border-red-800'
+                    : 'bg-destructive/10 border border-destructive/20'
+                }`}
+              >
+                <p
+                  className={
+                    theme === 'dark' ? 'text-red-300' : 'text-destructive'
+                  }
+                >
+                  {_error}
+                </p>
               </div>
             )}
 
@@ -186,15 +232,17 @@ Requirements:
               <Button
                 onClick={handleAnalyze}
                 disabled={progress.isAnalyzing}
-                className='px-8 py-3 text-lg'
+                className='px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-lg w-full sm:w-auto'
               >
                 {progress.isAnalyzing ? (
-                  <div className='flex items-center space-x-2'>
-                    <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
-                    <span>Analyzing with AI...</span>
+                  <div className='flex items-center justify-center space-x-2'>
+                    <div className='w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
+                    <span className='text-sm sm:text-base'>
+                      Analyzing with AI...
+                    </span>
                   </div>
                 ) : (
-                  <span>
+                  <span className='text-sm sm:text-base'>
                     {showJDInput
                       ? 'Analyze with Job Description'
                       : 'Quick Analysis'}
@@ -204,9 +252,17 @@ Requirements:
 
               {progress.isAnalyzing && (
                 <div className='mt-6'>
-                  <div className='w-full bg-gray-700 rounded-full h-2'>
+                  <div
+                    className={`w-full rounded-full h-2 ${
+                      theme === 'dark' ? 'bg-slate-700' : 'bg-gray-200'
+                    }`}
+                  >
                     <div
-                      className='bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full transition-all duration-500'
+                      className={`h-2 rounded-full transition-all duration-500 ${
+                        theme === 'dark'
+                          ? 'bg-gradient-to-r from-cyan-400 to-blue-500'
+                          : 'bg-gradient-to-r from-cyan-500 to-blue-600'
+                      }`}
                       style={{
                         width: `${(progress.currentStep / (progress.steps.length - 1)) * 100}%`,
                       }}

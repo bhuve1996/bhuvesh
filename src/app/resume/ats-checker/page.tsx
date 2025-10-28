@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 import { UnifiedWelcomeBar } from '@/components/layout/UnifiedWelcomeBar';
@@ -8,31 +8,25 @@ import { FileUpload } from '@/components/molecules/FileUpload/FileUpload';
 import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
 import { ResultsDisplay } from '@/components/resume/ResultsDisplay';
 import { Section } from '@/components/ui/Section';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useAnalysisProgress } from '@/hooks/useAnalysisProgress';
 import { atsApi } from '@/lib/ats/api';
+import { ERROR_MESSAGES, formatErrorForUser } from '@/lib/utils/errorHandling';
 import { useResumeActions, useResumeStore } from '@/store/resumeStore';
 import type { AnalysisResult } from '@/types';
-import { ResumeDataUtils } from '@/types/resume';
+import { ResumeData, ResumeDataUtils } from '@/types/resume';
 
 export default function ATSCheckerPage() {
-  const [file, setFile] = useState<File | null>(null);
+  // Theme
+  const { theme } = useTheme();
 
   // Use global state
   const analysisResult = useResumeStore(state => state.analysisResult);
   const resumeData = useResumeStore(state => state.resumeData);
   const isLoading = useResumeStore(state => state.isLoading);
   const error = useResumeStore(state => state.error);
-
-  const [activeTab, setActiveTab] = useState<'upload' | 'results'>(
-    analysisResult ? 'results' : 'upload'
-  );
-
-  // Update activeTab when analysisResult changes
-  useEffect(() => {
-    if (analysisResult) {
-      setActiveTab('results');
-    }
-  }, [analysisResult]);
+  const uploadedFile = useResumeStore(state => state.uploadedFile);
+  const activeTab = useResumeStore(state => state.activeTab);
 
   const {
     setAnalysisResult,
@@ -40,8 +34,17 @@ export default function ATSCheckerPage() {
     setExtractedDataBackup,
     setError,
     setLoading,
-    clearAnalysisData,
+    setUploadedFile,
+    setActiveTab,
+    clearAllData,
   } = useResumeActions();
+
+  // Update activeTab when analysisResult changes
+  useEffect(() => {
+    if (analysisResult) {
+      setActiveTab('analysis');
+    }
+  }, [analysisResult, setActiveTab]);
 
   // Progress tracking
   const {
@@ -51,24 +54,52 @@ export default function ATSCheckerPage() {
     setError: setProgressError,
   } = useAnalysisProgress();
 
-  // Handle file upload and parse to ResumeData directly
+  // Handle file upload and parse to ResumeData
   const handleFileUpload = async (files: File[]) => {
     const file = files[0];
     if (!file) return;
 
     try {
-      setFile(file);
+      setUploadedFile(file);
       setLoading(true);
       setError(null);
 
-      // Use the new endpoint that returns ResumeData directly
+      // Parse the file first
       const result = await atsApi.uploadFile(file);
 
       if (result.success && result.data) {
-        // Clean the data using ResumeDataUtils (backend already does most cleaning)
-        const cleanedData = ResumeDataUtils.cleanResumeData(result.data);
+        // Create basic ResumeData from parsed content
+        const resumeData: ResumeData = {
+          personal: {
+            fullName: '',
+            email: '',
+            phone: '',
+            location: '',
+            linkedin: '',
+            github: '',
+            portfolio: '',
+            jobTitle: '',
+          },
+          summary: result.data.text || '',
+          experience: [],
+          education: [],
+          skills: {
+            technical: [],
+            business: [],
+            soft: [],
+            languages: [],
+            certifications: [],
+          },
+          projects: [],
+          achievements: [],
+          certifications: [],
+          hobbies: [],
+        };
 
-        // Set the cleaned ResumeData directly in the store
+        // Clean the data using ResumeDataUtils
+        const cleanedData = ResumeDataUtils.cleanResumeData(resumeData);
+
+        // Set the cleaned ResumeData in the store
         setResumeData(cleanedData);
         setExtractedDataBackup(cleanedData);
 
@@ -77,8 +108,7 @@ export default function ATSCheckerPage() {
         throw new Error(result.message || 'Failed to parse resume');
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to upload resume';
+      const errorMessage = formatErrorForUser(error, ERROR_MESSAGES.UPLOAD);
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -88,7 +118,7 @@ export default function ATSCheckerPage() {
 
   // Handle ATS analysis with job description
   const handleAnalysis = async (jobDescription: string) => {
-    if (!file) {
+    if (!uploadedFile) {
       toast.error('Please upload a resume first');
       return;
     }
@@ -99,7 +129,7 @@ export default function ATSCheckerPage() {
 
       // Perform ATS analysis
       const result = await atsApi.analyzeResumeWithJobDescription(
-        file,
+        uploadedFile,
         jobDescription
       );
 
@@ -127,13 +157,13 @@ export default function ATSCheckerPage() {
 
         setAnalysisResult(analysisResult);
         completeAnalysis();
+        setActiveTab('analysis');
         toast.success('ATS analysis completed successfully!');
       } else {
         throw new Error(result.message || 'Analysis failed');
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Analysis failed';
+      const errorMessage = formatErrorForUser(error, ERROR_MESSAGES.ANALYSIS);
       setError(errorMessage);
       setProgressError(errorMessage);
       toast.error(errorMessage);
@@ -142,65 +172,112 @@ export default function ATSCheckerPage() {
 
   // Clear all data
   const handleClearData = () => {
-    clearAnalysisData();
-    setFile(null);
+    clearAllData();
     setActiveTab('upload');
-    toast.success('Data cleared successfully');
+    toast.success('All data cleared successfully');
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-50 to-blue-50'>
-      <UnifiedWelcomeBar currentPage='ats-checker' />
+    <div
+      className={`min-h-screen bg-gradient-to-br ${
+        theme === 'dark'
+          ? 'from-slate-900 to-slate-800'
+          : 'from-slate-50 to-blue-50'
+      }`}
+    >
+      <UnifiedWelcomeBar
+        currentPage='ats-checker'
+        resumeData={resumeData}
+        analysisResult={
+          analysisResult
+            ? {
+                jobType: analysisResult.jobType,
+                atsScore: analysisResult.atsScore?.toString(),
+              }
+            : null
+        }
+      />
 
-      <main className='container mx-auto px-4 py-8'>
-        <Section className='mb-8'>
-          <div className='text-center mb-8'>
-            <h1 className='text-4xl font-bold text-gray-900 mb-4'>
+      <main className='container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8'>
+        <Section className='mb-6 sm:mb-8'>
+          <div className='text-center mb-6 sm:mb-8'>
+            <h1
+              className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}
+            >
               ATS Resume Checker
             </h1>
-            <p className='text-xl text-gray-600 max-w-3xl mx-auto'>
+            <p
+              className={`text-base sm:text-lg md:text-xl max-w-3xl mx-auto px-4 sm:px-0 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+              }`}
+            >
               Get your resume analyzed for ATS compatibility across all job
               profiles. Receive detailed feedback and optimization suggestions.
             </p>
           </div>
 
-          {/* Action buttons */}
-          <div className='flex flex-wrap gap-4 justify-center mb-8'>
-            <button
-              onClick={() => setActiveTab('upload')}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                activeTab === 'upload'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+          {/* Tab Navigation */}
+          <div className='flex justify-center mb-6 sm:mb-8'>
+            <div
+              className={`inline-flex rounded-lg p-1 w-full max-w-md sm:w-auto ${
+                theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'
               }`}
             >
-              📄 Upload New Resume
-            </button>
-
-            {resumeData && (
               <button
-                onClick={() => setActiveTab('results')}
-                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                  activeTab === 'results'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                onClick={() => setActiveTab('upload')}
+                className={`px-3 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-all duration-200 text-sm sm:text-base flex-1 sm:flex-none ${
+                  activeTab === 'upload'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                📊 Analysis Results
+                <span className='hidden sm:inline'>📄 Upload & Analyze</span>
+                <span className='sm:hidden'>📄 Upload</span>
               </button>
-            )}
+
+              <button
+                onClick={() => {
+                  if (!resumeData) {
+                    toast.error(
+                      'Please upload a resume and complete analysis first!'
+                    );
+                    return;
+                  }
+                  setActiveTab('analysis');
+                }}
+                className={`px-3 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-all duration-200 text-sm sm:text-base flex-1 sm:flex-none ${
+                  activeTab === 'analysis'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : resumeData
+                      ? 'text-gray-600 hover:text-gray-800'
+                      : 'text-gray-400 cursor-not-allowed'
+                }`}
+                disabled={!resumeData}
+              >
+                <span className='hidden sm:inline'>📊 Analysis Results</span>
+                <span className='sm:hidden'>📊 Results</span>
+              </button>
+            </div>
           </div>
 
           {/* Error display */}
           {error && (
-            <div className='bg-red-50 border border-red-200 rounded-lg p-4 mb-6'>
-              <p className='text-red-800'>{error}</p>
+            <div
+              className={`rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 mx-4 sm:mx-0 ${
+                theme === 'dark'
+                  ? 'bg-red-900/20 border border-red-800 text-red-200'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}
+            >
+              <p className='text-sm sm:text-base'>{error}</p>
             </div>
           )}
 
           {/* Tab content */}
           {activeTab === 'upload' && (
-            <div className='max-w-2xl mx-auto'>
+            <div className='max-w-2xl mx-auto space-y-4 sm:space-y-6 px-4 sm:px-0'>
               <FileUpload
                 onFileUpload={handleFileUpload}
                 loading={isLoading}
@@ -208,24 +285,25 @@ export default function ATSCheckerPage() {
                 maxSize={10 * 1024 * 1024} // 10MB
               />
 
-              {resumeData && (
-                <div className='mt-6 p-4 bg-green-50 border border-green-200 rounded-lg'>
-                  <h3 className='text-lg font-semibold text-green-800 mb-2'>
-                    ✅ Resume Parsed Successfully!
-                  </h3>
-                  <p className='text-green-700 mb-4'>
-                    Your resume has been parsed and is ready for ATS analysis.
-                  </p>
-                  <div className='flex gap-4'>
-                    <button
-                      onClick={() => setActiveTab('results')}
-                      className='px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors'
-                    >
-                      View Parsed Data
-                    </button>
+              {/* Job Description Input and Analyze Button - Only show when resume data exists */}
+              {resumeData && uploadedFile && (
+                <div className='space-y-3 sm:space-y-4'>
+                  <ATSAnalysis
+                    file={uploadedFile}
+                    onAnalyze={handleAnalysis}
+                    error={error}
+                    progress={progress}
+                  />
+
+                  {/* Clear Data Button */}
+                  <div className='flex justify-center'>
                     <button
                       onClick={handleClearData}
-                      className='px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors'
+                      className={`px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 text-white hover:bg-gray-600'
+                          : 'bg-gray-600 text-white hover:bg-gray-700'
+                      }`}
                     >
                       Clear Data
                     </button>
@@ -235,18 +313,77 @@ export default function ATSCheckerPage() {
             </div>
           )}
 
-          {activeTab === 'results' && resumeData && (
-            <div className='space-y-6'>
-              {/* ATS Analysis Section */}
-              <ATSAnalysis
-                file={file!}
-                onAnalyze={handleAnalysis}
-                error={error}
-                progress={progress}
-              />
-
-              {/* Results Display */}
-              {analysisResult && <ResultsDisplay result={analysisResult} />}
+          {activeTab === 'analysis' && (
+            <div className='space-y-4 sm:space-y-6 px-4 sm:px-0'>
+              {resumeData ? (
+                analysisResult ? (
+                  <ResultsDisplay result={analysisResult} />
+                ) : (
+                  <div className='text-center py-8 sm:py-12'>
+                    <div className='max-w-md mx-auto'>
+                      <div className='text-4xl sm:text-6xl mb-3 sm:mb-4'>
+                        📊
+                      </div>
+                      <h3
+                        className={`text-lg sm:text-xl font-semibold mb-2 ${
+                          theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}
+                      >
+                        Analysis Results
+                      </h3>
+                      <p
+                        className={`mb-4 sm:mb-6 text-sm sm:text-base ${
+                          theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                        }`}
+                      >
+                        Complete the analysis in the Upload & Analyze tab to
+                        view detailed results here.
+                      </p>
+                      <button
+                        onClick={() => setActiveTab('upload')}
+                        className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
+                          theme === 'dark'
+                            ? 'bg-cyan-600 text-white hover:bg-cyan-700'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
+                      >
+                        Go to Upload & Analyze
+                      </button>
+                    </div>
+                  </div>
+                )
+              ) : (
+                <div className='text-center py-8 sm:py-12'>
+                  <div className='max-w-md mx-auto'>
+                    <div className='text-4xl sm:text-6xl mb-3 sm:mb-4'>📄</div>
+                    <h3
+                      className={`text-lg sm:text-xl font-semibold mb-2 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}
+                    >
+                      Upload Resume First
+                    </h3>
+                    <p
+                      className={`mb-4 sm:mb-6 text-sm sm:text-base ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                      }`}
+                    >
+                      Please upload a resume and complete the analysis to view
+                      results here.
+                    </p>
+                    <button
+                      onClick={() => setActiveTab('upload')}
+                      className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
+                        theme === 'dark'
+                          ? 'bg-cyan-600 text-white hover:bg-cyan-700'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      Upload Resume
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </Section>

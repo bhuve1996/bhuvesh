@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
-import type { AnalysisResult, ATSCheckerProps } from '@/types';
+import { ERROR_MESSAGES, formatErrorForUser } from '@/lib/utils/errorHandling';
+import type { ATSCheckerProps, AnalysisResult } from '@/types';
 
 import { Alert } from '../../atoms/Alert/Alert';
 import { Button } from '../../atoms/Button/Button';
@@ -93,8 +94,7 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
         throw new Error(result.message || 'Analysis failed');
       }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Analysis failed';
+      const errorMessage = formatErrorForUser(err, ERROR_MESSAGES.ANALYSIS);
       setError(errorMessage);
 
       if (onError) {

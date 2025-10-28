@@ -1,11 +1,19 @@
 /**
  * API Service for Enhanced ATS Backend
- * Connects to Python FastAPI backend with semantic matching
+ * Uses unified API client for consistent error handling and retry logic
  */
 
-import { ResumeData } from '@/types/resume';
+import {
+  analyzeResume,
+  checkApiHealth,
+  detectJobRole,
+  extractKeywords,
+  improveResume,
+  uploadFile,
+} from '@/lib/api/unifiedClient';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Re-export types for backward compatibility
+export type { ApiError, ApiResponse } from '@/lib/api/unifiedClient';
 
 export interface ATSAnalysisResult {
   ats_score: number;
@@ -30,8 +38,28 @@ export interface ATSAnalysisResult {
 
 export interface ATSAnalysisResponse {
   success: boolean;
-  data: ATSAnalysisResult;
+  data?: ATSAnalysisResult;
   message: string;
+}
+
+export interface ParseResponse {
+  success: boolean;
+  data?: {
+    filename: string;
+    file_size: number;
+    file_type: string;
+    text: string;
+    word_count: number;
+    character_count: number;
+    formatting_analysis: Record<string, unknown>;
+    parsed_content: Record<string, unknown>;
+  };
+  message: string;
+}
+
+export interface SupportedFormatsResponse {
+  supported_formats: string[];
+  max_file_size: string;
 }
 
 /**
@@ -39,9 +67,8 @@ export interface ATSAnalysisResponse {
  */
 export async function checkBackendHealth(): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/health`);
-    const data = await response.json();
-    return data.status === 'healthy';
+    const response = await checkApiHealth();
+    return response.success;
   } catch {
     return false;
   }
@@ -54,114 +81,154 @@ export async function analyzeResumeWithJobDescription(
   file: File,
   jobDescription: string
 ): Promise<ATSAnalysisResponse> {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('job_description', jobDescription);
-
   try {
-    const response = await fetch(`${API_BASE_URL}/api/upload/analyze`, {
-      method: 'POST',
-      body: formData,
+    // First upload the file
+    const uploadResponse = await uploadFile(file);
+    if (!uploadResponse.success || !uploadResponse.data) {
+      throw new Error('Failed to upload file');
+    }
+
+    // Then analyze with job description
+    const analysisResponse = await analyzeResume({
+      resume_text: uploadResponse.data.extracted_text,
+      job_description: jobDescription,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Analysis failed');
-    }
-
-    return response.json();
+    return {
+      success: analysisResponse.success,
+      data: analysisResponse.data,
+      message: analysisResponse.message,
+    };
   } catch (error) {
-    if (error instanceof Error) {
-      throw error;
-    }
-    throw new Error('Failed to connect to analysis server');
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Analysis failed',
+    };
   }
 }
 
 /**
  * Parse resume only (without job description)
  */
-export async function parseResume(file: File) {
-  const formData = new FormData();
-  formData.append('file', file);
-
+export async function parseResume(file: File): Promise<ParseResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/upload/parse`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Failed to parse file');
-    }
-
-    return response.json();
-  } catch (error) {
-    if (error instanceof Error) {
-      throw error;
-    }
-    throw new Error('Failed to parse resume');
-  }
-}
-
-/**
- * Upload and parse resume file - returns ResumeData directly
- * This eliminates the need for frontend conversion functions
- */
-export async function uploadFile(file: File): Promise<{
-  success: boolean;
-  data: ResumeData; // ResumeData format
-  message: string;
-}> {
-  const formData = new FormData();
-  formData.append('file', file);
-
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/upload/parse-to-resume-data`,
-      {
-        method: 'POST',
-        body: formData,
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Upload failed');
-    }
-
-    return response.json();
-  } catch (error) {
-    if (error instanceof Error) {
-      throw error;
-    }
-    throw new Error('Failed to upload and parse resume');
-  }
-}
-
-/**
- * Get supported file formats
- */
-export async function getSupportedFormats() {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/upload/supported-formats`
-    );
-    return response.json();
-  } catch {
+    const response = await uploadFile(file);
     return {
-      supported_formats: ['.pdf', '.docx', '.doc', '.txt'],
-      max_file_size: '10MB',
+      success: response.success,
+      data: response.data
+        ? {
+            filename: response.data.filename,
+            file_size: response.data.size,
+            file_type: response.data.content_type,
+            text: response.data.extracted_text,
+            word_count: response.data.extracted_text.split(' ').length,
+            character_count: response.data.extracted_text.length,
+            formatting_analysis: {},
+            parsed_content: {},
+          }
+        : undefined,
+      message: response.message,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to parse file',
     };
   }
 }
 
-// Export all functions as atsApi object
+/**
+ * Upload and parse resume file - returns parsed content
+ */
+export async function uploadResumeFile(file: File): Promise<ParseResponse> {
+  return parseResume(file);
+}
+
+/**
+ * Quick analysis with AI-generated job description
+ */
+export async function quickAnalyzeResume(
+  file: File
+): Promise<ATSAnalysisResponse> {
+  try {
+    // First upload the file
+    const uploadResponse = await uploadFile(file);
+    if (!uploadResponse.success || !uploadResponse.data) {
+      throw new Error('Failed to upload file');
+    }
+
+    // Detect job role from resume
+    const jobRoleResponse = await detectJobRole(
+      uploadResponse.data.extracted_text
+    );
+    if (!jobRoleResponse.success || !jobRoleResponse.data) {
+      throw new Error('Failed to detect job role');
+    }
+
+    // Extract keywords from detected role
+    const keywordsResponse = await extractKeywords(
+      jobRoleResponse.data.detected_role
+    );
+    if (!keywordsResponse.success || !keywordsResponse.data) {
+      throw new Error('Failed to extract keywords');
+    }
+
+    // Analyze resume with detected role as job description
+    const analysisResponse = await analyzeResume({
+      resume_text: uploadResponse.data.extracted_text,
+      job_description: jobRoleResponse.data.detected_role,
+    });
+
+    return {
+      success: analysisResponse.success,
+      data: analysisResponse.data,
+      message: analysisResponse.message,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Quick analysis failed',
+    };
+  }
+}
+
+/**
+ * Get supported file formats with fallback
+ */
+export async function getSupportedFormats(): Promise<SupportedFormatsResponse> {
+  const fallbackData: SupportedFormatsResponse = {
+    supported_formats: ['.pdf', '.docx', '.doc', '.txt'],
+    max_file_size: '10MB',
+  };
+
+  try {
+    const response = await checkApiHealth();
+    if (response.success) {
+      return fallbackData; // Backend is healthy, return supported formats
+    }
+  } catch {
+    // Backend is not available, return fallback
+  }
+
+  return fallbackData;
+}
+
+// Export all functions as atsApi object for backward compatibility
 export const atsApi = {
   checkBackendHealth,
   analyzeResumeWithJobDescription,
   parseResume,
-  uploadFile,
+  uploadFile: uploadResumeFile,
+  quickAnalyzeResume,
   getSupportedFormats,
+};
+
+// Export individual functions for direct use
+export {
+  analyzeResume,
+  checkApiHealth,
+  detectJobRole,
+  extractKeywords,
+  improveResume,
+  uploadFile,
 };
