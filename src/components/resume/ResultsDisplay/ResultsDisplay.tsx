@@ -334,7 +334,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
                     🎯 Job Type
                   </p>
                   <p className='text-sm font-semibold text-cyan-600 dark:text-cyan-400'>
-                    {result.jobType.split(' (')[0]}
+                    {result.jobType?.split(' (')[0] || 'Unknown'}
                   </p>
                 </div>
                 {/* Hover Tooltip */}

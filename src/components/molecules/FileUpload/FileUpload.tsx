@@ -168,11 +168,14 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           ${loading ? 'pointer-events-none' : ''}
         `}
-        onClick={() =>
-          !disabled &&
-          !loading &&
-          document.getElementById('file-input')?.click()
-        }
+        onClick={() => {
+          const fileInput = document.getElementById(
+            'file-input'
+          ) as HTMLInputElement;
+          if (fileInput && !fileInput.disabled) {
+            fileInput.click();
+          }
+        }}
       >
         <input
           id='file-input'

@@ -13,7 +13,7 @@ import { useAnalysisProgress } from '@/hooks/useAnalysisProgress';
 import { atsApi } from '@/lib/ats/api';
 import { ERROR_MESSAGES, formatErrorForUser } from '@/lib/utils/errorHandling';
 import { useResumeActions, useResumeStore } from '@/store/resumeStore';
-import type { AnalysisResult } from '@/types';
+import type { AnalysisResult, StructuredExperience } from '@/types';
 import { ResumeData, ResumeDataUtils } from '@/types/resume';
 
 export default function ATSCheckerPage() {
@@ -51,6 +51,8 @@ export default function ATSCheckerPage() {
     progress,
     startAnalysis,
     completeAnalysis,
+    updateStep,
+    resetProgress,
     setError: setProgressError,
   } = useAnalysisProgress();
 
@@ -127,10 +129,36 @@ export default function ATSCheckerPage() {
       startAnalysis();
       setError(null);
 
-      // Perform ATS analysis
+      // Perform ATS analysis with progress tracking
       const result = await atsApi.analyzeResumeWithJobDescription(
         uploadedFile,
-        jobDescription
+        jobDescription,
+        (step: string, progress: number) => {
+          // Update progress in the store
+          setProgressError('');
+
+          // Map step names to step indices for proper progress tracking
+          let stepIndex = 0;
+          switch (step.toLowerCase()) {
+            case 'uploading':
+              stepIndex = 0;
+              break;
+            case 'parsing':
+              stepIndex = 1;
+              break;
+            case 'analyzing':
+              stepIndex = 2;
+              break;
+            case 'results':
+              stepIndex = 3;
+              break;
+            default:
+              stepIndex = Math.floor(progress / 25); // Fallback based on progress percentage
+          }
+
+          // Update the current step
+          updateStep(stepIndex, 'active');
+        }
       );
 
       if (result.success && result.data) {
@@ -146,6 +174,19 @@ export default function ATSCheckerPage() {
           wordCount: result.data.word_count || 0,
           characterCount: result.data.word_count * 5 || 0, // Rough estimate
           keywordDensity: {}, // TODO: Calculate keyword density from backend data
+          job_description: result.data.job_description || '', // Add AI-generated job description
+          structured_experience: (result.data
+            .structured_experience as StructuredExperience) || {
+            work_experience: [],
+            contact_info: {
+              full_name: '',
+              email: '',
+              phone: '',
+              location: '',
+              linkedin: '',
+              github: '',
+            },
+          },
           detailed_scores: {
             keyword_score: result.data.detailed_scores?.keyword_score || 0,
             semantic_score: result.data.detailed_scores?.semantic_score || 0,
@@ -173,6 +214,7 @@ export default function ATSCheckerPage() {
   // Clear all data
   const handleClearData = () => {
     clearAllData();
+    resetProgress();
     setActiveTab('upload');
     toast.success('All data cleared successfully');
   };
@@ -278,7 +320,55 @@ export default function ATSCheckerPage() {
           {/* Tab content */}
           {activeTab === 'upload' && (
             <div className='max-w-2xl mx-auto space-y-4 sm:space-y-6 px-4 sm:px-0'>
+              {/* Clear Data Button - Show when there are analysis results */}
+              {analysisResult && (
+                <div
+                  className={`rounded-lg p-4 border ${
+                    theme === 'dark'
+                      ? 'bg-green-900/20 border-green-800'
+                      : 'bg-green-50 border-green-200'
+                  }`}
+                >
+                  <div className='flex items-center justify-between'>
+                    <div className='flex items-center space-x-3'>
+                      <div className='w-2 h-2 bg-green-500 rounded-full'></div>
+                      <div>
+                        <p
+                          className={`text-sm font-medium ${
+                            theme === 'dark'
+                              ? 'text-green-200'
+                              : 'text-green-800'
+                          }`}
+                        >
+                          Analysis Complete
+                        </p>
+                        <p
+                          className={`text-xs ${
+                            theme === 'dark'
+                              ? 'text-green-300'
+                              : 'text-green-600'
+                          }`}
+                        >
+                          Your resume has been analyzed successfully
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleClearData}
+                      className={`px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                        theme === 'dark'
+                          ? 'border border-red-600 text-red-400 hover:bg-red-900/20 hover:border-red-500'
+                          : 'border border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400'
+                      }`}
+                    >
+                      Clear Data
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <FileUpload
+                key={`file-upload-${resumeData ? 'with-data' : 'empty'}`}
                 onFileUpload={handleFileUpload}
                 loading={isLoading}
                 accept={'.pdf,.docx,.doc,.txt'}
@@ -294,20 +384,6 @@ export default function ATSCheckerPage() {
                     error={error}
                     progress={progress}
                   />
-
-                  {/* Clear Data Button */}
-                  <div className='flex justify-center'>
-                    <button
-                      onClick={handleClearData}
-                      className={`px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
-                        theme === 'dark'
-                          ? 'bg-gray-700 text-white hover:bg-gray-600'
-                          : 'bg-gray-600 text-white hover:bg-gray-700'
-                      }`}
-                    >
-                      Clear Data
-                    </button>
-                  </div>
                 </div>
               )}
             </div>

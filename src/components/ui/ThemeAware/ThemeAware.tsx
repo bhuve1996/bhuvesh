@@ -186,10 +186,16 @@ export const ThemeAwareInput: React.FC<ThemeAwareInputProps> = ({
 
   return (
     <div className='space-y-2'>
-      {label && <label className={`text-sm font-medium ${classes.text.primary}`}>{label}</label>}
+      {label && (
+        <label className={`text-sm font-medium ${classes.text.primary}`}>
+          {label}
+        </label>
+      )}
       <input className={inputClasses} {...props} />
       {error && <p className={`text-sm text-red-500`}>{error}</p>}
-      {help && !error && <p className={`text-sm ${classes.text.muted}`}>{help}</p>}
+      {help && !error && (
+        <p className={`text-sm ${classes.text.muted}`}>{help}</p>
+      )}
     </div>
   );
 };
@@ -393,7 +399,9 @@ export const ThemeAwareProgress: React.FC<ThemeAwareProgressProps> = ({
     <div className='space-y-2'>
       {label && (
         <div className='flex justify-between items-center'>
-          <span className={`text-sm font-medium ${classes.text.primary}`}>{label}</span>
+          <span className={`text-sm font-medium ${classes.text.primary}`}>
+            {label}
+          </span>
           {showPercentage && (
             <span className={`text-sm ${classes.text.muted}`}>
               {Math.round(percentage)}%
@@ -492,7 +500,6 @@ export const ThemeAwareSkeleton: React.FC<ThemeAwareSkeletonProps> = ({
   width,
   height,
 }) => {
-
   const skeletonClasses = combineClasses(
     'animate-pulse bg-gray-200 dark:bg-gray-700 rounded',
     className

@@ -197,6 +197,7 @@ class ATSAnalyzer:
             "formatting_issues": ats_analysis.get("issues", []),
             "ats_friendly": ats_analysis.get("ats_friendly", True),
             "word_count": parsed_resume.get("word_count", 0),
+            "job_description": job_description,  # Include the AI-generated job description
             "detailed_scores": {
                 "keyword_score": round(keyword_analysis["score"], 1),
                 "semantic_score": round(semantic_analysis["score"], 1),

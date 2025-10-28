@@ -269,7 +269,7 @@ export class UnifiedApiClient {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.formRequest('/upload', formData, {
+    return this.formRequest('/api/upload/parse', formData, {
       timeout: 60000, // 60 seconds for file uploads
     });
   }
@@ -277,6 +277,40 @@ export class UnifiedApiClient {
   // ============================================================================
   // ATS ANALYSIS
   // ============================================================================
+
+  async quickAnalyzeResume(file: File): Promise<
+    ApiResponse<{
+      ats_score: number;
+      match_category: string;
+      detected_job_type: string;
+      job_detection_confidence: number;
+      keyword_matches: string[];
+      missing_keywords: string[];
+      semantic_similarity: number;
+      suggestions: string[];
+      strengths: string[];
+      weaknesses: string[];
+      formatting_issues: string[];
+      ats_friendly: boolean;
+      word_count: number;
+      detailed_scores: {
+        keyword_score: number;
+        semantic_score: number;
+        format_score: number;
+        content_score: number;
+        ats_score: number;
+      };
+      structured_experience: unknown;
+      job_description: string;
+    }>
+  > {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.formRequest('/api/upload/quick-analyze', formData, {
+      timeout: 120000, // 2 minutes for analysis
+    });
+  }
 
   async analyzeResume(data: {
     resume_text: string;
@@ -303,7 +337,7 @@ export class UnifiedApiClient {
       };
     }>
   > {
-    return this.request('/analyze', {
+    return this.request('/api/upload/analyze', {
       method: 'POST',
       body: JSON.stringify(data),
       timeout: 120000, // 2 minutes for analysis
@@ -383,6 +417,8 @@ export const apiClient = new UnifiedApiClient();
 
 export const checkApiHealth = () => apiClient.checkHealth();
 export const uploadFile = (file: File) => apiClient.uploadFile(file);
+export const quickAnalyzeResume = (file: File) =>
+  apiClient.quickAnalyzeResume(file);
 export const analyzeResume = (
   data: Parameters<typeof apiClient.analyzeResume>[0]
 ) => apiClient.analyzeResume(data);

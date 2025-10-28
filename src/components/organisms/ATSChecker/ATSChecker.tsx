@@ -1,7 +1,12 @@
 import React, { useCallback, useState } from 'react';
 
+import { atsApi } from '@/lib/ats/api';
 import { ERROR_MESSAGES, formatErrorForUser } from '@/lib/utils/errorHandling';
-import type { ATSCheckerProps, AnalysisResult } from '@/types';
+import type {
+  ATSCheckerProps,
+  AnalysisResult,
+  StructuredExperience,
+} from '@/types';
 
 import { Alert } from '../../atoms/Alert/Alert';
 import { Button } from '../../atoms/Button/Button';
@@ -41,57 +46,91 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
     setError(null);
 
     try {
-      // Create FormData for file upload
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append(
-        'job_description',
-        jobDescription || 'General professional role'
+      // Use quick analyze endpoint which handles everything in one step
+      const analysisResult = await atsApi.analyzeResumeWithJobDescription(
+        file,
+        '', // Empty job description since we're using AI-generated one
+        (_step: string, _progress: number) => {
+          // Progress callback - you can add progress tracking here
+        }
       );
 
-      // Call the backend API
-      const response = await fetch('/api/upload/analyze', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Analysis failed: ${response.statusText}`);
+      if (!analysisResult.success || !analysisResult.data) {
+        throw new Error(analysisResult.message || 'Analysis failed');
       }
 
-      const result = await response.json();
+      const analysisData: AnalysisResult = {
+        jobType: analysisResult.data.match_category || 'General Professional',
+        atsScore: analysisResult.data.ats_score || 0,
+        keywordMatches: analysisResult.data.keyword_matches || [],
+        missingKeywords: analysisResult.data.missing_keywords || [],
+        suggestions: analysisResult.data.suggestions || [],
+        strengths: analysisResult.data.strengths || [],
+        weaknesses: analysisResult.data.weaknesses || [],
+        wordCount: analysisResult.data.word_count || 0,
+        characterCount: analysisResult.data.word_count * 5 || 0, // Rough estimate
+        keywordDensity: {}, // Will be populated by backend
+        extraction_details: {
+          full_resume_text: analysisResult.data.job_description || '',
+          total_resume_keywords:
+            analysisResult.data.keyword_matches?.length || 0,
+          total_jd_keywords: 0,
+          total_matched_keywords:
+            analysisResult.data.keyword_matches?.length || 0,
+          total_missing_keywords:
+            analysisResult.data.missing_keywords?.length || 0,
+        },
+        ats_compatibility: {
+          grade: 'C',
+          issues: [],
+          warnings: [],
+          recommendations: [],
+          sections_found: [],
+          contact_completeness: 'Partial',
+          bullet_consistency: false,
+          word_count_optimal: false,
+        },
+        format_analysis: {
+          grade: 'C',
+          sections_found: 0,
+          optional_sections_found: 0,
+          contact_completeness: 'Partial',
+          has_professional_summary: false,
+          section_headers_count: 0,
+          issues: [],
+          recommendations: [],
+        },
+        detailed_scores: analysisResult.data.detailed_scores || {
+          keyword_score: 0,
+          semantic_score: 0,
+          format_score: 0,
+          content_score: 0,
+          ats_score: 0,
+        },
+        semantic_similarity: analysisResult.data.semantic_similarity || 0,
+        match_category: analysisResult.data.match_category || 'Unknown',
+        ats_friendly: analysisResult.data.ats_friendly || false,
+        formatting_issues: analysisResult.data.formatting_issues || [],
+        job_description: analysisResult.data.job_description || '',
+        structured_experience: (analysisResult.data
+          .structured_experience as StructuredExperience) || {
+          work_experience: [],
+          contact_info: {
+            full_name: '',
+            email: '',
+            phone: '',
+            location: '',
+            linkedin: '',
+            github: '',
+          },
+        },
+      };
 
-      if (result.success) {
-        const analysisData: AnalysisResult = {
-          jobType: result.data.detected_job_type || 'General Professional',
-          atsScore: result.data.ats_score || 0,
-          keywordMatches: result.data.keyword_matches || [],
-          missingKeywords: result.data.missing_keywords || [],
-          suggestions: result.data.suggestions || [],
-          strengths: result.data.strengths || [],
-          weaknesses: result.data.weaknesses || [],
-          wordCount: result.data.word_count || 0,
-          characterCount: result.data.word_count * 5 || 0, // Rough estimate
-          keywordDensity: result.data.keyword_density || {},
-          extraction_details: result.data.extraction_details,
-          ats_compatibility: result.data.ats_compatibility,
-          format_analysis: result.data.format_analysis,
-          detailed_scores: result.data.detailed_scores,
-          semantic_similarity: result.data.semantic_similarity,
-          match_category: result.data.match_category,
-          ats_friendly: result.data.ats_friendly,
-          formatting_issues: result.data.formatting_issues,
-          structured_experience: result.data.structured_experience,
-        };
+      setAnalysisResult(analysisData);
+      setActiveTab('results');
 
-        setAnalysisResult(analysisData);
-        setActiveTab('results');
-
-        if (onAnalysisComplete) {
-          onAnalysisComplete(analysisData);
-        }
-      } else {
-        throw new Error(result.message || 'Analysis failed');
+      if (onAnalysisComplete) {
+        onAnalysisComplete(analysisData);
       }
     } catch (err) {
       const errorMessage = formatErrorForUser(err, ERROR_MESSAGES.ANALYSIS);
@@ -103,7 +142,7 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [file, jobDescription, onAnalysisComplete, onError]);
+  }, [file, onAnalysisComplete, onError]);
 
   const handleNewUpload = useCallback(() => {
     setFile(null);
@@ -126,6 +165,33 @@ export const ATSChecker: React.FC<ATSCheckerProps> = ({
       label: '📄 Upload Resume',
       content: (
         <div className='space-y-6'>
+          {/* Clear Data Button - Show when there are results */}
+          {analysisResult && (
+            <Card className='p-4 bg-green-50 border-green-200'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center space-x-3'>
+                  <div className='w-2 h-2 bg-green-500 rounded-full'></div>
+                  <div>
+                    <p className='text-sm font-medium text-green-800'>
+                      Analysis Complete
+                    </p>
+                    <p className='text-xs text-green-600'>
+                      Your resume has been analyzed successfully
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={handleNewUpload}
+                  className='border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400'
+                >
+                  Clear Data
+                </Button>
+              </div>
+            </Card>
+          )}
+
           {/* File Upload */}
           <FileUpload
             accept='.pdf,.docx,.doc,.txt'

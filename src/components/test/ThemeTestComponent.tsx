@@ -15,7 +15,11 @@ import {
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 
 export const ThemeTestComponent: React.FC = () => {
-  const { theme, toggleTheme, getThemeClasses: _getThemeClasses } = useThemeStyles();
+  const {
+    theme,
+    toggleTheme,
+    getThemeClasses: _getThemeClasses,
+  } = useThemeStyles();
 
   return (
     <div className='space-y-6 p-6'>
@@ -101,10 +105,13 @@ export const ThemeTestComponent: React.FC = () => {
             <div
               key={score}
               className={`p-4 rounded-lg border ${
-                score >= 90 ? 'bg-green-500/20 text-green-500 border-green-500' :
-                score >= 80 ? 'bg-blue-500/20 text-blue-500 border-blue-500' :
-                score >= 70 ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500' :
-                'bg-red-500/20 text-red-500 border-red-500'
+                score >= 90
+                  ? 'bg-green-500/20 text-green-500 border-green-500'
+                  : score >= 80
+                    ? 'bg-blue-500/20 text-blue-500 border-blue-500'
+                    : score >= 70
+                      ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500'
+                      : 'bg-red-500/20 text-red-500 border-red-500'
               }`}
             >
               <div className='text-center'>
@@ -133,15 +140,23 @@ export const ThemeTestComponent: React.FC = () => {
             <div
               key={category}
               className={`p-4 rounded-lg bg-gradient-to-r ${
-                category === 'ats' ? 'from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20' :
-                category === 'keyword' ? 'from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20' :
-                category === 'formatting' ? 'from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20' :
-                category === 'content' ? 'from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20' :
-                category === 'experience' ? 'from-cyan-50 to-cyan-100 dark:from-cyan-900/20 dark:to-cyan-800/20' :
-                category === 'skills' ? 'from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-800/20' :
-                category === 'education' ? 'from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20' :
-                category === 'structure' ? 'from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20' :
-                'from-slate-50 to-slate-100 dark:from-slate-900/20 dark:to-slate-800/20'
+                category === 'ats'
+                  ? 'from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20'
+                  : category === 'keyword'
+                    ? 'from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20'
+                    : category === 'formatting'
+                      ? 'from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20'
+                      : category === 'content'
+                        ? 'from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20'
+                        : category === 'experience'
+                          ? 'from-cyan-50 to-cyan-100 dark:from-cyan-900/20 dark:to-cyan-800/20'
+                          : category === 'skills'
+                            ? 'from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-800/20'
+                            : category === 'education'
+                              ? 'from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20'
+                              : category === 'structure'
+                                ? 'from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20'
+                                : 'from-slate-50 to-slate-100 dark:from-slate-900/20 dark:to-slate-800/20'
               }`}
             >
               <div className='text-center'>
