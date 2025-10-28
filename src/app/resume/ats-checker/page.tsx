@@ -197,6 +197,103 @@ export default function ATSCheckerPage() {
         };
 
         setAnalysisResult(analysisResult);
+
+        // Convert structured experience data to ResumeData format
+        if (analysisResult.structured_experience) {
+          try {
+            const structuredData = analysisResult.structured_experience;
+
+            // Convert structured work experience to ResumeData format
+            const workExperience =
+              structuredData.work_experience?.map((exp, index) => ({
+                id: `exp-${index}`,
+                company: exp.company,
+                position: exp.positions?.[0]?.title || 'Position',
+                location: '', // Not available in structured data
+                startDate: exp.positions?.[0]?.start_date || '',
+                endDate: exp.positions?.[0]?.end_date || '',
+                current: exp.current,
+                description: exp.responsibilities?.join('\n• ') || '',
+                achievements: exp.achievements || [],
+                skills: exp.skills_used || [],
+              })) || [];
+
+            // Create ResumeData from structured experience
+            const structuredResumeData: ResumeData = {
+              personal: {
+                fullName: structuredData.contact_info.full_name,
+                email: structuredData.contact_info.email,
+                phone: structuredData.contact_info.phone,
+                location: structuredData.contact_info.location,
+                linkedin: structuredData.contact_info.linkedin,
+                github: structuredData.contact_info.github,
+                portfolio: '',
+                jobTitle: '', // Will be filled from work experience
+              },
+              summary: resumeData?.summary || '', // Keep existing summary
+              experience: workExperience,
+              education: [], // Not available in current structured data
+              skills: {
+                technical: workExperience.flatMap(exp => exp.skills) || [],
+                business: [],
+                soft: [],
+                languages: [],
+                certifications: [],
+              },
+              projects:
+                structuredData.work_experience?.flatMap(
+                  exp =>
+                    exp.projects?.map((project, index) => ({
+                      id: `project-${index}`,
+                      name: project.name || '',
+                      description: project.description || '',
+                      technologies: project.technologies || [],
+                      url: '',
+                      github: '',
+                      startDate: '',
+                      endDate: '',
+                    })) || []
+                ) || [],
+              achievements:
+                structuredData.work_experience?.flatMap(
+                  exp => exp.achievements
+                ) || [],
+              certifications: [],
+              hobbies: [],
+            };
+
+            // Merge with existing resumeData to preserve any data that wasn't extracted
+            const mergedResumeData: ResumeData = {
+              ...resumeData, // Keep existing data as fallback
+              ...structuredResumeData, // Override with structured data
+              // Ensure we have a summary from the original text if structured data doesn't have one
+              summary:
+                structuredResumeData.summary || resumeData?.summary || '',
+            };
+
+            // Clean and validate the merged data
+            const cleanedMappedData =
+              ResumeDataUtils.cleanResumeData(mergedResumeData);
+
+            // Update the global state with the structured resume data
+            setResumeData(cleanedMappedData);
+            setExtractedDataBackup(cleanedMappedData);
+
+            // Debug logging disabled in production
+            // console.log(
+            //   '✅ Successfully converted ATS analysis to ResumeData:',
+            //   cleanedMappedData
+            // );
+          } catch (_error) {
+            // Debug logging disabled in production
+            // console.error(
+            //   '❌ Error converting ATS analysis to ResumeData:',
+            //   error
+            // );
+            // Don't fail the analysis if conversion fails, just log the error
+          }
+        }
+
         completeAnalysis();
         setActiveTab('analysis');
         toast.success('ATS analysis completed successfully!');

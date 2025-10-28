@@ -7,7 +7,7 @@ import os
 import sys
 from typing import Any
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 
 # Add the parent directory to the path so we can import our utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -28,17 +28,42 @@ router = APIRouter(prefix="/api/upload", tags=["upload"])
 
 
 @router.post("/parse")
-async def parse_resume(file: UploadFile = File(...)) -> dict[str, Any]:
+async def parse_resume(
+    file: UploadFile = File(...), request: Request = None
+) -> dict[str, Any]:
     """
-    Parse uploaded resume file
+    Parse uploaded resume file with mobile optimization
 
     Args:
         file: The uploaded file
+        request: FastAPI request object for mobile detection
 
     Returns:
         Parsed content and metadata
     """
     try:
+        # Detect mobile device from user agent
+        user_agent = request.headers.get("user-agent", "").lower() if request else ""
+        is_mobile = any(
+            mobile_indicator in user_agent
+            for mobile_indicator in [
+                "android",
+                "webos",
+                "iphone",
+                "ipad",
+                "ipod",
+                "blackberry",
+                "iemobile",
+                "opera mini",
+            ]
+        )
+        is_mobile_chrome = is_mobile and "chrome" in user_agent
+
+        # Mobile-specific file size limits
+        mobile_max_size = 5 * 1024 * 1024  # 5MB for mobile
+        desktop_max_size = 10 * 1024 * 1024  # 10MB for desktop
+        max_size = mobile_max_size if is_mobile else desktop_max_size
+
         # Validate file type
         if not file.filename:
             raise HTTPException(status_code=400, detail="No file provided")
@@ -54,11 +79,23 @@ async def parse_resume(file: UploadFile = File(...)) -> dict[str, Any]:
         # Read file content
         file_content = await file.read()
 
-        # Check file size (limit to 10MB)
-        if len(file_content) > 10 * 1024 * 1024:  # 10MB in bytes
+        # Check file size with mobile limits
+        if len(file_content) > max_size:
+            size_mb = max_size / (1024 * 1024)
+            device_type = "mobile" if is_mobile else "desktop"
             raise HTTPException(
-                status_code=400, detail="File too large. Maximum size is 10MB."
+                status_code=400,
+                detail=f"File too large. Maximum size is {size_mb:.0f}MB for {device_type} devices.",
             )
+
+        # Mobile-specific optimizations
+        if is_mobile_chrome:
+            # Additional validation for mobile Chrome issues
+            if " " in file.filename:
+                raise HTTPException(
+                    status_code=400,
+                    detail="File names with spaces may cause issues on mobile Chrome. Please rename the file.",
+                )
 
         # Parse the file
         parsed_content = file_parser.parse_file(file_content, file.filename)
@@ -75,6 +112,8 @@ async def parse_resume(file: UploadFile = File(...)) -> dict[str, Any]:
                 "character_count": parsed_content.get("character_count", 0),
                 "formatting_analysis": parsed_content.get("formatting_analysis", {}),
                 "parsed_content": parsed_content,
+                "mobile_optimized": is_mobile,
+                "device_type": "mobile" if is_mobile else "desktop",
             },
             "message": "Resume parsed successfully",
         }
@@ -192,10 +231,10 @@ async def parse_resume_to_resume_data(file: UploadFile = File(...)) -> dict[str,
     """
     Parse uploaded resume file and return ResumeData format directly
     This eliminates the need for frontend conversion functions
-    
+
     Args:
         file: The uploaded file
-        
+
     Returns:
         ResumeData format ready for frontend use
     """
@@ -223,11 +262,13 @@ async def parse_resume_to_resume_data(file: UploadFile = File(...)) -> dict[str,
 
         # Parse the file
         parsed_content = file_parser.parse_file(file_content, file.filename)
-        
+
         # Debug logging for parsed_content
         print(f"DEBUG: parsed_content type: {type(parsed_content)}")
-        print(f"DEBUG: parsed_content keys: {parsed_content.keys() if isinstance(parsed_content, dict) else 'Not a dict'}")
-        
+        print(
+            f"DEBUG: parsed_content keys: {parsed_content.keys() if isinstance(parsed_content, dict) else 'Not a dict'}"
+        )
+
         # Ensure parsed_content is a dictionary
         if not isinstance(parsed_content, dict):
             print(f"ERROR: parsed_content is not a dict, it's: {type(parsed_content)}")
@@ -238,11 +279,12 @@ async def parse_resume_to_resume_data(file: UploadFile = File(...)) -> dict[str,
         structured_experience_result = ats_analyzer.extract_structured_experience(
             parsed_content.get("text", "")
         )
-        
+
         # Handle the case where structured_experience might be a string or dict
         if isinstance(structured_experience_result, str):
             try:
                 import json
+
                 structured_experience = json.loads(structured_experience_result)
             except:
                 structured_experience = {}
@@ -252,15 +294,21 @@ async def parse_resume_to_resume_data(file: UploadFile = File(...)) -> dict[str,
         # Debug logging
         print(f"DEBUG: parsed_content type: {type(parsed_content)}")
         print(f"DEBUG: structured_experience type: {type(structured_experience)}")
-        print(f"DEBUG: structured_experience keys: {structured_experience.keys() if isinstance(structured_experience, dict) else 'Not a dict'}")
-        
+        print(
+            f"DEBUG: structured_experience keys: {structured_experience.keys() if isinstance(structured_experience, dict) else 'Not a dict'}"
+        )
+
         # Convert to ResumeData format
         try:
             # Test basic access first
-            print(f"Testing parsed_content access...")
-            test_text = parsed_content.get("text", "") if isinstance(parsed_content, dict) else ""
+            print("Testing parsed_content access...")
+            test_text = (
+                parsed_content.get("text", "")
+                if isinstance(parsed_content, dict)
+                else ""
+            )
             print(f"Successfully accessed text: {len(test_text)} characters")
-            
+
             resume_data = convert_to_resume_data(parsed_content, structured_experience)
         except Exception as e:
             print(f"ERROR in convert_to_resume_data: {e}")
@@ -268,7 +316,9 @@ async def parse_resume_to_resume_data(file: UploadFile = File(...)) -> dict[str,
             print(f"parsed_content value: {parsed_content}")
             print(f"structured_experience type: {type(structured_experience)}")
             print(f"structured_experience value: {structured_experience}")
-            raise HTTPException(status_code=500, detail=f"Error converting to ResumeData: {e!s}")
+            raise HTTPException(
+                status_code=500, detail=f"Error converting to ResumeData: {e!s}"
+            )
 
         return {
             "success": True,
@@ -291,92 +341,98 @@ def convert_to_resume_data(parsed_content: dict, structured_experience: dict) ->
     """
     import re
     from datetime import datetime
-    
+
     # Ensure we have valid dictionaries
     if not isinstance(parsed_content, dict):
-        print(f"WARNING: parsed_content is not a dict in convert_to_resume_data: {type(parsed_content)}")
+        print(
+            f"WARNING: parsed_content is not a dict in convert_to_resume_data: {type(parsed_content)}"
+        )
         parsed_content = {"text": str(parsed_content) if parsed_content else ""}
     if not isinstance(structured_experience, dict):
-        print(f"WARNING: structured_experience is not a dict in convert_to_resume_data: {type(structured_experience)}")
+        print(
+            f"WARNING: structured_experience is not a dict in convert_to_resume_data: {type(structured_experience)}"
+        )
         structured_experience = {}
-    
+
     # Helper function to clean name (matches frontend ResumeDataUtils.cleanName)
     def clean_name(name: str) -> str:
         if not name:
-            return ''
-        cleaned = re.sub(r'^(hi,?\s*|hello,?\s*|i\'?m\s*|i am\s*)', '', name, flags=re.IGNORECASE)
-        cleaned = re.sub(r'[.!?]+$', '', cleaned)
+            return ""
+        cleaned = re.sub(
+            r"^(hi,?\s*|hello,?\s*|i\'?m\s*|i am\s*)", "", name, flags=re.IGNORECASE
+        )
+        cleaned = re.sub(r"[.!?]+$", "", cleaned)
         return cleaned.strip() or name
-    
+
     # Helper function to clean portfolio URL (matches frontend ResumeDataUtils.cleanPortfolio)
     def clean_portfolio(portfolio: str) -> str:
         if not portfolio:
-            return ''
+            return ""
         invalid_patterns = [
-            r'^gmail\.com$',
-            r'^@',
-            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-            r'^www\.$',
-            r'^http://$',
-            r'^https://$',
+            r"^gmail\.com$",
+            r"^@",
+            r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+            r"^www\.$",
+            r"^http://$",
+            r"^https://$",
         ]
         for pattern in invalid_patterns:
             if re.match(pattern, portfolio, re.IGNORECASE):
-                return ''
+                return ""
         return portfolio
-    
+
     # Helper function to capitalize skills (matches frontend ResumeDataUtils.capitalizeSkills)
     def capitalize_skills(skills: list) -> list:
         if not isinstance(skills, list):
             return []
-        return [skill.capitalize() if skill else '' for skill in skills]
-    
+        return [skill.capitalize() if skill else "" for skill in skills]
+
     # Helper function to clean email (matches frontend ResumeDataUtils.cleanEmail)
     def clean_email(email: str) -> str:
         if not email:
-            return ''
+            return ""
         return email.lower().strip()
-    
+
     # Helper function to clean phone (matches frontend ResumeDataUtils.cleanPhone)
     def clean_phone(phone: str) -> str:
         if not phone:
-            return ''
-        return re.sub(r'[^\d+]', '', phone).strip()
-    
+            return ""
+        return re.sub(r"[^\d+]", "", phone).strip()
+
     # Helper function to clean location (matches frontend ResumeDataUtils.cleanLocation)
     def clean_location(location: str) -> str:
         if not location:
-            return ''
+            return ""
         return location.strip()
-    
+
     # Helper function to clean LinkedIn URL (matches frontend ResumeDataUtils.cleanLinkedIn)
     def clean_linkedin(linkedin: str) -> str:
         if not linkedin:
-            return ''
-        if linkedin.startswith('linkedin.com') or linkedin.startswith('www.linkedin.com'):
+            return ""
+        if linkedin.startswith(("linkedin.com", "www.linkedin.com")):
             return f"https://{linkedin}"
         return linkedin
-    
+
     # Helper function to clean GitHub URL (matches frontend ResumeDataUtils.cleanGitHub)
     def clean_github(github: str) -> str:
         if not github:
-            return ''
-        if github.startswith('github.com') or github.startswith('www.github.com'):
+            return ""
+        if github.startswith(("github.com", "www.github.com")):
             return f"https://{github}"
         return github
-    
+
     # Helper function to clean project URL (matches frontend ResumeDataUtils.cleanProjectUrl)
     def clean_project_url(url: str) -> str:
         if not url:
-            return ''
-        if not url.startswith('http://') and not url.startswith('https://'):
+            return ""
+        if not url.startswith("http://") and not url.startswith("https://"):
             return f"https://{url}"
         return url
-    
+
     # Helper function to generate unique ID (matches frontend ResumeDataUtils.generateId)
     def generate_id(prefix: str) -> str:
         return f"{prefix}-{int(datetime.now().timestamp())}-{hash(str(datetime.now())) % 10000}"
-    
+
     # Extract personal information
     personal = {
         "fullName": "",
@@ -388,22 +444,32 @@ def convert_to_resume_data(parsed_content: dict, structured_experience: dict) ->
         "portfolio": "",
         "jobTitle": "",
     }
-    
+
     # Use structured experience if available, otherwise fallback to parsed content
-    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("contact_info"):
+    if (
+        structured_experience
+        and isinstance(structured_experience, dict)
+        and structured_experience.get("contact_info")
+    ):
         contact_info = structured_experience["contact_info"]
-        personal.update({
-            "fullName": clean_name(contact_info.get("full_name", "")),
-            "email": clean_email(contact_info.get("email", "")),
-            "phone": clean_phone(contact_info.get("phone", "")),
-            "location": clean_location(contact_info.get("location", "")),
-            "linkedin": clean_linkedin(contact_info.get("linkedin", "")),
-            "github": clean_github(contact_info.get("github", "")),
-            "portfolio": clean_portfolio(contact_info.get("portfolio", "")),
-        })
-    
+        personal.update(
+            {
+                "fullName": clean_name(contact_info.get("full_name", "")),
+                "email": clean_email(contact_info.get("email", "")),
+                "phone": clean_phone(contact_info.get("phone", "")),
+                "location": clean_location(contact_info.get("location", "")),
+                "linkedin": clean_linkedin(contact_info.get("linkedin", "")),
+                "github": clean_github(contact_info.get("github", "")),
+                "portfolio": clean_portfolio(contact_info.get("portfolio", "")),
+            }
+        )
+
     # Extract current job title from work experience
-    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("work_experience"):
+    if (
+        structured_experience
+        and isinstance(structured_experience, dict)
+        and structured_experience.get("work_experience")
+    ):
         work_exp = structured_experience["work_experience"]
         if work_exp:
             # Find current job first
@@ -412,94 +478,132 @@ def convert_to_resume_data(parsed_content: dict, structured_experience: dict) ->
                 personal["jobTitle"] = current_job["positions"][0].get("title", "")
             elif work_exp[0].get("positions"):
                 personal["jobTitle"] = work_exp[0]["positions"][0].get("title", "")
-    
+
     # Extract summary
     summary = ""
-    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("summary"):
+    if (
+        structured_experience
+        and isinstance(structured_experience, dict)
+        and structured_experience.get("summary")
+    ):
         summary = structured_experience["summary"]
     elif isinstance(parsed_content, dict) and parsed_content.get("summary_profile"):
         summary = parsed_content["summary_profile"]
-    
+
     # Extract work experience
     experience = []
-    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("work_experience"):
+    if (
+        structured_experience
+        and isinstance(structured_experience, dict)
+        and structured_experience.get("work_experience")
+    ):
         for exp in structured_experience["work_experience"]:
             if exp.get("positions"):
                 for pos in exp["positions"]:
-                    experience.append({
-                        "id": generate_id("exp"),
-                        "company": exp.get("company", "").strip(),
-                        "position": pos.get("title", "").strip(),
-                        "location": clean_location(pos.get("location", "")),
-                        "startDate": pos.get("start_date", ""),
-                        "endDate": pos.get("end_date", ""),
-                        "current": pos.get("is_current", False),
-                        "description": " ".join(pos.get("responsibilities", [])),
-                        "achievements": pos.get("achievements", []),
-                        "technologies": capitalize_skills(pos.get("technologies", [])),
-                    })
-    
+                    experience.append(
+                        {
+                            "id": generate_id("exp"),
+                            "company": exp.get("company", "").strip(),
+                            "position": pos.get("title", "").strip(),
+                            "location": clean_location(pos.get("location", "")),
+                            "startDate": pos.get("start_date", ""),
+                            "endDate": pos.get("end_date", ""),
+                            "current": pos.get("is_current", False),
+                            "description": " ".join(pos.get("responsibilities", [])),
+                            "achievements": pos.get("achievements", []),
+                            "technologies": capitalize_skills(
+                                pos.get("technologies", [])
+                            ),
+                        }
+                    )
+
     # Extract education
     education = []
-    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("education"):
+    if (
+        structured_experience
+        and isinstance(structured_experience, dict)
+        and structured_experience.get("education")
+    ):
         for edu in structured_experience["education"]:
-            education.append({
-                "id": generate_id("edu"),
-                "institution": edu.get("institution", {}).get("name", "").strip(),
-                "degree": edu.get("degree_full", "").strip(),
-                "field": edu.get("major", "").strip(),
-                "location": clean_location(edu.get("institution", {}).get("location", "")),
-                "startDate": edu.get("duration", {}).get("start_date", ""),
-                "endDate": edu.get("duration", {}).get("end_date", ""),
-                "current": edu.get("duration", {}).get("is_current", False),
-                "gpa": str(edu.get("gpa", "")) if edu.get("gpa") else "",
-                "honors": edu.get("achievements", []),
-            })
-    
+            education.append(
+                {
+                    "id": generate_id("edu"),
+                    "institution": edu.get("institution", {}).get("name", "").strip(),
+                    "degree": edu.get("degree_full", "").strip(),
+                    "field": edu.get("major", "").strip(),
+                    "location": clean_location(
+                        edu.get("institution", {}).get("location", "")
+                    ),
+                    "startDate": edu.get("duration", {}).get("start_date", ""),
+                    "endDate": edu.get("duration", {}).get("end_date", ""),
+                    "current": edu.get("duration", {}).get("is_current", False),
+                    "gpa": str(edu.get("gpa", "")) if edu.get("gpa") else "",
+                    "honors": edu.get("achievements", []),
+                }
+            )
+
     # Extract skills
-    skills = {
+    skills: dict[str, list[str]] = {
         "technical": [],
         "business": [],
         "soft": [],
         "languages": [],
         "certifications": [],
     }
-    
-    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("skills"):
+
+    if (
+        structured_experience
+        and isinstance(structured_experience, dict)
+        and structured_experience.get("skills")
+    ):
         skills_data = structured_experience["skills"]
-        skills.update({
-            "technical": capitalize_skills(skills_data.get("technical_programming", []) + 
-                                        skills_data.get("technical_tools", [])),
-            "business": capitalize_skills(skills_data.get("business_management", [])),
-            "soft": capitalize_skills(skills_data.get("soft_skills", [])),
-            "languages": capitalize_skills(skills_data.get("languages_spoken", [])),
-            "certifications": capitalize_skills(skills_data.get("certifications", [])),
-        })
-    
+        skills.update(
+            {
+                "technical": capitalize_skills(
+                    skills_data.get("technical_programming", [])
+                    + skills_data.get("technical_tools", [])
+                ),
+                "business": capitalize_skills(
+                    skills_data.get("business_management", [])
+                ),
+                "soft": capitalize_skills(skills_data.get("soft_skills", [])),
+                "languages": capitalize_skills(skills_data.get("languages_spoken", [])),
+                "certifications": capitalize_skills(
+                    skills_data.get("certifications", [])
+                ),
+            }
+        )
+
     # Extract projects
     projects = []
-    if structured_experience and isinstance(structured_experience, dict) and structured_experience.get("projects"):
+    if (
+        structured_experience
+        and isinstance(structured_experience, dict)
+        and structured_experience.get("projects")
+    ):
         for proj in structured_experience["projects"]:
-            projects.append({
-                "id": generate_id("proj"),
-                "name": proj.get("name", "").strip(),
-                "description": proj.get("description", "").strip(),
-                "technologies": capitalize_skills(proj.get("technologies", [])),
-                "url": clean_project_url(proj.get("url", "")),
-                "github": clean_github(proj.get("github_url", "")),
-                "startDate": proj.get("duration", {}).get("start_date", ""),
-                "endDate": proj.get("duration", {}).get("end_date", ""),
-                "achievements": proj.get("achievements", []),
-            })
-    
+            projects.append(
+                {
+                    "id": generate_id("proj"),
+                    "name": proj.get("name", "").strip(),
+                    "description": proj.get("description", "").strip(),
+                    "technologies": capitalize_skills(proj.get("technologies", [])),
+                    "url": clean_project_url(proj.get("url", "")),
+                    "github": clean_github(proj.get("github_url", "")),
+                    "startDate": proj.get("duration", {}).get("start_date", ""),
+                    "endDate": proj.get("duration", {}).get("end_date", ""),
+                    "achievements": proj.get("achievements", []),
+                }
+            )
+
     # Extract achievements and hobbies
     achievements = []
     hobbies = []
-    
+
     if structured_experience and isinstance(structured_experience, dict):
         achievements = structured_experience.get("achievements", [])
         hobbies = structured_experience.get("hobbies_interests", [])
-    
+
     return {
         "personal": personal,
         "summary": summary,

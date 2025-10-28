@@ -5,6 +5,11 @@
  */
 
 import { formatErrorForUser } from '@/lib/utils/errorHandling';
+import {
+  getAdaptiveUploadConfig,
+  getMobileErrorMessage,
+  logMobileDebugInfo,
+} from '@/lib/utils/mobileDetection';
 
 // ============================================================================
 // TYPES
@@ -266,12 +271,49 @@ export class UnifiedApiClient {
       extracted_text: string;
     }>
   > {
+    const adaptiveConfig = getAdaptiveUploadConfig();
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.formRequest('/api/upload/parse', formData, {
-      timeout: 60000, // 60 seconds for file uploads
+    // Log mobile debug info
+    logMobileDebugInfo('File Upload', {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      adaptiveTimeout: adaptiveConfig.timeout,
+      adaptiveMaxSize: adaptiveConfig.maxSize,
     });
+
+    // Check file size against mobile limits
+    if (file.size > adaptiveConfig.maxSize) {
+      throw new UnifiedApiError(
+        `File size ${Math.round(file.size / (1024 * 1024))}MB exceeds mobile limit of ${Math.round(adaptiveConfig.maxSize / (1024 * 1024))}MB`,
+        400,
+        undefined,
+        'FILE_TOO_LARGE'
+      );
+    }
+
+    try {
+      return await this.formRequest('/api/upload/parse', formData, {
+        timeout: adaptiveConfig.timeout,
+        retries: adaptiveConfig.retries,
+        retryDelay: adaptiveConfig.retryDelay,
+      });
+    } catch (error) {
+      // Enhance error message for mobile devices
+      if (error instanceof UnifiedApiError) {
+        const mobileMessage = getMobileErrorMessage(error);
+        throw new UnifiedApiError(
+          mobileMessage,
+          error.status,
+          error.response,
+          error.code,
+          error.details
+        );
+      }
+      throw error;
+    }
   }
 
   // ============================================================================

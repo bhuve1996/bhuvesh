@@ -49,7 +49,7 @@ export const SectionSeparator: React.FC<SectionSeparatorProps> = ({
         return (
           <div
             className={`
-              w-full ${thicknessClasses[thickness]} 
+              w-full ${thicknessClasses[thickness]}
               bg-gradient-to-r ${colorClasses[color]}
               ${spacingClasses[spacing]}
               ${className}
@@ -61,7 +61,7 @@ export const SectionSeparator: React.FC<SectionSeparatorProps> = ({
         return (
           <div
             className={`
-              w-full ${thicknessClasses[thickness]} 
+              w-full ${thicknessClasses[thickness]}
               bg-gradient-to-r ${colorClasses[color]}
               ${spacingClasses[spacing]}
               ${className}
@@ -105,7 +105,7 @@ export const SectionSeparator: React.FC<SectionSeparatorProps> = ({
         return (
           <div
             className={`
-              w-full ${thicknessClasses[thickness]} 
+              w-full ${thicknessClasses[thickness]}
               bg-gradient-to-r ${colorClasses[color]}
               ${spacingClasses[spacing]}
               ${className}

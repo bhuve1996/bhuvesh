@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import toast from 'react-hot-toast';
 
 import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
 import { exportToDOCX, exportToPDF } from '@/lib/resume/exportUtils';
 import type { PageBreakConfig } from '@/lib/resume/pageBreakUtils';
 import { DEFAULT_PAGE_BREAK_CONFIG } from '@/lib/resume/pageBreakUtils';
+import { withExport } from '@/lib/utils/apiPatterns';
 import type { ExportTabProps } from '@/types';
 
 export const ExportTab: React.FC<ExportTabProps> = ({
@@ -22,25 +22,32 @@ export const ExportTab: React.FC<ExportTabProps> = ({
   );
 
   const handleExport = async (format: 'pdf' | 'docx') => {
-    setIsExporting(true);
     setExportFormat(format);
 
-    try {
+    const exportCall = async () => {
       switch (format) {
         case 'pdf':
-          await exportToPDF(template, resumeData, undefined, pageBreakConfig);
-          toast.success('Resume exported as PDF!');
-          break;
+          return await exportToPDF(
+            template,
+            resumeData,
+            undefined,
+            pageBreakConfig
+          );
         case 'docx':
-          await exportToDOCX(template, resumeData, undefined, pageBreakConfig);
-          toast.success('Resume exported as DOCX!');
-          break;
+          return await exportToDOCX(
+            template,
+            resumeData,
+            undefined,
+            pageBreakConfig
+          );
+        default:
+          throw new Error(`Unsupported format: ${format}`);
       }
-    } catch {
-      toast.error(`Failed to export as ${format.toUpperCase()}`);
-    } finally {
-      setIsExporting(false);
-    }
+    };
+
+    await withExport(exportCall, format, {
+      loadingState: { setter: setIsExporting },
+    });
   };
 
   const exportOptions = [

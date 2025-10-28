@@ -88,13 +88,17 @@ export async function analyzeResumeWithJobDescription(
     // Step 1: Uploading
     onProgress?.('Uploading', 25);
 
+    // Small delay to show uploading step
+    await new Promise(resolve => setTimeout(resolve, 200));
+
     // Use the backend /quick-analyze endpoint directly
     const formData = new FormData();
     formData.append('file', file);
 
-    // Step 2: Parsing
+    // Step 2: Parsing - call this before the actual request
     onProgress?.('Parsing', 50);
 
+    // Make the actual request - this is where the real work happens
     const response = await fetch(
       'http://localhost:8000/api/upload/quick-analyze',
       {
@@ -107,12 +111,16 @@ export async function analyzeResumeWithJobDescription(
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    // Step 3: Analyzing
+    // Step 3: Analyzing - call this after we get the response but before parsing
     onProgress?.('Analyzing', 75);
 
+    // Small delay to show analyzing step
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // Parse the response
     const result = await response.json();
 
-    // Step 4: Results
+    // Step 4: Results - call this after we have the parsed result
     onProgress?.('Results', 100);
 
     if (result.success && result.data) {

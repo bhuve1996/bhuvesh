@@ -270,6 +270,128 @@ export function createStaggeredDelay(
 }
 
 // ============================================================================
+// BADGE/TAG UTILITIES
+// ============================================================================
+
+/**
+ * Standard badge variants
+ */
+export const badgeVariants = {
+  default: 'px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full',
+  success: 'px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full',
+  warning: 'px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full',
+  error: 'px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full',
+  info: 'px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full',
+  purple: 'px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full',
+  cyan: 'px-2 py-1 bg-cyan-100 text-cyan-800 text-xs rounded-full',
+} as const;
+
+/**
+ * Create badge classes with optional custom styling
+ */
+export function createBadgeClasses(
+  variant: keyof typeof badgeVariants = 'default',
+  className?: string
+): string {
+  return cn(badgeVariants[variant], className);
+}
+
+/**
+ * Create tag classes for keywords, skills, etc.
+ */
+export function createTagClasses(
+  variant: keyof typeof badgeVariants = 'default',
+  size: 'sm' | 'md' | 'lg' = 'sm',
+  className?: string
+): string {
+  const sizeClasses = {
+    sm: 'px-2 py-1 text-xs',
+    md: 'px-3 py-1.5 text-sm',
+    lg: 'px-4 py-2 text-base',
+  };
+
+  return cn(
+    badgeVariants[variant],
+    sizeClasses[size],
+    'rounded-full',
+    className
+  );
+}
+
+// ============================================================================
+// TOAST UTILITIES
+// ============================================================================
+
+/**
+ * Standard toast messages for common actions
+ */
+export const toastMessages = {
+  success: {
+    upload: 'Resume uploaded and parsed successfully!',
+    analysis: 'ATS analysis completed successfully!',
+    export: (format: string) => `Resume exported as ${format.toUpperCase()}!`,
+    save: 'Resume saved successfully!',
+    clear: 'All data cleared successfully',
+  },
+  error: {
+    upload: 'Failed to upload resume',
+    analysis: 'Failed to analyze resume',
+    export: (format: string) => `Failed to export as ${format.toUpperCase()}`,
+    save: 'Failed to save resume',
+    noData: 'No resume data available',
+    validation: 'Please fix validation errors before proceeding',
+  },
+  info: {
+    processing: 'Processing your request...',
+    analyzing: 'Analyzing resume...',
+    exporting: 'Exporting resume...',
+  },
+} as const;
+
+// ============================================================================
+// LOADING STATE UTILITIES
+// ============================================================================
+
+/**
+ * Standard loading state configuration
+ */
+export interface LoadingStateConfig {
+  loading: boolean;
+  disabled?: boolean;
+  showSpinner?: boolean;
+  loadingText?: string;
+}
+
+/**
+ * Create loading state classes
+ */
+export function createLoadingStateClasses(
+  config: LoadingStateConfig,
+  baseClasses: string
+): string {
+  const { loading, disabled } = config;
+  return cn(
+    baseClasses,
+    (loading || disabled) && 'cursor-not-allowed opacity-75',
+    loading && 'relative'
+  );
+}
+
+/**
+ * Create loading button props
+ */
+export function createLoadingButtonProps(config: LoadingStateConfig) {
+  const { loading, disabled, loadingText } = config;
+
+  return {
+    disabled: disabled || loading,
+    'aria-disabled': disabled || loading,
+    'aria-busy': loading,
+    'aria-label': loading ? loadingText : undefined,
+  };
+}
+
+// ============================================================================
 // THEME UTILITIES
 // ============================================================================
 
@@ -322,6 +444,13 @@ const componentPatterns = {
   createStaggeredDelay,
   createThemeAwareClasses,
   themePatterns,
+  // New utilities
+  badgeVariants,
+  createBadgeClasses,
+  createTagClasses,
+  toastMessages,
+  createLoadingStateClasses,
+  createLoadingButtonProps,
 };
 
 export default componentPatterns;

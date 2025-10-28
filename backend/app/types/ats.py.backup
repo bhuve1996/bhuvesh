@@ -350,6 +350,33 @@ class LengthAnalysis(BaseModel):
     section_word_distribution: dict[str, int]
 
 
+class ATSCompatibilityFactors(BaseModel):
+    file_format: bool
+    text_extractable: bool
+    no_images_text: bool
+    standard_fonts: bool
+    proper_headers: bool
+    no_tables: bool
+    no_columns: bool
+
+
+class ATSCompatibility(BaseModel):
+    score: int
+    issues: Optional[list[str]] = None
+    warnings: Optional[list[str]] = None
+    recommendations: Optional[list[str]] = None
+    compatibility_factors: ATSCompatibilityFactors
+
+
+class FormattingAnalysis(BaseModel):
+    bullet_points: Optional[BulletPoints] = None
+    spacing: Optional[Spacing] = None
+    structure: Optional[Structure] = None
+    text_formatting: Optional[TextFormatting] = None
+    length_analysis: Optional[LengthAnalysis] = None
+    ats_compatibility: Optional[ATSCompatibility] = None
+
+
 # ============================================================================
 # ATS COMPATIBILITY
 # ============================================================================
@@ -383,22 +410,6 @@ class ATSCompatibility(BaseModel):
     keyword_score: int
     semantic_score: int
     compatibility_factors: ATSCompatibilityFactors
-
-
-# ============================================================================
-# FORMATTING ANALYSIS
-# ============================================================================
-
-
-class FormattingAnalysis(BaseModel):
-    """Detailed formatting analysis results"""
-
-    structure: Structure
-    text_formatting: TextFormatting
-    spacing: Spacing
-    bullet_points: BulletPoints
-    length_analysis: LengthAnalysis
-    ats_compatibility: ATSCompatibility
 
 
 # ============================================================================

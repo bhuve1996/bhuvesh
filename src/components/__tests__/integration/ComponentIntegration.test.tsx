@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
@@ -7,6 +7,7 @@ import { FileUpload } from '@/components/molecules/FileUpload/FileUpload';
 import { FormField } from '@/components/molecules/FormField/FormField';
 import { StatusBadge } from '@/components/molecules/StatusBadge/StatusBadge';
 import { FloatingPanel } from '@/components/organisms/FloatingPanel/FloatingPanel';
+import { render } from '@/tests/utils/testWrapper';
 import { ResumeData, ResumeTemplate } from '@/types/resume';
 
 // Mock react-hot-toast

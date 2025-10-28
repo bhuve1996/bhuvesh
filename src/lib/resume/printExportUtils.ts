@@ -365,7 +365,7 @@ export const exportToPDFViaPrint = async (
               @bottom-center { content: none; }
               @bottom-right { content: none; }
             }
-            
+
             /* Hide browser print headers and footers */
             @media print {
               @page {
@@ -382,25 +382,25 @@ export const exportToPDFViaPrint = async (
                 padding: 0 !important;
               }
               /* Hide any potential browser-generated content */
-              .print-header, .print-footer, 
+              .print-header, .print-footer,
               [class*="header"], [class*="footer"],
               [id*="header"], [id*="footer"] {
                 display: none !important;
               }
             }
-            
+
             /* Preserve ALL original styles */
             * {
               -webkit-print-color-adjust: exact !important;
               color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
-            
+
             /* Hide interactive elements only */
             button, .hover\\:scale-105, .hover\\:shadow-xl, .hover\\:bg-gray-50 {
               display: none !important;
             }
-            
+
             /* Ensure proper spacing for print */
             .mb-8 { margin-bottom: 2rem !important; }
             .mb-6 { margin-bottom: 1.5rem !important; }
@@ -410,20 +410,20 @@ export const exportToPDFViaPrint = async (
             .space-y-4 > * + * { margin-top: 1rem !important; }
             .space-y-3 > * + * { margin-top: 0.75rem !important; }
             .space-y-1 > * + * { margin-top: 0.25rem !important; }
-            
+
             /* Preserve all colors and fonts */
             body {
               font-family: inherit !important;
               margin: 0;
               padding: 0;
             }
-            
+
             .resume-template {
               max-width: 100%;
               margin: 0;
               padding: 0;
             }
-            
+
             /* Additional extracted styles */
             ${allStyles}
           </style>
@@ -469,7 +469,7 @@ export const exportToPDFViaPrint = async (
             } catch (e) {
               // console.log('Cannot access Chrome APIs');
             }
-            
+
             // Call original print
             originalPrint.call(this);
           };

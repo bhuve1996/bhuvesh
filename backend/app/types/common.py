@@ -48,7 +48,7 @@ class MimeType(str, Enum):
 class BaseEntity(BaseModel):
     """Base entity with common fields"""
 
-    id: str
+    entity_id: str
     created_at: datetime
     updated_at: datetime
 
@@ -71,7 +71,7 @@ class FileInfo(BaseModel):
 
     name: str
     size: int
-    type: str
+    file_type: str
     last_modified: datetime
     content: Optional[str] = None
 
@@ -103,7 +103,7 @@ class AnalysisProgress(BaseModel):
 class AnalysisStep(BaseModel):
     """Analysis step information"""
 
-    id: str
+    step_id: str
     name: str
     description: str
     status: str  # 'pending', 'active', 'completed', 'error'
@@ -120,7 +120,7 @@ class ScoreBreakdown(BaseModel):
 
     keyword: int = Field(ge=0, le=100)
     semantic: int = Field(ge=0, le=100)
-    format: int = Field(ge=0, le=100)
+    file_format: int = Field(ge=0, le=100)
     content: int = Field(ge=0, le=100)
     experience: int = Field(ge=0, le=100)
     skills: int = Field(ge=0, le=100)
@@ -169,7 +169,7 @@ class ValidationResult(BaseModel):
 class ExportOptions(BaseModel):
     """Export configuration options"""
 
-    format: str  # 'pdf', 'docx', 'html', 'json'
+    export_format: str  # 'pdf', 'docx', 'html', 'json'
     include_analysis: bool = True
     include_improvements: bool = True
     include_raw_data: bool = False

@@ -11,20 +11,14 @@ repos:
       - id: debug-statements
 
   # Frontend: ESLint
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.55.0
+  - repo: local
     hooks:
       - id: eslint
+        name: ESLint
+        entry: npm run lint:fix
+        language: system
         files: ^src/.*\.(ts|tsx|js|jsx)$
-        types: [file]
-        additional_dependencies:
-          - eslint@^8.55.0
-          - '@typescript-eslint/eslint-plugin@^6.0.0'
-          - '@typescript-eslint/parser@^6.0.0'
-          - 'eslint-plugin-import@^2.29.0'
-          - 'eslint-plugin-react@^7.33.0'
-          - 'eslint-plugin-react-hooks@^4.6.0'
-        args: [--fix, --max-warnings=0]
+        pass_filenames: false
 
   # Frontend: Prettier
   - repo: https://github.com/pre-commit/mirrors-prettier

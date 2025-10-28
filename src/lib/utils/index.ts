@@ -46,6 +46,7 @@ export function getAnimationDelay(
 }
 
 // Re-export all utility modules for easy access
+export * from './apiPatterns';
 export * from './apiUtils';
 export * from './componentUtils';
 export * from './dataCleaningUtils';

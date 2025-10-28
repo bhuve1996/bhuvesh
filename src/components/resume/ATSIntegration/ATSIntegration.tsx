@@ -9,6 +9,7 @@ import {
   checkBackendHealth,
   type ATSAnalysisResult,
 } from '@/lib/ats/api';
+import { createTagClasses } from '@/lib/utils/componentPatterns';
 import { ERROR_MESSAGES, formatErrorForUser } from '@/lib/utils/errorHandling';
 import { ResumeData } from '@/types/resume';
 
@@ -500,10 +501,7 @@ export const ATSIntegration: React.FC<ATSIntegrationProps> = ({
                 <div className='flex flex-wrap gap-2'>
                   {analysisResult.missing_keywords.map(
                     (keyword: string, index: number) => (
-                      <span
-                        key={index}
-                        className='px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full'
-                      >
+                      <span key={index} className={createTagClasses('warning')}>
                         {keyword}
                       </span>
                     )
@@ -522,10 +520,7 @@ export const ATSIntegration: React.FC<ATSIntegrationProps> = ({
                 <div className='flex flex-wrap gap-2'>
                   {analysisResult.keyword_matches.map(
                     (keyword: string, index: number) => (
-                      <span
-                        key={index}
-                        className='px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full'
-                      >
+                      <span key={index} className={createTagClasses('success')}>
                         {keyword}
                       </span>
                     )

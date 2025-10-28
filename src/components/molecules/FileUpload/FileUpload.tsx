@@ -1,8 +1,13 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { useTheme } from '@/contexts/ThemeContext';
 import { formatFileSize, getFileIcon } from '@/lib/utils/componentUtils';
+import {
+  detectMobileDevice,
+  getAdaptiveUploadConfig,
+  hasMobileChromeIssues,
+} from '@/lib/utils/mobileDetection';
 import { getThemeClasses } from '@/lib/utils/themeUtils';
 import type { FileUploadComponentProps } from '@/types';
 
@@ -30,12 +35,56 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadProgress] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
+  const [mobileConfig, setMobileConfig] = useState(detectMobileDevice());
+  const [adaptiveConfig, setAdaptiveConfig] = useState(
+    getAdaptiveUploadConfig()
+  );
+  const [showMobileTips, setShowMobileTips] = useState(true);
+
+  // Update mobile config on mount and when window resizes
+  useEffect(() => {
+    const updateConfig = () => {
+      setMobileConfig(detectMobileDevice());
+      setAdaptiveConfig(getAdaptiveUploadConfig());
+    };
+
+    updateConfig();
+    window.addEventListener('resize', updateConfig);
+    return () => window.removeEventListener('resize', updateConfig);
+  }, []);
+
+  // Load mobile tips preference from localStorage
+  useEffect(() => {
+    if (mobileConfig.isMobile) {
+      const savedPreference = localStorage.getItem('mobile-upload-tips-hidden');
+      if (savedPreference === 'true') {
+        setShowMobileTips(false);
+      }
+    }
+  }, [mobileConfig.isMobile]);
+
+  // Save mobile tips preference to localStorage
+  const handleToggleMobileTips = useCallback(
+    (show: boolean) => {
+      setShowMobileTips(show);
+      if (mobileConfig.isMobile) {
+        localStorage.setItem('mobile-upload-tips-hidden', (!show).toString());
+      }
+    },
+    [mobileConfig.isMobile]
+  );
+
+  // Use adaptive max size for mobile devices
+  const effectiveMaxSize = mobileConfig.isMobile
+    ? adaptiveConfig.maxSize
+    : maxSize;
+  const effectiveDragAndDrop = mobileConfig.supportsDragDrop && dragAndDrop;
 
   const validateFile = useCallback(
     (file: File): string | null => {
-      // Check file size
-      if (file.size > maxSize) {
-        return `File size exceeds ${Math.round(maxSize / (1024 * 1024))}MB limit`;
+      // Check file size against effective max size
+      if (file.size > effectiveMaxSize) {
+        return `File size exceeds ${Math.round(effectiveMaxSize / (1024 * 1024))}MB limit${mobileConfig.isMobile ? ' (mobile)' : ''}`;
       }
 
       // Check file type - default validation for common resume formats
@@ -50,6 +99,14 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
         return `File type .${fileExtension} is not allowed`;
       }
 
+      // Mobile-specific validations
+      if (mobileConfig.isMobileChrome && hasMobileChromeIssues()) {
+        // Additional validation for problematic mobile Chrome
+        if (file.name.includes(' ')) {
+          return 'File names with spaces may cause issues on mobile Chrome. Please rename the file.';
+        }
+      }
+
       // Custom validation
       if (validation?.custom) {
         return validation.custom(file);
@@ -57,7 +114,7 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
 
       return null;
     },
-    [maxSize, validation]
+    [effectiveMaxSize, validation, mobileConfig]
   );
 
   const handleFiles = useCallback(
@@ -100,18 +157,27 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
     [maxFiles, validateFile, onError, showToast, onFileUpload]
   );
 
-  const handleDrag = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
-    }
-  }, []);
+  const handleDrag = useCallback(
+    (e: React.DragEvent) => {
+      // Only handle drag events on desktop devices
+      if (!effectiveDragAndDrop) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.type === 'dragenter' || e.type === 'dragover') {
+        setDragActive(true);
+      } else if (e.type === 'dragleave') {
+        setDragActive(false);
+      }
+    },
+    [effectiveDragAndDrop]
+  );
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
+      // Only handle drop events on desktop devices
+      if (!effectiveDragAndDrop) return;
+
       e.preventDefault();
       e.stopPropagation();
       setDragActive(false);
@@ -123,7 +189,7 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
         handleFiles(files);
       }
     },
-    [disabled, loading, handleFiles]
+    [disabled, loading, handleFiles, effectiveDragAndDrop]
   );
 
   const handleFileInput = useCallback(
@@ -157,7 +223,7 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
         className={`
           relative border-2 border-dashed rounded-lg p-4 sm:p-6 md:p-8 text-center transition-colors
           ${
-            dragActive
+            dragActive && effectiveDragAndDrop
               ? theme === 'dark'
                 ? 'border-cyan-400 bg-cyan-900/20'
                 : 'border-cyan-500 bg-cyan-50'
@@ -176,6 +242,10 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
             fileInput.click();
           }
         }}
+        onDragEnter={effectiveDragAndDrop ? handleDrag : undefined}
+        onDragLeave={effectiveDragAndDrop ? handleDrag : undefined}
+        onDragOver={effectiveDragAndDrop ? handleDrag : undefined}
+        onDrop={effectiveDragAndDrop ? handleDrop : undefined}
       >
         <input
           id='file-input'
@@ -197,7 +267,7 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
             <p
               className={`text-base sm:text-lg font-medium ${getThemeClasses(theme).text.primary}`}
             >
-              {dragAndDrop
+              {effectiveDragAndDrop
                 ? 'Drag and drop your files here'
                 : 'Choose files to upload'}
             </p>
@@ -213,9 +283,68 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
             }`}
           >
             <p>Supports: {accept}</p>
-            <p>Max size: {formatFileSize(maxSize)}</p>
+            <p>
+              Max size: {formatFileSize(effectiveMaxSize)}
+              {mobileConfig.isMobile ? ' (mobile)' : ''}
+            </p>
             {maxFiles > 1 && <p>Max files: {maxFiles}</p>}
           </div>
+
+          {/* Mobile-specific messaging */}
+          {mobileConfig.isMobile && showMobileTips && (
+            <div
+              className={`
+                text-xs sm:text-sm p-3 rounded-md mt-2 relative
+                ${theme === 'dark' ? 'bg-blue-900/20 text-blue-300 border border-blue-800' : 'bg-blue-50 text-blue-700 border border-blue-200'}
+              `}
+            >
+              {/* Close button */}
+              <button
+                onClick={() => handleToggleMobileTips(false)}
+                className={`
+                  absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold
+                  ${theme === 'dark' ? 'hover:bg-blue-800 text-blue-200' : 'hover:bg-blue-100 text-blue-600'}
+                  transition-colors duration-200
+                `}
+                aria-label='Close mobile tips'
+                title='Close tips'
+              >
+                ×
+              </button>
+
+              <div className='pr-6'>
+                <p className='font-medium mb-2 flex items-center'>
+                  📱 Mobile Upload Tips
+                </p>
+                <ul className='text-left space-y-1'>
+                  <li>
+                    • Max file size:{' '}
+                    {Math.round(effectiveMaxSize / (1024 * 1024))}MB
+                  </li>
+                  <li>• Avoid files with spaces in names</li>
+                  <li>• Ensure stable internet connection</li>
+                  {mobileConfig.isMobileChrome && (
+                    <li>• If upload fails, try refreshing the page</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {/* Show tips button when tips are hidden */}
+          {mobileConfig.isMobile && !showMobileTips && (
+            <button
+              onClick={() => handleToggleMobileTips(true)}
+              className={`
+                text-xs sm:text-sm p-2 rounded-md mt-2 w-full
+                ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}
+                transition-colors duration-200 flex items-center justify-center space-x-2
+              `}
+            >
+              <span>📱</span>
+              <span>Show Mobile Upload Tips</span>
+            </button>
+          )}
         </div>
 
         {loading && (

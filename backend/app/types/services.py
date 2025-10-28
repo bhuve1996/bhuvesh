@@ -7,6 +7,7 @@ from typing import Any, Optional
 from pydantic import BaseModel, Field
 
 from .ats import ATSCompatibility, DetailedScores, FormatAnalysis
+from .common_types import ExtractionResult
 
 
 class JobDetectionResult(BaseModel):
@@ -22,7 +23,7 @@ class ResumeExtractionResult(BaseModel):
     """Result of resume text extraction"""
 
     text: str
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, str] = Field(default_factory=dict)
     sections: dict[str, str] = Field(default_factory=dict)
     word_count: int
     character_count: int
@@ -40,7 +41,7 @@ class ATSAnalysisResult(BaseModel):
     strengths: list[str] = Field(default_factory=list)
     weaknesses: list[str] = Field(default_factory=list)
     word_count: int
-    extraction_details: dict[str, Any] = Field(default_factory=dict)
+    extraction_details: dict[str, str] = Field(default_factory=dict)
     ats_compatibility: ATSCompatibility
     format_analysis: FormatAnalysis
     detailed_scores: DetailedScores
@@ -48,14 +49,14 @@ class ATSAnalysisResult(BaseModel):
     match_category: str
     ats_friendly: bool
     formatting_issues: list[str] = Field(default_factory=list)
-    structured_experience: dict[str, Any] = Field(default_factory=dict)
+    structured_experience: ExtractionResult = Field(default_factory=dict)
     job_description: str
 
 
 class ImprovementPlanResult(BaseModel):
     """Result of improvement plan generation"""
 
-    improvements: list[dict[str, Any]] = Field(default_factory=list)
+    improvements: list[dict[str, str]] = Field(default_factory=list)
     summary: str
     quick_wins: list[str] = Field(default_factory=list)
     estimated_impact: int = Field(ge=0, le=100)

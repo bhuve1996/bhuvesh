@@ -6,7 +6,9 @@ Generates specific, actionable suggestions to boost ATS score
 import logging
 import os
 import re
-from typing import Any, Optional
+from typing import Optional
+
+from ..types.common_types import ATSAnalysisResult, ExtractionResult
 
 logger = logging.getLogger(__name__)
 
@@ -42,10 +44,10 @@ class ResumeImprover:
 
     def generate_improvement_plan(
         self,
-        analysis_result: dict[str, Any],
-        extracted_data: dict[str, Any],
+        analysis_result: ATSAnalysisResult,
+        extracted_data: ExtractionResult,
         job_description: Optional[str] = None,
-    ) -> dict[str, Any]:
+    ) -> dict[str, str]:
         """
         Generate comprehensive ATS-focused improvement plan
 

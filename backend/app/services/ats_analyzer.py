@@ -94,21 +94,30 @@ class ATSAnalyzer:
 
         # Try to load content generation model if available
         try:
-            import google.generativeai as genai
             import os
-            
+
+            import google.generativeai as genai
+
             api_key = os.getenv("GEMINI_API_KEY")
             if api_key:
                 genai.configure(api_key=api_key)
                 self.content_model = genai.GenerativeModel("gemini-2.0-flash")
                 self.use_content_generation = True
-                print("✅ ATS Analyzer: AI content generation model loaded successfully")
+                print(
+                    "✅ ATS Analyzer: AI content generation model loaded successfully"
+                )
             else:
-                print("⚠️  WARNING: GEMINI_API_KEY not set. AI content generation disabled.")
+                print(
+                    "⚠️  WARNING: GEMINI_API_KEY not set. AI content generation disabled."
+                )
         except ImportError:
-            print("⚠️  WARNING: google-generativeai not available. AI content generation disabled.")
+            print(
+                "⚠️  WARNING: google-generativeai not available. AI content generation disabled."
+            )
         except Exception as e:
-            print(f"⚠️  WARNING: Failed to load AI content generation model: {e}. Using fallback methods.")
+            print(
+                f"⚠️  WARNING: Failed to load AI content generation model: {e}. Using fallback methods."
+            )
 
     def extract_structured_experience(self, resume_text: str) -> dict[str, Any]:
         """
@@ -1755,8 +1764,12 @@ class ATSAnalyzer:
             if self.use_content_generation and self.content_model:
                 response = self.content_model.generate_content(prompt)
             else:
-                print("⚠️  AI keyword classification failed: Content generation model not available, using fallback")
-                return set(keywords)  # Return all keywords as technical if AI is not available
+                print(
+                    "⚠️  AI keyword classification failed: Content generation model not available, using fallback"
+                )
+                return set(
+                    keywords
+                )  # Return all keywords as technical if AI is not available
 
             if response and response.text:
                 # Parse the JSON response
@@ -1765,27 +1778,28 @@ class ATSAnalyzer:
                 try:
                     # Try to extract JSON from the response
                     response_text = response.text.strip()
-                    
+
                     # First try direct parsing
                     try:
                         technical_list = json.loads(response_text)
                     except json.JSONDecodeError:
                         # Try to find JSON array in the response
                         import re
-                        json_match = re.search(r'\[.*?\]', response_text, re.DOTALL)
+
+                        json_match = re.search(r"\[.*?\]", response_text, re.DOTALL)
                         if json_match:
                             technical_list = json.loads(json_match.group())
                         else:
-                            raise json.JSONDecodeError("No JSON array found", response_text, 0)
-                    
+                            raise json.JSONDecodeError(
+                                "No JSON array found", response_text, 0
+                            )
+
                     print(
                         f"✅ AI classified {len(technical_list)} technical keywords from {len(keywords)} total keywords"
                     )
                     return set(technical_list)
                 except json.JSONDecodeError as e:
-                    print(
-                        f"⚠️  Failed to parse AI keyword classification: {e}"
-                    )
+                    print(f"⚠️  Failed to parse AI keyword classification: {e}")
                     print(f"Raw AI response: {response.text[:200]}...")
                     return self._rule_based_technical_classification(keywords)
             else:
@@ -2035,7 +2049,9 @@ class ATSAnalyzer:
             if self.use_content_generation and self.content_model:
                 response = self.content_model.generate_content(prompt)
             else:
-                print("⚠️  AI resume keyword extraction failed: Content generation model not available, using fallback")
+                print(
+                    "⚠️  AI resume keyword extraction failed: Content generation model not available, using fallback"
+                )
                 return self._extract_keywords(resume_text)
 
             if response and response.text:
@@ -2044,27 +2060,28 @@ class ATSAnalyzer:
                 try:
                     # Try to extract JSON from the response
                     response_text = response.text.strip()
-                    
+
                     # First try direct parsing
                     try:
                         ai_keywords = json.loads(response_text)
                     except json.JSONDecodeError:
                         # Try to find JSON array in the response
                         import re
-                        json_match = re.search(r'\[.*?\]', response_text, re.DOTALL)
+
+                        json_match = re.search(r"\[.*?\]", response_text, re.DOTALL)
                         if json_match:
                             ai_keywords = json.loads(json_match.group())
                         else:
-                            raise json.JSONDecodeError("No JSON array found", response_text, 0)
-                    
+                            raise json.JSONDecodeError(
+                                "No JSON array found", response_text, 0
+                            )
+
                     print(
                         f"✅ AI extracted {len(ai_keywords)} technical keywords from resume"
                     )
                     return ai_keywords
                 except json.JSONDecodeError as e:
-                    print(
-                        f"⚠️  Failed to parse AI resume keyword extraction: {e}"
-                    )
+                    print(f"⚠️  Failed to parse AI resume keyword extraction: {e}")
                     print(f"Raw AI response: {response.text[:200]}...")
                     return self._extract_keywords(resume_text)
             else:
@@ -2151,21 +2168,30 @@ class ATSAnalyzer:
         ]
 
         # Better section detection - look for section headers, not just keywords in text
-        lines = text.split('\n')
+        lines = text.split("\n")
         section_headers_found = set()
-        
+
         for line in lines:
             line_clean = line.strip().lower()
             # Check if line looks like a section header (short, capitalized, or all caps)
-            if (len(line_clean) < 50 and 
-                (line_clean.isupper() or line_clean.istitle() or 
-                 any(section in line_clean for section in required_sections + optional_sections))):
+            if len(line_clean) < 50 and (
+                line_clean.isupper()
+                or line_clean.istitle()
+                or any(
+                    section in line_clean
+                    for section in required_sections + optional_sections
+                )
+            ):
                 for section in required_sections + optional_sections:
                     if section in line_clean:
                         section_headers_found.add(section)
-        
-        found_required = sum(1 for section in required_sections if section in section_headers_found)
-        found_optional = sum(1 for section in optional_sections if section in section_headers_found)
+
+        found_required = sum(
+            1 for section in required_sections if section in section_headers_found
+        )
+        found_optional = sum(
+            1 for section in optional_sections if section in section_headers_found
+        )
 
         section_score = (found_required / len(required_sections)) * 40
         score += section_score
@@ -2213,8 +2239,12 @@ class ATSAnalyzer:
         phone_found = bool(re.search(r"([\+\d][\d\s\-\(\)]{8,})", text))
         linkedin_found = bool(re.search(r"linkedin\.com", text, re.IGNORECASE))
         github_found = bool(re.search(r"github\.com", text, re.IGNORECASE))
-        portfolio_found = bool(re.search(r"(https?://)?(?:www\.)?([\w\-]+\.(?:com|dev|io|net|org|in))", text))
-        
+        portfolio_found = bool(
+            re.search(
+                r"(https?://)?(?:www\.)?([\w\-]+\.(?:com|dev|io|net|org|in))", text
+            )
+        )
+
         essential_found = sum([email_found, phone_found])
         additional_found = sum([linkedin_found, github_found, portfolio_found])
 
@@ -2231,9 +2261,7 @@ class ATSAnalyzer:
                 missing_items.append("email")
             if not phone_found:
                 missing_items.append("phone")
-            issues.append(
-                f"Missing essential contact info: {', '.join(missing_items)}"
-            )
+            issues.append(f"Missing essential contact info: {', '.join(missing_items)}")
             recommendations.append(
                 "Include email and phone number at the top of your resume."
             )
@@ -2244,7 +2272,7 @@ class ATSAnalyzer:
 
         # Define essential contact patterns for header check
         essential_contact = ["@", "email", "phone", "tel", "call", "contact"]
-        
+
         # Check if contact info appears early (first 10 lines)
         contact_in_header = any(
             contact in " ".join(lines[:10]).lower() for contact in essential_contact
@@ -2295,7 +2323,7 @@ class ATSAnalyzer:
             "section_headers_count": len(section_headers),
             "issues": issues,
             "recommendations": recommendations,
-            "format_grade": self._get_format_grade(min(score, 100)),
+            "format_grade": self._get_format_grade(int(min(score, 100))),
         }
 
     def _get_format_grade(self, score: int) -> str:
@@ -2534,7 +2562,7 @@ class ATSAnalyzer:
             "issues": issues,
             "warnings": warnings,
             "recommendations": recommendations,
-            "compatibility_grade": self._get_compatibility_grade(final_score),
+            "compatibility_grade": self._get_compatibility_grade(int(final_score)),
             "sections_found": found_sections,
             "contact_completeness": f"{contact_found}/{len(contact_required)}",
             "bullet_consistency": len(bullet_counts) <= 2,
@@ -2705,7 +2733,7 @@ class ATSAnalyzer:
         Detailed formatting analysis for ATS compatibility
         Checks: bullets, spacing, consistency, structure, etc.
         """
-        analysis = {
+        analysis: dict[str, Any] = {
             "images_count": 0,  # Add image detection
             "bullet_points": {
                 "detected": False,
@@ -2772,14 +2800,22 @@ class ATSAnalyzer:
         # In a real implementation, this would check for embedded images in PDFs/DOCs
         # For now, we'll assume text-based resumes have no images
         image_patterns = [
-            r"\[image\]", r"\[img\]", r"\[photo\]", r"\[picture\]",
-            r"<img", r"<image", r"\.jpg", r"\.jpeg", r"\.png", r"\.gif"
+            r"\[image\]",
+            r"\[img\]",
+            r"\[photo\]",
+            r"\[picture\]",
+            r"<img",
+            r"<image",
+            r"\.jpg",
+            r"\.jpeg",
+            r"\.png",
+            r"\.gif",
         ]
         images_found = 0
         for pattern in image_patterns:
             matches = re.findall(pattern, text, re.IGNORECASE)
             images_found += len(matches)
-        
+
         analysis["images_count"] = images_found
 
         # Check spacing
@@ -2927,7 +2963,7 @@ class ATSAnalyzer:
 
     def _extract_contact_info(self, text: str) -> dict[str, Any]:
         """Extract detailed contact information"""
-        contact = {
+        contact: dict[str, Any] = {
             "full_name": "",
             "first_name": "",
             "middle_name": "",
@@ -3021,7 +3057,7 @@ class ATSAnalyzer:
             r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),\s*(USA|United States|US|America)",
             r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),\s*(India|Canada|UK|United Kingdom|Australia|Germany|France|Japan|China|Brazil|Mexico|Spain|Italy|Netherlands|Sweden|Norway|Denmark|Finland|Switzerland|Austria|Belgium|Poland|Czech Republic|Portugal|Greece|Turkey|Russia|South Korea|Singapore|Hong Kong|Taiwan|Thailand|Malaysia|Indonesia|Philippines|Vietnam|New Zealand|South Africa|Argentina|Chile|Colombia|Peru|Venezuela|Ecuador|Uruguay|Paraguay|Bolivia|Guyana|Suriname|French Guiana)",
         ]
-        
+
         location_match = None
         for pattern in location_patterns:
             location_match = re.search(pattern, text)
@@ -3069,7 +3105,7 @@ class ATSAnalyzer:
         # Look for education section
         lines = text.split("\n")
         in_education = False
-        current_edu: dict[str, str] = {}
+        current_edu: dict[str, Any] = {}
 
         for i, line in enumerate(lines):
             line_stripped = line.strip()
@@ -3185,7 +3221,9 @@ class ATSAnalyzer:
                     # Clean up institution name (remove "Institution:" prefix)
                     institution_name = line_stripped
                     if institution_name.startswith("Institution:"):
-                        institution_name = institution_name.replace("Institution:", "").strip()
+                        institution_name = institution_name.replace(
+                            "Institution:", ""
+                        ).strip()
                     current_edu["institution"]["name"] = institution_name
 
                     # Determine institution type
@@ -3203,29 +3241,56 @@ class ATSAnalyzer:
                     # Look for location patterns: "City, State" or "City, Country"
                     location_match = re.search(
                         r"([A-Za-z\s]+),\s*([A-Za-z\s]+)(?:\s*[-–]\s*([A-Za-z\s]+))?",
-                        line_stripped
+                        line_stripped,
                     )
-                    if location_match and not any(keyword in line_lower for keyword in ["university", "college", "institute", "school", "bachelor", "master", "phd", "degree"]):
-                        location_parts = [part.strip() for part in location_match.groups() if part]
+                    if location_match and not any(
+                        keyword in line_lower
+                        for keyword in [
+                            "university",
+                            "college",
+                            "institute",
+                            "school",
+                            "bachelor",
+                            "master",
+                            "phd",
+                            "degree",
+                        ]
+                    ):
+                        location_parts = [
+                            part.strip() for part in location_match.groups() if part
+                        ]
                         if len(location_parts) >= 2:
-                            current_edu["institution"]["location"] = ", ".join(location_parts)
+                            current_edu["institution"]["location"] = ", ".join(
+                                location_parts
+                            )
 
                 # Extract year with detailed parsing
                 if current_edu:
                     # First try to match year ranges (2017-2021)
-                    year_range_match = re.search(r"(19|20)(\d{2})\s*[-–]\s*(19|20)(\d{2})", line)
+                    year_range_match = re.search(
+                        r"(19|20)(\d{2})\s*[-–]\s*(19|20)(\d{2})", line
+                    )
                     if year_range_match:
-                        start_year = year_range_match.group(1) + year_range_match.group(2)
+                        start_year = year_range_match.group(1) + year_range_match.group(
+                            2
+                        )
                         end_year = year_range_match.group(3) + year_range_match.group(4)
 
                         current_edu["duration"]["start_year"] = start_year
                         current_edu["duration"]["end_year"] = end_year
-                        current_edu["duration"]["total_years"] = int(end_year) - int(start_year)
+                        current_edu["duration"]["total_years"] = int(end_year) - int(
+                            start_year
+                        )
                     else:
                         # Try to match single graduation year (2017)
                         single_year_match = re.search(r"\b(19|20)(\d{2})\b", line)
-                        if single_year_match and not current_edu["duration"]["end_year"]:
-                            graduation_year = single_year_match.group(1) + single_year_match.group(2)
+                        if (
+                            single_year_match
+                            and not current_edu["duration"]["end_year"]
+                        ):
+                            graduation_year = single_year_match.group(
+                                1
+                            ) + single_year_match.group(2)
                             current_edu["duration"]["end_year"] = graduation_year
                             # Estimate start year (typically 4 years for bachelor's, 2 for master's)
                             if current_edu.get("degree_type") == "Bachelor":
@@ -3336,36 +3401,52 @@ class ATSAnalyzer:
 
             if in_experience and line_stripped:
                 # First, detect job role/title (before company detection)
-                if (not current_job and  # No current job yet
-                    re.search(
+                if (
+                    not current_job
+                    and re.search(  # No current job yet
                         r"(engineer|developer|manager|analyst|designer|architect|consultant|specialist|lead|senior|junior|software|frontend|backend)",
                         line_lower,
-                    ) and
-                    not re.search(
+                    )
+                    and not re.search(
                         r"(developed|built|implemented|created|designed|integrated|engineered|architected)",
                         line_lower,
-                    )):
+                    )
+                ):
                     pending_title = line_stripped
                     continue
-                
+
                 # Detect company name (usually has location pattern or is followed by date)
                 # Look ahead to see if next few lines have date pattern
                 has_date_nearby = False
                 for j in range(i, min(i + 3, len(lines))):
                     # Support multiple date formats: MM/YYYY, YYYY, YYYY-MM
                     if re.search(
-                        r"(\d{2}/\d{4}|\d{4})\s*[-–]\s*(\d{2}/\d{4}|\d{4}|present)", lines[j].lower()
+                        r"(\d{2}/\d{4}|\d{4})\s*[-–]\s*(\d{2}/\d{4}|\d{4}|present)",
+                        lines[j].lower(),
                     ):
                         has_date_nearby = True
                         break
 
                 # More specific company detection - avoid dates and locations
-                if (has_date_nearby and 
-                    not re.search(r"\d{4}", line) and  # Not a date line
-                    not re.search(r"^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*,\s*([A-Z]{2}|[A-Z][a-z]+)$", line) and  # Not a location line
-                    (re.search(r",\s*[A-Z][a-z]+", line) or  # Has location pattern (but not state abbreviations)
-                     (line.isupper() and len(line_stripped) < 60) or  # All caps short line
-                     (not re.search(r"[•\-\*]", line) and len(line_stripped) < 60 and not re.search(r",\s*[A-Z]{2}$", line)))):  # Not a bullet point and not state abbreviation
+                if (
+                    has_date_nearby
+                    and not re.search(r"\d{4}", line)
+                    and not re.search(  # Not a date line
+                        r"^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*,\s*([A-Z]{2}|[A-Z][a-z]+)$",
+                        line,
+                    )
+                    and (  # Not a location line
+                        re.search(r",\s*[A-Z][a-z]+", line)
+                        or (  # Has location pattern (but not state abbreviations)
+                            line.isupper() and len(line_stripped) < 60
+                        )
+                        or (  # All caps short line
+                            not re.search(r"[•\-\*]", line)
+                            and len(line_stripped) < 60
+                            and not re.search(r",\s*[A-Z]{2}$", line)
+                        )
+                    )
+                ):  # Not a bullet point and not state abbreviation
                     # Save previous job
                     if current_project and current_job:
                         current_job["projects"].append(current_project)
@@ -3621,85 +3702,6 @@ class ATSAnalyzer:
             r"percentile",
         ]
 
-        lines = text.split("\n")
-        for line in lines:
-            line_lower = line.lower()
-            for pattern in achievement_patterns:
-                if re.search(pattern, line_lower):
-                    achievements.append(line.strip())
-                    break
-
-        return achievements
-
-    def _extract_summary(self, text: str) -> str:
-        """Extract summary/profile section"""
-        lines = text.split("\n")
-        summary = ""
-
-        in_summary = False
-        for i, line in enumerate(lines):
-            line_lower = line.lower()
-
-            if (
-                re.search(r"\b(summary|profile|objective|about)\b", line_lower)
-                and len(line.strip()) < 30
-            ):
-                in_summary = True
-                continue
-
-            if in_summary:
-                if (
-                    re.search(r"\b(experience|education|skills|work)\b", line_lower)
-                    and len(line.strip()) < 30
-                ):
-                    break
-                if line.strip():
-                    summary += line.strip() + " "
-
-        return summary.strip()
-
-
-    def _extract_hobbies(self, text: str) -> list[str]:
-        """Extract hobbies and interests"""
-        hobbies = []
-        lines = text.split("\n")
-
-        for i, line in enumerate(lines):
-            line_lower = line.lower()
-
-            if (
-                re.search(r"\b(hobbies|interests|activities)\b", line_lower)
-                and len(line.strip()) < 30
-            ):
-                # Look for hobbies in the next few lines
-                for j in range(i + 1, min(i + 10, len(lines))):
-                    hobby_line = lines[j].strip()
-                    if not hobby_line:
-                        continue
-                    if re.search(r"\b(education|skills|experience|certification)\b", hobby_line.lower()):
-                        break
-                    if hobby_line.startswith("•") or hobby_line.startswith("-"):
-                        hobbies.append(hobby_line)
-                    elif len(hobby_line) < 50 and not re.search(r"\d{4}", hobby_line):
-                        hobbies.append(hobby_line)
-
-        return hobbies
-
-    def _extract_achievements(self, text: str) -> list[str]:
-        """Extract achievements and awards"""
-        achievements = []
-
-        # Look for achievement indicators
-        achievement_patterns = [
-            r"top\s+\d+\s*%",
-            r"ranked\s+\d+",
-            r"award",
-            r"achievement",
-            r"recognition",
-            r"winner",
-        ]
-        
-        # Search for achievements in the text
         lines = text.split("\n")
         for line in lines:
             line_lower = line.lower()

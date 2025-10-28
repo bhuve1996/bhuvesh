@@ -6,6 +6,7 @@ import { Button } from '@/components/atoms/Button/Button';
 import { Card } from '@/components/ui/Card';
 import { atsApi } from '@/lib/ats/api';
 import { CloudResume, cloudStorage } from '@/lib/resume/cloudStorage';
+import { createTagClasses } from '@/lib/utils/componentPatterns';
 import { ERROR_MESSAGES, formatErrorForUser } from '@/lib/utils/errorHandling';
 import { ResumeData, ResumeDataUtils } from '@/types/resume';
 
@@ -380,7 +381,11 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
                       {resume.tags.map((tag, index) => (
                         <span
                           key={index}
-                          className='px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full whitespace-nowrap'
+                          className={createTagClasses(
+                            'default',
+                            'sm',
+                            'whitespace-nowrap'
+                          )}
                         >
                           {tag}
                         </span>

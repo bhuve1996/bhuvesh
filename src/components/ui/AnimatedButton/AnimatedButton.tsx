@@ -119,9 +119,9 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       type={type}
       disabled={disabled || loading}
       className={`
-        inline-flex items-center justify-center font-semibold rounded-lg 
-        transition-all duration-300 focus:outline-none focus:ring-2 
-        focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 
+        inline-flex items-center justify-center font-semibold rounded-lg
+        transition-all duration-300 focus:outline-none focus:ring-2
+        focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50
         disabled:cursor-not-allowed relative overflow-hidden
         ${variantClasses[variant]}
         ${sizeClasses[size]}

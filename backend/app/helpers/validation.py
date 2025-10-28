@@ -6,9 +6,17 @@ import mimetypes
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import magic
+
+from ..types.common_types import (
+    ATSAnalysisResult,
+    ContactInfo,
+    EducationEntry,
+    SkillsDict,
+    ValidationResult,
+    WorkExperienceEntry,
+)
 
 # ============================================================================
 # FILE VALIDATION
@@ -46,8 +54,8 @@ class FileValidator:
             Tuple of (is_valid, error_message)
         """
         try:
-            file_path = Path(file_path)
-            extension = file_path.suffix.lower()
+            path_obj = Path(file_path)
+            extension = path_obj.suffix.lower()
 
             # Check extension
             if extension not in cls.SUPPORTED_EXTENSIONS:
@@ -125,13 +133,13 @@ class FileValidator:
             Tuple of (is_valid, error_message)
         """
         try:
-            file_path = Path(file_path)
-            extension = file_path.suffix.lower()
+            path_obj = Path(file_path)
+            extension = path_obj.suffix.lower()
 
             # Basic content validation based on file type
             if extension == ".txt":
                 # Check if text file is readable
-                with open(file_path, encoding="utf-8") as f:
+                with open(path_obj, encoding="utf-8") as f:
                     content = f.read(1000)  # Read first 1000 characters
                     if not content.strip():
                         return False, "Text file appears to be empty"
@@ -151,7 +159,9 @@ class FileValidator:
             return False, f"Error validating file content: {e!s}"
 
     @classmethod
-    def validate_file(cls, file_path: str, content_type: str = None) -> dict[str, Any]:
+    def validate_file(
+        cls, file_path: str, content_type: str = None
+    ) -> ValidationResult:
         """
         Comprehensive file validation
 
@@ -162,7 +172,7 @@ class FileValidator:
         Returns:
             Dictionary with validation results
         """
-        results = {
+        results: ValidationResult = {
             "is_valid": True,
             "errors": [],
             "warnings": [],
@@ -175,9 +185,9 @@ class FileValidator:
         }
 
         try:
-            file_path = Path(file_path)
-            results["file_info"]["extension"] = file_path.suffix.lower()
-            results["file_info"]["size"] = os.path.getsize(file_path)
+            path_obj = Path(file_path)
+            results["file_info"]["extension"] = path_obj.suffix.lower()
+            results["file_info"]["size"] = os.path.getsize(path_obj)
 
             # Validate file type
             is_valid_type, type_error = cls.validate_file_type(file_path, content_type)
@@ -202,7 +212,7 @@ class FileValidator:
                 results["file_info"]["type"] = content_type
             else:
                 # Try to detect MIME type
-                mime_type, _ = mimetypes.guess_type(str(file_path))
+                mime_type, _ = mimetypes.guess_type(str(path_obj))
                 results["file_info"]["type"] = mime_type
 
         except Exception as e:
@@ -221,7 +231,7 @@ class DataValidator:
     """Validates extracted resume data"""
 
     @staticmethod
-    def validate_contact_info(contact_info: dict[str, Any]) -> dict[str, Any]:
+    def validate_contact_info(contact_info: ContactInfo) -> ValidationResult:
         """
         Validate contact information
 
@@ -231,7 +241,7 @@ class DataValidator:
         Returns:
             Dictionary with validation results
         """
-        results = {
+        results: ValidationResult = {
             "is_valid": True,
             "errors": [],
             "warnings": [],
@@ -263,7 +273,9 @@ class DataValidator:
         return results
 
     @staticmethod
-    def validate_work_experience(experience: list[dict[str, Any]]) -> dict[str, Any]:
+    def validate_work_experience(
+        experience: list[WorkExperienceEntry],
+    ) -> ValidationResult:
         """
         Validate work experience data
 
@@ -273,7 +285,7 @@ class DataValidator:
         Returns:
             Dictionary with validation results
         """
-        results = {
+        results: ValidationResult = {
             "is_valid": True,
             "errors": [],
             "warnings": [],
@@ -309,7 +321,7 @@ class DataValidator:
         return results
 
     @staticmethod
-    def validate_education(education: list[dict[str, Any]]) -> dict[str, Any]:
+    def validate_education(education: list[EducationEntry]) -> ValidationResult:
         """
         Validate education data
 
@@ -319,7 +331,7 @@ class DataValidator:
         Returns:
             Dictionary with validation results
         """
-        results = {
+        results: ValidationResult = {
             "is_valid": True,
             "errors": [],
             "warnings": [],
@@ -341,7 +353,7 @@ class DataValidator:
         return results
 
     @staticmethod
-    def validate_skills(skills: dict[str, list[str]]) -> dict[str, Any]:
+    def validate_skills(skills: SkillsDict) -> ValidationResult:
         """
         Validate skills data
 
@@ -351,7 +363,7 @@ class DataValidator:
         Returns:
             Dictionary with validation results
         """
-        results = {
+        results: ValidationResult = {
             "is_valid": True,
             "errors": [],
             "warnings": [],
@@ -386,7 +398,7 @@ class JobDescriptionValidator:
     MAX_LENGTH = 10000
 
     @classmethod
-    def validate_job_description(cls, job_description: str) -> dict[str, Any]:
+    def validate_job_description(cls, job_description: str) -> ValidationResult:
         """
         Validate job description text
 
@@ -396,7 +408,7 @@ class JobDescriptionValidator:
         Returns:
             Dictionary with validation results
         """
-        results = {
+        results: ValidationResult = {
             "is_valid": True,
             "errors": [],
             "warnings": [],
@@ -457,7 +469,7 @@ class AnalysisValidator:
     """Validates analysis results"""
 
     @staticmethod
-    def validate_analysis_result(result: dict[str, Any]) -> dict[str, Any]:
+    def validate_analysis_result(result: ATSAnalysisResult) -> ValidationResult:
         """
         Validate analysis result data
 
@@ -467,7 +479,7 @@ class AnalysisValidator:
         Returns:
             Dictionary with validation results
         """
-        results = {
+        results: ValidationResult = {
             "is_valid": True,
             "errors": [],
             "warnings": [],

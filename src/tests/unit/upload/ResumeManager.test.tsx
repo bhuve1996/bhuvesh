@@ -1,10 +1,11 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import { atsApi } from '@/api/endpoints/ats';
 import { ResumeManager } from '@/components/resume/ResumeManager/ResumeManager';
 import { cloudStorage } from '@/lib/resume/cloudStorage';
+import { render } from '@/tests/utils/testWrapper';
 
 // Mock dependencies
 jest.mock('@/lib/resume/cloudStorage');

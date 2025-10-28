@@ -4,6 +4,10 @@ import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 
 import { AnimatedScore, Card, DataVisualization, Tabs } from '@/components/ui';
+import {
+  createButtonClasses,
+  createTagClasses,
+} from '@/lib/utils/componentPatterns';
 import type { AnalysisResult } from '@/types';
 
 import { DetailedAnalyticsDisplay } from './DetailedAnalyticsDisplay';
@@ -38,7 +42,10 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             </h3>
             <button
               onClick={() => setShowJobDescription(!showJobDescription)}
-              className='px-4 py-2 bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-lg transition-colors duration-200 text-sm font-medium'
+              className={`${createButtonClasses(
+                'ghost',
+                'md'
+              )} text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-900/50`}
             >
               {showJobDescription ? 'Hide' : 'Show'} Job Description
             </button>
@@ -338,7 +345,13 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
                   </p>
                 </div>
                 {/* Hover Tooltip */}
-                <div className='absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-10'>
+                <div
+                  className={createTagClasses(
+                    'default',
+                    'sm',
+                    'absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-slate-900 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-10'
+                  )}
+                >
                   {result.jobType}
                   <div className='absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-slate-900'></div>
                 </div>
