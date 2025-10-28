@@ -1,9 +1,11 @@
 # Cursor Rules for Bhuvesh Portfolio Project
 
 ## Project Overview
+
 This is a Next.js 15 portfolio website with TypeScript, Tailwind CSS, and a well-organized component structure.
 
 ## Tech Stack
+
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
@@ -11,6 +13,7 @@ This is a Next.js 15 portfolio website with TypeScript, Tailwind CSS, and a well
 - **Build Tool**: Turbopack
 
 ## Project Structure
+
 ```
 src/
 ├── app/                    # Next.js App Router pages
@@ -26,6 +29,7 @@ src/
 ## Coding Standards
 
 ### TypeScript
+
 - Always use TypeScript for all files
 - Define proper interfaces and types in `/types/index.ts`
 - Use strict type checking
@@ -33,6 +37,7 @@ src/
 - Export types from a central location
 
 ### React Components
+
 - Use functional components with hooks
 - Always define proper prop types
 - Use React.FC for component typing
@@ -40,11 +45,13 @@ src/
 - Use descriptive component names
 
 ### File Naming
+
 - Use PascalCase for component files: `Button.tsx`
 - Use camelCase for utility files: `data.ts`
 - Use kebab-case for page routes: `page.tsx`
 
 ### Import Organization
+
 1. React imports first
 2. Third-party libraries
 3. Internal components (use absolute imports with `@/`)
@@ -52,6 +59,7 @@ src/
 5. Relative imports last
 
 ### Component Structure
+
 ```tsx
 import React from 'react';
 import { ComponentProps } from '@/types';
@@ -74,6 +82,7 @@ export default ComponentName;
 ```
 
 ### Styling Guidelines
+
 - Use Tailwind CSS classes
 - Follow mobile-first responsive design
 - Use consistent color scheme (cyan-400, blue-500, etc.)
@@ -81,12 +90,14 @@ export default ComponentName;
 - Maintain consistent spacing and typography
 
 ### Data Management
+
 - Store all static data in `/lib/data.ts`
 - Use TypeScript interfaces for data structures
 - Keep data separate from components
 - Use descriptive variable names
 
 ### SVG Icons
+
 - Use the custom SVG component system
 - Add new icons to the `Icons` object in `SVG.tsx`
 - Use consistent sizing (w-6 h-6, w-5 h-5, etc.)
@@ -95,18 +106,21 @@ export default ComponentName;
 ## Best Practices
 
 ### Performance
+
 - Use dynamic imports for large components
 - Optimize images and assets
 - Use React.memo for expensive components
 - Implement proper loading states
 
 ### Accessibility
+
 - Use semantic HTML elements
 - Add proper ARIA labels
 - Ensure keyboard navigation
 - Maintain color contrast ratios
 
 ### Code Quality
+
 - Write self-documenting code
 - Use meaningful variable and function names
 - Keep functions small and focused
@@ -114,6 +128,7 @@ export default ComponentName;
 - Follow DRY (Don't Repeat Yourself) principle
 
 ### Git Workflow
+
 - Use descriptive commit messages
 - Create feature branches for new features
 - Keep commits atomic and focused
@@ -122,24 +137,28 @@ export default ComponentName;
 ## Component Guidelines
 
 ### UI Components
+
 - Make components reusable and configurable
 - Use consistent prop interfaces
 - Provide sensible defaults
 - Support className overrides
 
 ### Layout Components
+
 - Keep layout components flexible
 - Use CSS Grid and Flexbox appropriately
 - Ensure responsive behavior
 - Handle mobile navigation properly
 
 ### Section Components
+
 - Keep sections focused on single responsibility
 - Use consistent spacing and styling
 - Make sections reusable across pages
 - Handle data through props or data imports
 
 ## Development Commands
+
 ```bash
 npm run dev          # Start development server
 npm run build        # Build for production
@@ -150,30 +169,35 @@ npm run format       # Format code with Prettier
 ```
 
 ## File Organization Rules
+
 - Keep related files together
 - Use index.ts files for clean exports
 - Group components by functionality
 - Separate concerns (UI, logic, data)
 
 ## Error Handling
+
 - Use proper error boundaries
 - Handle loading and error states
 - Provide meaningful error messages
 - Log errors appropriately
 
 ## Testing Considerations
+
 - Write testable components
 - Keep business logic separate from UI
 - Use proper prop validation
 - Consider accessibility testing
 
 ## Performance Considerations
+
 - Optimize bundle size
 - Use code splitting appropriately
 - Minimize re-renders
 - Optimize images and assets
 
 ## Security
+
 - Sanitize user inputs
 - Use proper authentication patterns
 - Follow Next.js security best practices
@@ -182,48 +206,56 @@ npm run format       # Format code with Prettier
 ## 🚀 OPTIMIZATION GUIDELINES
 
 ### DRY Principle Compliance
+
 - **NEVER duplicate code** - Use shared utilities and components
 - **Centralize common patterns** - Use `componentPatterns.ts` for UI patterns
 - **Unified API layer** - Use `unifiedClient.ts` for all API calls
 - **Single theme system** - Use `useThemeStyles` hook consistently
 
 ### Performance Optimization
+
 - **Memoization**: Use `React.memo` for expensive components
 - **Lazy Loading**: Use dynamic imports for heavy components
 - **Bundle Optimization**: Use tree shaking and code splitting
 - **API Optimization**: Use retry logic and timeout handling
 
 ### Code Organization
+
 - **Utility Functions**: Place in `/lib/utils/` with clear naming
 - **Component Patterns**: Use `/lib/utils/componentPatterns.ts` for common UI patterns
 - **API Layer**: Use `/lib/api/unifiedClient.ts` for all API calls
 - **Theme System**: Use `/hooks/useThemeStyles.ts` for theme-aware styling
 
 ### Type Safety
+
 - **Strict TypeScript**: Enable strict mode everywhere
 - **API Types**: Use generated types from backend schemas
 - **Component Props**: Define proper interfaces for all props
 - **Error Handling**: Use typed error interfaces
 
 ### Responsive Design
+
 - **Mobile First**: Always start with mobile design
 - **Breakpoints**: Use consistent Tailwind breakpoints
 - **Responsive Utilities**: Use `responsivePadding`, `responsiveTextSizes` from componentPatterns
 - **Touch Targets**: Ensure minimum 44px touch targets
 
 ### Accessibility
+
 - **Semantic HTML**: Use proper HTML elements
 - **ARIA Labels**: Add proper ARIA attributes
 - **Keyboard Navigation**: Ensure all interactive elements are keyboard accessible
 - **Color Contrast**: Maintain WCAG AA compliance
 
 ### Error Handling
+
 - **Centralized**: Use unified error handling patterns
 - **User-Friendly**: Provide meaningful error messages
 - **Retry Logic**: Implement automatic retry for failed requests
 - **Fallbacks**: Provide graceful degradation
 
 ### Testing
+
 - **Unit Tests**: Test utility functions and hooks
 - **Component Tests**: Test component behavior and accessibility
 - **Integration Tests**: Test API interactions
@@ -232,6 +264,7 @@ npm run format       # Format code with Prettier
 ## 🎯 OPTIMIZATION CHECKLIST
 
 Before committing code, ensure:
+
 - [ ] No code duplication (DRY principle)
 - [ ] Proper TypeScript types
 - [ ] Responsive design implementation

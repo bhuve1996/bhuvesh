@@ -59,10 +59,10 @@ export class UnifiedApiError extends Error implements ApiError {
   ) {
     super(message);
     this.name = 'UnifiedApiError';
-    this.status = status;
-    this.response = response;
-    this.code = code;
-    this.details = details;
+    if (status !== undefined) this.status = status;
+    if (response !== undefined) this.response = response;
+    if (code !== undefined) this.code = code;
+    if (details !== undefined) this.details = details;
   }
 }
 
@@ -200,7 +200,7 @@ export class UnifiedApiClient {
       };
     };
 
-    const requestWithTimeout = withTimeout(requestFn, timeout);
+    const requestWithTimeout = () => withTimeout(requestFn(), timeout);
     return withRetry(requestWithTimeout, retries, retryDelay);
   }
 
@@ -240,7 +240,7 @@ export class UnifiedApiClient {
       };
     };
 
-    const requestWithTimeout = withTimeout(requestFn, timeout);
+    const requestWithTimeout = () => withTimeout(requestFn(), timeout);
     return withRetry(requestWithTimeout, retries, retryDelay);
   }
 

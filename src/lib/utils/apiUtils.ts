@@ -4,7 +4,9 @@
  * @deprecated Use UnifiedApiClient from @/lib/api/unifiedClient
  */
 
-import { formatErrorForUser } from './errorHandling';
+import type { ApiError, ApiResponse } from '@/lib/api/unifiedClient';
+
+import { formatErrorForUser, ERROR_MESSAGES } from './errorHandling';
 
 // Re-export types from unified client
 export type { ApiResponse, ApiError } from '@/lib/api/unifiedClient';
@@ -16,7 +18,7 @@ export async function handleApiError(
   response: Response,
   context: string
 ): Promise<never> {
-  let errorMessage = ERROR_MESSAGES.SERVER;
+  let errorMessage: string = ERROR_MESSAGES.SERVER;
 
   try {
     const error = await response.json();
@@ -161,7 +163,7 @@ export async function retryApiRequest<T>(
       if (
         error instanceof Error &&
         'status' in error &&
-        error.status &&
+        typeof error.status === 'number' &&
         error.status >= 400 &&
         error.status < 500
       ) {

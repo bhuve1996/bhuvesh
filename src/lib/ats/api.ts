@@ -96,7 +96,26 @@ export async function analyzeResumeWithJobDescription(
 
     return {
       success: analysisResponse.success,
-      data: analysisResponse.data,
+      data: analysisResponse.data || {
+        ats_score: 0,
+        match_category: 'No Match',
+        keyword_matches: [],
+        missing_keywords: [],
+        semantic_similarity: 0,
+        suggestions: [],
+        strengths: [],
+        weaknesses: [],
+        formatting_issues: [],
+        ats_friendly: false,
+        word_count: 0,
+        detailed_scores: {
+          keyword_score: 0,
+          semantic_score: 0,
+          format_score: 0,
+          content_score: 0,
+          ats_score: 0,
+        },
+      },
       message: analysisResponse.message,
     };
   } catch (error) {
@@ -126,7 +145,16 @@ export async function parseResume(file: File): Promise<ParseResponse> {
             formatting_analysis: {},
             parsed_content: {},
           }
-        : undefined,
+        : {
+            filename: '',
+            file_size: 0,
+            file_type: '',
+            text: '',
+            word_count: 0,
+            character_count: 0,
+            formatting_analysis: {},
+            parsed_content: {},
+          },
       message: response.message,
     };
   } catch (error) {
@@ -181,7 +209,26 @@ export async function quickAnalyzeResume(
 
     return {
       success: analysisResponse.success,
-      data: analysisResponse.data,
+      data: analysisResponse.data || {
+        ats_score: 0,
+        match_category: 'No Match',
+        keyword_matches: [],
+        missing_keywords: [],
+        semantic_similarity: 0,
+        suggestions: [],
+        strengths: [],
+        weaknesses: [],
+        formatting_issues: [],
+        ats_friendly: false,
+        word_count: 0,
+        detailed_scores: {
+          keyword_score: 0,
+          semantic_score: 0,
+          format_score: 0,
+          content_score: 0,
+          ats_score: 0,
+        },
+      },
       message: analysisResponse.message,
     };
   } catch (error) {

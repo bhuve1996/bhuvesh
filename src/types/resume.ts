@@ -5,9 +5,19 @@ import {
   cleanEmail,
   cleanGitHub,
   cleanLinkedIn,
+  cleanLocation,
+  cleanName,
+  cleanPersonalInfo,
   cleanPhone,
+  cleanPortfolio,
+  cleanProject,
+  cleanProjectUrl,
   cleanSkills,
   cleanWorkExperience,
+  generateDataId as generateId,
+  getCurrentJobTitle,
+  getResumeStats,
+  validateResumeData,
 } from '@/lib/utils/dataCleaningUtils';
 
 import type {

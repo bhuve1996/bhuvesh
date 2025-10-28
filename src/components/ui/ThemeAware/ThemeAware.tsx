@@ -8,7 +8,9 @@ import React from 'react';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 
 // Simple utility to combine classes
-const combineClasses = (...classes: (string | undefined | null | false)[]): string => {
+const combineClasses = (
+  ...classes: (string | undefined | null | false)[]
+): string => {
   return classes.filter(Boolean).join(' ');
 };
 
@@ -27,8 +29,6 @@ export const ThemeAware: React.FC<ThemeAwareProps> = ({
   size = 'md',
   theme: _theme = 'auto',
 }) => {
-  const { getThemeClasses } = useThemeStyles();
-
   const getVariantClasses = () => {
     switch (variant) {
       case 'card':
@@ -84,7 +84,8 @@ export const ThemeAwareButton: React.FC<ThemeAwareButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const { classes } = useThemeStyles();
+  const { getThemeClasses } = useThemeStyles();
+  const classes = getThemeClasses();
 
   const getVariantClasses = () => {
     switch (variant) {
@@ -97,7 +98,7 @@ export const ThemeAwareButton: React.FC<ThemeAwareButtonProps> = ({
       case 'ghost':
         return classes.button.ghost;
       case 'destructive':
-        return classes.button.destructive;
+        return 'bg-red-600 text-white hover:bg-red-700';
       default:
         return classes.button.primary;
     }
@@ -169,20 +170,26 @@ export const ThemeAwareInput: React.FC<ThemeAwareInputProps> = ({
   className = '',
   ...props
 }) => {
-  const { classes } = useThemeStyles();
+  const { getThemeClasses } = useThemeStyles();
+  const classes = getThemeClasses();
 
   const inputClasses = combineClasses(
-    classes.input.base,
-    variant === 'error' ? classes.input.error : '',
+    'px-3 py-2 rounded-md border transition-colors',
+    classes.input.background,
+    classes.input.border,
+    classes.input.text,
+    classes.input.placeholder,
+    classes.input.focus,
+    variant === 'error' ? 'border-red-500' : '',
     className
   );
 
   return (
     <div className='space-y-2'>
-      {label && <label className={classes.form.label}>{label}</label>}
+      {label && <label className={`text-sm font-medium ${classes.text.primary}`}>{label}</label>}
       <input className={inputClasses} {...props} />
-      {error && <p className={classes.form.error}>{error}</p>}
-      {help && !error && <p className={classes.form.help}>{help}</p>}
+      {error && <p className={`text-sm text-red-500`}>{error}</p>}
+      {help && !error && <p className={`text-sm ${classes.text.muted}`}>{help}</p>}
     </div>
   );
 };
@@ -205,18 +212,19 @@ export const ThemeAwareCard: React.FC<ThemeAwareCardProps> = ({
   className = '',
   variant = 'default',
 }) => {
-  const { classes } = useThemeStyles();
+  const { getThemeClasses } = useThemeStyles();
+  const classes = getThemeClasses();
 
   const getVariantClasses = () => {
     switch (variant) {
       case 'elevated':
-        return classes.card.elevated;
+        return `${classes.background.card} border ${classes.border.primary} rounded-lg shadow-lg`;
       case 'glass':
-        return classes.card.glass;
+        return `${classes.background.card} backdrop-blur-sm border ${classes.border.secondary} rounded-lg`;
       case 'interactive':
-        return classes.card.interactive;
+        return `${classes.background.card} border ${classes.border.primary} rounded-lg shadow-sm hover:shadow-md transition-shadow`;
       default:
-        return classes.card.base;
+        return `${classes.background.card} border ${classes.border.primary} rounded-lg shadow-sm`;
     }
   };
 
@@ -262,7 +270,8 @@ export const ThemeAwareBadge: React.FC<ThemeAwareBadgeProps> = ({
   size = 'md',
   className = '',
 }) => {
-  const { getBadgeClass } = useThemeStyles();
+  const { getThemeClasses } = useThemeStyles();
+  const classes = getThemeClasses();
 
   const getSizeClasses = () => {
     switch (size) {
@@ -275,8 +284,28 @@ export const ThemeAwareBadge: React.FC<ThemeAwareBadgeProps> = ({
     }
   };
 
+  const getBadgeVariantClasses = () => {
+    switch (variant) {
+      case 'primary':
+        return 'bg-blue-600 text-white';
+      case 'success':
+        return 'bg-green-600 text-white';
+      case 'warning':
+        return 'bg-yellow-600 text-white';
+      case 'error':
+        return 'bg-red-600 text-white';
+      case 'info':
+        return 'bg-cyan-600 text-white';
+      case 'outline':
+        return `border ${classes.border.primary} ${classes.text.primary}`;
+      default:
+        return `${classes.background.secondary} ${classes.text.primary}`;
+    }
+  };
+
   const badgeClasses = combineClasses(
-    getBadgeClass(variant),
+    'inline-flex items-center rounded-full font-medium',
+    getBadgeVariantClasses(),
     getSizeClasses(),
     className
   );
@@ -300,10 +329,26 @@ export const ThemeAwareAlert: React.FC<ThemeAwareAlertProps> = ({
   title,
   className = '',
 }) => {
-  const { getAlertClass } = useThemeStyles();
+  const { getThemeClasses } = useThemeStyles();
+  const classes = getThemeClasses();
+
+  const getAlertVariantClasses = () => {
+    switch (variant) {
+      case 'success':
+        return 'bg-green-50 border border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300';
+      case 'warning':
+        return 'bg-yellow-50 border border-yellow-200 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-300';
+      case 'error':
+        return 'bg-red-50 border border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300';
+      case 'info':
+        return 'bg-blue-50 border border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300';
+      default:
+        return `${classes.background.card} border ${classes.border.primary} ${classes.text.primary}`;
+    }
+  };
 
   const alertClasses = combineClasses(
-    getAlertClass(variant),
+    getAlertVariantClasses(),
     'rounded-lg p-4',
     className
   );
@@ -334,12 +379,13 @@ export const ThemeAwareProgress: React.FC<ThemeAwareProgressProps> = ({
   className = '',
   showPercentage = true,
 }) => {
-  const { classes } = useThemeStyles();
+  const { getThemeClasses } = useThemeStyles();
+  const classes = getThemeClasses();
 
   const percentage = Math.min((value / max) * 100, 100);
 
   const progressClasses = combineClasses(
-    classes.progress.container,
+    'w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2',
     className
   );
 
@@ -347,9 +393,9 @@ export const ThemeAwareProgress: React.FC<ThemeAwareProgressProps> = ({
     <div className='space-y-2'>
       {label && (
         <div className='flex justify-between items-center'>
-          <span className={classes.progress.label}>{label}</span>
+          <span className={`text-sm font-medium ${classes.text.primary}`}>{label}</span>
           {showPercentage && (
-            <span className='text-sm text-muted-foreground'>
+            <span className={`text-sm ${classes.text.muted}`}>
               {Math.round(percentage)}%
             </span>
           )}
@@ -357,7 +403,7 @@ export const ThemeAwareProgress: React.FC<ThemeAwareProgressProps> = ({
       )}
       <div className={progressClasses}>
         <div
-          className={classes.progress.bar}
+          className='bg-blue-600 dark:bg-cyan-400 h-2 rounded-full transition-all duration-300'
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -379,7 +425,8 @@ export const ThemeAwareLoading: React.FC<ThemeAwareLoadingProps> = ({
   text,
   className = '',
 }) => {
-  const { classes } = useThemeStyles();
+  const { getThemeClasses } = useThemeStyles();
+  const classes = getThemeClasses();
 
   const getSizeClasses = () => {
     switch (size) {
@@ -393,7 +440,7 @@ export const ThemeAwareLoading: React.FC<ThemeAwareLoadingProps> = ({
   };
 
   const spinnerClasses = combineClasses(
-    classes.loading.spinner,
+    'animate-spin rounded-full border-2 border-gray-300 border-t-blue-600 dark:border-gray-600 dark:border-t-cyan-400',
     getSizeClasses(),
     className
   );
@@ -401,7 +448,7 @@ export const ThemeAwareLoading: React.FC<ThemeAwareLoadingProps> = ({
   return (
     <div className='flex items-center justify-center space-x-2'>
       <div className={spinnerClasses} />
-      {text && <span className='text-sm text-muted-foreground'>{text}</span>}
+      {text && <span className={`text-sm ${classes.text.muted}`}>{text}</span>}
     </div>
   );
 };
@@ -418,12 +465,13 @@ export const ThemeAwareDivider: React.FC<ThemeAwareDividerProps> = ({
   orientation = 'horizontal',
   className = '',
 }) => {
-  const { classes } = useThemeStyles();
+  const { getThemeClasses } = useThemeStyles();
+  const classes = getThemeClasses();
 
   const dividerClasses = combineClasses(
     orientation === 'horizontal'
-      ? classes.divider.horizontal
-      : classes.divider.vertical,
+      ? `w-full h-px ${classes.border.primary}`
+      : `h-full w-px ${classes.border.primary}`,
     className
   );
 
@@ -444,10 +492,9 @@ export const ThemeAwareSkeleton: React.FC<ThemeAwareSkeletonProps> = ({
   width,
   height,
 }) => {
-  const { classes } = useThemeStyles();
 
   const skeletonClasses = combineClasses(
-    classes.loading.skeleton,
+    'animate-pulse bg-gray-200 dark:bg-gray-700 rounded',
     className
   );
 

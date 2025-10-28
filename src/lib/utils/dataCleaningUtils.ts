@@ -150,7 +150,7 @@ export function cleanProjectUrl(url: string): string {
 /**
  * Generate unique ID
  */
-export function generateId(prefix: string): string {
+export function generateDataId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
@@ -240,7 +240,7 @@ export function cleanWorkExperience(experience: {
   responsibilities: string[];
 } {
   return {
-    id: experience.id || generateId('exp'),
+    id: experience.id || generateDataId('exp'),
     company: experience.company || '',
     position: experience.position || '',
     location: cleanLocation(experience.location || ''),
@@ -283,7 +283,7 @@ export function cleanEducation(education: {
   honors: string[];
 } {
   return {
-    id: education.id || generateId('edu'),
+    id: education.id || generateDataId('edu'),
     institution: education.institution || '',
     degree: education.degree || '',
     field: education.field || '',
@@ -323,7 +323,7 @@ export function cleanProject(project: {
   impact: string[];
 } {
   return {
-    id: project.id || generateId('proj'),
+    id: project.id || generateDataId('proj'),
     name: project.name || '',
     description: project.description || '',
     technologies: project.technologies || [],
