@@ -47,14 +47,15 @@ export default function ATSCheckerPage() {
   const {
     progress,
     startAnalysis,
-    updateStep,
-    completeStep,
     completeAnalysis,
     setError: setProgressError,
   } = useAnalysisProgress();
 
   // Handle file upload and parse to ResumeData directly
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = async (files: File[]) => {
+    const file = files[0];
+    if (!file) return;
+
     try {
       setFile(file);
       setLoading(true);
@@ -105,7 +106,7 @@ export default function ATSCheckerPage() {
       if (result.success && result.data) {
         // Convert backend response to AnalysisResult format
         const analysisResult: AnalysisResult = {
-          jobType: result.data.detected_job_type || 'Unknown',
+          jobType: result.data.match_category || 'Unknown',
           atsScore: result.data.ats_score || 0,
           keywordMatches: result.data.keyword_matches || [],
           missingKeywords: result.data.missing_keywords || [],
@@ -114,11 +115,13 @@ export default function ATSCheckerPage() {
           weaknesses: result.data.weaknesses || [],
           wordCount: result.data.word_count || 0,
           characterCount: result.data.word_count * 5 || 0, // Rough estimate
-          detailedScores: {
-            keywords: result.data.detailed_scores?.keyword_score || 0,
-            semantic: result.data.detailed_scores?.semantic_score || 0,
-            format: result.data.detailed_scores?.format_score || 0,
-            content: result.data.detailed_scores?.content_score || 0,
+          keywordDensity: {}, // TODO: Calculate keyword density from backend data
+          detailed_scores: {
+            keyword_score: result.data.detailed_scores?.keyword_score || 0,
+            semantic_score: result.data.detailed_scores?.semantic_score || 0,
+            format_score: result.data.detailed_scores?.format_score || 0,
+            content_score: result.data.detailed_scores?.content_score || 0,
+            ats_score: result.data.detailed_scores?.ats_score || 0,
           },
         };
 
@@ -147,7 +150,7 @@ export default function ATSCheckerPage() {
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-50 to-blue-50'>
-      <UnifiedWelcomeBar />
+      <UnifiedWelcomeBar currentPage='ats-checker' />
 
       <main className='container mx-auto px-4 py-8'>
         <Section className='mb-8'>

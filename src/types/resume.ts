@@ -265,9 +265,8 @@ export class ResumeDataUtils {
       current: experience.current || false,
       description: experience.description || '',
       achievements: experience.achievements || [],
-      technologies: experience.technologies || [],
-      title: experience.title || '',
       keyTechnologies: experience.keyTechnologies || [],
+      title: experience.title || '',
       impactMetrics: experience.impactMetrics || [],
       responsibilities: experience.responsibilities || [],
     };

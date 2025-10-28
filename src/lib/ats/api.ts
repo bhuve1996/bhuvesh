@@ -3,6 +3,8 @@
  * Connects to Python FastAPI backend with semantic matching
  */
 
+import { ResumeData } from '@/types/resume';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface ATSAnalysisResult {
@@ -109,7 +111,7 @@ export async function parseResume(file: File) {
  */
 export async function uploadFile(file: File): Promise<{
   success: boolean;
-  data: any; // ResumeData format
+  data: ResumeData; // ResumeData format
   message: string;
 }> {
   const formData = new FormData();

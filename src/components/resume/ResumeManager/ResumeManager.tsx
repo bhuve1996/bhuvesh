@@ -111,26 +111,28 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
       if (result.success && result.data) {
         // Clean the data using ResumeDataUtils
         const cleanedData = ResumeDataUtils.cleanResumeData(result.data);
-        
+
         // Use the parsed name or fallback to filename
-        const resumeName = cleanedData.personal.fullName || file.name.replace(/\.[^/.]+$/, '');
-        
+        const resumeName =
+          cleanedData.personal.fullName || file.name.replace(/\.[^/.]+$/, '');
+
         // Use the cleaned ResumeData from the backend
         const resumeData = cleanedData;
 
-      const newResumeId = cloudStorage.saveResume(
-        resumeName,
-        resumeData,
-        'unknown'
-      );
+        const newResumeId = cloudStorage.saveResume(
+          resumeName,
+          resumeData,
+          'unknown'
+        );
 
-      loadResumes();
-      alert('Resume uploaded and processed successfully!');
+        loadResumes();
+        alert('Resume uploaded and processed successfully!');
 
-      // Auto-select the newly created resume
-      const newResume = cloudStorage.getResume(newResumeId);
-      if (newResume) {
-        onResumeSelect(newResume);
+        // Auto-select the newly created resume
+        const newResume = cloudStorage.getResume(newResumeId);
+        if (newResume) {
+          onResumeSelect(newResume);
+        }
       }
     } catch {
       // console.error('Upload error:', error);

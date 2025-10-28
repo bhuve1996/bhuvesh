@@ -105,7 +105,7 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
 
       // Update if we don't have resume data OR if we have new data from ATS analysis
       if (!resumeData || (hasNewData && !hasExistingData)) {
-        console.log('📝 Updating resume data from initialData:', initialData);
+        // console.log('📝 Updating resume data from initialData:', initialData);
         setResumeData({
           personal: {
             fullName: initialData.personal?.fullName || '',
@@ -145,9 +145,9 @@ export const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
         (initialData.summary?.length || 0) > (resumeData.summary?.length || 0);
 
       if (initialHasMoreData) {
-        console.log(
-          '🔄 Updating resume data with more complete data from store'
-        );
+        // console.log(
+        //   '🔄 Updating resume data with more complete data from store'
+        // );
         setResumeData({
           personal: {
             fullName: initialData.personal?.fullName || '',
