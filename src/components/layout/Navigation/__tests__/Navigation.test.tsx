@@ -8,6 +8,7 @@ import {
 } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { TourProvider } from '@/contexts/TourContext';
 
 import { Navigation } from '../Navigation';
@@ -15,12 +16,14 @@ import { Navigation } from '../Navigation';
 // Extend Jest matchers
 expect.extend(toHaveNoViolations);
 
-// Helper function to render Navigation with TourProvider
+// Helper function to render Navigation with all providers
 const renderNavigationWithProvider = (props: Record<string, unknown>) => {
   return render(
-    <TourProvider>
-      <Navigation {...props} />
-    </TourProvider>
+    <ThemeProvider>
+      <TourProvider>
+        <Navigation {...props} />
+      </TourProvider>
+    </ThemeProvider>
   );
 };
 

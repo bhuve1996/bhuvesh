@@ -5,18 +5,26 @@ import { Button } from '@/components/atoms/Button/Button';
 import { Navigation } from '@/components/layout/Navigation';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { TourProvider } from '@/contexts/TourContext';
 
 // Extend Jest matchers
 expect.extend(toHaveNoViolations);
 
-// Helper function to render Navigation with TourProvider
+// Helper function to render Navigation with all providers
 const renderNavigationWithProvider = (props: Record<string, unknown>) => {
   return render(
-    <TourProvider>
-      <Navigation {...props} />
-    </TourProvider>
+    <ThemeProvider>
+      <TourProvider>
+        <Navigation {...props} />
+      </TourProvider>
+    </ThemeProvider>
   );
+};
+
+// Helper function to render components with ThemeProvider
+const renderWithTheme = (component: React.ReactElement) => {
+  return render(<ThemeProvider>{component}</ThemeProvider>);
 };
 
 describe('Accessibility Tests', () => {
@@ -118,13 +126,13 @@ describe('Accessibility Tests', () => {
 
   describe('ThemeToggle Component Accessibility', () => {
     it('should not have accessibility violations', async () => {
-      const { container } = render(<ThemeToggle />);
+      const { container } = renderWithTheme(<ThemeToggle />);
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
 
     it('should have proper ARIA label', () => {
-      const { container } = render(<ThemeToggle />);
+      const { container } = renderWithTheme(<ThemeToggle />);
       const button = container.querySelector('button');
 
       expect(button).toHaveAttribute('aria-label');
@@ -132,7 +140,7 @@ describe('Accessibility Tests', () => {
     });
 
     it('should be keyboard accessible', () => {
-      const { container } = render(<ThemeToggle />);
+      const { container } = renderWithTheme(<ThemeToggle />);
       const button = container.querySelector('button');
 
       expect(button).toHaveAttribute('tabIndex', '0');

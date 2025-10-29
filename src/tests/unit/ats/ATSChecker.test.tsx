@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import { ATSChecker } from '@/components/organisms/ATSChecker/ATSChecker';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { atsApi } from '@/lib/ats/api';
 
 // Mock dependencies
 jest.mock('react-hot-toast', () => ({
@@ -11,9 +13,18 @@ jest.mock('react-hot-toast', () => ({
   loading: jest.fn(),
 }));
 
-// Mock fetch globally
-global.fetch = jest.fn();
-const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+// Mock the atsApi module
+jest.mock('@/lib/ats/api', () => ({
+  atsApi: {
+    analyzeResumeWithJobDescription: jest.fn(),
+    checkBackendHealth: jest.fn().mockResolvedValue(true),
+  },
+}));
+
+// Helper function to render with ThemeProvider
+const renderWithTheme = (component: React.ReactElement) => {
+  return render(<ThemeProvider>{component}</ThemeProvider>);
+};
 
 describe('ATSChecker Component', () => {
   const mockAnalysisResult = {
@@ -50,8 +61,11 @@ describe('ATSChecker Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset fetch mock
-    mockFetch.mockClear();
+
+    // Set up default atsApi mock to return successful analysis
+    (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockResolvedValue(
+      mockAnalysisResult
+    );
   });
 
   describe('File Upload', () => {
@@ -61,10 +75,14 @@ describe('ATSChecker Component', () => {
         type: 'application/pdf',
       });
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
+
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
 
       // Verify that the file was uploaded and job description input appears
       await waitFor(() => {
@@ -83,12 +101,12 @@ describe('ATSChecker Component', () => {
         type: 'text/plain',
       });
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
-      expect(mockFetch).not.toHaveBeenCalled();
+      expect(atsApi.analyzeResumeWithJobDescription).not.toHaveBeenCalled();
     });
 
     it('should handle file upload errors', async () => {
@@ -97,12 +115,18 @@ describe('ATSChecker Component', () => {
         type: 'application/pdf',
       });
 
-      mockFetch.mockRejectedValue(new Error('Upload failed'));
+      (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockRejectedValue(
+        new Error('Upload failed')
+      );
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
+
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
 
       // Wait for the analyze button to appear and click it
       const analyzeButton = await screen.findByRole('button', {
@@ -125,14 +149,28 @@ describe('ATSChecker Component', () => {
         type: 'application/pdf',
       });
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       // Upload a file first
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);
@@ -147,14 +185,28 @@ describe('ATSChecker Component', () => {
         type: 'application/pdf',
       });
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       // Upload a file first
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, shortDescription);
@@ -173,13 +225,27 @@ describe('ATSChecker Component', () => {
       const jobDescription =
         'We are looking for a Senior Software Engineer with experience in React, Node.js, and TypeScript. The ideal candidate should have 5+ years of experience.';
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);
@@ -200,18 +266,31 @@ describe('ATSChecker Component', () => {
       const jobDescription =
         'We are looking for a Senior Software Engineer with experience in React, Node.js, and TypeScript.';
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockAnalysisResult,
-      } as Response);
+      (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockResolvedValue(
+        mockAnalysisResult
+      );
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);
@@ -239,18 +318,31 @@ describe('ATSChecker Component', () => {
       const jobDescription =
         'We are looking for a Senior Software Engineer with experience in React, Node.js, and TypeScript.';
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockAnalysisResult,
-      } as Response);
+      (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockResolvedValue(
+        mockAnalysisResult
+      );
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);
@@ -280,18 +372,31 @@ describe('ATSChecker Component', () => {
       const jobDescription =
         'We are looking for a Senior Software Engineer with experience in React, Node.js, and TypeScript.';
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockAnalysisResult,
-      } as Response);
+      (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockResolvedValue(
+        mockAnalysisResult
+      );
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);
@@ -319,18 +424,31 @@ describe('ATSChecker Component', () => {
       const jobDescription =
         'We are looking for a Senior Software Engineer with experience in React, Node.js, and TypeScript.';
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockAnalysisResult,
-      } as Response);
+      (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockResolvedValue(
+        mockAnalysisResult
+      );
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);
@@ -365,27 +483,34 @@ describe('ATSChecker Component', () => {
         'We are looking for a Senior Software Engineer with experience in React, Node.js, and TypeScript.';
 
       // Mock a slow analysis
-      mockFetch.mockImplementation(
+      (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockImplementation(
         () =>
           new Promise(resolve =>
-            setTimeout(
-              () =>
-                resolve({
-                  ok: true,
-                  json: async () => mockAnalysisResult,
-                } as Response),
-              1000
-            )
+            setTimeout(() => resolve(mockAnalysisResult), 1000)
           )
       );
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);
@@ -411,27 +536,34 @@ describe('ATSChecker Component', () => {
       const jobDescription =
         'We are looking for a Senior Software Engineer with experience in React, Node.js, and TypeScript.';
 
-      mockFetch.mockImplementation(
+      (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockImplementation(
         () =>
           new Promise(resolve =>
-            setTimeout(
-              () =>
-                resolve({
-                  ok: true,
-                  json: async () => mockAnalysisResult,
-                } as Response),
-              1000
-            )
+            setTimeout(() => resolve(mockAnalysisResult), 1000)
           )
       );
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);
@@ -461,15 +593,31 @@ describe('ATSChecker Component', () => {
       const jobDescription =
         'We are looking for a Senior Software Engineer with experience in React, Node.js, and TypeScript.';
 
-      mockFetch.mockRejectedValue(new Error('API Error'));
+      (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockRejectedValue(
+        new Error('API Error')
+      );
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);
@@ -496,15 +644,31 @@ describe('ATSChecker Component', () => {
       const jobDescription =
         'We are looking for a Senior Software Engineer with experience in React, Node.js, and TypeScript.';
 
-      mockFetch.mockRejectedValue(new Error('Network Error'));
+      (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockRejectedValue(
+        new Error('Network Error')
+      );
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);
@@ -526,7 +690,7 @@ describe('ATSChecker Component', () => {
 
   describe('Accessibility', () => {
     it('should have proper ARIA labels', () => {
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       expect(screen.getByLabelText(/upload resume/i)).toBeInTheDocument();
       // Job description input only appears after file upload
@@ -537,7 +701,7 @@ describe('ATSChecker Component', () => {
 
     it('should support keyboard navigation', async () => {
       const user = userEvent.setup();
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       // File input is hidden, so focus goes to the upload button
       await user.tab();
@@ -552,18 +716,31 @@ describe('ATSChecker Component', () => {
       const jobDescription =
         'We are looking for a Senior Software Engineer with experience in React, Node.js, and TypeScript.';
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockAnalysisResult,
-      } as Response);
+      (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockResolvedValue(
+        mockAnalysisResult
+      );
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);
@@ -604,18 +781,31 @@ describe('ATSChecker Component', () => {
         },
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => poorScoreResult,
-      } as Response);
+      (atsApi.analyzeResumeWithJobDescription as jest.Mock).mockResolvedValue(
+        poorScoreResult
+      );
 
-      render(<ATSChecker />);
+      renderWithTheme(<ATSChecker />);
 
       const fileInput = screen.getByLabelText(/upload resume/i);
       await user.upload(fileInput, mockFile);
 
+      // Click the upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       // Wait for the job description input to appear after file upload
-      const jobInput = await screen.findByPlaceholderText(
+      await waitFor(
+        () => {
+          expect(
+            screen.getByPlaceholderText(
+              /paste the job description here for better analysis/i
+            )
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
+      const jobInput = screen.getByPlaceholderText(
         /paste the job description here for better analysis/i
       );
       await user.type(jobInput, jobDescription);

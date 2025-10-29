@@ -2,6 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
+import { ThemeProvider } from '@/contexts/ThemeContext';
+
 import { FileUpload } from '../FileUpload';
 
 // Mock react-hot-toast
@@ -10,9 +12,14 @@ jest.mock('react-hot-toast', () => ({
   success: jest.fn(),
 }));
 
+// Helper function to render with ThemeProvider
+const renderWithTheme = (component: React.ReactElement) => {
+  return render(<ThemeProvider>{component}</ThemeProvider>);
+};
+
 describe('FileUpload Component', () => {
   const defaultProps = {
-    onUpload: jest.fn(),
+    onFileUpload: jest.fn(),
   };
 
   beforeEach(() => {
@@ -20,7 +27,7 @@ describe('FileUpload Component', () => {
   });
 
   it('renders with default props', () => {
-    render(<FileUpload {...defaultProps} />);
+    renderWithTheme(<FileUpload {...defaultProps} />);
 
     expect(
       screen.getByText(/drag and drop your files here/i)
@@ -33,25 +40,25 @@ describe('FileUpload Component', () => {
   });
 
   it('renders with custom accept types', () => {
-    render(<FileUpload {...defaultProps} accept='.pdf,.jpg,.png' />);
+    renderWithTheme(<FileUpload {...defaultProps} accept='.pdf,.jpg,.png' />);
     expect(
       screen.getByText(/supports: \.pdf,\.jpg,\.png/i)
     ).toBeInTheDocument();
   });
 
   it('renders with custom max size', () => {
-    render(<FileUpload {...defaultProps} maxSize={5 * 1024 * 1024} />);
+    renderWithTheme(<FileUpload {...defaultProps} maxSize={5 * 1024 * 1024} />);
     expect(screen.getByText(/max size: 5 mb/i)).toBeInTheDocument();
   });
 
   it('renders with custom max files', () => {
-    render(<FileUpload {...defaultProps} maxFiles={3} />);
+    renderWithTheme(<FileUpload {...defaultProps} maxFiles={3} />);
     expect(screen.getByText(/max files: 3/i)).toBeInTheDocument();
   });
 
   it('handles file selection via input', async () => {
     const user = userEvent.setup();
-    render(<FileUpload {...defaultProps} />);
+    renderWithTheme(<FileUpload {...defaultProps} />);
 
     const file = new File(['test content'], 'test.pdf', {
       type: 'application/pdf',
@@ -65,7 +72,7 @@ describe('FileUpload Component', () => {
   });
 
   it('handles drag and drop', async () => {
-    render(<FileUpload {...defaultProps} />);
+    renderWithTheme(<FileUpload {...defaultProps} />);
 
     const dropZone = screen
       .getByText(/drag and drop your files here/i)
@@ -93,7 +100,9 @@ describe('FileUpload Component', () => {
   it('validates file size', async () => {
     const user = userEvent.setup();
     const onError = jest.fn();
-    render(<FileUpload {...defaultProps} onError={onError} maxSize={1024} />);
+    renderWithTheme(
+      <FileUpload {...defaultProps} onError={onError} maxSize={1024} />
+    );
 
     const file = new File(['test content'], 'test.pdf', {
       type: 'application/pdf',
@@ -111,7 +120,7 @@ describe('FileUpload Component', () => {
   it('validates file type', async () => {
     const user = userEvent.setup();
     const onError = jest.fn();
-    render(
+    renderWithTheme(
       <FileUpload
         {...defaultProps}
         onError={onError}
@@ -131,7 +140,7 @@ describe('FileUpload Component', () => {
   it('validates max files', async () => {
     const user = userEvent.setup();
     const onError = jest.fn();
-    render(
+    renderWithTheme(
       <FileUpload {...defaultProps} onError={onError} maxFiles={1} multiple />
     );
 
@@ -157,7 +166,7 @@ describe('FileUpload Component', () => {
       .fn()
       .mockReturnValue('Custom validation error');
 
-    render(
+    renderWithTheme(
       <FileUpload
         {...defaultProps}
         onError={onError}
@@ -178,14 +187,14 @@ describe('FileUpload Component', () => {
   });
 
   it('shows loading state', () => {
-    render(<FileUpload {...defaultProps} loading />);
+    renderWithTheme(<FileUpload {...defaultProps} loading />);
 
     expect(screen.getByText(/uploading\.\.\./i)).toBeInTheDocument();
     expect(screen.getByLabelText(/upload resume file/i)).toBeDisabled();
   });
 
   it('shows disabled state', () => {
-    render(<FileUpload {...defaultProps} disabled />);
+    renderWithTheme(<FileUpload {...defaultProps} disabled />);
 
     expect(screen.getByLabelText(/upload resume file/i)).toBeDisabled();
     // Just verify the component renders in disabled state
@@ -196,7 +205,7 @@ describe('FileUpload Component', () => {
 
   it('removes files when remove button is clicked', async () => {
     const user = userEvent.setup();
-    render(<FileUpload {...defaultProps} />);
+    renderWithTheme(<FileUpload {...defaultProps} />);
 
     const file = new File(['test content'], 'test.pdf', {
       type: 'application/pdf',
@@ -214,7 +223,7 @@ describe('FileUpload Component', () => {
 
   it('calls onUpload when upload button is clicked', async () => {
     const user = userEvent.setup();
-    render(<FileUpload {...defaultProps} />);
+    renderWithTheme(<FileUpload {...defaultProps} />);
 
     const file = new File(['test content'], 'test.pdf', {
       type: 'application/pdf',
@@ -225,13 +234,15 @@ describe('FileUpload Component', () => {
     const uploadButton = screen.getByText(/upload 1 file/i);
     await user.click(uploadButton);
 
-    expect(defaultProps.onUpload).toHaveBeenCalledWith([file]);
+    expect(defaultProps.onFileUpload).toHaveBeenCalledWith([file]);
   });
 
   it('disables upload button when there are errors', async () => {
     const user = userEvent.setup();
     const onError = jest.fn();
-    render(<FileUpload {...defaultProps} onError={onError} maxSize={1024} />);
+    renderWithTheme(
+      <FileUpload {...defaultProps} onError={onError} maxSize={1024} />
+    );
 
     const file = new File(['test content'], 'test.pdf', {
       type: 'application/pdf',
@@ -246,7 +257,7 @@ describe('FileUpload Component', () => {
   });
 
   it('formats file size correctly', () => {
-    render(<FileUpload {...defaultProps} />);
+    renderWithTheme(<FileUpload {...defaultProps} />);
 
     // Test different file sizes
     expect(screen.getByText(/max size: 10 mb/i)).toBeInTheDocument();
@@ -254,7 +265,7 @@ describe('FileUpload Component', () => {
 
   it('shows correct file icons', async () => {
     const user = userEvent.setup();
-    render(<FileUpload {...defaultProps} />);
+    renderWithTheme(<FileUpload {...defaultProps} />);
 
     const pdfFile = new File(['test content'], 'test.pdf', {
       type: 'application/pdf',
@@ -280,7 +291,7 @@ describe('FileUpload Component', () => {
 
   it('handles multiple files', async () => {
     const user = userEvent.setup();
-    render(<FileUpload {...defaultProps} multiple maxFiles={3} />);
+    renderWithTheme(<FileUpload {...defaultProps} multiple maxFiles={3} />);
 
     const file1 = new File(['test content 1'], 'test1.pdf', {
       type: 'application/pdf',
@@ -298,7 +309,7 @@ describe('FileUpload Component', () => {
   });
 
   it('applies custom className', () => {
-    render(<FileUpload {...defaultProps} className='custom-class' />);
+    renderWithTheme(<FileUpload {...defaultProps} className='custom-class' />);
 
     const container = screen
       .getByText(/drag and drop your files here/i)

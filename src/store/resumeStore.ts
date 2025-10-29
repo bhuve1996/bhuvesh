@@ -399,10 +399,7 @@ export const useResumeStore = create<ResumeState>()(
         set(initialState);
       },
       clearAnalysisData: () => {
-        // Clear localStorage manually to ensure persistence is cleared
-        localStorage.removeItem('resume-store');
         set({
-          resumeData: null,
           analysisResult: null,
           extractedDataBackup: null,
           selectedTemplate: null,

@@ -120,7 +120,10 @@ describe('Component Integration Tests', () => {
 
       await user.upload(input, file);
 
-      // FileUpload automatically calls onFileUpload when files are selected
+      // Click the upload button to trigger onFileUpload
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
       expect(onUpload).toHaveBeenCalledWith([file]);
       expect(
         screen.getByText('File uploaded successfully')
@@ -344,8 +347,12 @@ describe('Component Integration Tests', () => {
       const input = screen.getByLabelText(/upload resume file/i);
       await user.upload(input, testFile);
 
-      // FileUpload automatically calls onFileUpload when files are selected
-      expect(screen.getByText('File: test.pdf')).toBeInTheDocument();
+      // Click upload button to process the file
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
+      // Check that file is displayed
+      expect(screen.getByText('test.pdf')).toBeInTheDocument();
 
       // Analyze file
       const analyzeButton = screen.getByRole('button', { name: /analyze/i });

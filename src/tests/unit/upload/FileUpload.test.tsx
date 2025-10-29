@@ -1,8 +1,9 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import { FileUpload } from '@/components/molecules/FileUpload/FileUpload';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import type { FileUploadComponentProps } from '@/types';
 
 // Mock react-hot-toast
@@ -10,6 +11,11 @@ jest.mock('react-hot-toast', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
+
+// Helper function to render with ThemeProvider
+const renderWithTheme = (component: React.ReactElement) => {
+  return render(<ThemeProvider>{component}</ThemeProvider>);
+};
 
 describe('FileUpload Component', () => {
   const defaultProps: FileUploadComponentProps = {
@@ -29,10 +35,14 @@ describe('FileUpload Component', () => {
         type: 'application/pdf',
       });
 
-      render(<FileUpload {...defaultProps} />);
+      renderWithTheme(<FileUpload {...defaultProps} />);
 
       const fileInput = screen.getByLabelText(/upload resume file/i);
       await user.upload(fileInput, mockFile);
+
+      // Click the upload button to trigger onFileUpload
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
 
       expect(defaultProps.onFileUpload).toHaveBeenCalledWith([mockFile]);
     });
@@ -43,10 +53,14 @@ describe('FileUpload Component', () => {
         type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       });
 
-      render(<FileUpload {...defaultProps} />);
+      renderWithTheme(<FileUpload {...defaultProps} />);
 
       const fileInput = screen.getByLabelText(/upload resume file/i);
       await user.upload(fileInput, mockFile);
+
+      // Click the upload button to trigger onFileUpload
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
 
       expect(defaultProps.onFileUpload).toHaveBeenCalledWith([mockFile]);
     });
@@ -59,7 +73,9 @@ describe('FileUpload Component', () => {
       // Mock file size to be larger than 10MB
       Object.defineProperty(mockFile, 'size', { value: 11 * 1024 * 1024 });
 
-      render(<FileUpload {...defaultProps} maxSize={10 * 1024 * 1024} />);
+      renderWithTheme(
+        <FileUpload {...defaultProps} maxSize={10 * 1024 * 1024} />
+      );
 
       const fileInput = screen.getByLabelText(/upload resume file/i);
       await user.upload(fileInput, mockFile);
@@ -75,7 +91,7 @@ describe('FileUpload Component', () => {
         type: 'text/plain',
       });
 
-      render(
+      renderWithTheme(
         <FileUpload
           {...defaultProps}
           validation={{ allowedTypes: ['pdf', 'docx'] }}
@@ -98,7 +114,7 @@ describe('FileUpload Component', () => {
         new File(['test3'], 'test3.pdf', { type: 'application/pdf' }),
       ];
 
-      render(<FileUpload {...defaultProps} maxFiles={2} multiple />);
+      renderWithTheme(<FileUpload {...defaultProps} maxFiles={2} multiple />);
 
       const fileInput = screen.getByLabelText(/upload resume file/i);
       await user.upload(fileInput, mockFiles);
@@ -111,12 +127,12 @@ describe('FileUpload Component', () => {
 
   describe('Drag and Drop', () => {
     it('should handle drag and drop events', async () => {
-      // const _user = userEvent.setup();
+      const user = userEvent.setup();
       const mockFile = new File(['test content'], 'test.pdf', {
         type: 'application/pdf',
       });
 
-      render(<FileUpload {...defaultProps} dragAndDrop />);
+      renderWithTheme(<FileUpload {...defaultProps} dragAndDrop />);
 
       const dropZone = screen
         .getByText('Drag and drop your files here')
@@ -137,9 +153,11 @@ describe('FileUpload Component', () => {
         },
       });
 
-      await waitFor(() => {
-        expect(defaultProps.onFileUpload).toHaveBeenCalledWith([mockFile]);
-      });
+      // Click the upload button to trigger onFileUpload
+      const uploadButton = screen.getByText(/upload 1 file/i);
+      await user.click(uploadButton);
+
+      expect(defaultProps.onFileUpload).toHaveBeenCalledWith([mockFile]);
     });
 
     it('should not handle drag events when disabled', () => {
@@ -147,7 +165,7 @@ describe('FileUpload Component', () => {
         type: 'application/pdf',
       });
 
-      render(<FileUpload {...defaultProps} disabled dragAndDrop />);
+      renderWithTheme(<FileUpload {...defaultProps} disabled dragAndDrop />);
 
       const dropZone = screen
         .getByText('Drag and drop your files here')
@@ -165,13 +183,13 @@ describe('FileUpload Component', () => {
 
   describe('Upload Progress', () => {
     it('should show upload progress when loading', () => {
-      render(<FileUpload {...defaultProps} loading />);
+      renderWithTheme(<FileUpload {...defaultProps} loading />);
 
       expect(screen.getByText(/uploading/i)).toBeInTheDocument();
     });
 
     it('should disable upload button when loading', () => {
-      render(<FileUpload {...defaultProps} loading />);
+      renderWithTheme(<FileUpload {...defaultProps} loading />);
 
       // When loading, the upload button is not visible, only the loading state
       expect(screen.getByText(/uploading/i)).toBeInTheDocument();
@@ -185,7 +203,7 @@ describe('FileUpload Component', () => {
         type: 'application/pdf',
       });
 
-      render(<FileUpload {...defaultProps} preview />);
+      renderWithTheme(<FileUpload {...defaultProps} preview />);
 
       const fileInput = screen.getByLabelText(/upload resume file/i);
       await user.upload(fileInput, mockFile);
@@ -200,7 +218,7 @@ describe('FileUpload Component', () => {
         type: 'application/pdf',
       });
 
-      render(<FileUpload {...defaultProps} preview={false} />);
+      renderWithTheme(<FileUpload {...defaultProps} preview={false} />);
 
       const fileInput = screen.getByLabelText(/upload resume file/i);
       await user.upload(fileInput, mockFile);
@@ -216,7 +234,7 @@ describe('FileUpload Component', () => {
         type: 'text/plain',
       });
 
-      render(
+      renderWithTheme(
         <FileUpload {...defaultProps} validation={{ allowedTypes: ['pdf'] }} />
       );
 
@@ -241,7 +259,7 @@ describe('FileUpload Component', () => {
         return null;
       };
 
-      render(
+      renderWithTheme(
         <FileUpload
           {...defaultProps}
           validation={{ custom: customValidation }}
@@ -259,7 +277,7 @@ describe('FileUpload Component', () => {
 
   describe('Accessibility', () => {
     it('should have proper ARIA labels', () => {
-      render(<FileUpload {...defaultProps} />);
+      renderWithTheme(<FileUpload {...defaultProps} />);
 
       const fileInput = screen.getByLabelText(/upload resume file/i);
       expect(fileInput).toHaveAttribute('type', 'file');
@@ -267,7 +285,7 @@ describe('FileUpload Component', () => {
 
     it('should be keyboard accessible', async () => {
       const user = userEvent.setup();
-      render(<FileUpload {...defaultProps} />);
+      renderWithTheme(<FileUpload {...defaultProps} />);
 
       // The file input should be focusable
       const fileInput = screen.getByLabelText(/upload resume file/i);
@@ -281,7 +299,7 @@ describe('FileUpload Component', () => {
         type: 'text/plain',
       });
 
-      render(
+      renderWithTheme(
         <FileUpload {...defaultProps} validation={{ allowedTypes: ['pdf'] }} />
       );
 

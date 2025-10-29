@@ -16,7 +16,7 @@
     "type-check:main": "tsc --noEmit",
     "check-all": "npm run type-check && npm run lint && npm run format:check",
     "fix-all": "npm run lint:fix && npm run format",
-    "prepare": "npx husky",
+    "prepare": "husky",
     "db:generate": "npx prisma generate",
     "db:push": "npx prisma db push",
     "db:migrate": "npx prisma migrate dev",
