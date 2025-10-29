@@ -437,7 +437,7 @@
   }
 
   /* Remove column spans in print */
-  .lg\\:col-span-2 {
+  .lg\:col-span-2 {
     width: 100% !important;
     max-width: none !important;
   }
