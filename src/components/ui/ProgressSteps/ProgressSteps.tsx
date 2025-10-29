@@ -66,7 +66,7 @@ export const ProgressSteps: React.FC<ProgressStepsProps> = ({
         <div className='absolute top-6 left-6 right-6 h-0.5 bg-gray-700 -z-10'>
           <div
             className='h-full bg-gradient-to-r from-green-400 via-cyan-400 to-blue-500 transition-all duration-1000 ease-out'
-            style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+            style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
           />
         </div>
 

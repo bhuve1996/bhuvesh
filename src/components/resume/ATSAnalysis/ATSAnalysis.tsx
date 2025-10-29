@@ -79,7 +79,7 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
                 >
                   {progress.isAnalyzing
                     ? Math.round(
-                        (progress.currentStep / (progress.steps.length - 1)) *
+                        ((progress.currentStep + 1) / progress.steps.length) *
                           100
                       )
                     : 100}
@@ -103,8 +103,8 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
                     style={{
                       width: `${
                         progress.isAnalyzing
-                          ? (progress.currentStep /
-                              (progress.steps.length - 1)) *
+                          ? ((progress.currentStep + 1) /
+                              progress.steps.length) *
                             100
                           : 100
                       }%`,
@@ -264,7 +264,7 @@ Requirements:
                           : 'bg-gradient-to-r from-cyan-500 to-blue-600'
                       }`}
                       style={{
-                        width: `${(progress.currentStep / (progress.steps.length - 1)) * 100}%`,
+                        width: `${((progress.currentStep + 1) / progress.steps.length) * 100}%`,
                       }}
                     ></div>
                   </div>

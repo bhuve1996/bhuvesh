@@ -14,8 +14,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
-# Import our API routes
-from app.api.upload import router as upload_router
+# Import our API routes with error handling
+try:
+    from app.api.upload import router as upload_router
+
+    UPLOAD_ROUTER_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Upload router not available: {e}")
+    UPLOAD_ROUTER_AVAILABLE = False
 
 # Create FastAPI app instance (like const app = express())
 app = FastAPI(
@@ -63,10 +69,10 @@ app.add_middleware(
 
 
 # Define a route (like app.get() in Express)
-@app.get("/")
-async def root():
+@app.get("/api")
+async def api_root():
     """
-    Root endpoint - like a health check
+    API root endpoint - like a health check
     Returns a simple message to test if the API is working
     """
     return {"message": "ATS Resume Checker API is running!"}
@@ -108,8 +114,28 @@ async def health_check():
     }
 
 
-# Include API routes
-app.include_router(upload_router)
+# Railway-specific healthcheck endpoint (faster response)
+@app.get("/")
+async def railway_health():
+    """
+    Railway healthcheck endpoint - responds immediately
+    """
+    return {"status": "ok", "message": "Service is running"}
+
+
+# Include API routes if available
+if UPLOAD_ROUTER_AVAILABLE:
+    app.include_router(upload_router)
+else:
+    # Add a fallback route if upload router is not available
+    @app.get("/api/upload/quick-analyze")
+    async def fallback_analyze():
+        return {
+            "success": False,
+            "message": "Analysis service temporarily unavailable. Please try again later.",
+            "error": "Service dependencies not available",
+        }
+
 
 # This is like the app.listen() in Node.js
 # But we'll run it with uvicorn command instead

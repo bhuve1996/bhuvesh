@@ -133,28 +133,12 @@ export default function ATSCheckerPage() {
       const result = await atsApi.analyzeResumeWithJobDescription(
         uploadedFile,
         jobDescription,
-        (step: string, progress: number) => {
+        (_step: string, progress: number) => {
           // Update progress in the store
           setProgressError('');
 
-          // Map step names to step indices for proper progress tracking
-          let stepIndex = 0;
-          switch (step.toLowerCase()) {
-            case 'uploading':
-              stepIndex = 0;
-              break;
-            case 'parsing':
-              stepIndex = 1;
-              break;
-            case 'analyzing':
-              stepIndex = 2;
-              break;
-            case 'results':
-              stepIndex = 3;
-              break;
-            default:
-              stepIndex = Math.floor(progress / 25); // Fallback based on progress percentage
-          }
+          // Use the progress number directly as step index since API now reports step indices
+          const stepIndex = progress;
 
           // Update the current step
           updateStep(stepIndex, 'active');

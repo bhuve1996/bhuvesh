@@ -22,12 +22,24 @@ def preload_models():
 
         # Import and initialize services that load ML models
         try:
+            # Only try to load if dependencies are available
+            from app.services.ats_analyzer import get_ats_analyzer
+
+            ats_analyzer = get_ats_analyzer()
             logger.info("✅ ATS Analyzer initialized")
+        except ImportError as e:
+            logger.warning(f"⚠️  ATS Analyzer dependencies not available: {e}")
         except Exception as e:
             logger.warning(f"⚠️  ATS Analyzer initialization failed: {e}")
 
         try:
+            # Only try to load if dependencies are available
+            from app.services.job_detector import get_job_detector
+
+            job_detector = get_job_detector()
             logger.info("✅ Job Detector initialized")
+        except ImportError as e:
+            logger.warning(f"⚠️  Job Detector dependencies not available: {e}")
         except Exception as e:
             logger.warning(f"⚠️  Job Detector initialization failed: {e}")
 

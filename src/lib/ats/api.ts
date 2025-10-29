@@ -86,7 +86,7 @@ export async function analyzeResumeWithJobDescription(
 ): Promise<ATSAnalysisResponse> {
   try {
     // Step 1: Uploading
-    onProgress?.('Uploading', 25);
+    onProgress?.('Uploading', 0);
 
     // Small delay to show uploading step
     await new Promise(resolve => setTimeout(resolve, 200));
@@ -96,7 +96,7 @@ export async function analyzeResumeWithJobDescription(
     formData.append('file', file);
 
     // Step 2: Parsing - call this before the actual request
-    onProgress?.('Parsing', 50);
+    onProgress?.('Parsing', 1);
 
     // Make the actual request - this is where the real work happens
     const response = await fetch(
@@ -112,7 +112,7 @@ export async function analyzeResumeWithJobDescription(
     }
 
     // Step 3: Analyzing - call this after we get the response but before parsing
-    onProgress?.('Analyzing', 75);
+    onProgress?.('Analyzing', 2);
 
     // Small delay to show analyzing step
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -121,7 +121,7 @@ export async function analyzeResumeWithJobDescription(
     const result = await response.json();
 
     // Step 4: Results - call this after we have the parsed result
-    onProgress?.('Results', 100);
+    onProgress?.('Results', 3);
 
     if (result.success && result.data) {
       return {

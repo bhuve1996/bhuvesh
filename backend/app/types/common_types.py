@@ -3,7 +3,9 @@
 # ============================================================================
 
 from datetime import datetime
-from typing import Optional, TypedDict, Union
+from typing import Optional, Union
+
+from typing_extensions import TypedDict
 
 # ============================================================================
 # BASIC TYPES
