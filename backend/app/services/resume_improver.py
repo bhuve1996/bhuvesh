@@ -115,9 +115,9 @@ class ResumeImprover:
                 "summary": summary,
                 "quick_wins": quick_wins,
                 "ai_analysis_available": self.use_ai,
-                "analysis_method": "AI-powered"
-                if self.use_ai
-                else "Rule-based fallback",
+                "analysis_method": (
+                    "AI-powered" if self.use_ai else "Rule-based fallback"
+                ),
             }
 
         except Exception as e:
@@ -131,7 +131,7 @@ class ResumeImprover:
                 },
                 "quick_wins": [],
                 "ai_analysis_available": self.use_ai,
-                "analysis_method": "Error occurred"
+                "analysis_method": "Error occurred",
             }
 
     def _generate_keyword_improvements(
@@ -145,7 +145,9 @@ class ResumeImprover:
         if isinstance(keyword_matches_data, dict):
             matched_keywords = keyword_matches_data.get("matched_keywords", [])
         else:
-            matched_keywords = keyword_matches_data if isinstance(keyword_matches_data, list) else []
+            matched_keywords = (
+                keyword_matches_data if isinstance(keyword_matches_data, list) else []
+            )
 
         # Critical: Too many missing keywords
         if len(missing_keywords) > 10:
@@ -320,7 +322,9 @@ class ResumeImprover:
 
         return improvements
 
-    def _check_bullet_points_in_experience(self, extracted_data: ExtractionResult) -> bool:
+    def _check_bullet_points_in_experience(
+        self, extracted_data: ExtractionResult
+    ) -> bool:
         """Check if bullet points exist in work experience sections"""
         work_experience = extracted_data.get("work_experience", [])
         bullet_patterns = ["•", "●", "◦", "▪", "▸", "→", "-", "*", "✓", "►"]
@@ -454,7 +458,9 @@ class ResumeImprover:
 
         return word_count
 
-    def _ai_analyze_resume_content(self, resume_text: str, analysis_type: str) -> dict[str, Any]:
+    def _ai_analyze_resume_content(
+        self, resume_text: str, analysis_type: str
+    ) -> dict[str, Any]:
         """Use AI to analyze resume content for specific information"""
         if not self.use_ai or not resume_text:
             return {"found": False, "confidence": 0, "details": ""}
@@ -684,7 +690,7 @@ class ResumeImprover:
                     total_words = length_analysis.get("total_words")
                     if isinstance(total_words, int):
                         word_count = total_words
-            
+
             if word_count == 0 and extracted_data:
                 # Calculate word count from extracted data as fallback
                 word_count = self._calculate_word_count_from_data(extracted_data)
@@ -764,7 +770,9 @@ class ResumeImprover:
         return improvements
 
     def _generate_structure_improvements(
-        self, extracted_data: ExtractionResult, analysis_result: Optional[ATSAnalysisResult] = None
+        self,
+        extracted_data: ExtractionResult,
+        analysis_result: Optional[ATSAnalysisResult] = None,
     ) -> list[dict[str, Any]]:
         """Generate structure-specific improvements"""
         improvements = []
@@ -820,7 +828,7 @@ class ResumeImprover:
         # First check the extracted data directly
         if not contact.get("email"):
             missing_contact.append("email")
-        
+
         # Handle phone field - could be dict or string
         phone = contact.get("phone", {})
         if isinstance(phone, dict):
@@ -828,7 +836,7 @@ class ResumeImprover:
                 missing_contact.append("phone")
         elif isinstance(phone, str) and not phone.strip():
             missing_contact.append("phone")
-        
+
         # Handle location field - could be dict or string
         location: Any = contact.get("location", {})
         if isinstance(location, dict):
@@ -883,7 +891,9 @@ class ResumeImprover:
             # Fallback to original logic
             linkedin = contact.get("linkedin", {})
             if isinstance(linkedin, dict):
-                linkedin_missing = not linkedin.get("url") and not linkedin.get("username")
+                linkedin_missing = not linkedin.get("url") and not linkedin.get(
+                    "username"
+                )
             else:
                 linkedin_missing = not linkedin
 
@@ -916,7 +926,7 @@ class ResumeImprover:
         ats_compat = formatting_analysis.get("ats_compatibility", {})
         ats_score = ats_compat.get("score", 100)
         current_ats_score = analysis_result.get("ats_score", 0)
-        
+
         # Ensure scores are integers
         if not isinstance(ats_score, int):
             ats_score = 100
@@ -1101,7 +1111,11 @@ class ResumeImprover:
         if job_type and work_experience:
             # Check if experience aligns with detected job type
             experience_text = " ".join(
-                [str(exp.get("description", "")) for exp in work_experience if isinstance(exp, dict)]
+                [
+                    str(exp.get("description", ""))
+                    for exp in work_experience
+                    if isinstance(exp, dict)
+                ]
             ).lower()
 
             # Basic alignment check (can be enhanced with more sophisticated analysis)
@@ -1178,7 +1192,11 @@ class ResumeImprover:
                         "Repeat important keywords 2-3 times across sections",
                         "Ensure keywords appear in context, not as lists",
                     ],
-                    "keywords": missing_keywords[:12] if isinstance(missing_keywords, list) else [],  # Top 12 for action steps
+                    "keywords": (
+                        missing_keywords[:12]
+                        if isinstance(missing_keywords, list)
+                        else []
+                    ),  # Top 12 for action steps
                 }
             )
 
@@ -1260,7 +1278,9 @@ class ResumeImprover:
             "estimated_total_boost": min(total_boost, 35),  # Cap at realistic +35
         }
 
-    def _identify_ats_quick_wins(self, improvements: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def _identify_ats_quick_wins(
+        self, improvements: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Identify top 3 ATS-focused quick wins (high impact, easy to fix)"""
         # Quick wins: critical/high priority + high score impact + ATS-relevant
         ats_categories = ["ats", "keyword", "formatting"]
@@ -1286,6 +1306,8 @@ class ResumeImprover:
         # Sort by score impact (highest first)
         return sorted(quick_wins, key=lambda x: -x.get("score_impact", 0))[:3]
 
-    def _identify_quick_wins(self, improvements: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def _identify_quick_wins(
+        self, improvements: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Legacy method - redirects to ATS-focused quick wins"""
         return self._identify_ats_quick_wins(improvements)

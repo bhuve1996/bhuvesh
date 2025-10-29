@@ -1,23 +1,42 @@
 #!/bin/bash
-# Deployment script for Railway
+# Deployment script for Railway with graceful dependency handling
 
-echo "🚀 Starting Railway deployment..."
+set -e
 
-# Install minimal requirements first
-echo "📦 Installing core dependencies..."
-pip install --no-cache-dir -r requirements-minimal.txt
+echo "🚀 Starting deployment process..."
 
-# Install ML dependencies in background (non-blocking)
-echo "🤖 Installing ML dependencies..."
-pip install --no-cache-dir \
-    --extra-index-url https://download.pytorch.org/whl/cpu \
-    torch==2.1.1+cpu \
-    sentence-transformers==2.2.2 \
-    scikit-learn==1.3.2 \
-    keybert==0.8.3 \
-    transformers==4.35.2 \
-    google-generativeai==0.3.2 &
+# Check Python version
+python_version=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+echo "🐍 Python version: $python_version"
 
-# Start the application
-echo "🌐 Starting application..."
-python start.py
+# Install dependencies with fallback
+echo "📦 Installing dependencies..."
+
+# Try full requirements first
+if pip install -r requirements.txt; then
+    echo "✅ Full requirements installed successfully"
+else
+    echo "⚠️  Full requirements failed, trying minimal requirements..."
+    if pip install -r requirements-minimal.txt; then
+        echo "✅ Minimal requirements installed successfully"
+    else
+        echo "❌ Failed to install even minimal requirements"
+        exit 1
+    fi
+fi
+
+# Check for sentence-transformers
+if python3 -c "import sentence_transformers" 2>/dev/null; then
+    echo "✅ sentence-transformers available"
+else
+    echo "⚠️  sentence-transformers not available - using keyword-only mode"
+fi
+
+# Check for Google Gemini
+if python3 -c "import google.generativeai" 2>/dev/null; then
+    echo "✅ Google Gemini available"
+else
+    echo "❌ Google Gemini not available - install with: pip install google-generativeai"
+fi
+
+echo "🎉 Deployment preparation complete!"

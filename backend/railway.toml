@@ -1,7 +1,7 @@
 [build]
-# Use minimal requirements for faster deployment
+# Use full requirements for complete functionality
 nixpacksVersion = "1.32.1"
-buildCommand = "pip install --no-cache-dir -r requirements-minimal.txt"
+buildCommand = "pip install --no-cache-dir -r requirements.txt"
 
 [deploy]
 startCommand = "python start.py"

@@ -8,6 +8,15 @@ import time
 # Load environment variables
 from dotenv import load_dotenv
 
+# Import compatibility layer early to fix importlib.metadata issues
+try:
+    from app.utils.compatibility import safe_importlib_metadata
+
+    if not safe_importlib_metadata():
+        print("⚠️  importlib.metadata compatibility issue detected - using fallback")
+except ImportError:
+    print("⚠️  Compatibility layer not available")
+
 # Import FastAPI (like importing Express in Node.js)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

@@ -1,46 +1,34 @@
-# FastAPI and web framework
+# Minimal requirements for faster deployment
+# Core FastAPI
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
 
-# File processing - CORE ONLY
-PyMuPDF==1.23.8  # Better PDF parsing (also known as fitz)
+# File processing
+PyMuPDF==1.23.8
 python-docx==1.1.0
-python-magic==0.4.27
-pdfplumber==0.10.3  # Alternative PDF parser
-Pillow==10.1.0  # Image processing for format checks
 
-# AI/LLM Integration (Required for basic functionality)
-google-generativeai==0.3.2  # Google Gemini (FREE tier available)
+# AI/LLM Integration
+google-generativeai==0.3.2
 
-# Data processing - MINIMAL
+# Data processing
 pandas==2.1.3
 numpy==1.25.2
 
-# Environment and configuration
+# Environment
 python-dotenv==1.0.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
 
-# CORS and middleware
-fastapi-cors==0.0.6
+# Fix compatibility
+importlib-metadata>=6.0.0
 
-# Testing
+# HTTP client
 httpx==0.25.2
 
-# Additional required packages for basic functionality
-backports-datetime-fromisoformat==2.0.3
-cffi==2.0.0
-cryptography==46.0.3
-environs==14.3.0
-marshmallow==4.0.1
-pdfminer.six==20221105
-pycparser==2.23
-pypdfium2==5.0.0
-python-dateutil==2.9.0.post0
-pytz==2025.2
-six==1.17.0
-tzdata==2025.2
-
-# NOTE: sentence-transformers and torch are excluded for faster deployment
-# The app will work with keyword-only matching and Gemini AI
+# Optional ML dependencies (install if needed)
+# --extra-index-url https://download.pytorch.org/whl/cpu
+# torch==2.1.1+cpu
+# sentence-transformers==2.2.2
+# scikit-learn==1.3.2
+# transformers==4.35.2

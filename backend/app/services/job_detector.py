@@ -674,3 +674,8 @@ Job Title:"""
 
 # Create global instance
 job_detector = JobTypeDetector()
+
+
+def get_job_detector() -> JobTypeDetector:
+    """Get the global job detector instance"""
+    return job_detector
