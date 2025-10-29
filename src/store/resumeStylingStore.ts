@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { createJSONStorage, persist, StateStorage } from 'zustand/middleware';
+
+import { getSessionStorageKey } from '@/lib/utils/userSession';
 
 /**
  * Comprehensive styling system for resume templates
@@ -1091,7 +1093,27 @@ export const useResumeStylingStore = create<ResumeStylingState>()(
     }),
     {
       name: 'resume-styling-store',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => {
+        // Create a custom storage adapter that uses session-specific keys
+        const sessionStorageAdapter: StateStorage = {
+          getItem: (name: string): string | null => {
+            if (typeof window === 'undefined') return null;
+            const sessionKey = getSessionStorageKey(name);
+            return localStorage.getItem(sessionKey);
+          },
+          setItem: (name: string, value: string): void => {
+            if (typeof window === 'undefined') return;
+            const sessionKey = getSessionStorageKey(name);
+            localStorage.setItem(sessionKey, value);
+          },
+          removeItem: (name: string): void => {
+            if (typeof window === 'undefined') return;
+            const sessionKey = getSessionStorageKey(name);
+            localStorage.removeItem(sessionKey);
+          },
+        };
+        return sessionStorageAdapter;
+      }),
       // Persist all styling data
       partialize: state => state,
     }

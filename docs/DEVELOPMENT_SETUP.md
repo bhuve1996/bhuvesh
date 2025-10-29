@@ -1,257 +1,302 @@
-# Development Setup Guide
+# 🚀 Development Setup Guide
 
-This document outlines the comprehensive development setup for the Bhuvesh Portfolio project, including TypeScript configuration, ESLint rules, Prettier formatting, and Git hooks.
+Complete guide for setting up the Bhuvesh Portfolio project for local development.
 
-## 🛠️ Configuration Overview
+## 📋 Prerequisites
 
-### TypeScript Configuration (`tsconfig.json`)
+### Required Software
 
-The project uses strict TypeScript configuration with the following key settings:
+- **Node.js**: Version 18 or higher
+- **npm**: Version 8 or higher (comes with Node.js)
+- **Python**: Version 3.9 or higher
+- **Git**: For version control
 
-- **Strict Mode**: All strict type checking enabled
-- **No Unused Locals/Parameters**: Catches unused variables
-- **Exact Optional Properties**: Ensures optional properties are exactly as defined
-- **No Implicit Returns**: Functions must have explicit return statements
-- **No Fallthrough Cases**: Switch statements must handle all cases
-- **No Unchecked Indexed Access**: Array/object access is type-safe
-- **No Implicit Override**: Override keyword required for overridden methods
+### Optional Software
 
-### ESLint Configuration (`eslint.config.mjs`)
+- **Google Gemini API Key**: For enhanced AI features
+- **VS Code**: Recommended IDE with extensions
+- **Docker**: For containerized development (optional)
 
-ESLint is configured with:
+## 🏗️ Project Setup
 
-- **Next.js Rules**: Core web vitals and TypeScript support
-- **Prettier Integration**: Prevents conflicts between ESLint and Prettier
-- **Import Ordering**: Enforces consistent import organization
-- **TypeScript Rules**: Strict type checking and best practices
-- **React Rules**: Optimized for Next.js development
-
-#### Key Rules:
-
-- `@typescript-eslint/no-unused-vars`: Prevents unused variables
-- `@typescript-eslint/no-explicit-any`: Warns against `any` type usage
-- `import/order`: Enforces import organization
-- `no-console`: Warns about console statements
-- `prefer-const`: Enforces const usage where appropriate
-
-### Prettier Configuration (`.prettierrc`)
-
-Code formatting is handled by Prettier with:
-
-- **Single Quotes**: Consistent quote style
-- **Semicolons**: Always required
-- **Trailing Commas**: ES5 compatible
-- **Print Width**: 80 characters
-- **Tab Width**: 2 spaces
-- **JSX Single Quotes**: Consistent JSX formatting
-
-## 🔧 Development Scripts
-
-### Available Commands
+### 1. Clone the Repository
 
 ```bash
-# Development
-npm run dev              # Start development server with Turbopack
-npm run build            # Build for production
-npm run start            # Start production server
-
-# Code Quality
-npm run lint             # Run ESLint
-npm run lint:fix         # Fix ESLint issues automatically
-npm run format           # Format code with Prettier
-npm run format:check     # Check code formatting
-npm run type-check       # Run TypeScript type checking
-
-# Combined Commands
-npm run check-all        # Run all checks (type, lint, format)
-npm run fix-all          # Fix all issues (lint + format)
+git clone https://github.com/yourusername/bhuvesh-portfolio.git
+cd bhuvesh-portfolio
 ```
 
-## 🪝 Git Hooks
+### 2. Frontend Setup
 
-### Pre-commit Hook (`.husky/pre-commit`)
+```bash
+# Install dependencies
+npm install
 
-Runs automatically before each commit:
+# Create environment file
+cp .env.example .env.local
 
-1. **TypeScript Check**: `npx tsc --noEmit`
-2. **Lint-staged**: ESLint + Prettier on staged files
-3. **Build Check**: Ensures the project builds successfully
+# Edit environment variables
+# NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-### Pre-push Hook (`.husky/pre-push`)
+### 3. Backend Setup
 
-Runs automatically before each push:
+```bash
+# Navigate to backend directory
+cd backend
 
-1. **TypeScript Check**: Type validation
-2. **ESLint**: Code quality checks
-3. **Format Check**: Code formatting validation
+# Create virtual environment
+python -m venv venv
 
-### Lint-staged Configuration
+# Activate virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+# On Windows:
+venv\Scripts\activate
 
-Automatically processes staged files:
+# Install dependencies
+pip install -r requirements.txt
 
-- **JavaScript/TypeScript**: ESLint fix + Prettier format
-- **JSON/Markdown/CSS**: Prettier format only
+# Create environment file
+cp .env.example .env
 
-## 🎯 VS Code Integration
+# Edit environment variables
+# GEMINI_API_KEY=your_gemini_api_key_here
+```
 
-### Recommended Extensions (`.vscode/extensions.json`)
+### 4. Environment Configuration
 
+#### Frontend (.env.local)
+
+```bash
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:8000
+
+# Optional: Analytics
+NEXT_PUBLIC_GA_ID=your_google_analytics_id
+```
+
+#### Backend (.env)
+
+```bash
+# AI Configuration
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Server Configuration
+PORT=8000
+HOST=0.0.0.0
+LOG_LEVEL=INFO
+
+# Optional: Database (if using)
+DATABASE_URL=postgresql://user:password@localhost:5432/portfolio
+```
+
+## 🚀 Running the Application
+
+### Development Mode
+
+#### Terminal 1 - Frontend
+
+```bash
+npm run dev
+```
+
+- Frontend will be available at http://localhost:3000
+- Hot reload enabled for development
+
+#### Terminal 2 - Backend
+
+```bash
+cd backend
+python start.py
+```
+
+- Backend will be available at http://localhost:8000
+- API documentation at http://localhost:8000/docs
+
+### Production Mode
+
+#### Frontend
+
+```bash
+npm run build
+npm run start
+```
+
+#### Backend
+
+```bash
+cd backend
+python start.py
+```
+
+## 🧪 Testing
+
+### Frontend Testing
+
+```bash
+# Run unit tests
+npm run test
+
+# Run E2E tests
+npm run test:e2e
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+### Backend Testing
+
+```bash
+cd backend
+
+# Run all tests
+python -m pytest
+
+# Run with coverage
+python -m pytest --cov=app
+
+# Run specific test file
+python -m pytest tests/test_ats_analyzer.py
+```
+
+## 🔧 Development Tools
+
+### VS Code Extensions (Recommended)
+
+Install these extensions for the best development experience:
+
+```json
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.pylint",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-typescript-next",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "ms-vscode.vscode-json"
+  ]
+}
+```
+
+### Code Quality Tools
+
+#### Frontend
+
+- **ESLint**: Code linting and style checking
 - **Prettier**: Code formatting
-- **ESLint**: Code linting
-- **Tailwind CSS**: CSS class completion
-- **TypeScript**: Enhanced TypeScript support
-- **Auto Rename Tag**: HTML/JSX tag management
-- **Path Intellisense**: Import path completion
+- **TypeScript**: Type checking
+- **Husky**: Git hooks for pre-commit checks
 
-### VS Code Settings (`.vscode/settings.json`)
+#### Backend
 
-- **Format on Save**: Automatic code formatting
-- **ESLint Auto-fix**: Automatic linting fixes
-- **Import Organization**: Automatic import sorting
-- **TypeScript Preferences**: Optimized for the project
-- **Tailwind CSS**: Enhanced CSS support
+- **Ruff**: Python linting and formatting
+- **MyPy**: Type checking
+- **Pytest**: Testing framework
+- **Black**: Code formatting
+
+### Pre-commit Hooks
+
+The project includes pre-commit hooks for code quality:
+
+```bash
+# Install pre-commit hooks
+npm run prepare
+
+# Run pre-commit checks manually
+npm run lint
+npm run lint:fix
+```
 
 ## 📁 Project Structure
 
-### Component Organization
-
-Each component is organized in its own folder:
-
 ```
-src/components/
-├── ui/
-│   ├── Button/
-│   │   ├── Button.tsx
-│   │   ├── types.ts
-│   │   └── index.ts
-│   ├── Card/
-│   │   ├── Card.tsx
-│   │   ├── types.ts
-│   │   └── index.ts
-│   └── ...
-├── layout/
-│   └── Navigation/
-│       ├── Navigation.tsx
-│       ├── types.ts
-│       └── index.ts
-└── sections/
-    ├── Hero/
-    │   ├── HeroSection.tsx
-    │   ├── types.ts
-    │   └── index.ts
-    └── ...
+bhuvesh-portfolio/
+├── src/                    # Frontend source code
+│   ├── app/               # Next.js App Router
+│   ├── components/        # React components
+│   ├── lib/               # Utilities and business logic
+│   ├── hooks/             # Custom React hooks
+│   ├── store/             # State management
+│   └── types/             # TypeScript definitions
+├── backend/               # Python FastAPI backend
+│   ├── app/               # FastAPI application
+│   ├── tests/             # Backend tests
+│   └── requirements.txt   # Python dependencies
+├── docs/                  # Documentation
+├── public/                # Static assets
+└── package.json           # Frontend dependencies
 ```
 
-### Type Organization
+## 🔍 Debugging
 
-Types are co-located with their components:
+### Frontend Debugging
 
-- **Component Types**: `src/components/[category]/[Component]/types.ts`
-- **Data Types**: `src/lib/data-types.ts`
-- **Global Types**: Shared across multiple components
+- Use React Developer Tools browser extension
+- Check browser console for errors
+- Use VS Code debugger for breakpoints
+- Check Network tab for API calls
 
-## 🚀 Getting Started
+### Backend Debugging
 
-### Initial Setup
-
-1. **Install Dependencies**:
-
-   ```bash
-   npm install
-   ```
-
-2. **Install Husky Hooks**:
-
-   ```bash
-   npm run prepare
-   ```
-
-3. **Verify Setup**:
-   ```bash
-   npm run check-all
-   ```
-
-### Development Workflow
-
-1. **Start Development**:
-
-   ```bash
-   npm run dev
-   ```
-
-2. **Before Committing**:
-
-   ```bash
-   npm run fix-all
-   ```
-
-3. **Verify Everything**:
-   ```bash
-   npm run check-all
-   ```
-
-## 🔍 Troubleshooting
+- Check server logs in terminal
+- Use Python debugger (pdb)
+- Check API documentation at /docs
+- Use logging statements for debugging
 
 ### Common Issues
 
-1. **TypeScript Errors**: Run `npm run type-check` to identify issues
-2. **ESLint Errors**: Run `npm run lint:fix` to auto-fix
-3. **Formatting Issues**: Run `npm run format` to fix formatting
-4. **Build Failures**: Check TypeScript and ESLint errors first
+#### Frontend Issues
 
-### Pre-commit Hook Failures
+1. **Build Errors**: Check TypeScript errors and fix type issues
+2. **API Connection**: Verify NEXT_PUBLIC_API_URL is correct
+3. **Styling Issues**: Check Tailwind CSS classes and imports
 
-If the pre-commit hook fails:
+#### Backend Issues
 
-1. **Fix Issues Manually**:
+1. **Import Errors**: Ensure virtual environment is activated
+2. **Model Loading**: Check if AI dependencies are installed
+3. **API Errors**: Check request format and server logs
 
-   ```bash
-   npm run fix-all
-   ```
+## 🚀 Deployment
 
-2. **Re-stage Files**:
+### Frontend (Vercel)
 
-   ```bash
-   git add .
-   ```
+1. Connect GitHub repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main
 
-3. **Commit Again**:
-   ```bash
-   git commit -m "your message"
-   ```
+### Backend (Railway)
 
-## 📚 Best Practices
+1. Connect GitHub repository to Railway
+2. Set environment variables in Railway dashboard
+3. Deploy automatically on push to main
 
-### Code Quality
+## 📚 Additional Resources
 
-- Always run `npm run check-all` before committing
-- Use TypeScript strict mode features
-- Follow ESLint rules and fix warnings
-- Maintain consistent code formatting
+- [Architecture Guide](./ARCHITECTURE.md) - System architecture overview
+- [Testing Guide](./TESTING_GUIDE.md) - Testing strategies and examples
+- [Backend Documentation](./backend/README.md) - Backend API and services
+- [Accessibility Guide](./ACCESSIBILITY_GUIDE.md) - Accessibility features
 
-### Component Development
+## 🆘 Getting Help
 
-- Co-locate types with components
-- Use descriptive type names
-- Export components and types from index files
-- Follow the established folder structure
+### Common Solutions
 
-### Git Workflow
+1. **Clear node_modules**: `rm -rf node_modules && npm install`
+2. **Clear Python cache**: `find . -type d -name __pycache__ -delete`
+3. **Restart servers**: Stop and restart both frontend and backend
+4. **Check logs**: Review terminal output for error messages
 
-- Use conventional commit messages
-- Ensure all hooks pass before pushing
-- Keep commits atomic and focused
-- Use meaningful commit descriptions
+### Support Channels
 
-## 🎉 Benefits
+- GitHub Issues: For bug reports and feature requests
+- Documentation: Check relevant guides first
+- Code Review: Submit pull requests for improvements
 
-This setup provides:
+---
 
-- **Type Safety**: Comprehensive TypeScript checking
-- **Code Quality**: Automated linting and formatting
-- **Consistency**: Enforced coding standards
-- **Developer Experience**: VS Code integration and helpful scripts
-- **CI/CD Ready**: Pre-commit hooks prevent bad code
-- **Maintainability**: Organized structure and clear patterns
-
-The development environment is now optimized for productivity, code quality, and team collaboration!
+**Last Updated**: December 2024  
+**Maintainer**: Bhuvesh Singla

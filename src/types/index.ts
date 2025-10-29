@@ -5,6 +5,7 @@ export * from './common';
 export * from './components';
 export type { DocumentStyle } from './document';
 export * from './forms';
+export * from './multiResume';
 export * from './panels';
 export * from './portfolio';
 export * from './theme';

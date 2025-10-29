@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { createJSONStorage, persist, StateStorage } from 'zustand/middleware';
 
+import { getSessionStorageKey } from '@/lib/utils/userSession';
 import {
   AnalysisResult,
   Certification,
@@ -338,17 +339,15 @@ export const useResumeStore = create<ResumeState>()(
 
       saveCustomizationPreset: name => {
         const state = get();
-        const presets = JSON.parse(
-          localStorage.getItem('template-presets') || '{}'
-        );
+        const presetKey = getSessionStorageKey('template-presets');
+        const presets = JSON.parse(localStorage.getItem(presetKey) || '{}');
         presets[name] = state.templateCustomizations;
-        localStorage.setItem('template-presets', JSON.stringify(presets));
+        localStorage.setItem(presetKey, JSON.stringify(presets));
       },
 
       loadCustomizationPreset: name => {
-        const presets = JSON.parse(
-          localStorage.getItem('template-presets') || '{}'
-        );
+        const presetKey = getSessionStorageKey('template-presets');
+        const presets = JSON.parse(localStorage.getItem(presetKey) || '{}');
         if (presets[name]) {
           set({ templateCustomizations: presets[name] });
         }
@@ -394,8 +393,13 @@ export const useResumeStore = create<ResumeState>()(
 
       // Data management
       clearAllData: () => {
-        // Clear localStorage manually to ensure persistence is cleared
-        localStorage.removeItem('resume-store');
+        // Clear session-specific localStorage data
+        if (typeof window !== 'undefined') {
+          const sessionKey = getSessionStorageKey('resume-store');
+          localStorage.removeItem(sessionKey);
+          // Also clear legacy key if it exists
+          localStorage.removeItem('resume-store');
+        }
         set(initialState);
       },
       clearAnalysisData: () => {
@@ -736,7 +740,27 @@ export const useResumeStore = create<ResumeState>()(
     }),
     {
       name: 'resume-store',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => {
+        // Create a custom storage adapter that uses session-specific keys
+        const sessionStorageAdapter: StateStorage = {
+          getItem: (name: string): string | null => {
+            if (typeof window === 'undefined') return null;
+            const sessionKey = getSessionStorageKey(name);
+            return localStorage.getItem(sessionKey);
+          },
+          setItem: (name: string, value: string): void => {
+            if (typeof window === 'undefined') return;
+            const sessionKey = getSessionStorageKey(name);
+            localStorage.setItem(sessionKey, value);
+          },
+          removeItem: (name: string): void => {
+            if (typeof window === 'undefined') return;
+            const sessionKey = getSessionStorageKey(name);
+            localStorage.removeItem(sessionKey);
+          },
+        };
+        return sessionStorageAdapter;
+      }),
       // Only persist essential data, not UI state
       partialize: state => ({
         resumeData: state.resumeData,

@@ -282,6 +282,17 @@ export const Icons = {
       <line x1='3' y1='9' x2='3' y2='21' strokeWidth='2' />
     </SVG>
   ),
+
+  // More options icon (three vertical dots)
+  MoreVertical: (props: SVGProps) => (
+    <SVG {...props} viewBox='0 0 24 24' stroke='currentColor' fill='none'>
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z'
+      />
+    </SVG>
+  ),
 };
 
 export default SVG;

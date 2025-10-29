@@ -6,9 +6,17 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 
 import { UserProfile } from '@/components/auth';
+import { ResumeDropdownContent } from '@/components/layout/ResumeDropdownContent';
 import { Tooltip, UniversalTourTrigger } from '@/components/ui';
+import { Icons } from '@/components/ui/SVG/SVG';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { COMMON_CLASSES, NAV_ITEMS } from '@/lib/constants';
+import {
+  COMMON_CLASSES,
+  MAIN_NAV_ITEMS,
+  SECONDARY_NAV_ITEMS,
+} from '@/lib/constants';
+import { useMultiResumeStore } from '@/store/multiResumeStore';
+import { useResumeStore } from '@/store/resumeStore';
 import type { NavigationProps } from '@/types';
 import { NavItem } from '@/types';
 
@@ -18,8 +26,23 @@ export const Navigation: React.FC<NavigationProps> = ({
   className,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showResumeDropdown, setShowResumeDropdown] = useState(false);
+  const [showMoreDropdown, setShowMoreDropdown] = useState(false);
 
-  const navItems: NavItem[] = NAV_ITEMS.map(item => ({
+  // Multi-resume state
+  const { groups, currentResume, loadGroups } = useMultiResumeStore();
+
+  // Load groups on mount
+  React.useEffect(() => {
+    loadGroups();
+  }, [loadGroups]);
+
+  const mainNavItems: NavItem[] = MAIN_NAV_ITEMS.map(item => ({
+    label: item.label,
+    href: item.href,
+  }));
+
+  const secondaryNavItems: NavItem[] = SECONDARY_NAV_ITEMS.map(item => ({
     label: item.label,
     href: item.href,
   }));
@@ -42,6 +65,15 @@ export const Navigation: React.FC<NavigationProps> = ({
       return activeSection === sectionId;
     }
     return false;
+  };
+
+  const handleResumeSelect = (groupId: string, variantId: string) => {
+    // Load resume data into the main resume store
+    const resume = useMultiResumeStore.getState().currentResume;
+    if (resume) {
+      useResumeStore.getState().setResumeData(resume.data);
+    }
+    setShowResumeDropdown(false);
   };
 
   return (
@@ -87,7 +119,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             className='hidden lg:flex items-center space-x-1 h-full flex-nowrap'
             data-tour='navigation'
           >
-            {navItems.map((item, index) => (
+            {mainNavItems.map((item, index) => (
               <motion.div
                 key={item.label}
                 initial={{ y: -20, opacity: 0 }}
@@ -137,6 +169,90 @@ export const Navigation: React.FC<NavigationProps> = ({
               </motion.div>
             ))}
 
+            {/* More Dropdown */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.6 }}
+              className='ml-2 relative'
+            >
+              <Tooltip content='More options' position='bottom' delay={200}>
+                <button
+                  onClick={() => setShowMoreDropdown(!showMoreDropdown)}
+                  className='flex items-center space-x-1 px-3 py-2 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base'
+                >
+                  <span>More</span>
+                  <Icons.ChevronDown className='w-4 h-4' />
+                </button>
+              </Tooltip>
+
+              {showMoreDropdown && (
+                <>
+                  {/* Backdrop */}
+                  <div
+                    className='fixed inset-0 z-40'
+                    onClick={() => setShowMoreDropdown(false)}
+                  />
+
+                  {/* Dropdown */}
+                  <div className='absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50'>
+                    <div className='py-1'>
+                      {secondaryNavItems.map(item => (
+                        <Link
+                          key={item.label}
+                          href={item.href}
+                          onClick={() => setShowMoreDropdown(false)}
+                          className='block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors'
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </motion.div>
+
+            {/* Resume Dropdown */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.7 }}
+              className='ml-4 relative'
+            >
+              <Tooltip
+                content='Manage your resumes'
+                position='bottom'
+                delay={200}
+              >
+                <button
+                  onClick={() => setShowResumeDropdown(!showResumeDropdown)}
+                  className='flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
+                >
+                  <span>📄 My Resumes</span>
+                  <Icons.ChevronDown className='w-4 h-4' />
+                </button>
+              </Tooltip>
+
+              {showResumeDropdown && (
+                <>
+                  {/* Backdrop */}
+                  <div
+                    className='fixed inset-0 z-40'
+                    onClick={() => setShowResumeDropdown(false)}
+                  />
+
+                  {/* Dropdown */}
+                  <div className='absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50'>
+                    <ResumeDropdownContent
+                      onResumeSelect={handleResumeSelect}
+                      onClose={() => setShowResumeDropdown(false)}
+                    />
+                  </div>
+                </>
+              )}
+            </motion.div>
+
             {/* User Profile & Theme Toggle */}
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
@@ -181,7 +297,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             transition={{ duration: 0.6, delay: 0.3 }}
             className='hidden md:flex lg:hidden items-center space-x-0.5 h-full flex-nowrap'
           >
-            {navItems.slice(0, 3).map((item, index) => (
+            {mainNavItems.map((item, index) => (
               <motion.div
                 key={item.label}
                 initial={{ y: -20, opacity: 0 }}
@@ -205,12 +321,90 @@ export const Navigation: React.FC<NavigationProps> = ({
               </motion.div>
             ))}
 
+            {/* More Dropdown for Medium Screens */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.6 }}
+              className='ml-1 relative'
+            >
+              <Tooltip content='More options' position='bottom' delay={200}>
+                <button
+                  onClick={() => setShowMoreDropdown(!showMoreDropdown)}
+                  className='flex items-center space-x-1 px-2 py-2 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-xs'
+                >
+                  <span>More</span>
+                  <Icons.ChevronDown className='w-3 h-3' />
+                </button>
+              </Tooltip>
+
+              {showMoreDropdown && (
+                <>
+                  <div
+                    className='fixed inset-0 z-40'
+                    onClick={() => setShowMoreDropdown(false)}
+                  />
+                  <div className='absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50'>
+                    <div className='py-1'>
+                      {secondaryNavItems.map(item => (
+                        <Link
+                          key={item.label}
+                          href={item.href}
+                          onClick={() => setShowMoreDropdown(false)}
+                          className='block px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors'
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </motion.div>
+
+            {/* Resume Dropdown for Medium Screens */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.7 }}
+              className='ml-1 relative'
+            >
+              <Tooltip
+                content='Manage your resumes'
+                position='bottom'
+                delay={200}
+              >
+                <button
+                  onClick={() => setShowResumeDropdown(!showResumeDropdown)}
+                  className='flex items-center space-x-1 px-2 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-xs'
+                >
+                  <span>📄</span>
+                  <Icons.ChevronDown className='w-3 h-3' />
+                </button>
+              </Tooltip>
+
+              {showResumeDropdown && (
+                <>
+                  <div
+                    className='fixed inset-0 z-40'
+                    onClick={() => setShowResumeDropdown(false)}
+                  />
+                  <div className='absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50'>
+                    <ResumeDropdownContent
+                      onResumeSelect={handleResumeSelect}
+                      onClose={() => setShowResumeDropdown(false)}
+                    />
+                  </div>
+                </>
+              )}
+            </motion.div>
+
             {/* User Profile & Theme Toggle for Medium Screens */}
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.8 }}
-              className='ml-2 flex items-center gap-2 h-full'
+              className='ml-1 flex items-center gap-1 h-full'
             >
               <UserProfile />
               <ThemeToggle size='sm' />
@@ -224,6 +418,38 @@ export const Navigation: React.FC<NavigationProps> = ({
             transition={{ duration: 0.4, delay: 0.5 }}
             className='md:hidden flex items-center gap-2'
           >
+            {/* Resume Dropdown for Mobile */}
+            <div className='relative'>
+              <Tooltip
+                content='Manage your resumes'
+                position='bottom'
+                delay={200}
+              >
+                <button
+                  onClick={() => setShowResumeDropdown(!showResumeDropdown)}
+                  className='flex items-center space-x-1 px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm'
+                >
+                  <span>📄</span>
+                  <Icons.ChevronDown className='w-3 h-3' />
+                </button>
+              </Tooltip>
+
+              {showResumeDropdown && (
+                <>
+                  <div
+                    className='fixed inset-0 z-40'
+                    onClick={() => setShowResumeDropdown(false)}
+                  />
+                  <div className='absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] sm:right-0 sm:left-auto left-1/2 sm:left-auto sm:transform-none transform -translate-x-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50'>
+                    <ResumeDropdownContent
+                      onResumeSelect={handleResumeSelect}
+                      onClose={() => setShowResumeDropdown(false)}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
             {/* User Profile & Theme Toggle for Mobile */}
             <div className='flex items-center gap-2'>
               <UserProfile />
@@ -277,7 +503,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             >
               <div className='pt-4 pb-4 border-t border-border'>
                 <div className='flex flex-col space-y-2'>
-                  {navItems.map((item, index) => (
+                  {mainNavItems.map((item, index) => (
                     <motion.div
                       key={item.label}
                       initial={{ x: -50, opacity: 0 }}
@@ -312,6 +538,52 @@ export const Navigation: React.FC<NavigationProps> = ({
                       )}
                     </motion.div>
                   ))}
+
+                  {/* Resume Management Section */}
+                  <div className='pt-2 border-t border-border'>
+                    <div className='px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+                      Resume Management
+                    </div>
+                    <div className='px-4 py-2'>
+                      <ResumeDropdownContent
+                        onResumeSelect={(groupId, variantId) => {
+                          handleResumeSelect(groupId, variantId);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        onClose={() => setIsMobileMenuOpen(false)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Secondary Navigation Items */}
+                  <div className='pt-2 border-t border-border'>
+                    <div className='px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+                      More
+                    </div>
+                    <div className='flex flex-col space-y-1'>
+                      {secondaryNavItems.map((item, index) => (
+                        <motion.div
+                          key={item.label}
+                          initial={{ x: -50, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{
+                            duration: 0.3,
+                            delay: (mainNavItems.length + index) * 0.1,
+                          }}
+                        >
+                          <Link
+                            href={item.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className='px-4 py-3 rounded-lg text-left transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base text-foreground hover:text-primary-400 hover:bg-muted/50'
+                            role='menuitem'
+                            tabIndex={0}
+                          >
+                            {item.label}
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>

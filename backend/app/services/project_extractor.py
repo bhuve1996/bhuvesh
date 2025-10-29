@@ -6,22 +6,9 @@ import json
 import os
 from typing import Any
 
-# Try to import Google Gemini
-try:
-    import google.generativeai as genai
-
-    GEMINI_AVAILABLE = True
-    # Try to configure with API key from environment
-    api_key = os.getenv("GEMINI_API_KEY")
-    if api_key and api_key != "your_api_key_here" and len(api_key) > 20:
-        genai.configure(api_key=api_key)
-        print("✅ Project Extractor: Google Gemini configured")
-    else:
-        GEMINI_AVAILABLE = False
-        print("ℹ️  Project Extractor: Google Gemini available but no valid API key set")
-except ImportError:
-    GEMINI_AVAILABLE = False
-    print("ℹ️  Project Extractor: Google Gemini not installed")
+# Import centralized AI configuration
+from app.core.ai_config import ai_config, is_gemini_available
+from app.core.error_handling import handle_ai_error, log_service_operation
 
 
 class ProjectExtractor:
@@ -30,14 +17,15 @@ class ProjectExtractor:
     """
 
     def __init__(self):
+        # Initialize AI configuration
+        gemini_available, _ = ai_config.initialize()
+        
         self.model = None
-        global GEMINI_AVAILABLE
-        if GEMINI_AVAILABLE:
-            try:
-                self.model = genai.GenerativeModel("gemini-2.0-flash")
-            except Exception as e:
-                print(f"⚠️  Failed to initialize Gemini model: {e}")
-                GEMINI_AVAILABLE = False
+        if gemini_available:
+            self.model = ai_config.get_gemini_model()
+            print("✅ Project Extractor: Google Gemini configured")
+        else:
+            print("ℹ️  Project Extractor: Google Gemini not available")
 
     def extract_structured_experience(self, resume_text: str) -> dict[str, Any]:
         """

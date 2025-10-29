@@ -14,14 +14,21 @@ export const SITE_CONFIG = {
   },
 } as const;
 
-// Navigation Items
-export const NAV_ITEMS = [
+// Main Navigation Items (always visible)
+export const MAIN_NAV_ITEMS = [
   { label: 'ATS Checker', href: '/resume/ats-checker', type: 'route' },
   { label: 'Resume Builder', href: '/resume/builder', type: 'route' },
   { label: 'Templates', href: '/resume/templates', type: 'route' },
+] as const;
+
+// Secondary Navigation Items (in dropdown menu)
+export const SECONDARY_NAV_ITEMS = [
   { label: 'About', href: '/about', type: 'route' },
   { label: 'Contact', href: '/contact', type: 'route' },
 ] as const;
+
+// Legacy - keep for backward compatibility
+export const NAV_ITEMS = [...MAIN_NAV_ITEMS, ...SECONDARY_NAV_ITEMS];
 
 // Animation Delays
 export const ANIMATION_DELAYS = {

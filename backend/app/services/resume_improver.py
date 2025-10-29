@@ -12,14 +12,9 @@ from ..types.common_types import ATSAnalysisResult, ExtractionResult
 
 logger = logging.getLogger(__name__)
 
-# Try to import Google Gemini for AI analysis
-try:
-    import google.generativeai as genai
-
-    GEMINI_AVAILABLE = True
-except ImportError:
-    GEMINI_AVAILABLE = False
-    print("⚠️  Google Gemini not available for AI-powered analysis")
+# Import centralized AI configuration
+from app.core.ai_config import ai_config, is_gemini_available
+from app.core.error_handling import handle_ai_error, log_service_operation
 
 
 class ResumeImprover:
@@ -27,20 +22,15 @@ class ResumeImprover:
 
     def __init__(self):
         """Initialize the resume improver with AI capabilities"""
-        self.use_ai = GEMINI_AVAILABLE
+        # Initialize AI configuration
+        gemini_available, _ = ai_config.initialize()
+        
+        self.use_ai = gemini_available
         if self.use_ai:
-            try:
-                # Configure Gemini with API key from environment
-                api_key = os.getenv("GEMINI_API_KEY")
-                if api_key and api_key != "your_api_key_here" and len(api_key) > 20:
-                    genai.configure(api_key=api_key)
-                else:
-                    raise Exception("GEMINI_API_KEY not properly configured")
-                self.model = genai.GenerativeModel("gemini-pro")
-                print("✅ Resume Improver: AI analysis enabled with Gemini")
-            except Exception as e:
-                print(f"⚠️  Failed to initialize Gemini: {e}")
-                self.use_ai = False
+            self.model = ai_config.get_gemini_model()
+            print("✅ Resume Improver: AI analysis enabled with Gemini")
+        else:
+            print("⚠️  Resume Improver: Google Gemini not available")
 
     def generate_improvement_plan(
         self,

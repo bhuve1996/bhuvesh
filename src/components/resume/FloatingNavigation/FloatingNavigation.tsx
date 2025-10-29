@@ -10,10 +10,12 @@ import { useTheme } from '@/contexts/ThemeContext';
 
 interface FloatingNavigationProps {
   className?: string;
+  currentPage?: string;
 }
 
 export const FloatingNavigation: React.FC<FloatingNavigationProps> = ({
   className = '',
+  currentPage,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
@@ -49,133 +51,141 @@ export const FloatingNavigation: React.FC<FloatingNavigationProps> = ({
             transition={{ duration: 0.2 }}
             className='mb-4 space-y-3'
           >
-            {/* Resume Builder Button */}
-            <Tooltip content='Go to Resume Builder' position='left'>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
-              >
-                <Button
-                  onClick={handleNavigateToBuilder}
-                  variant='primary'
-                  size='lg'
-                  className={`
-                    w-full sm:w-auto px-6 py-3 rounded-lg shadow-lg hover:shadow-xl
-                    transition-all duration-200 transform hover:scale-105 active:scale-95
-                    ${
-                      theme === 'dark'
-                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
-                        : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
-                    }
-                    text-white font-medium
-                  `}
+            {/* Resume Builder Button - Only show when not on builder page */}
+            {currentPage !== 'builder' && (
+              <Tooltip content='Go to Resume Builder' position='left'>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
                 >
-                  <span className='flex items-center space-x-3'>
-                    <svg
-                      className='w-6 h-6'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
-                      />
-                    </svg>
-                    <span className='text-base font-semibold'>
-                      Resume Builder
+                  <Button
+                    onClick={handleNavigateToBuilder}
+                    variant='primary'
+                    size='lg'
+                    className={`
+                      w-full sm:w-auto px-6 py-3 rounded-lg shadow-lg hover:shadow-xl
+                      transition-all duration-200 transform hover:scale-105 active:scale-95
+                      ${
+                        theme === 'dark'
+                          ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
+                          : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
+                      }
+                      text-white font-medium
+                    `}
+                  >
+                    <span className='flex items-center space-x-3'>
+                      <svg
+                        className='w-6 h-6'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
+                        />
+                      </svg>
+                      <span className='text-base font-semibold'>
+                        Resume Builder
+                      </span>
                     </span>
-                  </span>
-                </Button>
-              </motion.div>
-            </Tooltip>
+                  </Button>
+                </motion.div>
+              </Tooltip>
+            )}
 
-            {/* Templates Button */}
-            <Tooltip content='View Resume Templates' position='left'>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Button
-                  onClick={handleNavigateToTemplates}
-                  variant='secondary'
-                  size='lg'
-                  className={`
-                    w-full sm:w-auto px-6 py-3 rounded-lg shadow-lg hover:shadow-xl
-                    transition-all duration-200 transform hover:scale-105 active:scale-95
-                    ${
-                      theme === 'dark'
-                        ? 'bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 border border-emerald-500/30'
-                        : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border border-emerald-400/30'
-                    }
-                    text-white font-medium
-                  `}
+            {/* Templates Button - Only show when not on templates page */}
+            {currentPage !== 'templates' && (
+              <Tooltip content='View Resume Templates' position='left'>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
                 >
-                  <span className='flex items-center space-x-3'>
-                    <svg
-                      className='w-6 h-6'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'
-                      />
-                    </svg>
-                    <span className='text-base font-semibold'>Templates</span>
-                  </span>
-                </Button>
-              </motion.div>
-            </Tooltip>
+                  <Button
+                    onClick={handleNavigateToTemplates}
+                    variant='secondary'
+                    size='lg'
+                    className={`
+                      w-full sm:w-auto px-6 py-3 rounded-lg shadow-lg hover:shadow-xl
+                      transition-all duration-200 transform hover:scale-105 active:scale-95
+                      ${
+                        theme === 'dark'
+                          ? 'bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 border border-emerald-500/30'
+                          : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border border-emerald-400/30'
+                      }
+                      text-white font-medium
+                    `}
+                  >
+                    <span className='flex items-center space-x-3'>
+                      <svg
+                        className='w-6 h-6'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'
+                        />
+                      </svg>
+                      <span className='text-base font-semibold'>Templates</span>
+                    </span>
+                  </Button>
+                </motion.div>
+              </Tooltip>
+            )}
 
-            {/* ATS Checker Button */}
-            <Tooltip content='ATS Resume Checker' position='left'>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <Button
-                  onClick={handleNavigateToATSChecker}
-                  variant='secondary'
-                  size='lg'
-                  className={`
-                    w-full sm:w-auto px-6 py-3 rounded-lg shadow-lg hover:shadow-xl
-                    transition-all duration-200 transform hover:scale-105 active:scale-95
-                    ${
-                      theme === 'dark'
-                        ? 'bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 border border-purple-500/30'
-                        : 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 border border-purple-400/30'
-                    }
-                    text-white font-medium
-                  `}
+            {/* ATS Checker Button - Only show when not on ATS checker page */}
+            {currentPage !== 'ats-checker' && (
+              <Tooltip content='ATS Resume Checker' position='left'>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
                 >
-                  <span className='flex items-center space-x-3'>
-                    <svg
-                      className='w-6 h-6'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-                      />
-                    </svg>
-                    <span className='text-base font-semibold'>ATS Checker</span>
-                  </span>
-                </Button>
-              </motion.div>
-            </Tooltip>
+                  <Button
+                    onClick={handleNavigateToATSChecker}
+                    variant='secondary'
+                    size='lg'
+                    className={`
+                      w-full sm:w-auto px-6 py-3 rounded-lg shadow-lg hover:shadow-xl
+                      transition-all duration-200 transform hover:scale-105 active:scale-95
+                      ${
+                        theme === 'dark'
+                          ? 'bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 border border-purple-500/30'
+                          : 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 border border-purple-400/30'
+                      }
+                      text-white font-medium
+                    `}
+                  >
+                    <span className='flex items-center space-x-3'>
+                      <svg
+                        className='w-6 h-6'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+                        />
+                      </svg>
+                      <span className='text-base font-semibold'>
+                        ATS Checker
+                      </span>
+                    </span>
+                  </Button>
+                </motion.div>
+              </Tooltip>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

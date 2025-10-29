@@ -10,26 +10,13 @@ from typing import Any
 
 from app.services.job_description_generator import job_description_generator
 
-# Import GEMINI_AVAILABLE for AI operations
-try:
-    from app.services.job_description_generator import GEMINI_AVAILABLE
-except ImportError:
-    GEMINI_AVAILABLE = False
+# Import centralized AI configuration
+from app.core.ai_config import ai_config, is_gemini_available, is_embeddings_available
+from app.core.error_handling import handle_ai_error, log_service_operation, ModelInitializationError
 
 # Import job detector and project extractor
 from app.services.job_detector import job_detector
 from app.services.project_extractor import project_extractor
-
-# Import sentence-transformers - required for AI-powered analysis
-try:
-    from sentence_transformers import SentenceTransformer, util
-
-    EMBEDDINGS_AVAILABLE = True
-except ImportError:
-    EMBEDDINGS_AVAILABLE = False
-    print(
-        "❌ ERROR: sentence-transformers is required for AI-powered analysis. Please install it."
-    )
 
 
 class ATSAnalyzer:
@@ -39,7 +26,9 @@ class ATSAnalyzer:
 
     def __init__(self):
         """Initialize with embeddings model - required for AI analysis"""
-
+        # Initialize AI configuration
+        gemini_available, embeddings_available = ai_config.initialize()
+        
         # Always initialize these attributes first
         self.model = None
         self.content_model = None
@@ -74,50 +63,20 @@ class ATSAnalyzer:
             "date_formats": [r"\d{1,2}/\d{4}", r"\d{4}", r"\d{1,2}-\d{4}"],
         }
 
-        # Try to load embeddings model if available
-        if not EMBEDDINGS_AVAILABLE:
-            print(
-                "⚠️  WARNING: sentence-transformers not available. Using keyword-only matching."
-            )
+        # Use centralized AI configuration
+        if embeddings_available:
+            self.model = ai_config.get_embeddings_model()
+            self.use_embeddings = True
+            print("✅ ATS Analyzer: AI embeddings model loaded successfully")
         else:
-            try:
-                self.model = SentenceTransformer(
-                    "all-MiniLM-L6-v2"
-                )  # Lightweight, fast model
-                self.use_embeddings = True
-                print("✅ ATS Analyzer: AI embeddings model loaded successfully")
-            except Exception as e:
-                print(
-                    f"⚠️  WARNING: Failed to load AI embeddings model: {e}. Using keyword-only matching."
-                )
-                # Don't raise exception, just use keyword-only mode
+            print("⚠️  WARNING: sentence-transformers not available. Using keyword-only matching.")
 
-        # Try to load content generation model if available
-        try:
-            import os
-
-            import google.generativeai as genai
-
-            api_key = os.getenv("GEMINI_API_KEY")
-            if api_key:
-                genai.configure(api_key=api_key)
-                self.content_model = genai.GenerativeModel("gemini-2.0-flash")
-                self.use_content_generation = True
-                print(
-                    "✅ ATS Analyzer: AI content generation model loaded successfully"
-                )
-            else:
-                print(
-                    "⚠️  WARNING: GEMINI_API_KEY not set. AI content generation disabled."
-                )
-        except ImportError:
-            print(
-                "⚠️  WARNING: google-generativeai not available. AI content generation disabled."
-            )
-        except Exception as e:
-            print(
-                f"⚠️  WARNING: Failed to load AI content generation model: {e}. Using fallback methods."
-            )
+        if gemini_available:
+            self.content_model = ai_config.get_gemini_model()
+            self.use_content_generation = True
+            print("✅ ATS Analyzer: AI content generation enabled")
+        else:
+            print("ℹ️  ATS Analyzer: Google Gemini not configured. Content generation disabled.")
 
     def extract_structured_experience(self, resume_text: str) -> dict[str, Any]:
         """

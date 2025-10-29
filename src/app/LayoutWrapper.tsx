@@ -1,7 +1,5 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-
 import { AnalyticsDebugger } from '@/components/analytics/AnalyticsDebugger';
 import { Footer, Navigation } from '@/components/layout';
 import { SessionProvider } from '@/components/providers/SessionProvider';
@@ -12,37 +10,8 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { TourProvider } from '@/contexts/TourContext';
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-
-  // Home page has its own Navigation with scroll tracking
-  // So we skip adding Navigation here for home page
-  const isHomePage = pathname === '/';
-
-  if (isHomePage) {
-    return (
-      <ThemeProvider>
-        <SessionProvider>
-          <TourProvider>
-            <AnalyticsProvider
-              trackPageViews={true}
-              trackScrollDepth={true}
-              trackTimeOnPage={true}
-            >
-              <TourManager>
-                {children}
-                <Toast />
-                <AnalyticsDebugger
-                  enabled={process.env.NODE_ENV === 'development'}
-                  position='bottom-left'
-                />
-              </TourManager>
-            </AnalyticsProvider>
-          </TourProvider>
-        </SessionProvider>
-      </ThemeProvider>
-    );
-  }
-
+  // All pages use the same Navigation component
+  // No special cases needed
   return (
     <ThemeProvider>
       <SessionProvider>

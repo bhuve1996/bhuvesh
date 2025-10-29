@@ -31,6 +31,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   React.useEffect(() => {
     setIsClient(true);
   }, []);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -71,6 +72,21 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       },
     },
   });
+
+  // Update editor content when content prop changes
+  React.useEffect(() => {
+    if (editor && content !== undefined) {
+      try {
+        const currentContent = editor.getHTML();
+        if (currentContent !== content) {
+          editor.commands.setContent(content || '');
+        }
+      } catch (error) {
+        // Editor might not be ready yet, ignore the error silently
+        // This is expected in test environments or during SSR
+      }
+    }
+  }, [editor, content]);
 
   const toggleBold = () => {
     editor?.chain().focus().toggleBold().run();

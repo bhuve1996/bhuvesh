@@ -3,8 +3,7 @@
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 
-import { UnifiedWelcomeBar } from '@/components/layout/UnifiedWelcomeBar';
-import { FileUpload } from '@/components/molecules/FileUpload/FileUpload';
+import { FileUploadWithResumeNaming } from '@/components/molecules/FileUpload/FileUploadWithResumeNaming';
 import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
 import { FloatingNavigation } from '@/components/resume/FloatingNavigation';
 import { ResultsDisplay } from '@/components/resume/ResultsDisplay';
@@ -309,19 +308,6 @@ export default function ATSCheckerPage() {
           : 'from-slate-50 to-blue-50'
       }`}
     >
-      <UnifiedWelcomeBar
-        currentPage='ats-checker'
-        resumeData={resumeData}
-        analysisResult={
-          analysisResult
-            ? {
-                jobType: analysisResult.jobType,
-                atsScore: analysisResult.atsScore?.toString(),
-              }
-            : null
-        }
-      />
-
       <main className='container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8'>
         <Section className='mb-6 sm:mb-8'>
           <div className='text-center mb-6 sm:mb-8'>
@@ -449,7 +435,7 @@ export default function ATSCheckerPage() {
                 </div>
               )}
 
-              <FileUpload
+              <FileUploadWithResumeNaming
                 key={`file-upload-${resumeData ? 'with-data' : 'empty'}`}
                 onFileUpload={handleFileUpload}
                 loading={isLoading}
@@ -548,7 +534,7 @@ export default function ATSCheckerPage() {
       </main>
 
       {/* Floating Navigation */}
-      <FloatingNavigation />
+      <FloatingNavigation currentPage='ats-checker' />
     </div>
   );
 }

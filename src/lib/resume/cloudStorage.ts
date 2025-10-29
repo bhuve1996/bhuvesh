@@ -1,3 +1,4 @@
+import { getSessionStorageKey } from '@/lib/utils/userSession';
 import { ResumeData } from '@/types/resume';
 
 export interface ResumeVersion {
@@ -22,15 +23,20 @@ export interface CloudResume {
 }
 
 class CloudStorageService {
-  private storageKey = 'resume-cloud-storage';
+  private baseStorageKey = 'resume-cloud-storage';
   private maxVersions = 10;
+
+  // Get session-specific storage key
+  private getStorageKey(): string {
+    return getSessionStorageKey(this.baseStorageKey);
+  }
 
   // Get all saved resumes
   getResumes(): CloudResume[] {
     if (typeof window === 'undefined') return [];
 
     try {
-      const stored = localStorage.getItem(this.storageKey);
+      const stored = localStorage.getItem(this.getStorageKey());
       return stored ? JSON.parse(stored) : [];
     } catch {
       // Error loading resumes from cloud storage
@@ -157,10 +163,11 @@ class CloudStorageService {
   renameResume(resumeId: string, newName: string): void {
     const resumes = this.getResumes();
     const resumeIndex = resumes.findIndex(r => r.id === resumeId);
+    const resume = resumes[resumeIndex];
 
-    if (resumeIndex !== -1 && resumes[resumeIndex]) {
-      resumes[resumeIndex].name = newName;
-      resumes[resumeIndex].updatedAt = new Date();
+    if (resumeIndex !== -1 && resume) {
+      resume.name = newName;
+      resume.updatedAt = new Date();
       this.saveResumes(resumes);
     }
   }
@@ -169,12 +176,13 @@ class CloudStorageService {
   addTags(resumeId: string, tags: string[]): void {
     const resumes = this.getResumes();
     const resumeIndex = resumes.findIndex(r => r.id === resumeId);
+    const resume = resumes[resumeIndex];
 
-    if (resumeIndex !== -1 && resumes[resumeIndex]) {
-      const existingTags = resumes[resumeIndex].tags;
+    if (resumeIndex !== -1 && resume) {
+      const existingTags = resume.tags;
       const newTags = [...new Set([...existingTags, ...tags])];
-      resumes[resumeIndex].tags = newTags;
-      resumes[resumeIndex].updatedAt = new Date();
+      resume.tags = newTags;
+      resume.updatedAt = new Date();
       this.saveResumes(resumes);
     }
   }
@@ -183,12 +191,11 @@ class CloudStorageService {
   removeTags(resumeId: string, tags: string[]): void {
     const resumes = this.getResumes();
     const resumeIndex = resumes.findIndex(r => r.id === resumeId);
+    const resume = resumes[resumeIndex];
 
-    if (resumeIndex !== -1 && resumes[resumeIndex]) {
-      resumes[resumeIndex].tags = resumes[resumeIndex].tags.filter(
-        tag => !tags.includes(tag)
-      );
-      resumes[resumeIndex].updatedAt = new Date();
+    if (resumeIndex !== -1 && resume) {
+      resume.tags = resume.tags.filter(tag => !tags.includes(tag));
+      resume.updatedAt = new Date();
       this.saveResumes(resumes);
     }
   }
@@ -270,7 +277,7 @@ class CloudStorageService {
     if (typeof window === 'undefined') return;
 
     try {
-      localStorage.setItem(this.storageKey, JSON.stringify(resumes));
+      localStorage.setItem(this.getStorageKey(), JSON.stringify(resumes));
     } catch {
       // Error saving resumes to cloud storage
     }

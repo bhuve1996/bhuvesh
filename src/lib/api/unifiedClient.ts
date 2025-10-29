@@ -1,475 +1,358 @@
 /**
  * Unified API Client
- * Consolidates all API functionality with consistent error handling
- * Eliminates DRY violations in API layer
+ * Consolidates all API calls and eliminates duplication
+ * Provides consistent error handling, loading states, and retry logic
  */
 
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+
 import { formatErrorForUser } from '@/lib/utils/errorHandling';
-import {
-  getAdaptiveUploadConfig,
-  getMobileErrorMessage,
-  logMobileDebugInfo,
-} from '@/lib/utils/mobileDetection';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export interface ApiResponse<T = unknown> {
+export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
-  message: string;
   error?: string;
+  message?: string;
 }
 
-export interface ApiError extends Error {
-  status?: number;
-  response?: Response;
-  code?: string;
-  details?: unknown;
+export interface ApiCallConfig {
+  loadingState?: {
+    setter: (loading: boolean) => void;
+    key?: string;
+  };
+  successMessage?: string;
+  errorMessage?: string;
+  showToast?: boolean;
+  onSuccess?: (data: any) => void;
+  onError?: (error: Error) => void;
+  onFinally?: () => void;
+  retries?: number;
+  timeout?: number;
 }
 
-export interface RequestOptions extends RequestInit {
+export interface ApiCallOptions extends RequestInit {
   timeout?: number;
   retries?: number;
-  retryDelay?: number;
 }
 
 // ============================================================================
-// CONFIGURATION
+// UNIFIED API CLIENT
 // ============================================================================
 
-const DEFAULT_TIMEOUT = 30000; // 30 seconds
-const DEFAULT_RETRIES = 3;
-const DEFAULT_RETRY_DELAY = 1000; // 1 second
+class UnifiedApiClient {
+  private baseURL: string;
+  private defaultTimeout: number = 30000; // 30 seconds
+  private defaultRetries: number = 3;
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-// ============================================================================
-// ERROR HANDLING
-// ============================================================================
-
-export class UnifiedApiError extends Error implements ApiError {
-  public status?: number;
-  public response?: Response;
-  public code?: string;
-  public details?: unknown;
-
-  constructor(
-    message: string,
-    status?: number,
-    response?: Response,
-    code?: string,
-    details?: unknown
-  ) {
-    super(message);
-    this.name = 'UnifiedApiError';
-    if (status !== undefined) this.status = status;
-    if (response !== undefined) this.response = response;
-    if (code !== undefined) this.code = code;
-    if (details !== undefined) this.details = details;
-  }
-}
-
-async function handleApiError(
-  response: Response,
-  context: string
-): Promise<never> {
-  let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-
-  try {
-    const errorData = await response.json();
-    if (errorData.message) {
-      errorMessage = errorData.message;
-    } else if (errorData.error) {
-      errorMessage = errorData.error;
-    } else if (errorData.errors && Array.isArray(errorData.errors)) {
-      errorMessage = errorData.errors.join(', ');
-    }
-  } catch (_parseError) {
-    errorMessage = `Server error: ${response.status} ${response.statusText}`;
+  constructor(baseURL: string = '') {
+    this.baseURL = baseURL;
   }
 
-  const formattedError = formatErrorForUser(errorMessage, context);
-  const apiError = new UnifiedApiError(
-    formattedError,
-    response.status,
-    response,
-    'API_ERROR'
-  );
+  // ============================================================================
+  // CORE HTTP METHODS
+  // ============================================================================
 
-  throw apiError;
-}
-
-// ============================================================================
-// RETRY LOGIC
-// ============================================================================
-
-async function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function withRetry<T>(
-  fn: () => Promise<T>,
-  retries: number = DEFAULT_RETRIES,
-  delay: number = DEFAULT_RETRY_DELAY
-): Promise<T> {
-  try {
-    return await fn();
-  } catch (error) {
-    if (
-      retries > 0 &&
-      error instanceof UnifiedApiError &&
-      error.status &&
-      error.status >= 500
-    ) {
-      await sleep(delay);
-      return withRetry(fn, retries - 1, delay * 2);
-    }
-    throw error;
-  }
-}
-
-// ============================================================================
-// TIMEOUT HANDLING
-// ============================================================================
-
-async function withTimeout<T>(
-  promise: Promise<T>,
-  timeoutMs: number = DEFAULT_TIMEOUT
-): Promise<T> {
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    setTimeout(() => {
-      reject(
-        new UnifiedApiError(`Request timed out after ${timeoutMs}ms`, 408)
-      );
-    }, timeoutMs);
-  });
-
-  return Promise.race([promise, timeoutPromise]);
-}
-
-// ============================================================================
-// MAIN API CLIENT
-// ============================================================================
-
-export class UnifiedApiClient {
-  private baseUrl: string;
-  private defaultTimeout: number;
-  private defaultRetries: number;
-
-  constructor(
-    baseUrl: string = API_BASE_URL,
-    defaultTimeout: number = DEFAULT_TIMEOUT,
-    defaultRetries: number = DEFAULT_RETRIES
-  ) {
-    this.baseUrl = baseUrl;
-    this.defaultTimeout = defaultTimeout;
-    this.defaultRetries = defaultRetries;
-  }
-
-  /**
-   * Generic request method with error handling, retries, and timeout
-   */
-  private async request<T>(
+  private async makeRequest<T>(
     endpoint: string,
-    options: RequestOptions = {}
+    options: ApiCallOptions = {}
   ): Promise<ApiResponse<T>> {
     const {
       timeout = this.defaultTimeout,
       retries = this.defaultRetries,
-      retryDelay = DEFAULT_RETRY_DELAY,
       ...fetchOptions
     } = options;
 
-    const url = `${this.baseUrl}${endpoint}`;
+    const url = `${this.baseURL}${endpoint}`;
+    let lastError: Error | null = null;
 
-    const requestFn = async (): Promise<ApiResponse<T>> => {
-      const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...fetchOptions.headers,
-        },
-        ...fetchOptions,
-      });
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-      if (!response.ok) {
-        await handleApiError(response, `API request to ${endpoint}`);
+        const response = await fetch(url, {
+          ...fetchOptions,
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+            ...fetchOptions.headers,
+          },
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return {
+          success: true,
+          data,
+        };
+      } catch (error) {
+        lastError = error as Error;
+        
+        // Don't retry on certain errors
+        if (error instanceof Error && (
+          error.name === 'AbortError' ||
+          error.message.includes('400') ||
+          error.message.includes('401') ||
+          error.message.includes('403') ||
+          error.message.includes('404')
+        )) {
+          break;
+        }
+
+        if (attempt < retries) {
+          // Exponential backoff
+          const delay = Math.pow(2, attempt) * 1000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
       }
+    }
 
-      const data = await response.json();
-      return {
-        success: true,
-        data,
-        message: 'Request successful',
-      };
+    return {
+      success: false,
+      error: lastError?.message || 'Request failed',
     };
-
-    const requestWithTimeout = () => withTimeout(requestFn(), timeout);
-    return withRetry(requestWithTimeout, retries, retryDelay);
   }
 
-  /**
-   * Form data request method
-   */
-  private async formRequest<T>(
+  // ============================================================================
+  // HTTP METHODS
+  // ============================================================================
+
+  async get<T>(endpoint: string, options: ApiCallOptions = {}): Promise<ApiResponse<T>> {
+    return this.makeRequest<T>(endpoint, { ...options, method: 'GET' });
+  }
+
+  async post<T>(endpoint: string, data?: any, options: ApiCallOptions = {}): Promise<ApiResponse<T>> {
+    return this.makeRequest<T>(endpoint, {
+      ...options,
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  async put<T>(endpoint: string, data?: any, options: ApiCallOptions = {}): Promise<ApiResponse<T>> {
+    return this.makeRequest<T>(endpoint, {
+      ...options,
+      method: 'PUT',
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  async delete<T>(endpoint: string, options: ApiCallOptions = {}): Promise<ApiResponse<T>> {
+    return this.makeRequest<T>(endpoint, { ...options, method: 'DELETE' });
+  }
+
+  async patch<T>(endpoint: string, data?: any, options: ApiCallOptions = {}): Promise<ApiResponse<T>> {
+    return this.makeRequest<T>(endpoint, {
+      ...options,
+      method: 'PATCH',
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  // ============================================================================
+  // FILE UPLOAD METHODS
+  // ============================================================================
+
+  async uploadFile<T>(
     endpoint: string,
-    formData: FormData,
-    options: RequestOptions = {}
+    file: File,
+    additionalData: Record<string, any> = {},
+    options: ApiCallOptions = {}
   ): Promise<ApiResponse<T>> {
-    const {
-      timeout = this.defaultTimeout,
-      retries = this.defaultRetries,
-      retryDelay = DEFAULT_RETRY_DELAY,
-      ...fetchOptions
-    } = options;
-
-    const url = `${this.baseUrl}${endpoint}`;
-
-    const requestFn = async (): Promise<ApiResponse<T>> => {
-      const response = await fetch(url, {
-        method: 'POST',
-        body: formData,
-        ...fetchOptions,
-      });
-
-      if (!response.ok) {
-        await handleApiError(response, `Form upload to ${endpoint}`);
-      }
-
-      const data = await response.json();
-      return {
-        success: true,
-        data,
-        message: 'Upload successful',
-      };
-    };
-
-    const requestWithTimeout = () => withTimeout(requestFn(), timeout);
-    return withRetry(requestWithTimeout, retries, retryDelay);
-  }
-
-  // ============================================================================
-  // HEALTH CHECK
-  // ============================================================================
-
-  async checkHealth(): Promise<
-    ApiResponse<{ status: string; timestamp: string }>
-  > {
-    return this.request('/health');
-  }
-
-  // ============================================================================
-  // FILE UPLOAD
-  // ============================================================================
-
-  async uploadFile(file: File): Promise<
-    ApiResponse<{
-      filename: string;
-      size: number;
-      content_type: string;
-      extracted_text: string;
-    }>
-  > {
-    const adaptiveConfig = getAdaptiveUploadConfig();
     const formData = new FormData();
     formData.append('file', file);
-
-    // Log mobile debug info
-    logMobileDebugInfo('File Upload', {
-      fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
-      adaptiveTimeout: adaptiveConfig.timeout,
-      adaptiveMaxSize: adaptiveConfig.maxSize,
+    
+    // Add additional data
+    Object.entries(additionalData).forEach(([key, value]) => {
+      formData.append(key, value);
     });
 
-    // Check file size against mobile limits
-    if (file.size > adaptiveConfig.maxSize) {
-      throw new UnifiedApiError(
-        `File size ${Math.round(file.size / (1024 * 1024))}MB exceeds mobile limit of ${Math.round(adaptiveConfig.maxSize / (1024 * 1024))}MB`,
-        400,
-        undefined,
-        'FILE_TOO_LARGE'
-      );
+    return this.makeRequest<T>(endpoint, {
+      ...options,
+      method: 'POST',
+      body: formData,
+      headers: {
+        // Don't set Content-Type for FormData, let browser set it
+        ...options.headers,
+      },
+    });
+  }
+
+  // ============================================================================
+  // ENHANCED API CALLS WITH CONFIGURATION
+  // ============================================================================
+
+  async callWithConfig<T>(
+    apiCall: () => Promise<ApiResponse<T>>,
+    config: ApiCallConfig = {}
+  ): Promise<ApiResponse<T>> {
+    const {
+      loadingState,
+      successMessage,
+      errorMessage,
+      showToast = true,
+      onSuccess,
+      onError,
+      onFinally,
+    } = config;
+
+    // Set loading state
+    if (loadingState) {
+      loadingState.setter(true);
     }
 
     try {
-      return await this.formRequest('/api/upload/parse', formData, {
-        timeout: adaptiveConfig.timeout,
-        retries: adaptiveConfig.retries,
-        retryDelay: adaptiveConfig.retryDelay,
-      });
-    } catch (error) {
-      // Enhance error message for mobile devices
-      if (error instanceof UnifiedApiError) {
-        const mobileMessage = getMobileErrorMessage(error);
-        throw new UnifiedApiError(
-          mobileMessage,
-          error.status,
-          error.response,
-          error.code,
-          error.details
-        );
+      const response = await apiCall();
+
+      if (response.success) {
+        if (successMessage && showToast) {
+          toast.success(successMessage);
+        }
+        onSuccess?.(response.data);
+      } else {
+        const error = new Error(response.error || 'API call failed');
+        if (errorMessage && showToast) {
+          toast.error(errorMessage);
+        } else if (showToast) {
+          toast.error(formatErrorForUser(error));
+        }
+        onError?.(error);
       }
-      throw error;
+
+      return response;
+    } catch (error) {
+      const apiError = error as Error;
+      if (errorMessage && showToast) {
+        toast.error(errorMessage);
+      } else if (showToast) {
+        toast.error(formatErrorForUser(apiError));
+      }
+      onError?.(apiError);
+      
+      return {
+        success: false,
+        error: apiError.message,
+      };
+    } finally {
+      if (loadingState) {
+        loadingState.setter(false);
+      }
+      onFinally?.();
     }
   }
 
   // ============================================================================
-  // ATS ANALYSIS
+  // CONVENIENCE METHODS
   // ============================================================================
 
-  async quickAnalyzeResume(file: File): Promise<
-    ApiResponse<{
-      ats_score: number;
-      match_category: string;
-      detected_job_type: string;
-      job_detection_confidence: number;
-      keyword_matches: string[];
-      missing_keywords: string[];
-      semantic_similarity: number;
-      suggestions: string[];
-      strengths: string[];
-      weaknesses: string[];
-      formatting_issues: string[];
-      ats_friendly: boolean;
-      word_count: number;
-      detailed_scores: {
-        keyword_score: number;
-        semantic_score: number;
-        format_score: number;
-        content_score: number;
-        ats_score: number;
-      };
-      structured_experience: unknown;
-      job_description: string;
-    }>
-  > {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    return this.formRequest('/api/upload/quick-analyze', formData, {
-      timeout: 120000, // 2 minutes for analysis
-    });
+  async getWithConfig<T>(
+    endpoint: string,
+    config: ApiCallConfig = {},
+    options: ApiCallOptions = {}
+  ): Promise<ApiResponse<T>> {
+    return this.callWithConfig(
+      () => this.get<T>(endpoint, options),
+      config
+    );
   }
 
-  async analyzeResume(data: {
-    resume_text: string;
-    job_description?: string;
-  }): Promise<
-    ApiResponse<{
-      ats_score: number;
-      match_category: string;
-      keyword_matches: string[];
-      missing_keywords: string[];
-      semantic_similarity: number;
-      suggestions: string[];
-      strengths: string[];
-      weaknesses: string[];
-      formatting_issues: string[];
-      ats_friendly: boolean;
-      word_count: number;
-      detailed_scores: {
-        keyword_score: number;
-        semantic_score: number;
-        format_score: number;
-        content_score: number;
-        ats_score: number;
-      };
-    }>
-  > {
-    return this.request('/api/upload/analyze', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      timeout: 120000, // 2 minutes for analysis
-    });
+  async postWithConfig<T>(
+    endpoint: string,
+    data: any,
+    config: ApiCallConfig = {},
+    options: ApiCallOptions = {}
+  ): Promise<ApiResponse<T>> {
+    return this.callWithConfig(
+      () => this.post<T>(endpoint, data, options),
+      config
+    );
   }
 
-  // ============================================================================
-  // RESUME IMPROVEMENT
-  // ============================================================================
-
-  async improveResume(data: {
-    resume_text: string;
-    job_description?: string;
-    improvement_type: 'content' | 'format' | 'keywords';
-  }): Promise<
-    ApiResponse<{
-      improved_text: string;
-      changes: string[];
-      score_improvement: number;
-    }>
-  > {
-    return this.request('/improve', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      timeout: 120000, // 2 minutes for improvement
-    });
-  }
-
-  // ============================================================================
-  // JOB DETECTION
-  // ============================================================================
-
-  async detectJobRole(resumeText: string): Promise<
-    ApiResponse<{
-      detected_role: string;
-      confidence: number;
-      related_roles: string[];
-    }>
-  > {
-    return this.request('/detect-job', {
-      method: 'POST',
-      body: JSON.stringify({ resume_text: resumeText }),
-    });
-  }
-
-  // ============================================================================
-  // KEYWORD EXTRACTION
-  // ============================================================================
-
-  async extractKeywords(jobDescription: string): Promise<
-    ApiResponse<{
-      keywords: string[];
-      categories: {
-        technical: string[];
-        soft_skills: string[];
-        experience: string[];
-        education: string[];
-      };
-    }>
-  > {
-    return this.request('/extract-keywords', {
-      method: 'POST',
-      body: JSON.stringify({ job_description: jobDescription }),
-    });
+  async uploadFileWithConfig<T>(
+    endpoint: string,
+    file: File,
+    additionalData: Record<string, any> = {},
+    config: ApiCallConfig = {},
+    options: ApiCallOptions = {}
+  ): Promise<ApiResponse<T>> {
+    return this.callWithConfig(
+      () => this.uploadFile<T>(endpoint, file, additionalData, options),
+      config
+    );
   }
 }
 
 // ============================================================================
-// SINGLETON INSTANCE
+// HOOKS FOR REACT COMPONENTS
 // ============================================================================
 
-export const apiClient = new UnifiedApiClient();
+export function useApiCall() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const call = async <T>(
+    apiCall: () => Promise<ApiResponse<T>>,
+    config: ApiCallConfig = {}
+  ): Promise<ApiResponse<T>> {
+    setError(null);
+    
+    return unifiedClient.callWithConfig(apiCall, {
+      ...config,
+      loadingState: {
+        setter: setIsLoading,
+        ...config.loadingState,
+      },
+      onError: (err) => {
+        setError(err.message);
+        config.onError?.(err);
+      },
+    });
+  };
+
+  return {
+    call,
+    isLoading,
+    error,
+    clearError: () => setError(null),
+  };
+}
+
+export function useLoadingStates(keys: string[]) {
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>(
+    keys.reduce((acc, key) => ({ ...acc, [key]: false }), {})
+  );
+
+  const setLoading = (key: string, loading: boolean) => {
+    setLoadingStates(prev => ({ ...prev, [key]: loading }));
+  };
+
+  const isLoading = (key: string) => loadingStates[key] || false;
+  const isAnyLoading = Object.values(loadingStates).some(Boolean);
+
+  return {
+    setLoading,
+    isLoading,
+    isAnyLoading,
+    loadingStates,
+  };
+}
 
 // ============================================================================
-// CONVENIENCE FUNCTIONS
+// GLOBAL INSTANCE
 // ============================================================================
 
-export const checkApiHealth = () => apiClient.checkHealth();
-export const uploadFile = (file: File) => apiClient.uploadFile(file);
-export const quickAnalyzeResume = (file: File) =>
-  apiClient.quickAnalyzeResume(file);
-export const analyzeResume = (
-  data: Parameters<typeof apiClient.analyzeResume>[0]
-) => apiClient.analyzeResume(data);
-export const improveResume = (
-  data: Parameters<typeof apiClient.improveResume>[0]
-) => apiClient.improveResume(data);
-export const detectJobRole = (resumeText: string) =>
-  apiClient.detectJobRole(resumeText);
-export const extractKeywords = (jobDescription: string) =>
-  apiClient.extractKeywords(jobDescription);
+// Create global instance
+export const unifiedClient = new UnifiedApiClient();
 
-export default apiClient;
+// Export for backward compatibility
+export default unifiedClient;

@@ -9,33 +9,9 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 from typing import Optional
 
-# Try to import sentence-transformers
-try:
-    from sentence_transformers import SentenceTransformer, util
-
-    EMBEDDINGS_AVAILABLE = True
-except ImportError:
-    EMBEDDINGS_AVAILABLE = False
-    print("Warning: sentence-transformers not available for job detection")
-
-# Try to import Google Gemini (optional, free tier)
-try:
-    import google.generativeai as genai
-
-    GEMINI_AVAILABLE = True
-    # Try to configure with API key from environment
-    api_key = os.getenv("GEMINI_API_KEY")
-    if api_key and api_key != "your_api_key_here" and len(api_key) > 20:
-        genai.configure(api_key=api_key)
-        print("✅ Google Gemini configured for AI job detection")
-    else:
-        GEMINI_AVAILABLE = False
-        print(
-            "❌ Google Gemini available but no valid API key set. AI job detection is required."
-        )
-except ImportError:
-    GEMINI_AVAILABLE = False
-    print("ℹ️  Google Gemini not installed. Run: pip install google-generativeai")
+# Import centralized AI configuration
+from app.core.ai_config import ai_config, is_gemini_available, is_embeddings_available
+from app.core.error_handling import handle_ai_error, log_service_operation
 
 
 class JobTypeDetector:
@@ -46,6 +22,8 @@ class JobTypeDetector:
 
     def __init__(self):
         """Initialize the detector with embedding model"""
+        # Initialize AI configuration
+        gemini_available, embeddings_available = ai_config.initialize()
         # Comprehensive job titles database (200+ roles)
         self.job_database = [
             # Technology - Software Engineering

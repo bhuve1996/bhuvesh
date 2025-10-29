@@ -1,305 +1,332 @@
-# Architecture Documentation
+# 🏗️ System Architecture
 
-## Overview
+Comprehensive overview of the Bhuvesh Portfolio system architecture, design decisions, and technical implementation.
 
-This document describes the architecture of the ATS Resume Checker application, including the frontend, backend, and data flow.
+## 🎯 System Overview
 
-## System Architecture
+The Bhuvesh Portfolio is a full-stack web application consisting of:
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Backend       │    │   External      │
-│   (Next.js)     │◄──►│   (FastAPI)     │◄──►│   Services      │
-│                 │    │                 │    │   (Gemini AI)   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+- **Frontend**: Next.js 15 React application with TypeScript
+- **Backend**: FastAPI Python application with AI capabilities
+- **AI Services**: Google Gemini and Sentence Transformers integration
+- **Deployment**: Vercel (frontend) and Railway (backend)
 
-## Frontend Architecture
+## 🏛️ High-Level Architecture
 
-### Atomic Design Structure
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        A[Web Browser]
+        B[Mobile Browser]
+    end
 
-The frontend follows atomic design principles:
+    subgraph "Frontend (Vercel)"
+        C[Next.js 15 App]
+        D[React Components]
+        E[State Management]
+        F[API Client]
+    end
 
-```
-src/
-├── components/
-│   ├── atoms/           # Basic building blocks
-│   │   ├── Button/
-│   │   ├── Input/
-│   │   ├── Badge/
-│   │   └── ...
-│   ├── molecules/       # Simple groups of atoms
-│   │   ├── FileUpload/
-│   │   ├── SearchInput/
-│   │   ├── DataTable/
-│   │   └── ...
-│   ├── organisms/       # Complex UI components
-│   │   ├── ATSChecker/
-│   │   ├── ResumeBuilder/
-│   │   ├── Dashboard/
-│   │   └── ...
-│   └── templates/       # Page layouts
-│       ├── MainLayout/
-│       ├── AuthLayout/
-│       └── ...
-├── shared/
-│   ├── types/          # TypeScript type definitions
-│   ├── utils/          # Utility functions
-│   ├── constants/      # Application constants
-│   └── helpers/        # Helper functions
-├── api/
-│   ├── endpoints/      # API client functions
-│   └── types/          # API-specific types
-└── features/
-    ├── resume/         # Resume-related features
-    └── portfolio/      # Portfolio features
-```
+    subgraph "Backend (Railway)"
+        G[FastAPI Server]
+        H[AI Services]
+        I[File Processing]
+        J[API Endpoints]
+    end
 
-### Component Hierarchy
+    subgraph "AI Services"
+        K[Google Gemini]
+        L[Sentence Transformers]
+        M[ML Models]
+    end
 
-```
-ATSChecker (Organism)
-├── FileUpload (Molecule)
-│   ├── Button (Atom)
-│   ├── Input (Atom)
-│   └── Alert (Atom)
-├── AnalysisProgress (Molecule)
-│   ├── Progress (Atom)
-│   └── Spinner (Atom)
-└── ATSResults (Organism)
-    ├── ScoreDisplay (Molecule)
-    ├── KeywordMatch (Molecule)
-    └── ImprovementPlan (Organism)
+    subgraph "Storage"
+        N[Local Storage]
+        O[Session Storage]
+    end
+
+    A --> C
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> K
+    H --> L
+    H --> M
+    G --> I
+    G --> J
+    C --> N
+    C --> O
 ```
 
-## Backend Architecture
+## 🎨 Frontend Architecture
 
-### Service-Oriented Architecture
+### Technology Stack
 
-```
-backend/
-├── app/
-│   ├── api/            # API endpoints
-│   │   └── upload.py   # File upload and analysis endpoints
-│   ├── services/       # Business logic services
-│   │   ├── ats_analyzer.py
-│   │   ├── job_detector.py
-│   │   ├── project_extractor.py
-│   │   └── resume_improver.py
-│   ├── utils/          # Utility functions
-│   │   └── file_parser.py
-│   ├── helpers/        # Helper functions
-│   │   └── validation.py
-│   ├── types/          # Type definitions
-│   │   └── ats.py
-│   └── core/           # Core configuration
-└── tests/              # Test files
-    ├── unit/           # Unit tests
-    ├── integration/    # Integration tests
-    └── mocks/          # Mock data
-```
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript with strict type checking
+- **Styling**: Tailwind CSS with custom theme system
+- **State Management**: Zustand with TypeScript
+- **Animations**: Framer Motion
+- **Build Tool**: Turbopack
 
-### Service Dependencies
+### Component Architecture
+
+#### Atomic Design Pattern
 
 ```
-ATS Analyzer
-├── Job Detector
-├── Project Extractor
-├── Resume Improver
-└── File Parser
+components/
+├── atoms/              # Basic UI elements
+│   ├── Button/
+│   ├── Input/
+│   └── Icon/
+├── molecules/          # Composite components
+│   ├── FormField/
+│   ├── StatusBadge/
+│   └── FileUpload/
+├── organisms/          # Complex components
+│   ├── ATSChecker/
+│   ├── ResumeBuilder/
+│   └── FloatingPanel/
+└── ui/                 # Reusable UI components
+    ├── Modal/
+    ├── Tooltip/
+    └── Loading/
 ```
 
-## Data Flow
+#### State Management
 
-### 1. File Upload Flow
+- **Zustand Stores**: Centralized state management
+- **React Context**: Theme and user preferences
+- **Local Storage**: Persistent data storage
+- **Session Storage**: Temporary data storage
 
-```
-User Uploads File
-       ↓
-FileUpload Component
-       ↓
-API Validation
-       ↓
-File Parser Service
-       ↓
-Structured Data Extraction
-       ↓
-Frontend Display
-```
+### Key Frontend Features
 
-### 2. Analysis Flow
+#### 1. Resume Management System
 
-```
-User Initiates Analysis
-       ↓
-ATSAnalysis Component
-       ↓
-Backend API Call
-       ↓
-ATS Analyzer Service
-       ↓
-AI Processing (Gemini)
-       ↓
-Results Processing
-       ↓
-Frontend Results Display
-```
+- **Multi-resume Support**: Save and organize multiple resume versions
+- **Version Control**: Track changes and revisions
+- **Comparison Tools**: Compare different resume versions
+- **ATS Analysis**: Real-time ATS scoring and feedback
 
-### 3. Improvement Plan Flow
+#### 2. AI Integration
 
-```
-User Requests Improvement Plan
-       ↓
-ImprovementPlan Component
-       ↓
-Resume Improver Service
-       ↓
-AI Analysis
-       ↓
-Categorized Improvements
-       ↓
-Interactive UI Display
-```
+- **Job Detection**: AI-powered job type identification
+- **Content Analysis**: Semantic analysis of resume content
+- **Improvement Suggestions**: AI-generated recommendations
+- **Real-time Feedback**: Interactive analysis results
 
-## API Design
+#### 3. User Experience
 
-### RESTful Endpoints
+- **Responsive Design**: Mobile-first approach
+- **Dark Theme**: System preference detection
+- **Smooth Animations**: Framer Motion transitions
+- **Accessibility**: WCAG 2.1 AA compliance
 
-```
-POST /api/upload/parse
-POST /api/upload/analyze
-POST /api/upload/extract-experience
-POST /api/upload/improvement-plan
-GET  /api/upload/supported-formats
-GET  /health
-GET  /version
+## 🔧 Backend Architecture
+
+### Technology Stack
+
+- **Framework**: FastAPI with Python 3.9+
+- **AI/ML**: Google Gemini, Sentence Transformers
+- **File Processing**: PyMuPDF, python-docx
+- **Validation**: Pydantic with type hints
+- **Deployment**: Railway with auto-scaling
+
+### Service Architecture
+
+#### Core Services
+
+```python
+app/
+├── core/                    # Core configuration
+│   ├── ai_config.py        # Centralized AI configuration
+│   └── error_handling.py   # Error handling utilities
+├── services/               # Business logic services
+│   ├── ats_analyzer.py     # ATS analysis engine
+│   ├── job_detector.py     # Job type detection
+│   ├── resume_improver.py  # Resume improvement suggestions
+│   ├── project_extractor.py # Work experience extraction
+│   └── job_description_generator.py # Job description generation
+├── api/                    # API endpoints
+│   └── upload.py          # File upload and analysis
+└── utils/                  # Utility functions
 ```
 
-### Request/Response Format
+#### AI Integration
 
-```typescript
-// Request
-{
-  file: File,
-  job_description: string
-}
+- **Centralized Configuration**: Single point for AI model management
+- **Error Handling**: Graceful fallbacks when AI services are unavailable
+- **Caching**: Model caching for improved performance
+- **Monitoring**: Health checks and performance tracking
 
-// Response
-{
-  success: boolean,
-  data: AnalysisResult,
-  message: string,
-  timestamp: string
-}
+### Key Backend Features
+
+#### 1. ATS Analysis Engine
+
+- **Semantic Matching**: Beyond keyword matching using embeddings
+- **Multi-dimensional Scoring**: Comprehensive ATS compatibility analysis
+- **Industry Standards**: Based on ATS industry best practices
+- **Real-time Processing**: Fast analysis with caching
+
+#### 2. File Processing
+
+- **Multi-format Support**: PDF, DOCX, DOC, TXT files
+- **Text Extraction**: High-quality text extraction from various formats
+- **Error Handling**: Robust error handling for corrupted files
+- **Validation**: File type and size validation
+
+#### 3. API Design
+
+- **RESTful APIs**: Clean, consistent API design
+- **OpenAPI Documentation**: Auto-generated API documentation
+- **Type Safety**: Full Pydantic validation
+- **Error Responses**: Standardized error response format
+
+## 🔄 Data Flow
+
+### Resume Analysis Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant B as Backend
+    participant AI as AI Services
+
+    U->>F: Upload Resume
+    F->>B: POST /api/upload/parse
+    B->>B: Extract Text
+    B->>AI: Analyze Content
+    AI-->>B: Analysis Results
+    B->>B: Generate ATS Score
+    B-->>F: Analysis Response
+    F->>F: Update UI
+    F-->>U: Show Results
 ```
 
-## State Management
+### State Management Flow
 
-### Frontend State
+```mermaid
+graph LR
+    A[User Action] --> B[Component]
+    B --> C[Zustand Store]
+    C --> D[API Call]
+    D --> E[Backend Service]
+    E --> F[AI Processing]
+    F --> E
+    E --> D
+    D --> C
+    C --> B
+    B --> A
+```
 
-- **Component State**: React useState for local component state
-- **Global State**: Context API for shared state
-- **Server State**: React Query for API data caching and synchronization
+## 🚀 Deployment Architecture
 
-### Backend State
+### Frontend (Vercel)
 
-- **Stateless Services**: All services are stateless for scalability
-- **Session Management**: JWT tokens for authentication
-- **Caching**: Redis for temporary data caching
+- **CDN**: Global content delivery network
+- **Edge Functions**: Serverless functions at the edge
+- **Automatic Scaling**: Handles traffic spikes automatically
+- **Preview Deployments**: Automatic preview for pull requests
 
-## Security
+### Backend (Railway)
+
+- **Containerized**: Docker-based deployment
+- **Auto-scaling**: Automatic scaling based on demand
+- **Health Monitoring**: Built-in health checks
+- **Log Management**: Centralized logging and monitoring
+
+### Environment Configuration
+
+- **Development**: Local development with hot reload
+- **Staging**: Preview deployments for testing
+- **Production**: Optimized for performance and reliability
+
+## 🔒 Security Architecture
 
 ### Frontend Security
 
-- **Input Validation**: Client-side validation for user inputs
-- **XSS Protection**: React's built-in XSS protection
-- **CSRF Protection**: SameSite cookies and CSRF tokens
+- **Content Security Policy**: XSS protection
+- **HTTPS Only**: Secure communication
+- **Input Validation**: Client-side validation
+- **Error Handling**: Secure error messages
 
 ### Backend Security
 
-- **Input Validation**: Pydantic models for request validation
-- **File Validation**: Comprehensive file type and size validation
-- **Rate Limiting**: API rate limiting to prevent abuse
-- **CORS**: Configured CORS for cross-origin requests
+- **CORS Configuration**: Controlled cross-origin requests
+- **Input Validation**: Pydantic model validation
+- **File Upload Security**: File type and size validation
+- **API Rate Limiting**: Protection against abuse
 
-## Performance
+## 📊 Performance Architecture
 
 ### Frontend Performance
 
-- **Code Splitting**: Dynamic imports for route-based code splitting
-- **Lazy Loading**: Lazy loading of components and images
-- **Caching**: Browser caching and service worker for offline support
-- **Bundle Optimization**: Webpack optimization for smaller bundles
+- **Code Splitting**: Lazy loading of components
+- **Image Optimization**: Next.js automatic image optimization
+- **Caching**: Browser and CDN caching
+- **Bundle Optimization**: Tree shaking and minification
 
 ### Backend Performance
 
-- **Async Processing**: FastAPI async/await for concurrent requests
-- **Connection Pooling**: Database connection pooling
-- **Caching**: Redis caching for frequently accessed data
-- **Load Balancing**: Horizontal scaling with load balancers
+- **Model Caching**: AI model caching for faster responses
+- **Connection Pooling**: Database connection optimization
+- **Async Processing**: Non-blocking I/O operations
+- **Response Compression**: Gzip compression for API responses
 
-## Testing Strategy
+## 🔍 Monitoring & Observability
+
+### Frontend Monitoring
+
+- **Error Tracking**: Client-side error monitoring
+- **Performance Metrics**: Core Web Vitals tracking
+- **User Analytics**: Usage analytics and insights
+- **A/B Testing**: Feature flag management
+
+### Backend Monitoring
+
+- **Health Checks**: Service health monitoring
+- **Logging**: Structured logging with levels
+- **Metrics**: Performance and usage metrics
+- **Alerting**: Automated alerting for issues
+
+## 🧪 Testing Architecture
 
 ### Frontend Testing
 
-- **Unit Tests**: Jest and React Testing Library for component testing
-- **Integration Tests**: Testing component interactions
-- **E2E Tests**: Playwright for end-to-end testing
-- **Visual Tests**: Storybook for visual regression testing
+- **Unit Tests**: Jest and React Testing Library
+- **Integration Tests**: Component integration testing
+- **E2E Tests**: Cypress for end-to-end testing
+- **Visual Regression**: Screenshot testing
 
 ### Backend Testing
 
-- **Unit Tests**: Pytest for service and utility testing
-- **Integration Tests**: Testing API endpoints
-- **Mock Tests**: Mocking external services
-- **Performance Tests**: Load testing with Locust
+- **Unit Tests**: Pytest for individual functions
+- **Integration Tests**: API endpoint testing
+- **Mock Testing**: AI service mocking
+- **Performance Tests**: Load testing
 
-## Deployment
-
-### Frontend Deployment
-
-- **Static Hosting**: Vercel for Next.js deployment
-- **CDN**: Global CDN for static assets
-- **Environment Variables**: Secure environment variable management
-
-### Backend Deployment
-
-- **Containerization**: Docker containers for consistent deployment
-- **Orchestration**: Kubernetes for container orchestration
-- **Monitoring**: Application monitoring and logging
-- **Scaling**: Auto-scaling based on demand
-
-## Monitoring and Observability
-
-### Metrics
-
-- **Application Metrics**: Response times, error rates, throughput
-- **Business Metrics**: Analysis completion rates, user engagement
-- **Infrastructure Metrics**: CPU, memory, disk usage
-
-### Logging
-
-- **Structured Logging**: JSON-formatted logs for easy parsing
-- **Log Levels**: DEBUG, INFO, WARN, ERROR, CRITICAL
-- **Log Aggregation**: Centralized log collection and analysis
-
-### Alerting
-
-- **Error Alerts**: Immediate alerts for critical errors
-- **Performance Alerts**: Alerts for performance degradation
-- **Business Alerts**: Alerts for business metric anomalies
-
-## Future Considerations
+## 🔮 Future Architecture Considerations
 
 ### Scalability
 
-- **Microservices**: Potential migration to microservices architecture
-- **Event-Driven**: Event-driven architecture for better decoupling
-- **Caching**: Advanced caching strategies for better performance
+- **Microservices**: Potential migration to microservices
+- **Database**: PostgreSQL for persistent storage
+- **Caching**: Redis for distributed caching
+- **Queue System**: Celery for background tasks
 
-### Features
+### AI Enhancements
 
-- **Real-time Updates**: WebSocket support for real-time analysis updates
-- **Batch Processing**: Support for batch resume analysis
-- **Advanced Analytics**: More sophisticated resume analytics
-- **Integration**: Integration with job boards and ATS systems
+- **Model Versioning**: A/B testing of AI models
+- **Custom Models**: Fine-tuned models for specific domains
+- **Real-time Processing**: WebSocket for real-time updates
+- **Batch Processing**: Bulk analysis capabilities
+
+---
+
+**Last Updated**: December 2024  
+**Maintainer**: Bhuvesh Singla

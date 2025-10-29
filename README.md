@@ -1,45 +1,48 @@
-# 🚀 Bhuvesh Portfolio - ATS Resume Checker
+# 🚀 Bhuvesh Portfolio - AI-Powered ATS Resume Checker
 
 A modern, full-stack portfolio website featuring an advanced ATS (Applicant Tracking System) resume checker powered by AI and semantic matching.
-
-<!-- Updated: Testing pre-commit hook with build check -->
-<!-- Added npm run build to pre-commit hooks -->
 
 ## ✨ Features
 
 ### 🎯 Portfolio Website
 
-- **Modern Design**: Clean, responsive UI with dark theme
-- **Interactive Sections**: Hero, About, Projects, Contact
+- **Modern Design**: Clean, responsive UI with dark theme support
+- **Interactive Sections**: Hero, About, Projects, Contact, Blog
 - **Smooth Animations**: Framer Motion powered transitions
-- **SEO Optimized**: Next.js 15 with App Router
+- **SEO Optimized**: Next.js 15 with App Router and metadata
+- **Performance**: Optimized with Turbopack and code splitting
 
-### 📄 ATS Resume Checker
+### 📄 AI-Powered ATS Resume Checker
 
-- **AI-Powered Analysis**: Google Gemini integration for job detection
-- **Semantic Matching**: Sentence transformers for concept matching
+- **Intelligent Analysis**: Google Gemini AI for job detection and content analysis
+- **Semantic Matching**: Sentence transformers for concept matching beyond keywords
 - **Comprehensive Scoring**: Multi-dimensional ATS compatibility analysis
-- **Real-time Feedback**: Toast notifications and progress indicators
-- **File Support**: PDF, DOCX, DOC, and TXT files
+- **Real-time Feedback**: Interactive UI with progress indicators and toast notifications
+- **Multi-format Support**: PDF, DOCX, DOC, and TXT files
+- **Resume Management**: Save, organize, and compare multiple resume versions
+- **Job-Specific Analysis**: Tailored recommendations for different job categories
 
 ## 🏗️ Tech Stack
 
 ### Frontend
 
 - **Framework**: Next.js 15 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
+- **Language**: TypeScript with strict type checking
+- **Styling**: Tailwind CSS with custom theme system
 - **Animations**: Framer Motion
+- **State Management**: Zustand with TypeScript
 - **Notifications**: React Hot Toast
 - **Build Tool**: Turbopack
+- **Testing**: Jest, Cypress, React Testing Library
 
 ### Backend
 
-- **Framework**: FastAPI (Python)
+- **Framework**: FastAPI (Python 3.9+)
 - **AI/ML**: Google Gemini, Sentence Transformers
 - **File Processing**: PyMuPDF, python-docx
 - **NLP**: scikit-learn, keybert
 - **Validation**: Pydantic
+- **Deployment**: Railway
 
 ## 🚀 Quick Start
 
@@ -47,178 +50,169 @@ A modern, full-stack portfolio website featuring an advanced ATS (Applicant Trac
 
 - Node.js 18+ and npm
 - Python 3.9+
-- Google Gemini API key (optional)
+- Google Gemini API key (optional, for enhanced AI features)
 
-### Frontend Setup
+### Installation
 
-```bash
-# Install dependencies
-npm install
+1. **Clone the repository**
 
-# Start development server
-npm run dev
+   ```bash
+   git clone https://github.com/yourusername/bhuvesh-portfolio.git
+   cd bhuvesh-portfolio
+   ```
 
-# Build for production
-npm run build
-```
+2. **Install frontend dependencies**
 
-### Backend Setup
+   ```bash
+   npm install
+   ```
 
-```bash
-cd backend
+3. **Install backend dependencies**
 
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-# Install dependencies
-pip install -r requirements.txt
+4. **Set up environment variables**
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY
+   ```bash
+   # Frontend (.env.local)
+   NEXT_PUBLIC_API_URL=http://localhost:8000
 
-# Start development server
-python -m uvicorn app.main:app --reload --port 8000
-```
+   # Backend (.env)
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
 
-### Environment Variables
+5. **Start the development servers**
 
-Create `.env` files in both root and backend directories:
+   ```bash
+   # Terminal 1 - Frontend
+   npm run dev
 
-**Frontend (.env.local)**:
+   # Terminal 2 - Backend
+   cd backend
+   python start.py
+   ```
 
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
-
-**Backend (.env)**:
-
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-```
+6. **Open your browser**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000
+   - API Docs: http://localhost:8000/docs
 
 ## 📁 Project Structure
 
 ```
-├── src/                    # Frontend source code
-│   ├── app/               # Next.js App Router pages
-│   ├── components/        # React components
-│   │   ├── ui/           # Reusable UI components
-│   │   ├── layout/       # Layout components
-│   │   └── sections/     # Page sections
-│   ├── lib/              # Utility functions
-│   └── types/            # TypeScript definitions
-├── backend/               # Backend source code
-│   ├── app/              # FastAPI application
-│   │   ├── api/          # API endpoints
-│   │   ├── services/     # Business logic
-│   │   └── utils/        # Utility functions
-│   └── docs/             # Backend documentation
-├── docs/                  # Project documentation
-│   ├── frontend/         # Frontend docs
-│   ├── backend/          # Backend docs
-│   └── architecture/     # System architecture
-└── public/               # Static assets
+├── src/                          # Frontend source code
+│   ├── app/                     # Next.js App Router pages
+│   ├── components/              # Reusable React components
+│   │   ├── atoms/              # Basic UI elements
+│   │   ├── molecules/           # Composite components
+│   │   ├── organisms/           # Complex components
+│   │   └── ui/                 # Reusable UI components
+│   ├── lib/                    # Utilities and business logic
+│   │   ├── api/                # API client and endpoints
+│   │   ├── resume/             # Resume-specific logic
+│   │   └── utils/              # Utility functions
+│   ├── hooks/                  # Custom React hooks
+│   ├── store/                  # State management (Zustand)
+│   └── types/                  # TypeScript definitions
+├── backend/                     # Python FastAPI backend
+│   ├── app/                    # FastAPI application
+│   │   ├── api/                # API endpoints
+│   │   ├── core/               # Core configuration
+│   │   ├── services/           # Business logic services
+│   │   └── utils/              # Utility functions
+│   └── tests/                  # Backend tests
+├── docs/                       # Documentation
+└── public/                     # Static assets
 ```
-
-## 🎨 Key Components
-
-### ATS Checker Features
-
-- **File Upload**: Drag & drop with validation
-- **Job Detection**: AI-powered role identification
-- **Semantic Analysis**: Concept matching beyond keywords
-- **Format Analysis**: ATS compatibility checking
-- **Improvement Suggestions**: Actionable recommendations
-- **Progress Tracking**: Real-time analysis status
-
-### UI Components
-
-- **Toast Notifications**: Success/error feedback
-- **Progress Indicators**: Loading states
-- **File Upload**: Drag & drop interface
-- **Results Display**: Comprehensive analysis results
-- **Responsive Design**: Mobile-first approach
 
 ## 🔧 Development
 
 ### Available Scripts
 
+#### Frontend
+
 ```bash
-# Frontend
 npm run dev          # Start development server
 npm run build        # Build for production
+npm run start        # Start production server
 npm run lint         # Run ESLint
-npm run format       # Format with Prettier
-npm run type-check   # TypeScript type checking
+npm run lint:fix     # Fix ESLint errors
+npm run test         # Run tests
+npm run test:e2e     # Run E2E tests
+```
 
-# Backend
-make dev-setup       # Complete development setup
-make format          # Format code with Black/isort
-make lint            # Run Ruff linter
-make type-check      # Run MyPy type checker
-make test            # Run tests
+#### Backend
+
+```bash
+cd backend
+python start.py      # Start development server
+python -m pytest    # Run tests
+make test           # Run all tests with coverage
 ```
 
 ### Code Quality
 
-- **TypeScript**: Strict type checking
-- **ESLint**: Code linting with Next.js config
+- **TypeScript**: Strict type checking enabled
+- **ESLint**: Configured with Next.js and TypeScript rules
 - **Prettier**: Code formatting
-- **Black/isort**: Python code formatting
-- **Ruff**: Fast Python linting
-- **MyPy**: Python type checking
-
-## 📚 Documentation
-
-- [Frontend Documentation](docs/frontend/)
-- [Backend Documentation](docs/backend/)
-- [Architecture Overview](docs/ARCHITECTURE.md)
-- [Development Setup](docs/DEVELOPMENT_SETUP.md)
-- [API Documentation](docs/backend/README.md)
+- **Pre-commit hooks**: Automated linting and testing
+- **Testing**: Unit, integration, and E2E tests
 
 ## 🚀 Deployment
 
 ### Frontend (Vercel)
 
-```bash
-# Deploy to Vercel
-vercel --prod
-```
+1. Connect your GitHub repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
 
 ### Backend (Railway)
 
-```bash
-# Deploy to Railway
-railway login
-railway link
-railway up
-```
+1. Connect your GitHub repository to Railway
+2. Set environment variables in Railway dashboard
+3. Deploy automatically on push to main branch
+
+## 📚 Documentation
+
+- [Architecture Guide](docs/ARCHITECTURE.md) - System architecture and design decisions
+- [Development Setup](docs/DEVELOPMENT_SETUP.md) - Detailed setup instructions
+- [Testing Guide](docs/TESTING_GUIDE.md) - Testing strategies and examples
+- [Accessibility Guide](docs/ACCESSIBILITY_GUIDE.md) - Accessibility features and testing
+- [Backend Documentation](docs/backend/README.md) - Backend API and services
+- [Duplication Cleanup Guide](DUPLICATION_CLEANUP_GUIDE.md) - Code optimization and DRY principles
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Author
+## 🙏 Acknowledgments
 
-**Bhuvesh Singla**
+- [Next.js](https://nextjs.org/) - React framework
+- [FastAPI](https://fastapi.tiangolo.com/) - Python web framework
+- [Google Gemini](https://ai.google.dev/) - AI capabilities
+- [Tailwind CSS](https://tailwindcss.com/) - Styling framework
+- [Framer Motion](https://www.framer.com/motion/) - Animation library
 
-- Portfolio: [bhuvesh.com](https://bhuvesh.com)
-- LinkedIn: [linkedin.com/in/bhuvesh-singla](https://linkedin.com/in/bhuvesh-singla)
-- GitHub: [github.com/bhuvesh-singla](https://github.com/bhuvesh-singla)
+## 📞 Contact
+
+- **Portfolio**: [bhuvesh.com](https://bhuvesh.com)
+- **Email**: contact@bhuvesh.com
+- **LinkedIn**: [linkedin.com/in/bhuvesh-singla](https://linkedin.com/in/bhuvesh-singla)
+- **GitHub**: [github.com/bhuvesh-singla](https://github.com/bhuvesh-singla)
 
 ---
 
-Built with ❤️ using Next.js, FastAPI, and modern web technologies.
-
-# Test commit
+**Built with ❤️ by Bhuvesh Singla**

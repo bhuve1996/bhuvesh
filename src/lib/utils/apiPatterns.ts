@@ -1,6 +1,8 @@
 /**
  * Centralized API patterns and utilities
  * Eliminates DRY violations in API calls and error handling
+ *
+ * @deprecated Use unifiedClient from '../api/unifiedClient' instead
  */
 
 import { useState } from 'react';
@@ -8,6 +10,13 @@ import toast from 'react-hot-toast';
 
 import { toastMessages } from './componentPatterns';
 import { ERROR_MESSAGES, formatErrorForUser } from './errorHandling';
+
+// Re-export from unified client for backward compatibility
+export {
+  unifiedClient,
+  useApiCall,
+  useLoadingStates,
+} from '../api/unifiedClient';
 
 // ============================================================================
 // API CALL WRAPPER
