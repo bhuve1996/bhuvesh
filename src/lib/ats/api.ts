@@ -12,6 +12,12 @@ import {
   uploadFile,
 } from '@/lib/api/unifiedClient';
 
+// ============================================================================
+// API CONFIGURATION
+// ============================================================================
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 // Re-export types for backward compatibility
 export type { ApiError, ApiResponse } from '@/lib/api/unifiedClient';
 
@@ -98,13 +104,10 @@ export async function analyzeResumeWithJobDescription(
     await new Promise(resolve => setTimeout(resolve, 300));
 
     // Make the actual request - this is where the real work happens
-    const response = await fetch(
-      'http://localhost:8000/api/upload/quick-analyze',
-      {
-        method: 'POST',
-        body: formData,
-      }
-    );
+    const response = await fetch(`${API_BASE_URL}/api/upload/quick-analyze`, {
+      method: 'POST',
+      body: formData,
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
