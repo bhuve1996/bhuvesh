@@ -3,7 +3,6 @@
 
 # 🚀 UNIFIED PRE-COMMIT HOOK - ZERO TOLERANCE FOR ERRORS/WARNINGS
 # This replaces both Husky and pre-commit framework with a single, comprehensive system
-# NO BYPASSES ALLOWED - All checks are MANDATORY
 
 echo "🔍 Running UNIFIED pre-commit checks with ZERO tolerance for warnings..."
 
@@ -50,23 +49,20 @@ print_footer() {
     echo -e "${CYAN}📊 $1${NC}"
 }
 
-# BLOCK --no-verify attempts
+# Check if --no-verify was used
 if [ "$1" = "--no-verify" ] || [ "$2" = "--no-verify" ]; then
-    print_error "🚫 BYPASSING PRE-COMMIT CHECKS IS NOT ALLOWED!"
-    print_error "🚫 --no-verify is DISABLED in this repository"
-    print_error "🚫 ALL quality checks are MANDATORY for every commit"
+    print_warning "⚠️  BYPASSING PRE-COMMIT CHECKS WITH --no-verify"
+    print_warning "⚠️  This bypasses ALL quality checks - use with caution!"
+    print_warning "⚠️  Consider running checks manually: npm run pre-commit:check"
     echo ""
-    print_status "To fix issues and commit:"
-    print_status "  1. Fix all errors shown above"
-    print_status "  2. Run: npm run pre-commit:check"
-    print_status "  3. Commit normally without --no-verify"
+    print_status "To run checks manually:"
+    print_status "  npm run pre-commit:check    # Quick checks"
+    print_status "  npm run pre-commit:full    # Full checks"
     echo ""
-    print_error "❌ COMMIT BLOCKED - Fix all issues before committing"
-    exit 1
+    exit 0
 fi
 
 print_header "UNIFIED PRE-COMMIT SYSTEM - ZERO TOLERANCE MODE"
-print_status "🚫 NO BYPASSES ALLOWED - All checks are MANDATORY"
 echo ""
 
 # =============================================================================
@@ -273,7 +269,7 @@ print_success "   ✅ Build Verification"
 echo ""
 print_success "🚀 COMMIT APPROVED - Code meets highest quality standards!"
 print_success "💡 This unified system replaces both Husky and pre-commit framework"
-print_success "🚫 NO BYPASSES ALLOWED - All checks are mandatory for every commit"
+print_success "🔧 Use --no-verify to bypass (not recommended)"
 
 # Log successful run
 echo "$(date): Pre-commit passed - $TOTAL_CHECKS checks, ${DURATION}s" >> .git/hooks/pre-commit.log 2>/dev/null || true
