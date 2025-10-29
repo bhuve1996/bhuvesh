@@ -112,7 +112,7 @@ export async function withFileUpload<T>(
   config: Partial<ApiCallConfig> = {}
 ): Promise<T | null> {
   return withApiCall(uploadCall, {
-    successMessage: toastMessages.success.upload,
+    successMessage: toastMessages.success.uploaded,
     errorMessage: toastMessages.error.upload,
     ...config,
   });
@@ -126,8 +126,8 @@ export async function withATSAnalysis<T>(
   config: Partial<ApiCallConfig> = {}
 ): Promise<T | null> {
   return withApiCall(analysisCall, {
-    successMessage: toastMessages.success.analysis,
-    errorMessage: toastMessages.error.analysis,
+    successMessage: 'Analysis completed successfully',
+    errorMessage: 'Analysis failed',
     ...config,
   });
 }
@@ -137,12 +137,12 @@ export async function withATSAnalysis<T>(
  */
 export async function withExport<T>(
   exportCall: () => Promise<T>,
-  format: string,
+  _format: string,
   config: Partial<ApiCallConfig> = {}
 ): Promise<T | null> {
   return withApiCall(exportCall, {
-    successMessage: toastMessages.success.export(format),
-    errorMessage: toastMessages.error.export(format),
+    successMessage: toastMessages.success.exported,
+    errorMessage: 'Export failed',
     ...config,
   });
 }
@@ -155,7 +155,7 @@ export async function withSave<T>(
   config: Partial<ApiCallConfig> = {}
 ): Promise<T | null> {
   return withApiCall(saveCall, {
-    successMessage: toastMessages.success.save,
+    successMessage: toastMessages.success.saved,
     errorMessage: toastMessages.error.save,
     ...config,
   });

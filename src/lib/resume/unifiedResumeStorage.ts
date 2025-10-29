@@ -126,8 +126,14 @@ class UnifiedResumeStorageService {
     if (groupIndex === -1) throw new Error('Resume group not found');
 
     const existingGroup = groups[groupIndex];
+    if (!existingGroup) throw new Error('Resume group not found');
+
     groups[groupIndex] = {
-      ...existingGroup,
+      id: existingGroup.id,
+      name: existingGroup.name,
+      description: existingGroup.description,
+      variants: existingGroup.variants,
+      createdAt: existingGroup.createdAt,
       ...updates,
       updatedAt: new Date(),
     };
@@ -217,7 +223,7 @@ class UnifiedResumeStorageService {
     variantId: string,
     newName?: string
   ): string {
-    const { groups, cloudResumes } = this.getStorageData();
+    const { groups } = this.getStorageData();
     const group = groups.find(g => g.id === groupId);
     const variant = group?.variants.find(v => v.id === variantId);
 

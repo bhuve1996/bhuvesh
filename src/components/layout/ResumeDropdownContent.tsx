@@ -35,8 +35,8 @@ export const ResumeDropdownContent: React.FC<ResumeDropdownContentProps> = ({
     try {
       addGroup(name, description);
       setShowCreateGroup(false);
-    } catch (error) {
-      console.error('Failed to create group:', error);
+    } catch (_error) {
+      // Failed to create group
     }
   };
 

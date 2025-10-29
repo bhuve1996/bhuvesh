@@ -15,15 +15,15 @@ export default function ResumeDemoPage() {
   }, []);
 
   const handleFileUpload = (
-    files: File[],
-    resumeName?: string,
-    groupId?: string
+    _files: File[],
+    _resumeName?: string,
+    _groupId?: string
   ) => {
-    console.log('File uploaded:', { files, resumeName, groupId });
+    // File uploaded successfully
   };
 
-  const handleResumeCreated = (groupId: string, variantId: string) => {
-    console.log('Resume created:', { groupId, variantId });
+  const handleResumeCreated = (_groupId: string, _variantId: string) => {
+    // Resume created successfully
     // Refresh groups
     setGroups(multiResumeStorage.getResumeGroups());
   };
@@ -144,12 +144,12 @@ export default function ResumeDemoPage() {
               <li>• Give it a name (or use the filename as backup)</li>
               <li>• Choose an existing group or create a new one</li>
               <li>
-                • Duplicate names will automatically get numbers (e.g., "Resume
-                1", "Resume 2")
+                • Duplicate names will automatically get numbers (e.g.,
+                &quot;Resume 1&quot;, &quot;Resume 2&quot;)
               </li>
               <li>
-                • Use the "My Resumes" dropdown in the top navigation to manage
-                resumes
+                • Use the &quot;My Resumes&quot; dropdown in the top navigation
+                to manage resumes
               </li>
             </ul>
           </div>

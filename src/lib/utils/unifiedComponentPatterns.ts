@@ -142,6 +142,9 @@ export const createBadgeClasses = (
   );
 };
 
+// Tag classes (alias for badge classes)
+export const createTagClasses = createBadgeClasses;
+
 // ============================================================================
 // LOADING PATTERNS
 // ============================================================================
@@ -348,6 +351,7 @@ export const unifiedComponentPatterns = {
   badgeVariants,
   badgeSizes,
   createBadgeClasses,
+  createTagClasses,
 
   // Loading patterns
   createLoadingButtonClasses,

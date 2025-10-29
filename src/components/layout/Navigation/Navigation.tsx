@@ -30,7 +30,7 @@ export const Navigation: React.FC<NavigationProps> = ({
   const [showMoreDropdown, setShowMoreDropdown] = useState(false);
 
   // Multi-resume state
-  const { groups, currentResume, loadGroups } = useMultiResumeStore();
+  const { loadGroups } = useMultiResumeStore();
 
   // Load groups on mount
   React.useEffect(() => {
@@ -67,7 +67,7 @@ export const Navigation: React.FC<NavigationProps> = ({
     return false;
   };
 
-  const handleResumeSelect = (groupId: string, variantId: string) => {
+  const handleResumeSelect = (_groupId: string, _variantId: string) => {
     // Load resume data into the main resume store
     const resume = useMultiResumeStore.getState().currentResume;
     if (resume) {
@@ -493,12 +493,14 @@ export const Navigation: React.FC<NavigationProps> = ({
           {isMobileMenuOpen && (
             <motion.div
               id='mobile-menu'
+              data-testid='mobile-menu'
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className='lg:hidden overflow-hidden'
-              role='menu'
+              role='navigation'
+              aria-label='Mobile navigation'
               aria-hidden={!isMobileMenuOpen}
             >
               <div className='pt-4 pb-4 border-t border-border'>
@@ -519,7 +521,6 @@ export const Navigation: React.FC<NavigationProps> = ({
                               ? 'text-primary-400 bg-primary-500/10 border border-primary-500/20'
                               : 'text-foreground hover:text-primary-400 hover:bg-muted/50'
                           }`}
-                          role='menuitem'
                           aria-current={isActive(item) ? 'page' : undefined}
                           tabIndex={0}
                         >
@@ -530,7 +531,6 @@ export const Navigation: React.FC<NavigationProps> = ({
                           href={item.href}
                           className='px-4 py-3 rounded-lg text-foreground hover:text-primary-400 hover:bg-muted/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base'
                           onClick={() => setIsMobileMenuOpen(false)}
-                          role='menuitem'
                           tabIndex={0}
                         >
                           {item.label}
@@ -575,7 +575,6 @@ export const Navigation: React.FC<NavigationProps> = ({
                             href={item.href}
                             onClick={() => setIsMobileMenuOpen(false)}
                             className='px-4 py-3 rounded-lg text-left transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm sm:text-base text-foreground hover:text-primary-400 hover:bg-muted/50'
-                            role='menuitem'
                             tabIndex={0}
                           >
                             {item.label}

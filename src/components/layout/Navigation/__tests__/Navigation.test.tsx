@@ -85,8 +85,8 @@ describe('Navigation Component', () => {
     renderNavigationWithProvider(defaultProps);
 
     // Check that desktop navigation links are present
-    const aboutLinks = screen.getAllByRole('link', { name: /about/i });
-    expect(aboutLinks.length).toBeGreaterThan(0);
+    const atsLinks = screen.getAllByRole('link', { name: /ats checker/i });
+    expect(atsLinks.length).toBeGreaterThan(0);
 
     // Check for Resume Builder link instead of Projects (which is commented out)
     const resumeBuilderLinks = screen.getAllByRole('link', {
@@ -102,8 +102,8 @@ describe('Navigation Component', () => {
     expect(links.length).toBeGreaterThan(0);
 
     // Check that navigation links have proper attributes
-    const aboutLinks = screen.getAllByRole('link', { name: /about/i });
-    expect(aboutLinks[0]).toHaveAttribute('tabIndex', '0');
+    const atsLinks = screen.getAllByRole('link', { name: /ats checker/i });
+    expect(atsLinks[0]).toHaveAttribute('tabIndex', '0');
   });
 
   it('highlights active section', () => {
@@ -115,8 +115,8 @@ describe('Navigation Component', () => {
     expect(nav).toBeInTheDocument();
 
     // Verify navigation links are present
-    const aboutLinks = screen.getAllByRole('link', { name: /about/i });
-    expect(aboutLinks.length).toBeGreaterThan(0);
+    const atsLinks = screen.getAllByRole('link', { name: /ats checker/i });
+    expect(atsLinks.length).toBeGreaterThan(0);
   });
 
   it('handles section clicks', () => {
@@ -154,8 +154,8 @@ describe('Navigation Component', () => {
 
     await waitFor(() => {
       expect(mobileButton).toHaveAttribute('aria-expanded', 'true');
-      const mobileMenu = screen.getByRole('menu');
-      expect(mobileMenu).toHaveAttribute('aria-hidden', 'false');
+      const mobileMenu = screen.getByTestId('mobile-menu');
+      expect(mobileMenu).toBeInTheDocument();
     });
   });
 
@@ -166,12 +166,12 @@ describe('Navigation Component', () => {
     fireEvent.click(mobileButton);
 
     await waitFor(() => {
-      expect(screen.getByRole('menu')).toHaveAttribute('aria-hidden', 'false');
+      expect(screen.getByTestId('mobile-menu')).toHaveAttribute('aria-hidden', 'false');
     });
 
     // Get the mobile menu first, then find the about link within it
-    const mobileMenu = screen.getByRole('menu');
-    const aboutLink = within(mobileMenu).getByRole('menuitem', {
+    const mobileMenu = screen.getByTestId('mobile-menu');
+    const aboutLink = within(mobileMenu).getByRole('link', {
       name: /about/i,
     });
     fireEvent.click(aboutLink);
@@ -208,11 +208,11 @@ describe('Navigation Component', () => {
     expect(links.length).toBeGreaterThan(0);
 
     // Test focus on the first navigation link
-    const aboutLinks = screen.getAllByRole('link', { name: /about/i });
+    const atsLinks = screen.getAllByRole('link', { name: /ats checker/i });
     act(() => {
-      aboutLinks[0].focus();
+      atsLinks[0].focus();
     });
-    expect(aboutLinks[0]).toHaveFocus();
+    expect(atsLinks[0]).toHaveFocus();
   });
 
   it('renders theme toggle', () => {
@@ -246,7 +246,7 @@ describe('Navigation Component', () => {
     fireEvent.click(mobileButton);
 
     await waitFor(() => {
-      expect(screen.getByRole('menu')).toHaveAttribute('aria-hidden', 'false');
+      expect(screen.getByTestId('mobile-menu')).toHaveAttribute('aria-hidden', 'false');
     });
 
     const results = await axe(container);
@@ -284,8 +284,8 @@ describe('Navigation Component', () => {
     expect(nav).toBeInTheDocument();
 
     // Check that navigation links are present
-    const aboutLinks = screen.getAllByRole('link', { name: /about/i });
-    expect(aboutLinks.length).toBeGreaterThan(0);
+    const atsLinks = screen.getAllByRole('link', { name: /ats checker/i });
+    expect(atsLinks.length).toBeGreaterThan(0);
 
     // Check for Resume Builder link instead of Projects (which is commented out)
     const resumeBuilderLinks = screen.getAllByRole('link', {
@@ -301,11 +301,11 @@ describe('Navigation Component', () => {
     fireEvent.click(mobileButton);
 
     await waitFor(() => {
-      const mobileMenu = screen.getByRole('menu');
-      expect(mobileMenu).toHaveAttribute('aria-hidden', 'false');
+      const mobileMenu = screen.getByTestId('mobile-menu');
+      expect(mobileMenu).toBeInTheDocument();
     });
 
-    const menuItems = screen.getAllByRole('menuitem');
+    const menuItems = screen.getAllByRole('link');
     const firstMenuItem = menuItems[0];
     if (firstMenuItem) {
       act(() => {

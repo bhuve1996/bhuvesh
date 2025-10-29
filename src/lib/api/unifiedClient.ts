@@ -13,11 +13,23 @@ import { formatErrorForUser } from '@/lib/utils/errorHandling';
 // TYPES
 // ============================================================================
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
   message?: string;
+}
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public status?: number,
+    public code?: string,
+    public response?: Response
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
 }
 
 export interface ApiCallConfig {
@@ -28,7 +40,7 @@ export interface ApiCallConfig {
   successMessage?: string;
   errorMessage?: string;
   showToast?: boolean;
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: unknown) => void;
   onError?: (error: Error) => void;
   onFinally?: () => void;
   retries?: number;
@@ -97,15 +109,16 @@ class UnifiedApiClient {
         };
       } catch (error) {
         lastError = error as Error;
-        
+
         // Don't retry on certain errors
-        if (error instanceof Error && (
-          error.name === 'AbortError' ||
-          error.message.includes('400') ||
-          error.message.includes('401') ||
-          error.message.includes('403') ||
-          error.message.includes('404')
-        )) {
+        if (
+          error instanceof Error &&
+          (error.name === 'AbortError' ||
+            error.message.includes('400') ||
+            error.message.includes('401') ||
+            error.message.includes('403') ||
+            error.message.includes('404'))
+        ) {
           break;
         }
 
@@ -127,35 +140,53 @@ class UnifiedApiClient {
   // HTTP METHODS
   // ============================================================================
 
-  async get<T>(endpoint: string, options: ApiCallOptions = {}): Promise<ApiResponse<T>> {
+  async get<T>(
+    endpoint: string,
+    options: ApiCallOptions = {}
+  ): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  async post<T>(endpoint: string, data?: any, options: ApiCallOptions = {}): Promise<ApiResponse<T>> {
+  async post<T>(
+    endpoint: string,
+    data?: unknown,
+    options: ApiCallOptions = {}
+  ): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(endpoint, {
       ...options,
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data ? JSON.stringify(data) : null,
     });
   }
 
-  async put<T>(endpoint: string, data?: any, options: ApiCallOptions = {}): Promise<ApiResponse<T>> {
+  async put<T>(
+    endpoint: string,
+    data?: unknown,
+    options: ApiCallOptions = {}
+  ): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(endpoint, {
       ...options,
       method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data ? JSON.stringify(data) : null,
     });
   }
 
-  async delete<T>(endpoint: string, options: ApiCallOptions = {}): Promise<ApiResponse<T>> {
+  async delete<T>(
+    endpoint: string,
+    options: ApiCallOptions = {}
+  ): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(endpoint, { ...options, method: 'DELETE' });
   }
 
-  async patch<T>(endpoint: string, data?: any, options: ApiCallOptions = {}): Promise<ApiResponse<T>> {
+  async patch<T>(
+    endpoint: string,
+    data?: unknown,
+    options: ApiCallOptions = {}
+  ): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(endpoint, {
       ...options,
       method: 'PATCH',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data ? JSON.stringify(data) : null,
     });
   }
 
@@ -166,15 +197,19 @@ class UnifiedApiClient {
   async uploadFile<T>(
     endpoint: string,
     file: File,
-    additionalData: Record<string, any> = {},
+    additionalData: Record<string, unknown> = {},
     options: ApiCallOptions = {}
   ): Promise<ApiResponse<T>> {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     // Add additional data
     Object.entries(additionalData).forEach(([key, value]) => {
-      formData.append(key, value);
+      if (value instanceof File || value instanceof Blob) {
+        formData.append(key, value);
+      } else {
+        formData.append(key, String(value));
+      }
     });
 
     return this.makeRequest<T>(endpoint, {
@@ -224,7 +259,7 @@ class UnifiedApiClient {
         if (errorMessage && showToast) {
           toast.error(errorMessage);
         } else if (showToast) {
-          toast.error(formatErrorForUser(error));
+          toast.error(formatErrorForUser(error, 'API call'));
         }
         onError?.(error);
       }
@@ -235,10 +270,10 @@ class UnifiedApiClient {
       if (errorMessage && showToast) {
         toast.error(errorMessage);
       } else if (showToast) {
-        toast.error(formatErrorForUser(apiError));
+        toast.error(formatErrorForUser(apiError, 'API call'));
       }
       onError?.(apiError);
-      
+
       return {
         success: false,
         error: apiError.message,
@@ -260,15 +295,12 @@ class UnifiedApiClient {
     config: ApiCallConfig = {},
     options: ApiCallOptions = {}
   ): Promise<ApiResponse<T>> {
-    return this.callWithConfig(
-      () => this.get<T>(endpoint, options),
-      config
-    );
+    return this.callWithConfig(() => this.get<T>(endpoint, options), config);
   }
 
   async postWithConfig<T>(
     endpoint: string,
-    data: any,
+    data: unknown,
     config: ApiCallConfig = {},
     options: ApiCallOptions = {}
   ): Promise<ApiResponse<T>> {
@@ -281,7 +313,7 @@ class UnifiedApiClient {
   async uploadFileWithConfig<T>(
     endpoint: string,
     file: File,
-    additionalData: Record<string, any> = {},
+    additionalData: Record<string, unknown> = {},
     config: ApiCallConfig = {},
     options: ApiCallOptions = {}
   ): Promise<ApiResponse<T>> {
@@ -300,24 +332,24 @@ export function useApiCall() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const call = async <T>(
+  async function call<T>(
     apiCall: () => Promise<ApiResponse<T>>,
     config: ApiCallConfig = {}
   ): Promise<ApiResponse<T>> {
     setError(null);
-    
+
     return unifiedClient.callWithConfig(apiCall, {
       ...config,
       loadingState: {
         setter: setIsLoading,
         ...config.loadingState,
       },
-      onError: (err) => {
+      onError: err => {
         setError(err.message);
         config.onError?.(err);
       },
     });
-  };
+  }
 
   return {
     call,
@@ -346,6 +378,24 @@ export function useLoadingStates(keys: string[]) {
     loadingStates,
   };
 }
+
+// ============================================================================
+// CONVENIENCE FUNCTION EXPORTS
+// ============================================================================
+
+export const analyzeResume = (data: unknown) =>
+  unifiedClient.post('/api/analyze', data);
+export const checkApiHealth = () => unifiedClient.get('/api/health');
+export const detectJobRole = (data: unknown) =>
+  unifiedClient.post('/api/detect-job-role', data);
+export const extractKeywords = (data: unknown) =>
+  unifiedClient.post('/api/extract-keywords', data);
+export const improveResume = (data: unknown) =>
+  unifiedClient.post('/api/improve', data);
+export const uploadFile = (
+  file: File,
+  additionalData: Record<string, unknown> = {}
+) => unifiedClient.uploadFile('/api/upload', file, additionalData);
 
 // ============================================================================
 // GLOBAL INSTANCE

@@ -178,16 +178,18 @@ export async function analyzeResumeWithJobDescription(
 export async function parseResume(file: File): Promise<ParseResponse> {
   try {
     const response = await uploadFile(file);
+    const responseData = response.data as Record<string, unknown>; // Type assertion for API response
     return {
       success: response.success,
       data: response.data
         ? {
-            filename: response.data.filename,
-            file_size: response.data.size,
-            file_type: response.data.content_type,
-            text: response.data.extracted_text,
-            word_count: (response.data.extracted_text || '').split(' ').length,
-            character_count: (response.data.extracted_text || '').length,
+            filename: String(responseData.filename || ''),
+            file_size: Number(responseData.size || 0),
+            file_type: String(responseData.content_type || ''),
+            text: String(responseData.extracted_text || ''),
+            word_count: String(responseData.extracted_text || '').split(' ')
+              .length,
+            character_count: String(responseData.extracted_text || '').length,
             formatting_analysis: {},
             parsed_content: {},
           }
@@ -201,7 +203,7 @@ export async function parseResume(file: File): Promise<ParseResponse> {
             formatting_analysis: {},
             parsed_content: {},
           },
-      message: response.message,
+      message: response.message || 'File upload completed',
     };
   } catch (error) {
     return {

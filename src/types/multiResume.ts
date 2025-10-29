@@ -1,4 +1,4 @@
-import { AnalysisResult } from './ats';
+import { AnalysisResult } from './resume';
 import { ResumeData } from './resume';
 
 export interface ATSAnalysisResult {

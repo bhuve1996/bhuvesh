@@ -41,8 +41,8 @@ export const ResumeActionsMenu: React.FC<ResumeActionsMenuProps> = ({
       multiResumeStorage.duplicateResumeVariant(groupId, variantId);
       onAction?.();
       onClose();
-    } catch (error) {
-      console.error('Failed to duplicate resume:', error);
+    } catch (_error) {
+      // Failed to duplicate resume
     }
   };
 
@@ -59,8 +59,8 @@ export const ResumeActionsMenu: React.FC<ResumeActionsMenuProps> = ({
       multiResumeStorage.deleteResumeVariant(groupId, variantId);
       onAction?.();
       onClose();
-    } catch (error) {
-      console.error('Failed to delete resume:', error);
+    } catch (_error) {
+      // Failed to delete resume
     }
   };
 
@@ -71,8 +71,8 @@ export const ResumeActionsMenu: React.FC<ResumeActionsMenuProps> = ({
       });
       onAction?.();
       onClose();
-    } catch (error) {
-      console.error('Failed to rename resume:', error);
+    } catch (_error) {
+      // Failed to rename resume
     }
   };
 

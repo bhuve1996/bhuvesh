@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { multiResumeStorage } from '@/lib/resume/multiResumeStorage';
 import { getSessionStorageKey } from '@/lib/utils/userSession';
 import { ResumeGroup, ResumeVariant } from '@/types/multiResume';
+import { ResumeData } from '@/types/resume';
 
 interface MultiResumeState {
   // Data
@@ -25,7 +26,7 @@ interface MultiResumeState {
   addResume: (
     groupId: string,
     name: string,
-    data: any,
+    data: ResumeData,
     templateId?: string,
     description?: string
   ) => string;
@@ -68,7 +69,7 @@ export const useMultiResumeStore = create<MultiResumeState>()(
         try {
           const groups = multiResumeStorage.getResumeGroups();
           set({ groups, error: null });
-        } catch (error) {
+        } catch (_error) {
           set({ error: 'Failed to load resume groups' });
         }
       },
@@ -82,9 +83,9 @@ export const useMultiResumeStore = create<MultiResumeState>()(
           );
           get().loadGroups(); // Refresh groups
           return groupId;
-        } catch (error) {
+        } catch (_error) {
           set({ error: 'Failed to create group' });
-          throw error;
+          throw _error;
         }
       },
 
@@ -93,7 +94,7 @@ export const useMultiResumeStore = create<MultiResumeState>()(
         try {
           multiResumeStorage.updateResumeGroup(groupId, updates);
           get().loadGroups(); // Refresh groups
-        } catch (error) {
+        } catch (_error) {
           set({ error: 'Failed to update group' });
         }
       },
@@ -109,7 +110,7 @@ export const useMultiResumeStore = create<MultiResumeState>()(
           if (currentResume && currentResume.id === groupId) {
             set({ currentResume: null, currentGroup: null });
           }
-        } catch (error) {
+        } catch (_error) {
           set({ error: 'Failed to delete group' });
         }
       },
@@ -118,7 +119,7 @@ export const useMultiResumeStore = create<MultiResumeState>()(
       addResume: (
         groupId: string,
         name: string,
-        data: any,
+        data: ResumeData,
         templateId = 'unknown',
         description?: string
       ) => {
@@ -132,9 +133,9 @@ export const useMultiResumeStore = create<MultiResumeState>()(
           );
           get().loadGroups(); // Refresh groups
           return variantId;
-        } catch (error) {
+        } catch (_error) {
           set({ error: 'Failed to add resume' });
-          throw error;
+          throw _error;
         }
       },
 
@@ -159,7 +160,7 @@ export const useMultiResumeStore = create<MultiResumeState>()(
               set({ currentResume: updatedResume });
             }
           }
-        } catch (error) {
+        } catch (_error) {
           set({ error: 'Failed to update resume' });
         }
       },
@@ -175,7 +176,7 @@ export const useMultiResumeStore = create<MultiResumeState>()(
           if (currentResume && currentResume.id === variantId) {
             set({ currentResume: null, currentGroup: null });
           }
-        } catch (error) {
+        } catch (_error) {
           set({ error: 'Failed to delete resume' });
         }
       },
@@ -194,9 +195,9 @@ export const useMultiResumeStore = create<MultiResumeState>()(
           );
           get().loadGroups(); // Refresh groups
           return newVariantId;
-        } catch (error) {
+        } catch (_error) {
           set({ error: 'Failed to duplicate resume' });
-          throw error;
+          throw _error;
         }
       },
 
@@ -218,7 +219,7 @@ export const useMultiResumeStore = create<MultiResumeState>()(
               isDropdownOpen: false,
             });
           }
-        } catch (error) {
+        } catch (_error) {
           set({ error: 'Failed to select resume' });
         }
       },

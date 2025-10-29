@@ -8,6 +8,7 @@ import { UserProfile } from '@/components/auth/UserProfile';
 import { Icons } from '@/components/ui/SVG/SVG';
 import { useMultiResumeStore } from '@/store/multiResumeStore';
 import { useResumeStore } from '@/store/resumeStore';
+
 import { ResumeDropdownContent } from './ResumeDropdownContent';
 
 interface UnifiedWelcomeBarWithResumeDropdownProps {
@@ -27,7 +28,7 @@ export const UnifiedWelcomeBarWithResumeDropdown: React.FC<
   UnifiedWelcomeBarWithResumeDropdownProps
 > = ({
   currentPage,
-  analysisResult,
+  analysisResult: _analysisResult,
   resumeData,
   onBackToManager,
   onEditInBuilder,
@@ -36,7 +37,6 @@ export const UnifiedWelcomeBarWithResumeDropdown: React.FC<
 }) => {
   // Use global multi-resume state
   const {
-    groups: resumeGroups,
     currentResume,
     isDropdownOpen: showResumeDropdown,
     setDropdownOpen: setShowResumeDropdown,
@@ -58,9 +58,7 @@ export const UnifiedWelcomeBarWithResumeDropdown: React.FC<
     }
   };
 
-  const handleGroupsUpdate = () => {
-    loadGroups();
-  };
+  // Groups are managed by the store, no need for manual updates
 
   const getPageContent = (): {
     title: string;
@@ -191,11 +189,8 @@ export const UnifiedWelcomeBarWithResumeDropdown: React.FC<
                   {/* Dropdown */}
                   <div className='absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50'>
                     <ResumeDropdownContent
-                      groups={resumeGroups}
-                      currentResume={currentResume}
                       onResumeSelect={handleResumeSelect}
                       onClose={() => setShowResumeDropdown(false)}
-                      onGroupsUpdate={handleGroupsUpdate}
                     />
                   </div>
                 </>

@@ -81,7 +81,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         if (currentContent !== content) {
           editor.commands.setContent(content || '');
         }
-      } catch (error) {
+      } catch (_error) {
         // Editor might not be ready yet, ignore the error silently
         // This is expected in test environments or during SSR
       }

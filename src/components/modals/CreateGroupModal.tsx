@@ -21,9 +21,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
     }
   };
 
-  const isFormValid = () => {
-    return name.trim() !== '';
-  };
+  // Form validation is handled by the disabled state on the button
 
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>

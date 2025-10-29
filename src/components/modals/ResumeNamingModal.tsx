@@ -17,7 +17,7 @@ export const ResumeNamingModal: React.FC<ResumeNamingModalProps> = ({
 }) => {
   const [resumeName, setResumeName] = useState('');
   const [groupName, setGroupName] = useState('');
-  const { groups, loadGroups } = useMultiResumeStore();
+  const { groups, loadGroups, addGroup } = useMultiResumeStore();
   const [useExistingGroup, setUseExistingGroup] = useState(groups.length > 0);
   const [selectedGroupId, setSelectedGroupId] = useState('');
 
@@ -55,13 +55,13 @@ export const ResumeNamingModal: React.FC<ResumeNamingModalProps> = ({
       onSubmit(finalResumeName, selectedGroupId);
     } else if (!useExistingGroup && groupName.trim()) {
       // Create new group first
-      const groupId = multiResumeStorage.createResumeGroup(groupName.trim());
+      const groupId = addGroup(groupName.trim(), '');
       onSubmit(finalResumeName, groupId);
     } else {
       // Use default group or create one
       let groupId = groups[0]?.id;
       if (!groupId) {
-        groupId = multiResumeStorage.createResumeGroup('My Resumes');
+        groupId = addGroup('My Resumes', '');
       }
       onSubmit(finalResumeName, groupId);
     }
