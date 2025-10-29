@@ -173,7 +173,7 @@ export const Footer: React.FC = () => {
                 Terms of Service
               </Link>
               <Link
-                href='/sitemap'
+                href='/sitemap.xml'
                 className='text-muted-foreground hover:text-cyan-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black'
               >
                 Sitemap

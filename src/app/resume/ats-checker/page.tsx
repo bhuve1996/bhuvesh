@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { UnifiedWelcomeBar } from '@/components/layout/UnifiedWelcomeBar';
 import { FileUpload } from '@/components/molecules/FileUpload/FileUpload';
 import { ATSAnalysis } from '@/components/resume/ATSAnalysis';
+import { FloatingNavigation } from '@/components/resume/FloatingNavigation';
 import { ResultsDisplay } from '@/components/resume/ResultsDisplay';
 import { Section } from '@/components/ui/Section';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -302,7 +303,7 @@ export default function ATSCheckerPage() {
 
   return (
     <div
-      className={`min-h-screen bg-gradient-to-br ${
+      className={`min-h-screen bg-gradient-to-br print:bg-white print:text-black ${
         theme === 'dark'
           ? 'from-slate-900 to-slate-800'
           : 'from-slate-50 to-blue-50'
@@ -545,6 +546,9 @@ export default function ATSCheckerPage() {
           )}
         </Section>
       </main>
+
+      {/* Floating Navigation */}
+      <FloatingNavigation />
     </div>
   );
 }

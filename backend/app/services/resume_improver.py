@@ -6,7 +6,7 @@ Generates specific, actionable suggestions to boost ATS score
 import logging
 import os
 import re
-from typing import Optional
+from typing import Optional, Any
 
 from ..types.common_types import ATSAnalysisResult, ExtractionResult
 
@@ -47,7 +47,7 @@ class ResumeImprover:
         analysis_result: ATSAnalysisResult,
         extracted_data: ExtractionResult,
         job_description: Optional[str] = None,
-    ) -> dict[str, str]:
+    ) -> dict[str, Any]:
         """
         Generate comprehensive ATS-focused improvement plan
 
@@ -130,15 +130,22 @@ class ResumeImprover:
                     "estimated_total_boost": 0,
                 },
                 "quick_wins": [],
+                "ai_analysis_available": self.use_ai,
+                "analysis_method": "Error occurred"
             }
 
     def _generate_keyword_improvements(
-        self, analysis_result: dict, job_description: Optional[str] = None
-    ) -> list[dict]:
+        self, analysis_result: ATSAnalysisResult, job_description: Optional[str] = None
+    ) -> list[dict[str, Any]]:
         """Generate keyword-specific improvements"""
         improvements = []
         missing_keywords = analysis_result.get("missing_keywords", [])
-        matched_keywords = analysis_result.get("keyword_matches", [])
+        keyword_matches_data: Any = analysis_result.get("keyword_matches", [])
+        # Handle both KeywordAnalysis dict and list formats
+        if isinstance(keyword_matches_data, dict):
+            matched_keywords = keyword_matches_data.get("matched_keywords", [])
+        else:
+            matched_keywords = keyword_matches_data if isinstance(keyword_matches_data, list) else []
 
         # Critical: Too many missing keywords
         if len(missing_keywords) > 10:
@@ -203,10 +210,10 @@ class ResumeImprover:
 
     def _generate_formatting_improvements(
         self,
-        formatting_analysis: dict,
-        extracted_data: dict = None,
-        analysis_result: dict = None,
-    ) -> list[dict]:
+        formatting_analysis: dict[str, Any],
+        extracted_data: ExtractionResult,
+        analysis_result: ATSAnalysisResult,
+    ) -> list[dict[str, Any]]:
         """Generate formatting-specific improvements"""
         improvements = []
 
@@ -313,37 +320,45 @@ class ResumeImprover:
 
         return improvements
 
-    def _check_bullet_points_in_experience(self, extracted_data: dict) -> bool:
+    def _check_bullet_points_in_experience(self, extracted_data: ExtractionResult) -> bool:
         """Check if bullet points exist in work experience sections"""
         work_experience = extracted_data.get("work_experience", [])
         bullet_patterns = ["•", "●", "◦", "▪", "▸", "→", "-", "*", "✓", "►"]
 
         for exp in work_experience:
-            # Check project descriptions
-            projects = exp.get("projects", [])
-            for project in projects:
-                desc = str(project.get("description", ""))
-                for bullet in bullet_patterns:
-                    if bullet in desc:
-                        return True
+            if isinstance(exp, dict):
+                # Check project descriptions
+                exp_projects = exp.get("projects", [])
+                if isinstance(exp_projects, list):
+                    for project in exp_projects:
+                        if isinstance(project, dict):
+                            desc = str(project.get("description", ""))
+                            for bullet in bullet_patterns:
+                                if bullet in desc:
+                                    return True
+                        elif isinstance(project, str):
+                            for bullet in bullet_patterns:
+                                if bullet in project:
+                                    return True
 
-            # Check responsibilities
-            responsibilities = exp.get("responsibilities", [])
-            for resp in responsibilities:
-                resp_text = str(resp)
-                for bullet in bullet_patterns:
-                    if bullet in resp_text:
-                        return True
+                # Check responsibilities
+                responsibilities = exp.get("responsibilities", [])
+                if isinstance(responsibilities, list):
+                    for resp in responsibilities:
+                        resp_text = str(resp)
+                        for bullet in bullet_patterns:
+                            if bullet in resp_text:
+                                return True
 
-            # Check role description
-            role_desc = str(exp.get("description", ""))
-            for bullet in bullet_patterns:
-                if bullet in role_desc:
-                    return True
+                # Check role description
+                role_desc = str(exp.get("description", ""))
+                for bullet in bullet_patterns:
+                    if bullet in role_desc:
+                        return True
 
         return False
 
-    def _calculate_word_count_from_data(self, extracted_data: dict) -> int:
+    def _calculate_word_count_from_data(self, extracted_data: ExtractionResult) -> int:
         """Calculate word count from extracted resume data"""
         word_count = 0
 
@@ -360,38 +375,45 @@ class ResumeImprover:
         # Count words in work experience
         work_experience = extracted_data.get("work_experience", [])
         for exp in work_experience:
-            if exp.get("title"):
-                word_count += len(str(exp["title"]).split())
-            if exp.get("company"):
-                word_count += len(str(exp["company"]).split())
-            if exp.get("description"):
-                word_count += len(str(exp["description"]).split())
+            if isinstance(exp, dict):
+                if exp.get("title"):
+                    word_count += len(str(exp["title"]).split())
+                if exp.get("company"):
+                    word_count += len(str(exp["company"]).split())
+                if exp.get("description"):
+                    word_count += len(str(exp["description"]).split())
 
-            # Count project descriptions
-            projects = exp.get("projects", [])
-            for project in projects:
-                if project.get("name"):
-                    word_count += len(str(project["name"]).split())
-                if project.get("description"):
-                    word_count += len(str(project["description"]).split())
+                # Count project descriptions
+                exp_projects = exp.get("projects", [])
+                if isinstance(exp_projects, list):
+                    for project in exp_projects:
+                        if isinstance(project, dict):
+                            if project.get("name"):
+                                word_count += len(str(project["name"]).split())
+                            if project.get("description"):
+                                word_count += len(str(project["description"]).split())
+                        elif isinstance(project, str):
+                            word_count += len(project.split())
 
-            # Count responsibilities
-            responsibilities = exp.get("responsibilities", [])
-            for resp in responsibilities:
-                word_count += len(str(resp).split())
+                # Count responsibilities
+                responsibilities = exp.get("responsibilities", [])
+                if isinstance(responsibilities, list):
+                    for resp in responsibilities:
+                        word_count += len(str(resp).split())
 
         # Count words in education
         education = extracted_data.get("education", [])
         for edu in education:
-            if edu.get("degree"):
-                word_count += len(str(edu["degree"]).split())
-            if edu.get("institution"):
-                word_count += len(str(edu["institution"]).split())
-            if edu.get("description"):
-                word_count += len(str(edu["description"]).split())
+            if isinstance(edu, dict):
+                if edu.get("degree"):
+                    word_count += len(str(edu["degree"]).split())
+                if edu.get("institution"):
+                    word_count += len(str(edu["institution"]).split())
+                if edu.get("description"):
+                    word_count += len(str(edu["description"]).split())
 
         # Count words in skills
-        skills = extracted_data.get("skills", [])
+        skills: Any = extracted_data.get("skills", [])
         for skill_category in skills:
             if isinstance(skill_category, dict) and skill_category.get("skills"):
                 for skill in skill_category["skills"]:
@@ -405,30 +427,34 @@ class ResumeImprover:
         # Count words in certifications
         certifications = extracted_data.get("certifications", [])
         for cert in certifications:
-            if cert.get("name"):
-                word_count += len(str(cert["name"]).split())
-            if cert.get("issuer"):
-                word_count += len(str(cert["issuer"]).split())
-            if cert.get("description"):
-                word_count += len(str(cert["description"]).split())
+            if isinstance(cert, dict):
+                if cert.get("name"):
+                    word_count += len(str(cert["name"]).split())
+                if cert.get("issuer"):
+                    word_count += len(str(cert["issuer"]).split())
+                if cert.get("description"):
+                    word_count += len(str(cert["description"]).split())
 
         # Count words in projects
-        projects = extracted_data.get("projects", [])
+        projects: Any = extracted_data.get("projects", [])
         for project in projects:
-            if project.get("name"):
-                word_count += len(str(project["name"]).split())
-            if project.get("description"):
-                word_count += len(str(project["description"]).split())
-            if project.get("technologies"):
-                if isinstance(project["technologies"], list):
-                    for tech in project["technologies"]:
-                        word_count += len(str(tech).split())
-                else:
-                    word_count += len(str(project["technologies"]).split())
+            if isinstance(project, dict):
+                if project.get("name"):
+                    word_count += len(str(project["name"]).split())
+                if project.get("description"):
+                    word_count += len(str(project["description"]).split())
+                if project.get("technologies"):
+                    if isinstance(project["technologies"], list):
+                        for tech in project["technologies"]:
+                            word_count += len(str(tech).split())
+                    else:
+                        word_count += len(str(project["technologies"]).split())
+            elif isinstance(project, str):
+                word_count += len(project.split())
 
         return word_count
 
-    def _ai_analyze_resume_content(self, resume_text: str, analysis_type: str) -> dict:
+    def _ai_analyze_resume_content(self, resume_text: str, analysis_type: str) -> dict[str, Any]:
         """Use AI to analyze resume content for specific information"""
         if not self.use_ai or not resume_text:
             return {"found": False, "confidence": 0, "details": ""}
@@ -566,8 +592,8 @@ class ResumeImprover:
             }
 
     def _generate_content_improvements(
-        self, extracted_data: dict, analysis_result: dict
-    ) -> list[dict]:
+        self, extracted_data: ExtractionResult, analysis_result: ATSAnalysisResult
+    ) -> list[dict[str, Any]]:
         """Generate content-specific improvements"""
         improvements = []
         work_experience = extracted_data.get("work_experience", [])
@@ -594,27 +620,34 @@ class ResumeImprover:
             # Fallback to original logic
             if work_experience:
                 for exp in work_experience:
-                    # Check project descriptions
-                    projects = exp.get("projects", [])
-                    if projects:
-                        for project in projects:
-                            desc = str(project.get("description", ""))
-                            if any(char.isdigit() for char in desc):
-                                has_numbers = True
-                                break
+                    if isinstance(exp, dict):
+                        # Check project descriptions
+                        exp_projects = exp.get("projects", [])
+                        if isinstance(exp_projects, list) and exp_projects:
+                            for project in exp_projects:
+                                if isinstance(project, dict):
+                                    desc = str(project.get("description", ""))
+                                    if any(char.isdigit() for char in desc):
+                                        has_numbers = True
+                                        break
+                                elif isinstance(project, str):
+                                    if any(char.isdigit() for char in project):
+                                        has_numbers = True
+                                        break
 
-                    # Also check role description and responsibilities
-                    if not has_numbers:
-                        role_desc = str(exp.get("description", ""))
-                        responsibilities = exp.get("responsibilities", [])
-                        for resp in responsibilities:
-                            if any(char.isdigit() for char in str(resp)):
+                        # Also check role description and responsibilities
+                        if not has_numbers:
+                            role_desc = str(exp.get("description", ""))
+                            responsibilities = exp.get("responsibilities", [])
+                            if isinstance(responsibilities, list):
+                                for resp in responsibilities:
+                                    if any(char.isdigit() for char in str(resp)):
+                                        has_numbers = True
+                                        break
+                            if not has_numbers and any(
+                                char.isdigit() for char in role_desc
+                            ):
                                 has_numbers = True
-                                break
-                        if not has_numbers and any(
-                            char.isdigit() for char in role_desc
-                        ):
-                            has_numbers = True
 
                     if has_numbers:
                         break
@@ -644,15 +677,15 @@ class ResumeImprover:
         word_count = analysis_result.get("word_count", 0)
         if word_count == 0:
             # Try to get word count from analysis result's length analysis
-            if (
-                analysis_result.get("extraction_details", {})
-                .get("length_analysis", {})
-                .get("total_words")
-            ):
-                word_count = analysis_result["extraction_details"]["length_analysis"][
-                    "total_words"
-                ]
-            elif extracted_data:
+            extraction_details = analysis_result.get("extraction_details", {})
+            if isinstance(extraction_details, dict):
+                length_analysis = extraction_details.get("length_analysis", {})
+                if isinstance(length_analysis, dict):
+                    total_words = length_analysis.get("total_words")
+                    if isinstance(total_words, int):
+                        word_count = total_words
+            
+            if word_count == 0 and extracted_data:
                 # Calculate word count from extracted data as fallback
                 word_count = self._calculate_word_count_from_data(extracted_data)
 
@@ -731,8 +764,8 @@ class ResumeImprover:
         return improvements
 
     def _generate_structure_improvements(
-        self, extracted_data: dict, analysis_result: dict = None
-    ) -> list[dict]:
+        self, extracted_data: ExtractionResult, analysis_result: Optional[ATSAnalysisResult] = None
+    ) -> list[dict[str, Any]]:
         """Generate structure-specific improvements"""
         improvements = []
 
@@ -757,7 +790,7 @@ class ResumeImprover:
             )
         else:
             # Fallback to original logic
-            summary_exists = summary and len(str(summary).strip()) >= 50
+            summary_exists = bool(summary and len(str(summary).strip()) >= 50)
 
         if not summary_exists:
             improvements.append(
@@ -787,13 +820,21 @@ class ResumeImprover:
         # First check the extracted data directly
         if not contact.get("email"):
             missing_contact.append("email")
-        if not contact.get("phone", {}).get("raw") and not contact.get("phone", {}).get(
-            "number"
-        ):
+        
+        # Handle phone field - could be dict or string
+        phone = contact.get("phone", {})
+        if isinstance(phone, dict):
+            if not phone.get("raw") and not phone.get("number"):
+                missing_contact.append("phone")
+        elif isinstance(phone, str) and not phone.strip():
             missing_contact.append("phone")
-        if not contact.get("location", {}).get("full") and not contact.get(
-            "location", {}
-        ).get("city"):
+        
+        # Handle location field - could be dict or string
+        location: Any = contact.get("location", {})
+        if isinstance(location, dict):
+            if not location.get("full") and not location.get("city"):
+                missing_contact.append("location (city, state)")
+        elif isinstance(location, str) and not location.strip():
             missing_contact.append("location (city, state)")
 
         # If AI is available and we found missing contact info, double-check with AI
@@ -840,9 +881,11 @@ class ResumeImprover:
             linkedin_missing = not ai_analysis.get("linkedin_found", False)
         else:
             # Fallback to original logic
-            linkedin_missing = not contact.get("linkedin", {}).get(
-                "url"
-            ) and not contact.get("linkedin", {}).get("username")
+            linkedin = contact.get("linkedin", {})
+            if isinstance(linkedin, dict):
+                linkedin_missing = not linkedin.get("url") and not linkedin.get("username")
+            else:
+                linkedin_missing = not linkedin
 
         if linkedin_missing:
             improvements.append(
@@ -865,14 +908,20 @@ class ResumeImprover:
         return improvements
 
     def _generate_ats_improvements(
-        self, formatting_analysis: dict, analysis_result: dict
-    ) -> list[dict]:
+        self, formatting_analysis: dict[str, Any], analysis_result: ATSAnalysisResult
+    ) -> list[dict[str, Any]]:
         """Generate comprehensive ATS-specific improvements"""
         improvements = []
 
         ats_compat = formatting_analysis.get("ats_compatibility", {})
         ats_score = ats_compat.get("score", 100)
-        current_ats_score = analysis_result.get("atsScore", 0)
+        current_ats_score = analysis_result.get("ats_score", 0)
+        
+        # Ensure scores are integers
+        if not isinstance(ats_score, int):
+            ats_score = 100
+        if not isinstance(current_ats_score, int):
+            current_ats_score = 0
 
         # Critical ATS issues
         if ats_score < 70:
@@ -986,7 +1035,7 @@ class ResumeImprover:
         keyword_matches = analysis_result.get("keywordMatches", [])
         missing_keywords = analysis_result.get("missingKeywords", [])
 
-        if len(keyword_matches) < 5:
+        if isinstance(keyword_matches, list) and len(keyword_matches) < 5:
             improvements.append(
                 {
                     "id": "ats-003",
@@ -1010,8 +1059,8 @@ class ResumeImprover:
         return improvements
 
     def _generate_ai_powered_improvements(
-        self, analysis_result: dict, extracted_data: dict
-    ) -> list[dict]:
+        self, analysis_result: ATSAnalysisResult, extracted_data: ExtractionResult
+    ) -> list[dict[str, Any]]:
         """Generate AI-powered improvements based on missing elements and industry standards"""
         improvements = []
 
@@ -1052,7 +1101,7 @@ class ResumeImprover:
         if job_type and work_experience:
             # Check if experience aligns with detected job type
             experience_text = " ".join(
-                [exp.get("description", "") for exp in work_experience]
+                [str(exp.get("description", "")) for exp in work_experience if isinstance(exp, dict)]
             ).lower()
 
             # Basic alignment check (can be enhanced with more sophisticated analysis)
@@ -1088,7 +1137,7 @@ class ResumeImprover:
 
         # Analyze content depth and specificity
         word_count = analysis_result.get("word_count", 0)
-        if word_count < 400:
+        if isinstance(word_count, int) and word_count < 400:
             improvements.append(
                 {
                     "id": "ai-003",
@@ -1111,7 +1160,7 @@ class ResumeImprover:
 
         # Analyze keyword optimization opportunities
         missing_keywords = analysis_result.get("missingKeywords", [])
-        if len(missing_keywords) > 8:
+        if isinstance(missing_keywords, list) and len(missing_keywords) > 8:
             improvements.append(
                 {
                     "id": "ai-004",
@@ -1129,15 +1178,15 @@ class ResumeImprover:
                         "Repeat important keywords 2-3 times across sections",
                         "Ensure keywords appear in context, not as lists",
                     ],
-                    "keywords": missing_keywords[:12],  # Top 12 for action steps
+                    "keywords": missing_keywords[:12] if isinstance(missing_keywords, list) else [],  # Top 12 for action steps
                 }
             )
 
         return improvements
 
     def _generate_enhanced_summary(
-        self, improvements: list[dict], analysis_result: dict
-    ) -> dict:
+        self, improvements: list[dict[str, Any]], analysis_result: ATSAnalysisResult
+    ) -> dict[str, Any]:
         """Generate enhanced summary with ATS focus"""
         total = len(improvements)
         by_priority = {
@@ -1170,7 +1219,7 @@ class ResumeImprover:
             "estimated_time": self._estimate_completion_time(improvements),
         }
 
-    def _estimate_completion_time(self, improvements: list[dict]) -> str:
+    def _estimate_completion_time(self, improvements: list[dict[str, Any]]) -> str:
         """Estimate time to complete all improvements"""
         total_time = 0
         for improvement in improvements:
@@ -1194,7 +1243,7 @@ class ResumeImprover:
             else:
                 return f"{hours}h {minutes}m"
 
-    def _generate_summary(self, improvements: list[dict]) -> dict:
+    def _generate_summary(self, improvements: list[dict[str, Any]]) -> dict[str, Any]:
         """Generate summary statistics"""
         total = len(improvements)
         by_priority = {
@@ -1211,7 +1260,7 @@ class ResumeImprover:
             "estimated_total_boost": min(total_boost, 35),  # Cap at realistic +35
         }
 
-    def _identify_ats_quick_wins(self, improvements: list[dict]) -> list[dict]:
+    def _identify_ats_quick_wins(self, improvements: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Identify top 3 ATS-focused quick wins (high impact, easy to fix)"""
         # Quick wins: critical/high priority + high score impact + ATS-relevant
         ats_categories = ["ats", "keyword", "formatting"]
@@ -1237,6 +1286,6 @@ class ResumeImprover:
         # Sort by score impact (highest first)
         return sorted(quick_wins, key=lambda x: -x.get("score_impact", 0))[:3]
 
-    def _identify_quick_wins(self, improvements: list[dict]) -> list[dict]:
+    def _identify_quick_wins(self, improvements: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Legacy method - redirects to ATS-focused quick wins"""
         return self._identify_ats_quick_wins(improvements)

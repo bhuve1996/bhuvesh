@@ -52,6 +52,13 @@ export const TemplateCarousel: React.FC<TemplateCarouselProps> = ({
     }
   };
 
+  // Auto-select first template if none is selected and templates are available
+  React.useEffect(() => {
+    if (!selectedTemplate && templates.length > 0) {
+      onTemplateSelect(templates[0]);
+    }
+  }, [selectedTemplate, templates, onTemplateSelect]);
+
   return (
     <motion.div
       initial={{ y: position === 'bottom' ? 100 : -100, opacity: 0 }}

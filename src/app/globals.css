@@ -418,4 +418,58 @@
   .manual-spacing-control {
     display: none !important;
   }
+
+  /* Force single column layout for ATS Analysis Results */
+  .grid {
+    display: block !important;
+  }
+
+  .grid > * {
+    width: 100% !important;
+    max-width: none !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Ensure cards stack properly in print */
+  .space-y-6 > * + *,
+  .space-y-8 > * + * {
+    margin-top: 1.5rem !important;
+  }
+
+  /* Remove column spans in print */
+  .lg\\:col-span-2 {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Hide floating navigation in print */
+  .fixed {
+    display: none !important;
+  }
+
+  /* Ensure proper spacing for print */
+  .space-y-6 > * + * {
+    margin-top: 1.5rem !important;
+  }
+
+  .space-y-8 > * + * {
+    margin-top: 2rem !important;
+  }
+
+  /* Remove shadows and effects for print */
+  .shadow-xl,
+  .shadow-2xl,
+  .shadow-lg {
+    box-shadow: none !important;
+  }
+
+  /* Ensure text is readable in print */
+  .text-muted-foreground {
+    color: #6b7280 !important;
+  }
+
+  /* Remove blur effects */
+  .blur-xl {
+    filter: none !important;
+  }
 }

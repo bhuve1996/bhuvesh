@@ -32,7 +32,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
   };
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6 print:space-y-4'>
       {/* AI-Generated Job Description - Hidden by default with toggle */}
       {result.job_description && (
         <Card className='p-6'>
@@ -65,9 +65,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
       )}
 
       {/* Main Grid Layout */}
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8'>
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 print:grid-cols-1 print:gap-4'>
         {/* Main Content - Left 2/3 */}
-        <div className='lg:col-span-2 space-y-6 lg:space-y-8'>
+        <div className='lg:col-span-2 space-y-6 lg:space-y-8 print:col-span-1 print:space-y-4'>
           {/* Section Divider */}
           <div className='relative flex items-center justify-center'>
             <div className='absolute inset-0 flex items-center'>
@@ -153,7 +153,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         </div>
 
         {/* Analysis & Metrics Sidebar - Right 1/3 */}
-        <div className='space-y-6 lg:space-y-8 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent'>
+        <div className='space-y-6 lg:space-y-8 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent print:max-h-none print:overflow-visible print:space-y-4'>
           {/* ATS Score Section */}
           <div className='relative'>
             <div className='absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-2xl blur-xl'></div>

@@ -53,7 +53,9 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
                 ? 'Analysis Failed'
                 : progress.isAnalyzing
                   ? 'Analyzing Your Resume'
-                  : 'Analysis Complete!'}
+                  : progress.currentStep === progress.steps.length - 1
+                    ? 'Analysis Complete!'
+                    : 'Analyzing Your Resume'}
             </h3>
             <p className='text-muted-foreground mb-4'>
               {progress.error
@@ -68,7 +70,8 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
               <div className='mb-4'>
                 <div
                   className={`text-2xl font-bold mb-2 ${
-                    progress.isAnalyzing
+                    progress.isAnalyzing ||
+                    progress.currentStep < progress.steps.length - 1
                       ? theme === 'dark'
                         ? 'text-cyan-400'
                         : 'text-cyan-600'
@@ -77,7 +80,8 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
                         : 'text-green-600'
                   }`}
                 >
-                  {progress.isAnalyzing
+                  {progress.isAnalyzing ||
+                  progress.currentStep < progress.steps.length - 1
                     ? Math.round(
                         ((progress.currentStep + 1) / progress.steps.length) *
                           100
@@ -92,7 +96,8 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
                 >
                   <div
                     className={`h-3 rounded-full transition-all duration-500 ease-out ${
-                      progress.isAnalyzing
+                      progress.isAnalyzing ||
+                      progress.currentStep < progress.steps.length - 1
                         ? theme === 'dark'
                           ? 'bg-gradient-to-r from-cyan-400 to-blue-500'
                           : 'bg-gradient-to-r from-cyan-500 to-blue-600'
@@ -102,7 +107,8 @@ export const ATSAnalysis: React.FC<ATSAnalysisProps> = ({
                     }`}
                     style={{
                       width: `${
-                        progress.isAnalyzing
+                        progress.isAnalyzing ||
+                        progress.currentStep < progress.steps.length - 1
                           ? ((progress.currentStep + 1) /
                               progress.steps.length) *
                             100
@@ -264,7 +270,14 @@ Requirements:
                           : 'bg-gradient-to-r from-cyan-500 to-blue-600'
                       }`}
                       style={{
-                        width: `${((progress.currentStep + 1) / progress.steps.length) * 100}%`,
+                        width: `${
+                          progress.isAnalyzing ||
+                          progress.currentStep < progress.steps.length - 1
+                            ? ((progress.currentStep + 1) /
+                                progress.steps.length) *
+                              100
+                            : 100
+                        }%`,
                       }}
                     ></div>
                   </div>

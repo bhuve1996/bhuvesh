@@ -195,6 +195,11 @@ export default function TemplateGalleryPage() {
   const handleDataChoice = (useUserData: boolean) => {
     setUseUserData(useUserData);
     setShowDataChoice(false);
+
+    // Auto-select first template if none is selected
+    if (!selectedTemplate && filteredTemplates.length > 0) {
+      setSelectedTemplate(filteredTemplates[0]);
+    }
   };
 
   // Keyboard shortcuts for carousel toggle
@@ -257,6 +262,13 @@ export default function TemplateGalleryPage() {
 
     loadUserData();
   }, [userResumeData, setResumeData]);
+
+  // Auto-select first template if none is selected
+  useEffect(() => {
+    if (!selectedTemplate && filteredTemplates.length > 0) {
+      setSelectedTemplate(filteredTemplates[0]);
+    }
+  }, [selectedTemplate, filteredTemplates, setSelectedTemplate]);
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-background to-muted'>

@@ -3,7 +3,7 @@
 # ============================================================================
 
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 from typing_extensions import TypedDict
 
@@ -74,6 +74,9 @@ class EducationEntry(TypedDict, total=False):
     gpa: StringValue
     honors: list[StringValue]
     achievements: list[StringValue]
+    degree: StringValue  # Added missing field
+    institution_name: StringValue  # Added missing field (renamed to avoid conflict)
+    description: StringValue  # Added missing field
 
 
 # ============================================================================
@@ -114,6 +117,8 @@ class WorkExperienceEntry(TypedDict, total=False):
     end_date: StringValue
     company_name: StringValue  # Alternative field name
     job_title: StringValue  # Alternative field name
+    title: StringValue  # Added missing field
+    responsibilities: list[StringValue]  # Added missing field
 
 
 # ============================================================================
@@ -187,6 +192,11 @@ class ATSAnalysisResult(TypedDict, total=False):
     detailed_scores: dict[str, Score]
     format_analysis: FormatAnalysis
     metadata: AnalysisMetadata
+    extraction_details: dict[str, Any]  # Added missing field
+    word_count: int  # Added missing field
+    jobType: StringValue  # Added missing field
+    keywordMatches: list[StringValue]  # Added missing field
+    missingKeywords: list[StringValue]  # Added missing field
 
 
 # ============================================================================
@@ -222,7 +232,9 @@ class ExtractionResult(TypedDict, total=False):
     skills: SkillsDict
     projects: list[StringValue]
     summary: StringValue
+    summary_profile: StringValue  # Added missing field
     metadata: AnalysisMetadata
+    formatting_analysis: dict[str, Any]  # Added missing field
 
 
 # ============================================================================
