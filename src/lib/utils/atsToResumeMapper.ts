@@ -20,6 +20,8 @@ import type {
   ResumeData,
 } from '@/types/resume';
 
+import { cleanWorkExperienceComprehensive } from './dataCleaningUtils';
+
 /**
  * Convert ATS ContactInfo to Resume Builder PersonalInfo
  */
@@ -160,7 +162,8 @@ export function mapStructuredWorkExperience(
 ): ResumeBuilderWorkExperience {
   const position = structuredWork.positions?.[0];
 
-  return {
+  // Use comprehensive cleaning to remove duplicates and standardize content
+  const cleanedExperience = cleanWorkExperienceComprehensive({
     id: `job-${index}`,
     company: structuredWork.company || '',
     position: position?.title || '',
@@ -170,6 +173,21 @@ export function mapStructuredWorkExperience(
     current: structuredWork.current || false,
     description: structuredWork.responsibilities?.join('\n') || '',
     achievements: structuredWork.achievements || [],
+    responsibilities: structuredWork.responsibilities || [],
+    keyTechnologies: structuredWork.skills_used || [],
+    impactMetrics: structuredWork.skills_used || [],
+  });
+
+  return {
+    id: cleanedExperience.id,
+    company: cleanedExperience.company,
+    position: cleanedExperience.position,
+    location: cleanedExperience.location,
+    startDate: cleanedExperience.startDate,
+    endDate: cleanedExperience.endDate,
+    current: cleanedExperience.current,
+    description: cleanedExperience.description,
+    achievements: cleanedExperience.achievements,
   };
 }
 

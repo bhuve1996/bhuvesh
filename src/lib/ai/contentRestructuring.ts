@@ -3,6 +3,7 @@
  * Automatically organizes and formats resume content for better presentation
  */
 
+import { formatExperienceYears } from '@/lib/utils';
 import { ResumeData } from '@/types/resume';
 
 export interface RestructuredContent {
@@ -502,7 +503,7 @@ export class ContentRestructuringService {
     const topSkills = skills.technical.slice(0, 5);
     const primaryRole = latestExp?.position || 'Software Developer';
 
-    return `${primaryRole} with ${yearsOfExperience}+ years of experience building scalable applications, specializing in ${topSkills.join(', ')}. Proven expertise in ${this.extractKeyAreas(experience).join(', ')} and cross-platform development.`;
+    return `${primaryRole} with ${formatExperienceYears(yearsOfExperience)} of experience building scalable applications, specializing in ${topSkills.join(', ')}. Proven expertise in ${this.extractKeyAreas(experience).join(', ')} and cross-platform development.`;
   }
 
   private static calculateYearsOfExperience(

@@ -65,6 +65,11 @@ CRITICAL RULES:
 10. Extract all certifications with issuer and dates
 11. Extract all awards and recognitions
 12. Extract automation projects and their impact
+13. AVOID DUPLICATE CONTENT - Do not repeat the same information in responsibilities and achievements
+14. Separate responsibilities (daily tasks) from achievements (measurable results)
+15. Clean and normalize text - remove redundant phrases and bullet points
+16. For achievements, focus on quantifiable results (numbers, percentages, metrics)
+17. For responsibilities, focus on actions and processes performed
 
 {{
   "summary": "Professional summary or objective from the top of resume",

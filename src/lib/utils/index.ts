@@ -51,4 +51,5 @@ export * from './apiUtils';
 export * from './componentUtils';
 export * from './dataCleaningUtils';
 export * from './errorHandling';
+export * from './experienceUtils';
 export * from './themeUtils';

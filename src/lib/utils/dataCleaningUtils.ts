@@ -208,7 +208,7 @@ export function cleanPersonalInfo(personal: {
 }
 
 /**
- * Clean work experience entry
+ * Clean work experience entry (legacy function - use cleanWorkExperienceComprehensive for better cleaning)
  */
 export function cleanWorkExperience(experience: {
   id?: string;
@@ -254,6 +254,176 @@ export function cleanWorkExperience(experience: {
     impactMetrics: experience.impactMetrics || [],
     responsibilities: experience.responsibilities || [],
   };
+}
+
+/**
+ * Remove duplicate content from text arrays
+ */
+export function removeDuplicateContent(items: string[]): string[] {
+  if (!items || items.length === 0) return [];
+
+  const seen = new Set<string>();
+  const cleaned: string[] = [];
+
+  for (const item of items) {
+    const normalized = normalizeText(item);
+    if (!seen.has(normalized) && normalized.length > 0) {
+      seen.add(normalized);
+      cleaned.push(item);
+    }
+  }
+
+  return cleaned;
+}
+
+/**
+ * Normalize text for comparison (remove extra spaces, convert to lowercase, etc.)
+ */
+export function normalizeText(text: string): string {
+  if (!text) return '';
+
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .replace(/[^\w\s]/g, '') // Remove punctuation
+    .trim();
+}
+
+/**
+ * Check if two text items are similar (for detecting duplicates)
+ */
+export function areTextItemsSimilar(
+  text1: string,
+  text2: string,
+  threshold: number = 0.8
+): boolean {
+  if (!text1 || !text2) return false;
+
+  const normalized1 = normalizeText(text1);
+  const normalized2 = normalizeText(text2);
+
+  if (normalized1 === normalized2) return true;
+
+  // Check if one contains the other (for partial duplicates)
+  if (normalized1.includes(normalized2) || normalized2.includes(normalized1)) {
+    return true;
+  }
+
+  // Calculate similarity using simple word overlap
+  const words1 = normalized1.split(' ');
+  const words2 = normalized2.split(' ');
+
+  const commonWords = words1.filter(word => words2.includes(word));
+  const similarity =
+    commonWords.length / Math.max(words1.length, words2.length);
+
+  return similarity >= threshold;
+}
+
+/**
+ * Clean and deduplicate work experience comprehensively
+ */
+export function cleanWorkExperienceComprehensive(experience: {
+  id?: string;
+  company?: string;
+  position?: string;
+  location?: string;
+  startDate?: string;
+  endDate?: string;
+  current?: boolean;
+  description?: string;
+  achievements?: string[];
+  keyTechnologies?: string[];
+  title?: string;
+  impactMetrics?: string[];
+  responsibilities?: string[];
+}): {
+  id: string;
+  company: string;
+  position: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
+  description: string;
+  achievements: string[];
+  keyTechnologies: string[];
+  title: string;
+  impactMetrics: string[];
+  responsibilities: string[];
+} {
+  // Clean basic fields
+  const cleaned = {
+    id: experience.id || generateDataId('exp'),
+    company: (experience.company || '').trim(),
+    position: (experience.position || '').trim(),
+    location: cleanLocation(experience.location || ''),
+    startDate: experience.startDate || '',
+    endDate: experience.endDate || '',
+    current: experience.current || false,
+    description: (experience.description || '').trim(),
+    achievements: removeDuplicateContent(experience.achievements || []),
+    keyTechnologies: removeDuplicateContent(experience.keyTechnologies || []),
+    title: (experience.title || '').trim(),
+    impactMetrics: removeDuplicateContent(experience.impactMetrics || []),
+    responsibilities: removeDuplicateContent(experience.responsibilities || []),
+  };
+
+  // Remove duplicates between achievements and responsibilities
+  const allContent = [...cleaned.achievements, ...cleaned.responsibilities];
+  const uniqueContent = removeDuplicateContent(allContent);
+
+  // Split back into achievements and responsibilities based on content type
+  cleaned.achievements = uniqueContent.filter(item =>
+    isAchievementContent(item)
+  );
+  cleaned.responsibilities = uniqueContent.filter(
+    item => !isAchievementContent(item)
+  );
+
+  return cleaned;
+}
+
+/**
+ * Determine if content is an achievement vs responsibility
+ */
+function isAchievementContent(content: string): boolean {
+  const achievementKeywords = [
+    'achieved',
+    'improved',
+    'increased',
+    'decreased',
+    'reduced',
+    'enhanced',
+    'optimized',
+    'streamlined',
+    'delivered',
+    'completed',
+    'successfully',
+    'awarded',
+    'recognized',
+    'exceeded',
+    'surpassed',
+    'led to',
+    'resulted in',
+    'contributed to',
+    'enabled',
+    'facilitated',
+    'drove',
+    'generated',
+    'saved',
+    'earned',
+    'won',
+    'ranked',
+    'scored',
+    'measured',
+    'metric',
+  ];
+
+  const normalizedContent = content.toLowerCase();
+  return achievementKeywords.some(keyword =>
+    normalizedContent.includes(keyword)
+  );
 }
 
 /**

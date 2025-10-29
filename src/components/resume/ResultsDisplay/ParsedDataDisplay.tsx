@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 import { Card } from '@/components/ui/Card';
+import { formatExperienceYears } from '@/lib/utils';
 import type { AnalysisResult } from '@/types';
 
 interface ParsedDataDisplayProps {
@@ -400,7 +401,9 @@ export const ParsedDataDisplay: React.FC<ParsedDataDisplayProps> = ({
                             </span>
                           )}
                           <span className='bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs'>
-                            {company.total_experience_years} years
+                            {formatExperienceYears(
+                              company.total_experience_years
+                            )}
                           </span>
                         </div>
                         {company.positions && company.positions.length > 0 && (
