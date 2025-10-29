@@ -2,14 +2,14 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import { atsApi } from '@/api/endpoints/ats';
 import { ResumeManager } from '@/components/resume/ResumeManager/ResumeManager';
+import { atsApi } from '@/lib/ats/api';
 import { cloudStorage } from '@/lib/resume/cloudStorage';
 import { render } from '@/tests/utils/testWrapper';
 
 // Mock dependencies
 jest.mock('@/lib/resume/cloudStorage');
-jest.mock('@/api/endpoints/ats');
+jest.mock('@/lib/ats/api');
 jest.mock('react-hot-toast', () => ({
   error: jest.fn(),
   success: jest.fn(),

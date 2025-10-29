@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description:
-    "Terms of Service for Bhuvesh Singla's portfolio website and services.",
+    'Terms of Service for Bhuvesh Singla&apos;s portfolio website and services.',
   robots: {
     index: true,
     follow: true,
@@ -41,7 +41,7 @@ export default function TermsPage() {
               </h2>
               <p className='text-gray-300 mb-4'>
                 Permission is granted to temporarily download one copy of the
-                materials on Bhuvesh Singla's website for personal,
+                materials on Bhuvesh Singla&apos;s website for personal,
                 non-commercial transitory viewing only. This is the grant of a
                 license, not a transfer of title, and under this license you may
                 not:
@@ -114,13 +114,13 @@ export default function TermsPage() {
                 6. Disclaimer
               </h2>
               <p className='text-gray-300 mb-4'>
-                The materials on Bhuvesh Singla's website are provided on an 'as
-                is' basis. Bhuvesh Singla makes no warranties, expressed or
-                implied, and hereby disclaims and negates all other warranties
-                including without limitation, implied warranties or conditions
-                of merchantability, fitness for a particular purpose, or
-                non-infringement of intellectual property or other violation of
-                rights.
+                The materials on Bhuvesh Singla&apos;s website are provided on
+                an &apos;as is&apos; basis. Bhuvesh Singla makes no warranties,
+                expressed or implied, and hereby disclaims and negates all other
+                warranties including without limitation, implied warranties or
+                conditions of merchantability, fitness for a particular purpose,
+                or non-infringement of intellectual property or other violation
+                of rights.
               </p>
             </section>
 
@@ -132,10 +132,10 @@ export default function TermsPage() {
                 In no event shall Bhuvesh Singla or its suppliers be liable for
                 any damages (including, without limitation, damages for loss of
                 data or profit, or due to business interruption) arising out of
-                the use or inability to use the materials on Bhuvesh Singla's
-                website, even if Bhuvesh Singla or an authorized representative
-                has been notified orally or in writing of the possibility of
-                such damage.
+                the use or inability to use the materials on Bhuvesh
+                Singla&apos;s website, even if Bhuvesh Singla or an authorized
+                representative has been notified orally or in writing of the
+                possibility of such damage.
               </p>
             </section>
 
@@ -144,7 +144,7 @@ export default function TermsPage() {
                 8. Accuracy of Materials
               </h2>
               <p className='text-gray-300 mb-4'>
-                The materials appearing on Bhuvesh Singla's website could
+                The materials appearing on Bhuvesh Singla&apos;s website could
                 include technical, typographical, or photographic errors.
                 Bhuvesh Singla does not warrant that any of the materials on its
                 website are accurate, complete, or current. Bhuvesh Singla may
@@ -162,7 +162,7 @@ export default function TermsPage() {
                 website and is not responsible for the contents of any such
                 linked site. The inclusion of any link does not imply
                 endorsement by Bhuvesh Singla of the site. Use of any such
-                linked website is at the user's own risk.
+                linked website is at the user&apos;s own risk.
               </p>
             </section>
 

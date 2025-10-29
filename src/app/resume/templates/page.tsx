@@ -198,7 +198,10 @@ export default function TemplateGalleryPage() {
 
     // Auto-select first template if none is selected
     if (!selectedTemplate && filteredTemplates.length > 0) {
-      setSelectedTemplate(filteredTemplates[0]);
+      const firstTemplate = filteredTemplates[0];
+      if (firstTemplate) {
+        setSelectedTemplate(firstTemplate);
+      }
     }
   };
 
@@ -266,7 +269,10 @@ export default function TemplateGalleryPage() {
   // Auto-select first template if none is selected
   useEffect(() => {
     if (!selectedTemplate && filteredTemplates.length > 0) {
-      setSelectedTemplate(filteredTemplates[0]);
+      const firstTemplate = filteredTemplates[0];
+      if (firstTemplate) {
+        setSelectedTemplate(firstTemplate);
+      }
     }
   }, [selectedTemplate, filteredTemplates, setSelectedTemplate]);
 

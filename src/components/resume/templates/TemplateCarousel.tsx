@@ -55,7 +55,10 @@ export const TemplateCarousel: React.FC<TemplateCarouselProps> = ({
   // Auto-select first template if none is selected and templates are available
   React.useEffect(() => {
     if (!selectedTemplate && templates.length > 0) {
-      onTemplateSelect(templates[0]);
+      const firstTemplate = templates[0];
+      if (firstTemplate) {
+        onTemplateSelect(firstTemplate);
+      }
     }
   }, [selectedTemplate, templates, onTemplateSelect]);
 

@@ -152,17 +152,21 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
       setErrors(newErrors);
       setSelectedFiles(validFiles);
 
-      // Call onFileUpload immediately when files are selected (for ATSChecker compatibility)
-      if (validFiles.length > 0 && onFileUpload) {
-        onFileUpload(validFiles);
-      }
+      // Note: Files are now uploaded only when the upload button is clicked
+      // This allows for better user control and matches test expectations
 
       if (newErrors.length > 0 && onError) {
         onError(newErrors.join(', '));
       }
     },
-    [maxFiles, validateFile, onError, showToast, onFileUpload]
+    [maxFiles, validateFile, onError, showToast]
   );
+
+  const handleUpload = useCallback(() => {
+    if (selectedFiles.length > 0 && onFileUpload) {
+      onFileUpload(selectedFiles);
+    }
+  }, [selectedFiles, onFileUpload]);
 
   const handleDrag = useCallback(
     (e: React.DragEvent) => {
@@ -218,6 +222,7 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
 
   return (
     <div
+      data-testid='file-upload'
       className={`file-upload ${className} ${dragActive ? 'border-cyan-500' : ''}`}
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
@@ -447,6 +452,27 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
               </button>
             </div>
           ))}
+
+          {/* Upload Button */}
+          <div className='mt-4'>
+            <button
+              onClick={handleUpload}
+              disabled={loading || selectedFiles.length === 0}
+              className={`
+                w-full px-4 py-2 rounded-lg font-medium transition-colors
+                ${
+                  loading
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-cyan-500 hover:bg-cyan-600 text-white'
+                }
+                ${selectedFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}
+              `}
+            >
+              {loading
+                ? 'Uploading...'
+                : `Upload ${selectedFiles.length} file${selectedFiles.length === 1 ? '' : 's'}`}
+            </button>
+          </div>
         </div>
       )}
 

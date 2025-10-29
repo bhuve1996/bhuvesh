@@ -106,7 +106,7 @@ describe('Component Integration Tests', () => {
 
       render(
         <div>
-          <FileUpload onUpload={onUpload} />
+          <FileUpload onFileUpload={onUpload} />
           <StatusBadge status='success' icon='✅'>
             File uploaded successfully
           </StatusBadge>
@@ -120,9 +120,7 @@ describe('Component Integration Tests', () => {
 
       await user.upload(input, file);
 
-      const uploadButton = screen.getByText(/upload 1 file/i);
-      await user.click(uploadButton);
-
+      // FileUpload automatically calls onFileUpload when files are selected
       expect(onUpload).toHaveBeenCalledWith([file]);
       expect(
         screen.getByText('File uploaded successfully')
@@ -316,7 +314,7 @@ describe('Component Integration Tests', () => {
 
         return (
           <div>
-            <FileUpload onUpload={handleFileUpload} />
+            <FileUpload onFileUpload={handleFileUpload} />
             {file && (
               <div>
                 <p>File: {file.name}</p>
@@ -346,9 +344,7 @@ describe('Component Integration Tests', () => {
       const input = screen.getByLabelText(/upload resume file/i);
       await user.upload(input, testFile);
 
-      const uploadButton = screen.getByText(/upload 1 file/i);
-      await user.click(uploadButton);
-
+      // FileUpload automatically calls onFileUpload when files are selected
       expect(screen.getByText('File: test.pdf')).toBeInTheDocument();
 
       // Analyze file

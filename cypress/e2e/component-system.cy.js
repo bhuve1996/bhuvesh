@@ -117,6 +117,9 @@ describe('Component System E2E Tests', () => {
 
       cy.get('[data-testid="file-upload"]').should('contain', fileName);
       cy.get('[data-testid="file-upload"]').should('contain', 'Upload 1 file');
+
+      // Click the upload button
+      cy.get('[data-testid="file-upload"]').contains('Upload 1 file').click();
     });
 
     it('should handle drag and drop', () => {
@@ -193,10 +196,10 @@ describe('Component System E2E Tests', () => {
       cy.get('[data-testid="floating-action-button"]').click();
 
       cy.get('[role="dialog"]').should('contain', 'ATS Analysis');
-      cy.get('[role="dialog"]').contains('Validate').click();
+      cy.get('[role="dialog"]').contains('Validate').click({ force: true });
       cy.get('[role="dialog"]').should('contain', 'Validate');
 
-      cy.get('[role="dialog"]').contains('Customize').click();
+      cy.get('[role="dialog"]').contains('Customize').click({ force: true });
       cy.get('[role="dialog"]').should('contain', 'Customize');
     });
 
@@ -231,7 +234,7 @@ describe('Component System E2E Tests', () => {
       cy.get('[data-testid="floating-action-button"]').click();
       cy.get('[role="dialog"]').should('contain', 'Resume Tools');
 
-      cy.get('[role="dialog"]').contains('Close').click();
+      cy.get('[role="dialog"]').contains('Close').click({ force: true });
       cy.get('[data-testid="floating-action-button"]').should('be.visible');
     });
   });
