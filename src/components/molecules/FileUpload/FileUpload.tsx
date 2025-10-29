@@ -49,13 +49,20 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
     };
 
     updateConfig();
-    window.addEventListener('resize', updateConfig);
-    return () => window.removeEventListener('resize', updateConfig);
+
+    // Only add event listeners on client side
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', updateConfig);
+      return () => window.removeEventListener('resize', updateConfig);
+    }
+
+    // Return undefined for server-side rendering
+    return undefined;
   }, []);
 
   // Load mobile tips preference from localStorage
   useEffect(() => {
-    if (mobileConfig.isMobile) {
+    if (mobileConfig.isMobile && typeof window !== 'undefined') {
       const savedPreference = localStorage.getItem('mobile-upload-tips-hidden');
       if (savedPreference === 'true') {
         setShowMobileTips(false);
@@ -67,7 +74,7 @@ export const FileUpload: React.FC<FileUploadComponentProps> = ({
   const handleToggleMobileTips = useCallback(
     (show: boolean) => {
       setShowMobileTips(show);
-      if (mobileConfig.isMobile) {
+      if (mobileConfig.isMobile && typeof window !== 'undefined') {
         localStorage.setItem('mobile-upload-tips-hidden', (!show).toString());
       }
     },

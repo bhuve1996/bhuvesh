@@ -34,6 +34,22 @@ export interface MobileConfig {
  * Detect if the current device is mobile
  */
 export function detectMobileDevice(): MobileConfig {
+  // Return default config if running on server
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return {
+      isMobile: false,
+      isAndroid: false,
+      isIOS: false,
+      isChrome: false,
+      isMobileChrome: false,
+      hasTouch: false,
+      connectionType: 'unknown',
+      recommendedTimeout: 60000,
+      recommendedMaxSize: 10 * 1024 * 1024,
+      supportsDragDrop: true,
+    };
+  }
+
   const userAgent = navigator.userAgent.toLowerCase();
   const isMobile =
     /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
