@@ -177,34 +177,39 @@ export async function analyzeResumeWithJobDescription(
  */
 export async function parseResume(file: File): Promise<ParseResponse> {
   try {
-    const response = await uploadFile(file);
-    const responseData = response.data as Record<string, unknown>; // Type assertion for API response
-    return {
-      success: response.success,
-      data: response.data
-        ? {
-            filename: String(responseData.filename || ''),
-            file_size: Number(responseData.size || 0),
-            file_type: String(responseData.content_type || ''),
-            text: String(responseData.extracted_text || ''),
-            word_count: String(responseData.extracted_text || '').split(' ')
-              .length,
-            character_count: String(responseData.extracted_text || '').length,
-            formatting_analysis: {},
-            parsed_content: {},
-          }
-        : {
-            filename: '',
-            file_size: 0,
-            file_type: '',
-            text: '',
-            word_count: 0,
-            character_count: 0,
-            formatting_analysis: {},
-            parsed_content: {},
-          },
-      message: response.message || 'File upload completed',
-    };
+    // Use the backend /parse endpoint directly (upload without analysis)
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/api/upload/parse`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      return {
+        success: true,
+        data: {
+          filename: result.data.filename || '',
+          file_size: result.data.file_size || 0,
+          file_type: result.data.file_type || '',
+          text: result.data.text || '',
+          word_count: result.data.word_count || 0,
+          character_count: result.data.character_count || 0,
+          formatting_analysis: result.data.formatting_analysis || {},
+          parsed_content: result.data.parsed_content || {},
+        },
+        message: result.message || 'File parsed successfully',
+      };
+    } else {
+      throw new Error(result.error || 'Failed to parse file');
+    }
   } catch (error) {
     return {
       success: false,
