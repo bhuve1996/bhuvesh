@@ -1,6 +1,5 @@
 'use client';
 
-import { Footer } from '@/components/layout';
 import { ProjectsSection } from '@/components/sections';
 import { StructuredData } from '@/components/SEO/StructuredData';
 import { SectionSeparator } from '@/components/ui';
@@ -23,8 +22,6 @@ export default function Projects() {
         <ProjectsSection />
 
         <SectionSeparator variant='gradient' color='muted' spacing='lg' />
-
-        <Footer />
       </div>
     </>
   );

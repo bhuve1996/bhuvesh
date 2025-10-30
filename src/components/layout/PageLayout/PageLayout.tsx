@@ -2,23 +2,16 @@
 
 import React from 'react';
 
-import { Footer } from '@/components/layout/Footer';
-import { Navigation } from '@/components/layout/Navigation';
-
 interface PageLayoutProps {
   children: React.ReactNode;
   title: string;
   description?: string;
-  activeSection?: string;
-  onSectionClick?: (sectionId: string) => void;
 }
 
 export const PageLayout: React.FC<PageLayoutProps> = ({
   children,
   title,
   description,
-  activeSection = 'home',
-  onSectionClick,
 }) => {
   return (
     <div className='min-h-screen bg-gradient-to-br from-background via-background to-background text-foreground relative overflow-hidden'>
@@ -29,11 +22,6 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
         <div className='absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary-500/3 rounded-full blur-3xl animate-pulse-slow delay-1000'></div>
         <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-accent-500/2 rounded-full blur-3xl animate-pulse-slow delay-2000'></div>
       </div>
-
-      <Navigation
-        activeSection={activeSection}
-        onSectionClick={onSectionClick || (() => {})}
-      />
 
       {/* Page Header */}
       <section className='pt-16 pb-16 px-6'>
@@ -56,8 +44,6 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
 
       {/* Page Content */}
       <main className='relative z-10'>{children}</main>
-
-      <Footer />
     </div>
   );
 };

@@ -2,23 +2,14 @@
 
 import { useEffect, useState } from 'react';
 
-import { Footer, Navigation } from '@/components/layout';
 import { StructuredData } from '@/components/SEO/StructuredData';
 import { FlipCard, Loading, OrbitingElements } from '@/components/ui';
 import { pageCards } from '@/lib/pageCards';
 
 export default function Home() {
-  const [activeSection, setActiveSection] = useState('home');
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
-  const scrollToSection = (sectionId: string) => {
-    setActiveSection(sectionId);
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   useEffect(() => {
     setMounted(true);
@@ -63,11 +54,6 @@ export default function Home() {
           <div className='absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary-500/3 rounded-full blur-3xl animate-pulse-slow delay-1000'></div>
           <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-accent-500/2 rounded-full blur-3xl animate-pulse-slow delay-2000'></div>
         </div>
-
-        <Navigation
-          activeSection={activeSection}
-          onSectionClick={scrollToSection}
-        />
 
         {/* Homepage Content - Flip Card Gallery */}
         <main className='flex-1 min-h-screen pt-24 pb-20'>
@@ -117,8 +103,6 @@ export default function Home() {
             </div>
           </div>
         </main>
-
-        <Footer />
       </div>
     </>
   );

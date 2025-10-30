@@ -240,7 +240,6 @@ export default function Services() {
     <PageLayout
       title='My Services'
       description='Comprehensive web development and technology solutions to bring your ideas to life.'
-      activeSection='services'
     >
       {/* Services Grid */}
       <section className='px-6 pb-16' aria-labelledby='services-title'>

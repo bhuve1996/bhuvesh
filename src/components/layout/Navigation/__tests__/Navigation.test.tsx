@@ -166,7 +166,10 @@ describe('Navigation Component', () => {
     fireEvent.click(mobileButton);
 
     await waitFor(() => {
-      expect(screen.getByTestId('mobile-menu')).toHaveAttribute('aria-hidden', 'false');
+      expect(screen.getByTestId('mobile-menu')).toHaveAttribute(
+        'aria-hidden',
+        'false'
+      );
     });
 
     // Get the mobile menu first, then find the about link within it
@@ -246,7 +249,10 @@ describe('Navigation Component', () => {
     fireEvent.click(mobileButton);
 
     await waitFor(() => {
-      expect(screen.getByTestId('mobile-menu')).toHaveAttribute('aria-hidden', 'false');
+      expect(screen.getByTestId('mobile-menu')).toHaveAttribute(
+        'aria-hidden',
+        'false'
+      );
     });
 
     const results = await axe(container);
