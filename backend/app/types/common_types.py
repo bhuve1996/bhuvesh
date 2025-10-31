@@ -3,7 +3,7 @@
 # ============================================================================
 
 from datetime import datetime
-from typing import Optional, Union, Any
+from typing import Any, Optional, Union
 
 from typing_extensions import TypedDict
 

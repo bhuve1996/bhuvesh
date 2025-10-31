@@ -17,9 +17,11 @@ export const ResumeDropdownContent: React.FC<ResumeDropdownContentProps> = ({
   onClose,
 }) => {
   // Use global state
-  const { groups, currentResume, addGroup, loadGroups } = useMultiResumeStore();
+  const { groups, currentResume, addGroup, loadGroups, updateGroup } =
+    useMultiResumeStore();
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
 
   const toggleGroup = (groupId: string) => {
     const newExpanded = new Set(expandedGroups);
@@ -43,6 +45,20 @@ export const ResumeDropdownContent: React.FC<ResumeDropdownContentProps> = ({
   const handleResumeAction = () => {
     // Refresh groups after any action
     loadGroups();
+  };
+
+  const handleUpdateGroup = (
+    groupId: string,
+    name: string,
+    description?: string
+  ) => {
+    try {
+      updateGroup(groupId, { name, description });
+      setEditingGroupId(null);
+      loadGroups();
+    } catch (_error) {
+      // Failed to update group
+    }
   };
 
   return (
@@ -75,11 +91,11 @@ export const ResumeDropdownContent: React.FC<ResumeDropdownContentProps> = ({
               className='border border-gray-200 dark:border-gray-600 rounded-lg'
             >
               {/* Group Header */}
-              <button
-                onClick={() => toggleGroup(group.id)}
-                className='w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-t-lg'
-              >
-                <div className='text-left'>
+              <div className='flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-t-lg'>
+                <button
+                  onClick={() => toggleGroup(group.id)}
+                  className='flex-1 text-left'
+                >
                   <div className='font-medium text-gray-900 dark:text-white'>
                     {group.name}
                   </div>
@@ -87,13 +103,43 @@ export const ResumeDropdownContent: React.FC<ResumeDropdownContentProps> = ({
                     {group.variants.length} resume
                     {group.variants.length !== 1 ? 's' : ''}
                   </div>
+                </button>
+                <div className='flex items-center space-x-2 ml-2'>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation();
+                      setEditingGroupId(group.id);
+                    }}
+                    className='p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'
+                    title='Edit group'
+                  >
+                    <svg
+                      className='w-4 h-4'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => toggleGroup(group.id)}
+                    className='focus:outline-none'
+                    aria-label='Toggle group'
+                  >
+                    <Icons.ChevronDown
+                      className={`w-4 h-4 transition-transform text-gray-400 ${
+                        expandedGroups.has(group.id) ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
                 </div>
-                <Icons.ChevronDown
-                  className={`w-4 h-4 transition-transform text-gray-400 ${
-                    expandedGroups.has(group.id) ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
+              </div>
 
               {/* Group Variants */}
               {expandedGroups.has(group.id) && (
@@ -111,7 +157,10 @@ export const ResumeDropdownContent: React.FC<ResumeDropdownContentProps> = ({
                             ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-l-blue-500'
                             : ''
                         }`}
-                        onClick={() => onResumeSelect(group.id, variant.id)}
+                        onClick={() => {
+                          onResumeSelect(group.id, variant.id);
+                          onClose();
+                        }}
                       >
                         <div className='flex items-center justify-between'>
                           <div className='flex-1 min-w-0'>
@@ -160,6 +209,23 @@ export const ResumeDropdownContent: React.FC<ResumeDropdownContentProps> = ({
         <CreateGroupModal
           onClose={() => setShowCreateGroup(false)}
           onCreate={handleCreateGroup}
+          existingGroupNames={groups.map(g => g.name)}
+        />
+      )}
+
+      {/* Edit Group Modal */}
+      {editingGroupId && (
+        <CreateGroupModal
+          onClose={() => setEditingGroupId(null)}
+          onCreate={(name, description) => {
+            handleUpdateGroup(editingGroupId, name, description);
+          }}
+          existingGroupNames={groups.map(g => g.name)}
+          editMode={true}
+          initialName={groups.find(g => g.id === editingGroupId)?.name || ''}
+          initialDescription={
+            groups.find(g => g.id === editingGroupId)?.description || ''
+          }
         />
       )}
     </div>

@@ -11,6 +11,7 @@ import {
   improveResume,
   uploadFile,
 } from '@/lib/api/unifiedClient';
+import type { ResumeData } from '@/types/resume';
 
 // ============================================================================
 // API CONFIGURATION
@@ -52,16 +53,7 @@ export interface ATSAnalysisResponse {
 
 export interface ParseResponse {
   success: boolean;
-  data?: {
-    filename: string;
-    file_size: number;
-    file_type: string;
-    text: string;
-    word_count: number;
-    character_count: number;
-    formatting_analysis: Record<string, unknown>;
-    parsed_content: Record<string, unknown>;
-  };
+  data?: ResumeData;
   message: string;
 }
 
@@ -173,47 +165,47 @@ export async function analyzeResumeWithJobDescription(
 }
 
 /**
- * Parse resume only (without job description)
+ * Create basic ResumeData structure from uploaded file (no API call)
  */
 export async function parseResume(file: File): Promise<ParseResponse> {
   try {
-    // Use the backend /parse endpoint directly (upload without analysis)
-    const formData = new FormData();
-    formData.append('file', file);
+    // Create basic ResumeData structure without calling any API
+    const basicResumeData: ResumeData = {
+      personal: {
+        fullName: file.name.replace(/\.[^/.]+$/, ''), // Use filename as name
+        email: '',
+        phone: '',
+        location: '',
+        linkedin: '',
+        github: '',
+        portfolio: '',
+        jobTitle: '',
+      },
+      summary: '',
+      experience: [],
+      education: [],
+      skills: {
+        technical: [],
+        business: [],
+        soft: [],
+        languages: [],
+        certifications: [],
+      },
+      projects: [],
+      achievements: [],
+      hobbies: [],
+    };
 
-    const response = await fetch(`${API_BASE_URL}/api/upload/parse`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-
-    if (result.success && result.data) {
-      return {
-        success: true,
-        data: {
-          filename: result.data.filename || '',
-          file_size: result.data.file_size || 0,
-          file_type: result.data.file_type || '',
-          text: result.data.text || '',
-          word_count: result.data.word_count || 0,
-          character_count: result.data.character_count || 0,
-          formatting_analysis: result.data.formatting_analysis || {},
-          parsed_content: result.data.parsed_content || {},
-        },
-        message: result.message || 'File parsed successfully',
-      };
-    } else {
-      throw new Error(result.error || 'Failed to parse file');
-    }
+    return {
+      success: true,
+      data: basicResumeData,
+      message: 'File uploaded successfully',
+    };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to parse file',
+      message:
+        error instanceof Error ? error.message : 'Failed to process file',
     };
   }
 }

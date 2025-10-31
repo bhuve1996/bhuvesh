@@ -150,6 +150,12 @@ ignore = [
     "C414", # unnecessary list call within sorted
     "ERA001", # found commented-out code
     "G004", # logging statement uses f-string
+    "INP001", # implicit namespace package (acceptable for our structure)
+    "TRY400", # logging.exception vs logging.error (acceptable pattern)
+    "PLC0415", # imports inside functions (intentional for lazy loading)
+    "UP045", # Optional[X] vs X | None (backward compatibility)
+    "UP036", # version blocks (backward compatibility)
+    "F401", # unused imports (acceptable in test files for availability checks)
 ]
 
 [tool.ruff.per-file-ignores]

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { UnifiedWelcomeBarWithResumeDropdown } from '@/components/layout/UnifiedWelcomeBarWithResumeDropdown';
 import { CreateGroupModal } from '@/components/modals/CreateGroupModal';
@@ -103,6 +103,7 @@ export default function ResumeManagerPage() {
         <CreateGroupModal
           onClose={() => setShowCreateGroup(false)}
           onCreate={handleCreateGroup}
+          existingGroupNames={groups.map(g => g.name)}
         />
       )}
     </div>
@@ -115,80 +116,162 @@ const ResumeGroupCard: React.FC<{
   isSelected: boolean;
   onSelect: () => void;
   onUpdate: () => void;
-}> = ({ group, isSelected, onSelect, onUpdate: _onUpdate }) => {
+}> = ({ group, isSelected, onSelect, onUpdate }) => {
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [allGroups, setAllGroups] = useState<ResumeGroup[]>([]);
   const totalVariants = group.variants.length;
   // const hasAnalyses = group.variants.some(v => v.analyses.length > 0);
   const bestScore = Math.max(...group.variants.map(v => v.bestScore || 0), 0);
 
+  const handleEditGroup = (name: string, description?: string) => {
+    multiResumeStorage.updateResumeGroup(group.id, { name, description });
+    onUpdate();
+    setShowEditModal(false);
+  };
+
+  const handleDeleteGroup = () => {
+    if (
+      confirm(
+        `Are you sure you want to delete "${group.name}" and all its resumes?`
+      )
+    ) {
+      multiResumeStorage.deleteResumeGroup(group.id);
+      onUpdate();
+    }
+  };
+
   return (
-    <div
-      className={`border rounded-lg p-6 cursor-pointer transition-all ${
-        isSelected
-          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-      }`}
-      onClick={onSelect}
-    >
-      <div className='flex items-start justify-between mb-4'>
-        <div>
-          <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>
-            {group.name}
-          </h3>
-          {group.description && (
-            <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>
-              {group.description}
-            </p>
-          )}
-        </div>
-        <div className='text-right'>
-          <div className='text-2xl font-bold text-gray-900 dark:text-white'>
-            {totalVariants}
+    <>
+      <div
+        className={`border rounded-lg p-6 cursor-pointer transition-all ${
+          isSelected
+            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+        }`}
+        onClick={onSelect}
+      >
+        <div className='flex items-start justify-between mb-4'>
+          <div>
+            <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>
+              {group.name}
+            </h3>
+            {group.description && (
+              <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>
+                {group.description}
+              </p>
+            )}
           </div>
-          <div className='text-xs text-gray-500 dark:text-gray-400'>
-            resume{totalVariants !== 1 ? 's' : ''}
-          </div>
-        </div>
-      </div>
-
-      <div className='space-y-2'>
-        <div className='flex items-center justify-between text-sm'>
-          <span className='text-gray-600 dark:text-gray-400'>Best Score:</span>
-          {bestScore > 0 ? (
-            <span
-              className={`px-2 py-1 rounded text-xs font-medium ${
-                bestScore >= 80
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
-                  : bestScore >= 60
-                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300'
-                    : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
-              }`}
+          <div className='flex items-center space-x-2'>
+            <button
+              onClick={e => {
+                e.stopPropagation();
+                setAllGroups(multiResumeStorage.getResumeGroups());
+                setShowEditModal(true);
+              }}
+              className='p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'
+              title='Edit group'
             >
-              {bestScore}%
-            </span>
-          ) : (
-            <span className='text-gray-400 dark:text-gray-500'>
-              No analyses
-            </span>
-          )}
+              <svg
+                className='w-4 h-4'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
+                />
+              </svg>
+            </button>
+            <button
+              onClick={e => {
+                e.stopPropagation();
+                handleDeleteGroup();
+              }}
+              className='p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors'
+              title='Delete group'
+            >
+              <svg
+                className='w-4 h-4'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
+                />
+              </svg>
+            </button>
+            <div className='text-right'>
+              <div className='text-2xl font-bold text-gray-900 dark:text-white'>
+                {totalVariants}
+              </div>
+              <div className='text-xs text-gray-500 dark:text-gray-400'>
+                resume{totalVariants !== 1 ? 's' : ''}
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className='flex items-center justify-between text-sm'>
-          <span className='text-gray-600 dark:text-gray-400'>
-            Last Updated:
-          </span>
-          <span className='text-gray-900 dark:text-white'>
-            {new Date(group.updatedAt).toLocaleDateString()}
-          </span>
+        <div className='space-y-2'>
+          <div className='flex items-center justify-between text-sm'>
+            <span className='text-gray-600 dark:text-gray-400'>
+              Best Score:
+            </span>
+            {bestScore > 0 ? (
+              <span
+                className={`px-2 py-1 rounded text-xs font-medium ${
+                  bestScore >= 80
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+                    : bestScore >= 60
+                      ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300'
+                      : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
+                }`}
+              >
+                {bestScore}%
+              </span>
+            ) : (
+              <span className='text-gray-400 dark:text-gray-500'>
+                No analyses
+              </span>
+            )}
+          </div>
+
+          <div className='flex items-center justify-between text-sm'>
+            <span className='text-gray-600 dark:text-gray-400'>
+              Last Updated:
+            </span>
+            <span className='text-gray-900 dark:text-white'>
+              {new Date(group.updatedAt).toLocaleDateString()}
+            </span>
+          </div>
         </div>
+
+        {isSelected && (
+          <div className='mt-4 pt-4 border-t border-gray-200 dark:border-gray-700'>
+            <p className='text-sm text-blue-600 dark:text-blue-400'>
+              Click to view resume comparison ↓
+            </p>
+          </div>
+        )}
       </div>
 
-      {isSelected && (
-        <div className='mt-4 pt-4 border-t border-gray-200 dark:border-gray-700'>
-          <p className='text-sm text-blue-600 dark:text-blue-400'>
-            Click to view resume comparison ↓
-          </p>
-        </div>
+      {/* Edit Group Modal */}
+      {showEditModal && (
+        <CreateGroupModal
+          onClose={() => setShowEditModal(false)}
+          onCreate={handleEditGroup}
+          existingGroupNames={allGroups.map(g => g.name)}
+          editMode={true}
+          initialName={group.name}
+          initialDescription={group.description ?? ''}
+        />
       )}
-    </div>
+    </>
   );
 };

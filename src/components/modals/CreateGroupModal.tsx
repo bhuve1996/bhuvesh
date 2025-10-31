@@ -5,32 +5,65 @@ import React, { useState } from 'react';
 interface CreateGroupModalProps {
   onClose: () => void;
   onCreate: (name: string, description?: string) => void;
+  existingGroupNames?: string[];
+  editMode?: boolean;
+  initialName?: string;
+  initialDescription?: string;
 }
 
 export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
   onClose,
   onCreate,
+  existingGroupNames = [],
+  editMode = false,
+  initialName = '',
+  initialDescription = '',
 }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [name, setName] = useState(initialName);
+  const [description, setDescription] = useState(initialDescription);
+  const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
-      onCreate(name.trim(), description.trim() || undefined);
-    }
-  };
 
-  // Form validation is handled by the disabled state on the button
+    // Clear previous error
+    setError('');
+
+    if (!name.trim()) {
+      setError('Group name is required');
+      return;
+    }
+
+    // Check for duplicate names (case-insensitive), excluding the current name if editing
+    if (
+      existingGroupNames.some(
+        groupName =>
+          groupName.toLowerCase() === name.trim().toLowerCase() &&
+          (!editMode || groupName.toLowerCase() !== initialName.toLowerCase())
+      )
+    ) {
+      setError('A group with this name already exists');
+      return;
+    }
+
+    onCreate(name.trim(), description.trim() || undefined);
+  };
 
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
       <div className='bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4'>
         <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>
-          Create Resume Group
+          {editMode ? 'Edit Resume Group' : 'Create Resume Group'}
         </h3>
 
         <form onSubmit={handleSubmit} className='space-y-4'>
+          {/* Error Message */}
+          {error && (
+            <div className='p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg'>
+              <p className='text-sm text-red-600 dark:text-red-400'>{error}</p>
+            </div>
+          )}
+
           {/* Group Name */}
           <div>
             <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
@@ -75,7 +108,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
               disabled={!name.trim()}
               className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
             >
-              Create Group
+              {editMode ? 'Update Group' : 'Create Group'}
             </button>
           </div>
         </form>

@@ -21,7 +21,7 @@ class JobDescriptionGenerator:
     def __init__(self):
         # Initialize AI configuration
         gemini_available, _ = ai_config.initialize()
-        
+
         self.model = None
         if gemini_available:
             self.model = ai_config.get_gemini_model()
@@ -42,7 +42,7 @@ class JobDescriptionGenerator:
         Returns:
             A specific job description for ATS analysis
         """
-        if not GEMINI_AVAILABLE or not self.model:
+        if not is_gemini_available() or not self.model:
             raise Exception(
                 "AI job description generation is required. Please configure GEMINI_API_KEY in .env file"
             )

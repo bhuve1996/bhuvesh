@@ -107,51 +107,23 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
     setIsUploading(true);
 
     try {
-      // Use the new ATS API to upload and parse the file
+      // Upload the file locally (no API call)
       const result = await atsApi.uploadFile(file);
 
       if (result.success && result.data) {
-        // Create basic ResumeData from parsed content
-        const basicResumeData: ResumeData = {
-          personal: {
-            fullName: '',
-            email: '',
-            phone: '',
-            location: '',
-            linkedin: '',
-            github: '',
-            portfolio: '',
-            jobTitle: '',
-          },
-          summary: result.data.text || '',
-          experience: [],
-          education: [],
-          skills: {
-            technical: [],
-            business: [],
-            soft: [],
-            languages: [],
-            certifications: [],
-          },
-          projects: [],
-          achievements: [],
-          certifications: [],
-          hobbies: [],
-        };
+        // Result.data is already ResumeData format from local parsing
+        const resumeData: ResumeData = result.data;
 
         // Clean the data using ResumeDataUtils
-        const cleanedData = ResumeDataUtils.cleanResumeData(basicResumeData);
+        const cleanedData = ResumeDataUtils.cleanResumeData(resumeData);
 
         // Use the parsed name or fallback to filename
         const resumeName =
           cleanedData.personal.fullName || file.name.replace(/\.[^/.]+$/, '');
 
-        // Use the cleaned ResumeData from the backend
-        const resumeData = cleanedData;
-
         const newResumeId = cloudStorage.saveResume(
           resumeName,
-          resumeData,
+          cleanedData,
           'unknown'
         );
 

@@ -4,14 +4,27 @@ Detects ANY job role, not just predefined ones
 Uses parallel execution for Gemini + Semantic for best results
 """
 
-import os
 import re
 from concurrent.futures import ThreadPoolExecutor
-from typing import Optional
 
 # Import centralized AI configuration
-from app.core.ai_config import ai_config, is_gemini_available, is_embeddings_available
-from app.core.error_handling import handle_ai_error, log_service_operation
+from app.core.ai_config import ai_config, is_embeddings_available, is_gemini_available
+
+# Try to import sentence-transformers
+try:
+    from sentence_transformers import SentenceTransformer, util
+
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
+
+# Try to import Google Gemini
+try:
+    import google.generativeai as genai
+
+    GEMINI_AVAILABLE = True
+except ImportError:
+    GEMINI_AVAILABLE = False
 
 
 class JobTypeDetector:
@@ -23,7 +36,7 @@ class JobTypeDetector:
     def __init__(self):
         """Initialize the detector with embedding model"""
         # Initialize AI configuration
-        gemini_available, embeddings_available = ai_config.initialize()
+        _gemini_available, _embeddings_available = ai_config.initialize()
         # Comprehensive job titles database (200+ roles)
         self.job_database = [
             # Technology - Software Engineering
@@ -294,7 +307,7 @@ class JobTypeDetector:
         ]
 
         # Load embedding model if available
-        if EMBEDDINGS_AVAILABLE:
+        if is_embeddings_available():
             try:
                 self.model = SentenceTransformer("all-MiniLM-L6-v2")
                 # Pre-compute embeddings for job database
@@ -302,9 +315,7 @@ class JobTypeDetector:
                     self.job_database, convert_to_tensor=True
                 )
                 self.use_embeddings = True
-                print(
-                    f"✅ Job detector loaded with {len(self.job_database)} job titles"
-                )
+                print(f"✅ Job detector loaded with {len(self.job_database)} job titles")
             except Exception as e:
                 print(f"Warning: Could not load embedding model: {e}")
                 self.use_embeddings = False
@@ -337,11 +348,11 @@ class JobTypeDetector:
         # Combine and choose best result
         return self._combine_results(gemini_result, semantic_result)
 
-    def _safe_gemini_detection(self, resume_text: str) -> tuple[Optional[str], float]:
+    def _safe_gemini_detection(self, resume_text: str) -> tuple[str | None, float]:
         """
         Safely call Gemini detection with error handling
         """
-        if not GEMINI_AVAILABLE:
+        if not is_gemini_available():
             return None, 0.0
 
         try:
@@ -387,7 +398,7 @@ class JobTypeDetector:
 
     def _combine_results(
         self,
-        gemini_result: tuple[Optional[str], float],
+        gemini_result: tuple[str | None, float],
         semantic_result: tuple[str, float],
     ) -> tuple[str, float]:
         """
@@ -587,7 +598,7 @@ class JobTypeDetector:
         Use Google Gemini LLM to detect job type
         FREE tier: 15 requests/minute, 1500 requests/day
         """
-        if not GEMINI_AVAILABLE:
+        if not is_gemini_available():
             raise Exception(
                 "AI job detection is required. Please configure GEMINI_API_KEY in .env file"
             )

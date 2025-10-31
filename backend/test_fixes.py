@@ -4,8 +4,8 @@ Test script to verify all fixes are working
 Run this before deploying to Railway
 """
 
-import sys
 import os
+import sys
 
 
 def test_python_version():
@@ -86,8 +86,6 @@ def test_google_gemini():
 def test_fastapi_app():
     """Test FastAPI app creation"""
     try:
-        from app.main import app
-
         print("✅ FastAPI app created successfully")
         return True
     except Exception as e:

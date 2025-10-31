@@ -8,11 +8,18 @@ from collections import Counter
 from datetime import datetime
 from typing import Any
 
-from app.services.job_description_generator import job_description_generator
-
 # Import centralized AI configuration
-from app.core.ai_config import ai_config, is_gemini_available, is_embeddings_available
-from app.core.error_handling import handle_ai_error, log_service_operation, ModelInitializationError
+from app.core.ai_config import ai_config, is_gemini_available
+
+# Try to import sentence-transformers utilities
+try:
+    from sentence_transformers import util
+
+    UTIL_AVAILABLE = True
+except ImportError:
+    UTIL_AVAILABLE = False
+
+from app.services.job_description_generator import job_description_generator
 
 # Import job detector and project extractor
 from app.services.job_detector import job_detector
@@ -28,7 +35,7 @@ class ATSAnalyzer:
         """Initialize with embeddings model - required for AI analysis"""
         # Initialize AI configuration
         gemini_available, embeddings_available = ai_config.initialize()
-        
+
         # Always initialize these attributes first
         self.model = None
         self.content_model = None
@@ -69,14 +76,18 @@ class ATSAnalyzer:
             self.use_embeddings = True
             print("✅ ATS Analyzer: AI embeddings model loaded successfully")
         else:
-            print("⚠️  WARNING: sentence-transformers not available. Using keyword-only matching.")
+            print(
+                "⚠️  WARNING: sentence-transformers not available. Using keyword-only matching."
+            )
 
         if gemini_available:
             self.content_model = ai_config.get_gemini_model()
             self.use_content_generation = True
             print("✅ ATS Analyzer: AI content generation enabled")
         else:
-            print("ℹ️  ATS Analyzer: Google Gemini not configured. Content generation disabled.")
+            print(
+                "ℹ️  ATS Analyzer: Google Gemini not configured. Content generation disabled."
+            )
 
     def extract_structured_experience(self, resume_text: str) -> dict[str, Any]:
         """
@@ -1670,7 +1681,7 @@ class ATSAnalyzer:
         """
         Use AI to classify keywords as technical vs non-technical with enhanced analysis
         """
-        if not GEMINI_AVAILABLE or not self.model:
+        if not is_gemini_available() or not self.model:
             # Fallback to rule-based classification
             return self._rule_based_technical_classification(keywords)
 
@@ -1968,7 +1979,7 @@ class ATSAnalyzer:
         """
         Extract keywords from resume using AI for better technical term identification
         """
-        if not GEMINI_AVAILABLE or not self.model:
+        if not is_gemini_available() or not self.model:
             # Fallback to regular keyword extraction
             return self._extract_keywords(resume_text)
 
@@ -2056,7 +2067,9 @@ class ATSAnalyzer:
         """
         # Check if embeddings model is available
         if not self.model or not self.use_embeddings:
-            print("⚠️  Semantic analysis not available. Using keyword matching instead.")
+            print(
+                "⚠️  Semantic analysis not available. Using keyword matching instead."
+            )
             return {
                 "similarity_score": 0.5,
                 "score": 50,

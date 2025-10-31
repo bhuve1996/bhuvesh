@@ -6,7 +6,7 @@ Generates specific, actionable suggestions to boost ATS score
 import logging
 import os
 import re
-from typing import Optional, Any
+from typing import Any, Optional
 
 from ..types.common_types import ATSAnalysisResult, ExtractionResult
 
@@ -24,7 +24,7 @@ class ResumeImprover:
         """Initialize the resume improver with AI capabilities"""
         # Initialize AI configuration
         gemini_available, _ = ai_config.initialize()
-        
+
         self.use_ai = gemini_available
         if self.use_ai:
             self.model = ai_config.get_gemini_model()

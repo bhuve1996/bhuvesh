@@ -59,37 +59,12 @@ export const FileUploadWithResumeNaming: React.FC<
 
     setIsProcessing(true);
     try {
-      // Process the file first
+      // Process the file locally (no API call)
       const result = await atsApi.uploadFile(pendingFile);
 
       if (result.success && result.data) {
-        // Create basic ResumeData from parsed content
-        const resumeData: ResumeData = {
-          personal: {
-            fullName: '',
-            email: '',
-            phone: '',
-            location: '',
-            linkedin: '',
-            github: '',
-            portfolio: '',
-            jobTitle: '',
-          },
-          summary: result.data.text || '',
-          experience: [],
-          education: [],
-          skills: {
-            technical: [],
-            business: [],
-            soft: [],
-            languages: [],
-            certifications: [],
-          },
-          projects: [],
-          achievements: [],
-          certifications: [],
-          hobbies: [],
-        };
+        // Result.data is already ResumeData format from local parsing
+        const resumeData: ResumeData = result.data;
 
         // Clean the data using ResumeDataUtils
         const cleanedData = ResumeDataUtils.cleanResumeData(resumeData);
