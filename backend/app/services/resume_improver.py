@@ -4,17 +4,15 @@ Generates specific, actionable suggestions to boost ATS score
 """
 
 import logging
-import os
 import re
-from typing import Any, Optional
+from typing import Any
 
 from ..types.common_types import ATSAnalysisResult, ExtractionResult
 
 logger = logging.getLogger(__name__)
 
 # Import centralized AI configuration
-from app.core.ai_config import ai_config, is_gemini_available
-from app.core.error_handling import handle_ai_error, log_service_operation
+from app.core.ai_config import ai_config
 
 
 class ResumeImprover:
@@ -36,7 +34,7 @@ class ResumeImprover:
         self,
         analysis_result: ATSAnalysisResult,
         extracted_data: ExtractionResult,
-        job_description: Optional[str] = None,
+        job_description: str | None = None,
     ) -> dict[str, Any]:
         """
         Generate comprehensive ATS-focused improvement plan
@@ -125,7 +123,7 @@ class ResumeImprover:
             }
 
     def _generate_keyword_improvements(
-        self, analysis_result: ATSAnalysisResult, job_description: Optional[str] = None
+        self, analysis_result: ATSAnalysisResult, job_description: str | None = None
     ) -> list[dict[str, Any]]:
         """Generate keyword-specific improvements"""
         improvements = []
@@ -762,7 +760,7 @@ class ResumeImprover:
     def _generate_structure_improvements(
         self,
         extracted_data: ExtractionResult,
-        analysis_result: Optional[ATSAnalysisResult] = None,
+        analysis_result: ATSAnalysisResult | None = None,
     ) -> list[dict[str, Any]]:
         """Generate structure-specific improvements"""
         improvements = []

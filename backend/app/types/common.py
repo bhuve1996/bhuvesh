@@ -4,7 +4,6 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -57,7 +56,7 @@ class BaseResponse(BaseModel):
     """Base response model"""
 
     success: bool
-    message: Optional[str] = None
+    message: str | None = None
     timestamp: datetime = Field(default_factory=datetime.now)
 
 
@@ -73,7 +72,7 @@ class FileInfo(BaseModel):
     size: int
     file_type: str
     last_modified: datetime
-    content: Optional[str] = None
+    content: str | None = None
 
 
 class FileValidation(BaseModel):
@@ -97,7 +96,7 @@ class AnalysisProgress(BaseModel):
     is_analyzing: bool
     current_step_name: str
     progress: int = Field(ge=0, le=100)  # 0-100
-    error: Optional[str] = None
+    error: str | None = None
 
 
 class AnalysisStep(BaseModel):
@@ -107,7 +106,7 @@ class AnalysisStep(BaseModel):
     name: str
     description: str
     status: str  # 'pending', 'active', 'completed', 'error'
-    duration: Optional[float] = None
+    duration: float | None = None
 
 
 # ============================================================================
@@ -173,14 +172,14 @@ class ExportOptions(BaseModel):
     include_analysis: bool = True
     include_improvements: bool = True
     include_raw_data: bool = False
-    template: Optional[str] = None
+    template: str | None = None
 
 
 class ExportResult(BaseModel):
     """Export result"""
 
     success: bool
-    file_url: Optional[str] = None
+    file_url: str | None = None
     file_name: str
     file_size: int
     expires_at: datetime

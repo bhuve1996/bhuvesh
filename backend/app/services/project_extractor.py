@@ -3,12 +3,10 @@ Simplified Project Extractor Service - AI Only
 """
 
 import json
-import os
 from typing import Any
 
 # Import centralized AI configuration
 from app.core.ai_config import ai_config, is_gemini_available
-from app.core.error_handling import handle_ai_error, log_service_operation
 
 
 class ProjectExtractor:

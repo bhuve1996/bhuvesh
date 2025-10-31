@@ -2,7 +2,6 @@
 # API TYPES - Request/Response models for API endpoints
 # ============================================================================
 
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -13,7 +12,7 @@ class JobDescriptionRequest(BaseModel):
     """Request model for job description comparison"""
 
     job_description: str
-    resume_text: Optional[str] = None
+    resume_text: str | None = None
 
 
 class ImprovementPlanRequest(BaseModel):
@@ -21,7 +20,7 @@ class ImprovementPlanRequest(BaseModel):
 
     analysis_result: ATSAnalysisResult
     extracted_data: ExtractionResult
-    job_description: Optional[str] = None
+    job_description: str | None = None
 
 
 class FileUploadResponse(BaseModel):
@@ -30,16 +29,16 @@ class FileUploadResponse(BaseModel):
     filename: str
     size: int
     file_type: str
-    url: Optional[str] = None
+    url: str | None = None
 
 
 class AnalysisResponse(BaseModel):
     """Response model for resume analysis"""
 
     success: bool
-    data: Optional[ExtractionResult] = None
-    message: Optional[str] = None
-    error: Optional[str] = None
+    data: ExtractionResult | None = None
+    message: str | None = None
+    error: str | None = None
 
 
 class HealthCheckResponse(BaseModel):
@@ -56,7 +55,7 @@ class ErrorResponse(BaseModel):
 
     error: str
     message: str
-    details: Optional[dict[str, str]] = None
+    details: dict[str, str] | None = None
     timestamp: str
-    path: Optional[str] = None
-    method: Optional[str] = None
+    path: str | None = None
+    method: str | None = None

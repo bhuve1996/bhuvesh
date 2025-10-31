@@ -6,7 +6,7 @@ Eliminates duplication across all services
 import logging
 import traceback
 from functools import wraps
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ class ServiceError(Exception):
         self,
         message: str,
         error_code: str = "SERVICE_ERROR",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ):
         self.message = message
         self.error_code = error_code
@@ -34,7 +34,7 @@ class AIServiceError(ServiceError):
         self,
         message: str,
         service: str = "AI",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(message, f"AI_{service}_ERROR", details)
 
@@ -42,7 +42,7 @@ class AIServiceError(ServiceError):
 class ModelInitializationError(ServiceError):
     """Exception for model initialization errors"""
 
-    def __init__(self, model_name: str, details: Optional[Dict[str, Any]] = None):
+    def __init__(self, model_name: str, details: dict[str, Any] | None = None):
         super().__init__(
             f"Failed to initialize {model_name}", "MODEL_INIT_ERROR", details
         )
@@ -56,9 +56,9 @@ def handle_ai_error(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            logger.error(f"AI service error in {func.__name__}: {str(e)}")
+            logger.error(f"AI service error in {func.__name__}: {e!s}")
             logger.debug(traceback.format_exc())
-            raise AIServiceError(f"AI service failed: {str(e)}", func.__name__)
+            raise AIServiceError(f"AI service failed: {e!s}", func.__name__)
 
     return wrapper
 
@@ -72,7 +72,7 @@ def handle_model_initialization(model_name: str, required: bool = True):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                error_msg = f"Failed to initialize {model_name}: {str(e)}"
+                error_msg = f"Failed to initialize {model_name}: {e!s}"
                 logger.error(error_msg)
                 logger.debug(traceback.format_exc())
 
@@ -80,7 +80,7 @@ def handle_model_initialization(model_name: str, required: bool = True):
                     raise ModelInitializationError(model_name, {"error": str(e)})
                 else:
                     logger.warning(
-                        f"Optional model {model_name} failed to initialize: {str(e)}"
+                        f"Optional model {model_name} failed to initialize: {e!s}"
                     )
                     return None
 
@@ -105,7 +105,7 @@ def safe_ai_call(func, *args, **kwargs):
         result = func(*args, **kwargs)
         return result, True
     except Exception as e:
-        logger.error(f"AI call failed: {str(e)}")
+        logger.error(f"AI call failed: {e!s}")
         logger.debug(traceback.format_exc())
         return None, False
 
@@ -122,7 +122,7 @@ def log_service_operation(service_name: str, operation: str):
                 logger.info(f"Completed {service_name} operation: {operation}")
                 return result
             except Exception as e:
-                logger.error(f"Failed {service_name} operation: {operation} - {str(e)}")
+                logger.error(f"Failed {service_name} operation: {operation} - {e!s}")
                 raise
 
         return wrapper
@@ -130,7 +130,7 @@ def log_service_operation(service_name: str, operation: str):
     return decorator
 
 
-def create_error_response(error: Exception, context: str = "") -> Dict[str, Any]:
+def create_error_response(error: Exception, context: str = "") -> dict[str, Any]:
     """
     Create standardized error response
 
@@ -182,7 +182,7 @@ def validate_api_key(api_key: str, service_name: str) -> bool:
     return True
 
 
-def check_dependencies(required_modules: list, service_name: str) -> Dict[str, bool]:
+def check_dependencies(required_modules: list, service_name: str) -> dict[str, bool]:
     """
     Check if required modules are available
 

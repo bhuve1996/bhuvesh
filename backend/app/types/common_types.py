@@ -3,7 +3,7 @@
 # ============================================================================
 
 from datetime import datetime
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from typing_extensions import TypedDict
 
@@ -146,7 +146,7 @@ class ValidationResult(TypedDict, total=False):
     degrees_count: int
     companies_count: int
     total_years: int
-    file_info: dict[str, Union[str, int, None]]  # Added file_info field
+    file_info: dict[str, str | int | None]  # Added file_info field
 
 
 class AnalysisMetadata(TypedDict, total=False):
@@ -174,8 +174,8 @@ class FormatAnalysis(TypedDict, total=False):
 
     structure_score: Score
     ats_compatibility: Score
-    bullet_points: dict[str, Union[bool, int, list[StringValue]]]
-    spacing: dict[str, Union[bool, int, list[StringValue]]]
+    bullet_points: dict[str, bool | int | list[StringValue]]
+    spacing: dict[str, bool | int | list[StringValue]]
     consistency: bool
     recommendations: list[StringValue]
 
@@ -208,9 +208,9 @@ class APIResponse(TypedDict, total=False):
     """Standard API response structure"""
 
     success: bool
-    data: Optional[dict[str, Union[str, int, float, bool, list, dict]]]
-    message: Optional[StringValue]
-    error: Optional[StringValue]
+    data: dict[str, str | int | float | bool | list | dict] | None
+    message: StringValue | None
+    error: StringValue | None
 
 
 class FileInfo(TypedDict, total=False):

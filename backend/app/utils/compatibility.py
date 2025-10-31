@@ -4,7 +4,7 @@ Handles importlib.metadata compatibility issues
 """
 
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 # Handle importlib.metadata compatibility
 if sys.version_info >= (3, 8):
@@ -16,7 +16,7 @@ if sys.version_info >= (3, 8):
             from importlib_metadata import packages_distributions
         except ImportError:
             # If neither is available, create a dummy function
-            def packages_distributions() -> Dict[str, List[str]]:
+            def packages_distributions() -> dict[str, list[str]]:
                 return {}
 
 else:
@@ -25,7 +25,7 @@ else:
         from importlib_metadata import packages_distributions
     except ImportError:
 
-        def packages_distributions() -> Dict[str, List[str]]:
+        def packages_distributions() -> dict[str, list[str]]:
             return {}
 
 
@@ -38,7 +38,7 @@ def safe_importlib_metadata() -> bool:
         return False
 
 
-def get_package_info(package_name: str) -> Optional[Dict[str, Any]]:
+def get_package_info(package_name: str) -> dict[str, Any] | None:
     """Get package information safely"""
     try:
         if sys.version_info >= (3, 8):

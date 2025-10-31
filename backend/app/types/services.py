@@ -2,7 +2,7 @@
 # SERVICE TYPES - Types for service layer operations
 # ============================================================================
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -16,7 +16,7 @@ class JobDetectionResult(BaseModel):
     job_type: str
     confidence: float = Field(ge=0.0, le=1.0)
     keywords: list[str] = Field(default_factory=list)
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class ResumeExtractionResult(BaseModel):

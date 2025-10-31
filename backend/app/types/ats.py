@@ -4,7 +4,6 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -77,39 +76,39 @@ class SkillCategory(str, Enum):
 
 class PhoneInfo(BaseModel):
     raw: str
-    country_code: Optional[str] = None
-    number: Optional[str] = None
-    formatted: Optional[str] = None
+    country_code: str | None = None
+    number: str | None = None
+    formatted: str | None = None
 
 
 class SocialMedia(BaseModel):
     url: str
-    username: Optional[str] = None
-    profile_id: Optional[str] = None
+    username: str | None = None
+    profile_id: str | None = None
 
 
 class Location(BaseModel):
     full: str
-    city: Optional[str] = None
-    state: Optional[str] = None
-    country: Optional[str] = None
-    postal_code: Optional[str] = None
-    coordinates: Optional[dict[str, float]] = None
+    city: str | None = None
+    state: str | None = None
+    country: str | None = None
+    postal_code: str | None = None
+    coordinates: dict[str, float] | None = None
 
 
 class ContactInfo(BaseModel):
     full_name: str
     first_name: str
-    middle_name: Optional[str] = None
+    middle_name: str | None = None
     last_name: str
     email: str
-    phone: Optional[PhoneInfo] = None
-    linkedin: Optional[SocialMedia] = None
-    github: Optional[SocialMedia] = None
-    portfolio: Optional[SocialMedia] = None
-    website: Optional[str] = None
-    location: Optional[Location] = None
-    social_media: Optional[dict[str, str]] = None
+    phone: PhoneInfo | None = None
+    linkedin: SocialMedia | None = None
+    github: SocialMedia | None = None
+    portfolio: SocialMedia | None = None
+    website: str | None = None
+    location: Location | None = None
+    social_media: dict[str, str] | None = None
 
 
 # ============================================================================
@@ -120,27 +119,27 @@ class ContactInfo(BaseModel):
 class Institution(BaseModel):
     name: str
     institution_type: InstitutionType
-    location: Optional[str] = None
-    ranking: Optional[int] = None
-    accreditation: Optional[list[str]] = None
+    location: str | None = None
+    ranking: int | None = None
+    accreditation: list[str] | None = None
 
 
 class Duration(BaseModel):
-    raw: Optional[str] = None
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
-    start_year: Optional[int] = None
-    end_year: Optional[int] = None
-    total_years: Optional[float] = None
-    is_current: Optional[bool] = None
+    raw: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    start_year: int | None = None
+    end_year: int | None = None
+    total_years: float | None = None
+    is_current: bool | None = None
 
 
 class Grade(BaseModel):
-    value: Union[str, float]
+    value: str | float
     grade_type: str  # 'gpa', 'percentage', 'grade', 'class'
-    scale: Optional[str] = None
-    percentile: Optional[float] = None
-    honors: Optional[list[str]] = None
+    scale: str | None = None
+    percentile: float | None = None
+    honors: list[str] | None = None
 
 
 class Education(BaseModel):
@@ -148,16 +147,16 @@ class Education(BaseModel):
     degree_full: str
     degree_category: str
     degree_level: DegreeLevel
-    major: Optional[str] = None
-    specialization: Optional[str] = None
-    minor: Optional[str] = None
-    gpa: Optional[float] = None
+    major: str | None = None
+    specialization: str | None = None
+    minor: str | None = None
+    gpa: float | None = None
     institution: Institution
     duration: Duration
-    grade: Optional[Grade] = None
-    achievements: Optional[list[str]] = None
-    coursework: Optional[list[str]] = None
-    thesis: Optional[dict[str, str]] = None
+    grade: Grade | None = None
+    achievements: list[str] | None = None
+    coursework: list[str] | None = None
+    thesis: dict[str, str] | None = None
 
 
 # ============================================================================
@@ -166,18 +165,18 @@ class Education(BaseModel):
 
 
 class CompanyInfo(BaseModel):
-    industry: Optional[str] = None
-    size: Optional[str] = None
-    location: Optional[str] = None
-    website: Optional[str] = None
-    description: Optional[str] = None
+    industry: str | None = None
+    size: str | None = None
+    location: str | None = None
+    website: str | None = None
+    description: str | None = None
 
 
 class Position(BaseModel):
     item_id: str
     title: str
-    level: Optional[JobLevel] = None
-    department: Optional[str] = None
+    level: JobLevel | None = None
+    department: str | None = None
     location: str
     duration: str
     start_date: str
@@ -187,23 +186,23 @@ class Position(BaseModel):
     achievements: list[str]
     skills_used: list[str]
     technologies: list[str]
-    team_size: Optional[int] = None
-    reporting_to: Optional[str] = None
-    direct_reports: Optional[int] = None
-    budget_responsibility: Optional[float] = None
-    key_projects: Optional[list[str]] = None
+    team_size: int | None = None
+    reporting_to: str | None = None
+    direct_reports: int | None = None
+    budget_responsibility: float | None = None
+    key_projects: list[str] | None = None
 
 
 class WorkExperience(BaseModel):
     item_id: str
     company: str
-    company_info: Optional[CompanyInfo] = None
+    company_info: CompanyInfo | None = None
     positions: list[Position]
     total_experience_years: float
     current: bool
     start_date: str
-    end_date: Optional[str] = None
-    location: Optional[str] = None
+    end_date: str | None = None
+    location: str | None = None
     employment_type: EmploymentType
     remote: bool = False
     hybrid: bool = False
@@ -215,16 +214,16 @@ class WorkExperience(BaseModel):
 
 
 class ProjectMetrics(BaseModel):
-    users: Optional[int] = None
-    revenue: Optional[float] = None
-    performance: Optional[str] = None
-    efficiency: Optional[str] = None
+    users: int | None = None
+    revenue: float | None = None
+    performance: str | None = None
+    efficiency: str | None = None
 
 
 class ProjectDuration(BaseModel):
     start_date: str
-    end_date: Optional[str] = None
-    total_months: Optional[int] = None
+    end_date: str | None = None
+    total_months: int | None = None
 
 
 class Project(BaseModel):
@@ -237,15 +236,15 @@ class Project(BaseModel):
     challenges: list[str]
     solutions: list[str]
     results: list[str]
-    metrics: Optional[ProjectMetrics] = None
-    duration: Optional[ProjectDuration] = None
-    team_size: Optional[int] = None
+    metrics: ProjectMetrics | None = None
+    duration: ProjectDuration | None = None
+    team_size: int | None = None
     role: str
-    company: Optional[str] = None
-    url: Optional[str] = None
-    github_url: Optional[str] = None
-    demo_url: Optional[str] = None
-    images: Optional[list[str]] = None
+    company: str | None = None
+    url: str | None = None
+    github_url: str | None = None
+    demo_url: str | None = None
+    images: list[str] | None = None
     status: str  # 'completed', 'in-progress', 'on-hold', 'cancelled'
 
 
@@ -255,53 +254,51 @@ class Project(BaseModel):
 
 
 class SkillsFound(BaseModel):
-    technical_programming: Optional[list[str]] = None
-    technical_tools: Optional[list[str]] = None
-    frameworks_libraries: Optional[list[str]] = None
-    databases: Optional[list[str]] = None
-    cloud_platforms: Optional[list[str]] = None
-    devops_tools: Optional[list[str]] = None
-    business_management: Optional[list[str]] = None
-    financial_accounting: Optional[list[str]] = None
-    creative_design: Optional[list[str]] = None
-    media_content: Optional[list[str]] = None
-    medical_clinical: Optional[list[str]] = None
-    healthcare_admin: Optional[list[str]] = None
-    teaching_training: Optional[list[str]] = None
-    academic_research: Optional[list[str]] = None
-    sales_marketing: Optional[list[str]] = None
-    customer_service: Optional[list[str]] = None
-    manufacturing_operations: Optional[list[str]] = None
-    quality_control: Optional[list[str]] = None
-    hospitality_food: Optional[list[str]] = None
-    travel_tourism: Optional[list[str]] = None
-    legal_regulatory: Optional[list[str]] = None
-    hr_recruitment: Optional[list[str]] = None
-    fashion_styling: Optional[list[str]] = None
-    beauty_cosmetology: Optional[list[str]] = None
-    construction_civil: Optional[list[str]] = None
-    mechanical_electrical: Optional[list[str]] = None
-    soft_skills: Optional[list[str]] = None
-    languages_spoken: Optional[list[str]] = None
-    tools_software: Optional[list[str]] = None
-    certifications: Optional[list[str]] = None
-    methodologies: Optional[list[str]] = None
-    operating_systems: Optional[list[str]] = None
-    version_control: Optional[list[str]] = None
-    testing_tools: Optional[list[str]] = None
-    monitoring_tools: Optional[list[str]] = None
-    security_tools: Optional[list[str]] = None
+    technical_programming: list[str] | None = None
+    technical_tools: list[str] | None = None
+    frameworks_libraries: list[str] | None = None
+    databases: list[str] | None = None
+    cloud_platforms: list[str] | None = None
+    devops_tools: list[str] | None = None
+    business_management: list[str] | None = None
+    financial_accounting: list[str] | None = None
+    creative_design: list[str] | None = None
+    media_content: list[str] | None = None
+    medical_clinical: list[str] | None = None
+    healthcare_admin: list[str] | None = None
+    teaching_training: list[str] | None = None
+    academic_research: list[str] | None = None
+    sales_marketing: list[str] | None = None
+    customer_service: list[str] | None = None
+    manufacturing_operations: list[str] | None = None
+    quality_control: list[str] | None = None
+    hospitality_food: list[str] | None = None
+    travel_tourism: list[str] | None = None
+    legal_regulatory: list[str] | None = None
+    hr_recruitment: list[str] | None = None
+    fashion_styling: list[str] | None = None
+    beauty_cosmetology: list[str] | None = None
+    construction_civil: list[str] | None = None
+    mechanical_electrical: list[str] | None = None
+    soft_skills: list[str] | None = None
+    languages_spoken: list[str] | None = None
+    tools_software: list[str] | None = None
+    certifications: list[str] | None = None
+    methodologies: list[str] | None = None
+    operating_systems: list[str] | None = None
+    version_control: list[str] | None = None
+    testing_tools: list[str] | None = None
+    monitoring_tools: list[str] | None = None
+    security_tools: list[str] | None = None
 
 
 class SkillCategoryInfo(BaseModel):
     name: str
     skills: list[str]
-    proficiency: Optional[
-        str
-    ] = None  # 'beginner', 'intermediate', 'advanced', 'expert'
-    years_experience: Optional[int] = None
-    last_used: Optional[str] = None
-    relevance_score: Optional[float] = None
+    proficiency: str | None = None  # 'beginner', 'intermediate', 'advanced', 'expert'
+    years_experience: int | None = None
+    last_used: str | None = None
+    relevance_score: float | None = None
 
 
 # ============================================================================
@@ -312,9 +309,9 @@ class SkillCategoryInfo(BaseModel):
 class BulletPoints(BaseModel):
     detected: bool
     count: int
-    types_used: Optional[list[str]] = None
+    types_used: list[str] | None = None
     consistent: bool
-    recommendation: Optional[str] = None
+    recommendation: str | None = None
 
 
 class Spacing(BaseModel):
@@ -326,7 +323,7 @@ class Spacing(BaseModel):
 
 class Structure(BaseModel):
     has_clear_sections: bool
-    sections_detected: Optional[list[str]] = None
+    sections_detected: list[str] | None = None
     logical_flow: bool
     chronological_order: bool
     section_headers_consistent: bool
@@ -470,36 +467,36 @@ class ExtractionMetadata(BaseModel):
 
 
 class CategorizedResume(BaseModel):
-    contact_info: Optional[ContactInfo] = None
-    education: Optional[list[Education]] = None
-    work_experience: Optional[list[WorkExperience]] = None
-    projects: Optional[list[Project]] = None
-    skills: Optional[SkillsFound] = None
-    hobbies_interests: Optional[list[str]] = None
-    languages: Optional[list[str]] = None
-    achievements: Optional[list[str]] = None
-    summary_profile: Optional[str] = None
-    certifications: Optional[list[str]] = None
-    publications: Optional[list[str]] = None
-    volunteer_work: Optional[list[str]] = None
-    formatting_analysis: Optional[FormattingAnalysis] = None
+    contact_info: ContactInfo | None = None
+    education: list[Education] | None = None
+    work_experience: list[WorkExperience] | None = None
+    projects: list[Project] | None = None
+    skills: SkillsFound | None = None
+    hobbies_interests: list[str] | None = None
+    languages: list[str] | None = None
+    achievements: list[str] | None = None
+    summary_profile: str | None = None
+    certifications: list[str] | None = None
+    publications: list[str] | None = None
+    volunteer_work: list[str] | None = None
+    formatting_analysis: FormattingAnalysis | None = None
     metadata: ExtractionMetadata
 
 
 class ExtractionDetails(BaseModel):
-    all_resume_keywords: Optional[list[str]] = None
-    all_jd_keywords: Optional[list[str]] = None
-    all_matched_keywords: Optional[list[str]] = None
-    all_missing_keywords: Optional[list[str]] = None
-    skills_found: Optional[SkillsFound] = None
-    skills_required: Optional[SkillsFound] = None
-    resume_text_sample: Optional[str] = None
-    full_resume_text: Optional[str] = None
-    total_resume_keywords: Optional[int] = None
-    total_jd_keywords: Optional[int] = None
-    total_matched_keywords: Optional[int] = None
-    total_missing_keywords: Optional[int] = None
-    categorized_resume: Optional[CategorizedResume] = None
+    all_resume_keywords: list[str] | None = None
+    all_jd_keywords: list[str] | None = None
+    all_matched_keywords: list[str] | None = None
+    all_missing_keywords: list[str] | None = None
+    skills_found: SkillsFound | None = None
+    skills_required: SkillsFound | None = None
+    resume_text_sample: str | None = None
+    full_resume_text: str | None = None
+    total_resume_keywords: int | None = None
+    total_jd_keywords: int | None = None
+    total_matched_keywords: int | None = None
+    total_missing_keywords: int | None = None
+    categorized_resume: CategorizedResume | None = None
     extraction_confidence: float
     extraction_method: str  # 'ai', 'rule-based', 'hybrid'
     processing_time: float
@@ -521,13 +518,13 @@ class StructuredContactInfo(BaseModel):
     location: str
     linkedin: str
     github: str
-    portfolio: Optional[str] = None
-    website: Optional[str] = None
+    portfolio: str | None = None
+    website: str | None = None
 
 
 class StructuredWorkExperience(BaseModel):
     company: str
-    company_info: Optional[CompanyInfo] = None
+    company_info: CompanyInfo | None = None
     positions: list[Position]
     responsibilities: list[str]
     projects: list[Project]
@@ -537,14 +534,14 @@ class StructuredWorkExperience(BaseModel):
     total_experience_years: float
     current: bool
     start_date: str
-    end_date: Optional[str] = None
-    location: Optional[str] = None
+    end_date: str | None = None
+    location: str | None = None
     employment_type: EmploymentType
 
 
 class StructuredExperienceMetadata(BaseModel):
     total_experience_years: float
-    current_company: Optional[str] = None
+    current_company: str | None = None
     career_level: str  # 'entry', 'mid', 'senior', 'lead', 'executive'
     industry_experience: list[str]
     skill_categories: list[str]
@@ -556,7 +553,7 @@ class StructuredExperience(BaseModel):
     education: list[Education]
     projects: list[Project]
     skills: SkillsFound
-    summary: Optional[str] = None
+    summary: str | None = None
     metadata: StructuredExperienceMetadata
 
 
@@ -583,24 +580,24 @@ class AnalysisResult(BaseModel):
     suggestions: list[str]
     strengths: list[str]
     weaknesses: list[str]
-    keyword_density: Optional[dict[str, float]] = None
+    keyword_density: dict[str, float] | None = None
     word_count: int
     character_count: int
-    extraction_details: Optional[ExtractionDetails] = None
-    ats_compatibility: Optional[ATSCompatibility] = None
-    format_analysis: Optional[FormatAnalysis] = None
-    detailed_scores: Optional[DetailedScores] = None
-    semantic_similarity: Optional[float] = None
-    match_category: Optional[str] = None
-    ats_friendly: Optional[bool] = None
-    formatting_issues: Optional[list[str]] = None
-    structured_experience: Optional[StructuredExperience] = None
-    categorized_resume: Optional[CategorizedResume] = None
+    extraction_details: ExtractionDetails | None = None
+    ats_compatibility: ATSCompatibility | None = None
+    format_analysis: FormatAnalysis | None = None
+    detailed_scores: DetailedScores | None = None
+    semantic_similarity: float | None = None
+    match_category: str | None = None
+    ats_friendly: bool | None = None
+    formatting_issues: list[str] | None = None
+    structured_experience: StructuredExperience | None = None
+    categorized_resume: CategorizedResume | None = None
     metadata: AnalysisMetadata
 
 
 class ATSAnalysisResponse(BaseModel):
     success: bool
-    message: Optional[str] = None
+    message: str | None = None
     data: AnalysisResult
     timestamp: datetime = Field(default_factory=datetime.now)
