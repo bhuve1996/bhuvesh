@@ -590,7 +590,7 @@ class JobTypeDetector:
 
         # AI is required - no fallback
         raise Exception(
-            "AI job detection is required. Please configure GEMINI_API_KEY in .env file"
+            "AI job detection is required. Please configure GEMINI_API_KEY environment variable"
         )
 
     def _gemini_detection(self, resume_text: str) -> tuple[str, float]:
@@ -600,7 +600,7 @@ class JobTypeDetector:
         """
         if not is_gemini_available():
             raise Exception(
-                "AI job detection is required. Please configure GEMINI_API_KEY in .env file"
+                "AI job detection is required. Please configure GEMINI_API_KEY environment variable"
             )
 
         try:

@@ -42,7 +42,7 @@ class JobDescriptionGenerator:
         """
         if not is_gemini_available() or not self.model:
             raise Exception(
-                "AI job description generation is required. Please configure GEMINI_API_KEY in .env file"
+                "AI job description generation is required. Please configure GEMINI_API_KEY environment variable"
             )
 
         try:

@@ -31,7 +31,7 @@ class ProjectExtractor:
         """
         if not is_gemini_available() or not self.model:
             raise Exception(
-                "AI work experience extraction is required. Please configure GEMINI_API_KEY in .env file"
+                "AI work experience extraction is required. Please configure GEMINI_API_KEY environment variable"
             )
 
         try:
