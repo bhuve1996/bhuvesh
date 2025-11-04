@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """
-Startup script for Railway deployment
+Startup script for Cloud Run deployment
 Handles graceful loading of ML models and services
 """
 
 import logging
 import os
 import sys
+
+# Import deployment configuration
+from app.core.deployment_config import deployment_config, get_platform_info
 
 # Configure logging
 logging.basicConfig(
@@ -57,12 +60,17 @@ def main():
     """Main startup function"""
     logger.info("🚀 Starting ATS Resume Checker API...")
 
-    # Get port from environment (Railway sets this)
-    port = int(os.getenv("PORT", "8000"))
-    host = "0.0.0.0"
+    # Get configuration from deployment config
+    platform_info = get_platform_info()
+    port = deployment_config.port
+    host = deployment_config.host
 
     logger.info(f"📡 Server will start on {host}:{port}")
-    logger.info(f"🔧 Environment: {os.getenv('RAILWAY_ENVIRONMENT', 'development')}")
+    logger.info(
+        f"🔧 Platform: {platform_info['platform_name']} ({platform_info['platform']})"
+    )
+    logger.info(f"🔧 Environment: {platform_info['environment']}")
+    logger.info(f"🔧 CORS Origins: {platform_info['cors_origins_count']} configured")
 
     # Preload models in background (non-blocking)
     import threading
@@ -77,15 +85,8 @@ def main():
         from app.main import app
 
         logger.info("🌐 Starting Uvicorn server...")
-        uvicorn.run(
-            app,
-            host=host,
-            port=port,
-            workers=1,  # Single worker for Railway
-            log_level="info",
-            access_log=True,
-            loop="asyncio",  # Use asyncio loop for better compatibility
-        )
+        uvicorn_config = deployment_config.get_uvicorn_config()
+        uvicorn.run(app, **uvicorn_config)
 
     except Exception as e:
         logger.exception("❌ Failed to start server")

@@ -41,32 +41,11 @@ app = FastAPI(
 
 # Configure CORS (Cross-Origin Resource Sharing)
 # This allows our Next.js frontend to talk to this Python backend
-import os
+from app.core.deployment_config import deployment_config, get_cors_origins
 
-# Allow multiple origins for production and development
-origins = [
-    "http://localhost:3000",  # Local development
-    "http://localhost:3009",  # Local development (alternative port)
-    "http://127.0.0.1:3000",  # Local development (alternative)
-    "http://127.0.0.1:3009",  # Local development (alternative port)
-    "https://bhuvesh.vercel.app",  # Your Vercel deployment
-    "https://*.vercel.app",  # Any Vercel preview deployments
-    "https://www.bhuvesh.com",  # Your custom domain (HTTPS)
-    "https://bhuvesh.com",  # Your custom domain without www (HTTPS)
-    "http://www.bhuvesh.com",  # Your custom domain (HTTP)
-    "http://bhuvesh.com",  # Your custom domain without www (HTTP)
-]
-
-# Add additional custom domains from environment variable
-# Supports multiple domains separated by commas
-# Example: FRONTEND_URL=https://staging.bhuvesh.com,https://beta.bhuvesh.com
-custom_domains = os.getenv("FRONTEND_URL")
-if custom_domains:
-    # Split by comma and add each domain
-    additional_domains = [
-        domain.strip() for domain in custom_domains.split(",") if domain.strip()
-    ]
-    origins.extend(additional_domains)
+# Get CORS origins from deployment configuration
+# Automatically includes platform-specific origins (Cloud Run)
+origins = get_cors_origins()
 
 app.add_middleware(
     CORSMiddleware,
@@ -87,11 +66,11 @@ async def api_root():
     return {"message": "ATS Resume Checker API is running!"}
 
 
-# Startup endpoint for Railway
+# Startup endpoint
 @app.get("/startup")
 async def startup_check():
     """
-    Startup endpoint for Railway deployment
+    Startup endpoint for deployment
     Returns immediately to verify the app is starting
     """
     return {
@@ -119,15 +98,16 @@ async def health_check():
         "message": "API is running successfully",
         "version": "1.0.0",
         "timestamp": time.time(),
-        "environment": os.getenv("RAILWAY_ENVIRONMENT", "development"),
+        "environment": deployment_config.environment,
+        "platform": deployment_config.get_platform_name(),
     }
 
 
-# Railway-specific healthcheck endpoint (faster response)
+# Root healthcheck endpoint
 @app.get("/")
-async def railway_health():
+async def root_health():
     """
-    Railway healthcheck endpoint - responds immediately
+    Root healthcheck endpoint - responds immediately
     """
     return {"status": "ok", "message": "Service is running"}
 
